@@ -1,11 +1,15 @@
 {
   "require" : {
+    "php": "~5.6.0",
+    "oci8": "*",
+    "ext-oci8": "*",
     "silex/silex": "^2.0.4",
     "monolog/monolog": "^1.22",
     "twig/twig": "^2.0",
     "symfony/twig-bridge": "^3"
   },
   "require-dev": {
-    "heroku/heroku-buildpack-php": "*"
+    "heroku/heroku-buildpack-php": "*",
+    "https://github.com/cdinger/oracle-oci8-heroku-buildpack.git": "*"
   }
 }
