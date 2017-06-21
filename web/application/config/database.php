@@ -73,13 +73,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
+$tnsname = "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 180.250.18.176)(PORT = 1521))
+                (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = XE)))";
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => '',
-	'password' => '',
-	'database' => '',
-	'dbdriver' => 'mysqli',
+	'hostname' => $tnsname,
+	'username' => 'mpot2',
+	'password' => 'report123',
+	'database' => 'pnetdb',
+	'dbdriver' => 'oci8',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
 	'db_debug' => (ENVIRONMENT !== 'production'),
