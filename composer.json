@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
 	"description": "The CodeIgniter framework",
 	"name": "codeigniter/framework",
 	"type": "project",
@@ -20,4 +21,17 @@
 		"mikey179/vfsStream": "1.1.*",
 		"phpunit/phpunit": "4.* || 5.*"
 	}
+=======
+  "require" : {
+    "ext-oci8": "*",
+    "silex/silex": "^2.0.4",
+    "monolog/monolog": "^1.22",
+    "twig/twig": "^2.0",
+    "symfony/twig-bridge": "^3"
+  },
+  "require-dev": {
+    "heroku/heroku-buildpack-php": "*",
+    "https://github.com/cdinger/oracle-oci8-heroku-buildpack.git": "*"
+  }
+>>>>>>> 1a9d763ddadc253d8461380008d5e093bb21f6a2
 }
