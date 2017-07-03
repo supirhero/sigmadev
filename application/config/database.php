@@ -78,9 +78,9 @@ $tnsname = "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 180.250.18.176)(PO
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => $tnsname,
-	'username' => 'mpot2',
-	'password' => 'report123',
-	'database' => 'pnetdb',
+	'username' => 'PROUDS_DEV',
+	'password' => 'Prouds#123',
+	'database' => 'PROUDS_DEV',
 	'dbdriver' => 'oci8',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
