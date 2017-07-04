@@ -26,6 +26,7 @@ class Login extends CI_Controller {
             print_r(json_encode($data));
             //$this->load->view('footer_view',$data);
         }
+
     }
 
     //if login success go to home

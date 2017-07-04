@@ -7,7 +7,7 @@ Untuk tahap sekarang api yang tersedia :
     
 
 
-##Login 
+## Login 
 Menggunakan HTTP method POST,URI ajax :
 
 ```
@@ -29,11 +29,11 @@ Destroy session user data, URI logout :
 http://45.77.45.126/dev/login/logout
 ```
 
-##Register
+## Register
 Register terbagi 2, User dan Vendor. Untuk membedakan antara user dan vendor, di beri 1 variable POST patokan yaitu $_POST['Submit'] dimana :
   * $_POST['submit'] = 'registVendor' <- untuk vendor
   * $_POST['submit'] = 'registSigma'  <- untuk user sigma
-###Vendor
+### Vendor
 Menggunakan HTTP method POST,URI ajax :
 
 ```
@@ -49,7 +49,7 @@ Header HTTP method POST :
 -> V_USER_NAME
 -> V_PASSWORD
 ```
-###User
+### User
 Menggunakan HTTP method POST,URI ajax :
 
 ```

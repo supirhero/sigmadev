@@ -8,7 +8,6 @@ class Test extends CI_Controller {
         $this->load->model('mdlTesting');
     }
     public function index(){
-        print_r($this->mdlTesting->tes());
-        //echo $_SERVER['REQUEST_METHOD'];
+        $this->load-view('dummylogin');
     }
 }
