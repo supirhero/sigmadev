@@ -6,6 +6,6 @@ class MdlTesting extends CI_Model{
         $this->load->database();
     }
     function tes(){
-        return $this->db->query('describe USERS');
+        return $this->db->query('select * from USERS where rownum = 1')->result();
     }
 }
