@@ -22,7 +22,7 @@ class Login extends CI_Controller {
             $this->welcome();
         }else{
             $data['title']= 'error';
-            $data['redirect']='home';
+            $data['message']='username atau password tidak cocok';
             print_r(json_encode($data));
             //$this->load->view('footer_view',$data);
         }
@@ -49,30 +49,38 @@ class Login extends CI_Controller {
     //for login activity
     function login()
     {
-        $user_id = $this->input->post('user_id');
-        $password = $this->input->post('password');
+        if($_POST['user_id'] != "" && $_POST['password'] != "" && $_POST['fpid'] != ""){
 
-        //$sso variable for authetication login value
-        $sso =$this->sso($user_id,$password);
-        if($sso['STATUS']=='1'){
-            if(isset($sso['EMP_ID'])){
-                $result=$this->M_login->loginsso($sso['EMP_ID']);}
-            else {
-                $result=$this->M_login->loginsso($sso['NIK']);
-            }
-            redirect('/login/welcome');
-        }else {
-            $password = md5($password);
-            $cek=$this->M_login->validateLogin($user_id,$password);
-            if($cek=='0'){
-                $result=$this->M_login->login($user_id,$password);
-                if($result)
+            $user_id = $this->input->post('user_id');
+            $password = $this->input->post('password');
 
-                    redirect('/login/welcome');
+            //$sso variable for authetication login value
+            $sso =$this->sso($user_id,$password);
+            if($sso['STATUS']=='1'){
+                if(isset($sso['EMP_ID'])){
+                    $result=$this->M_login->loginsso($sso['EMP_ID']);}
+                else {
+                    $result=$this->M_login->loginsso($sso['NIK']);
+                }
+                redirect('/login/welcome');
+            }else {
+                $password = md5($password);
+                $cek=$this->M_login->validateLogin($user_id,$password);
+                if($cek=='0'){
+                    $result=$this->M_login->login($user_id,$password);
+                    if($result)
+
+                        redirect('/login/welcome');
+                }
             }
+            //print_r($result);
+            redirect('/login/index/'.$cek);
         }
-        //print_r($result);
-        redirect('/login/index/'.$cek);
+        else{
+            $data['title']= 'error';
+            $data['message']="Input User dan password tidak bolek kosong";
+            print_r(json_encode($data));
+        }
 
     }
     //authetivication login

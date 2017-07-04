@@ -5,9 +5,15 @@ Untuk tahap sekarang api yang tersedia :
     * Logout
     * Register User/Vendor
     
+    
+    
+
+    
 
 
-## Login 
+## LOGIN CONTROLLER
+
+### Login 
 Menggunakan HTTP method POST,URI ajax :
 
 ```
@@ -23,6 +29,22 @@ password <= password,user
 fpid     <= 160927084946 <= nilai ini dari source code asli
 ```
 
+
+Jika user berhasil Login, maka API akan me-return data user, data timesheet(untuk bulan ini) dan data agenda user dalam bentuk json string. 
+
+Data yang ada di dalam json string :
+```
+-> userdata <= informasi mengenai user
+-> datatimesheet <= persentase hasil dari timesheet untuk bulan ini
+-> task_user <= daftar agenda user
+```
+
+Jika user tidak berhasil Login, akan ada error message yang akan di return dalam bentuk json string 
+```
+-> error <- keterangan error dari user, err1 untuk salah user , err2 untuk salah password
+-> title = 'error'
+-> message = 'username atau password tidak cocok'
+```
 ## Logout
 Destroy session user data, URI logout :
 ```
@@ -65,3 +87,4 @@ Header HTTP method POST :
 -> USERNAME
 -> PASSWORD
 ```
+
