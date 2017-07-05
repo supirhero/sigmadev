@@ -6,18 +6,32 @@ class Home extends CI_Controller {
 
     public $datajson = array();
 
+
     public function __construct()
     {
+        session_start();
         parent::__construct();
-        $this->load->model('M_home');
 
-        $this->datajson['userdata'] = $_SESSION;
+        $this->load->model('M_home');
+        $this->load->model('M_project');
+        $this->load->model('M_business');
+        $this->load->model('M_detail_project');
+        $this->load->model('M_timesheet');
+        $this->load->model('M_invite');
+        $this->load->model('M_issue');
+        $this->load->model('M_Member_Activity');
+
+        $this->datajson = $_SESSION;
 
     }
 
     public function index(){
+        $bagian_unit = $_SESSION['userdata']['BU_ID'];
+
+        $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
+        $this->datajson['bussines_unit'] = $query->BU_NAME;
         $this->datatimesheet();
-        $this->assignment();
+        $this->project();
         print_r(json_encode($this->datajson));
     }
 
@@ -28,7 +42,7 @@ class Home extends CI_Controller {
             $tanggalnow = getdate();
             $_POST['bulan'] = $tanggalnow['mon'];
             $_POST['tahun'] = $tanggalnow['year'];
-            $user_id=	$this->session->userdata('USER_ID');
+            $user_id=$_SESSION['userdata']['USER_ID'];
             if (strlen($this->input->post('bulan'))=='2'){
                 $bulan = $this->input->post('bulan');
             }else {
@@ -171,15 +185,6 @@ class Home extends CI_Controller {
         }
         return $days;
     }
-    private function countDurationAll($start_date, $end_date) {
-        $start = new DateTime($start_date);
-        $end = new DateTime($end_date);
-        $end->modify('+1 day');
-        $interval = $end->diff($start);
-        $days = $interval->days;
-        $period = new DatePeriod($start, new DateInterval('P1D'), $end);
-        return $days;
-    }
 
     private function last_day($month = '', $year = '')
     {
@@ -229,8 +234,122 @@ class Home extends CI_Controller {
     }
 
     /*FOR ASSIGNMENT*/
-    private function assignment(){
+    /*private function assignment(){
         $user_id = $this->session->userdata('USER_ID');
+
+
+
         $this->datajson['task_user']=($this->M_home->assignmentView($user_id));
+    }*/
+    /*FOR PROJECT LIST*/
+    private function project(){
+        $prof = $_SESSION['userdata']['PROF_ID'];
+        $id = $_SESSION['userdata']['USER_ID'];
+        $this->datajson['projects'] = $this->M_project->getUsersProject($id);
+        //$id_bu = $this->session->userdata('BU_ID');
+        //$this->datajson['tampil_Timesheet']=($this->M_timesheet->selectTimesheet2($id_bu));
     }
+
+    /*FOR DETAIL PROJECT*/
+    public function detailproject(){
+        //print_r($_SESSION);
+        $data['error'] = ' ';
+        $data['message'] = ' ';
+        $id=$this->uri->segment(3);
+        /*$data['allbu']=$this->M_detail_project->getAllBU();
+        $data['files'] = $this->M_detail_project->getAllFile($this->uri->segment(3));
+//$data['progress']=$this->M_detail_project->projectProgress($this->uri->segment(3));
+
+
+        $data['history']=$this->M_detail_project->getHistory($id);
+        $data['parent_id']= $this->M_detail_project->getParentID($id);
+        if(empty($id)){
+            redirect('Home');
+        }
+//echo($id);
+
+        $data['project']=$this->M_detail_project->getProjectAvailablity($id);
+        if(empty($data['project'])){
+            redirect('Home');
+        }
+        $data['project_name']=$this->M_detail_project->getProjectName($id);
+
+        $data['AllProject']=$this->M_detail_project->getAllDataProject($id);
+        $data['AllProject2']=$this->M_detail_project->getAllDataProject2($id);
+        */
+        $data['dataProject']=$this->M_detail_project->getDataProject($id);
+        //$data['dataproject2']=$this->M_detail_project->getDataProject2($id);
+        /*$data['parent_id']= $this->M_detail_project->getParentID($id);
+        $data['tampil_issue']=($this->M_issue->selectIssue($id));
+        $data['tampil_Activity']=($this->M_Member_Activity->selectTimesheet($id));
+//echo($data['AllProject']);
+//$iwo=$this->M_detail_project->getProjectIWO($id);
+        */
+        $data['project_detail']=$this->M_detail_project->getProjectDetail($id);
+        /*$data['tampil_DETAIL']=$this->M_detail_project->selectWBS($this->uri->segment(3));
+        $data['business_unit_name']=$this->M_invite->getAllBUName();
+        //$self_bu=$this->session->userdata('BU_ID');
+        $data['tampil_project_id']=$this->uri->segment(3);
+        $bu = $this->uri->segment(3);
+        $GetBUCodeProject = $this->M_detail_project->GetBUCodeProject($bu);
+        $data['bu_code'] = $this->M_detail_project->getBUCode($GetBUCodeProject);
+// Gantt
+        $list=$this->M_project->getWBS($id);
+        $wbs=NULL;
+
+        */
+        $data['pv']=$this->M_detail_project->getPV($id);
+        $data['ev']=$this->M_detail_project->getEV($id);
+        if(is_null($this->M_detail_project->getAC($id))){
+            $data['ac']=0;
+        }else{
+            $data['ac']=$this->M_detail_project->getAC($id);
+        }
+        if($data['ac']!=0){
+            $data['cpi']=round($data['ev']/$data['ac'],2);
+        }else{
+            $data['cpi']="Unable to count CPI";
+        }
+        if($data['pv']!=0){
+            $data['spi']=round($data['ev']/$data['pv'],2);
+        }else{
+            $data['spi']="Unable to count SPI";
+        }
+//$data['spi']=round($data['ev']/$data['ac'],2);
+/// end here
+        /*
+        foreach($list as $l){
+            $wbs[]=array('text'=>$l['TEXT'],'id'=>$l['ID'],'parent'=>$l['PARENT'],'start_date'=>date("Y-m-d",strtotime($l['START_DATE'])),'duration'=>$l['DURATION'],'progress'=>$l['PROGRESS']);
+        }
+        */
+        //$data['WBS']=$wbs;
+        //Project Detail
+        $this->datajson['project_detail'] = $data;
+        $this->datajson['overview']['IWO'] = $this->datajson["project_detail"]["project_detail"]["IWO_NO"];
+        $this->datajson['overview']['BU_OWNER']=$this->datajson["project_detail"]["project_detail"]["BU_NAME"];
+        $this->datajson['overview']['DESCRIPTION']=$this->datajson["project_detail"]["project_detail"]["PROJECT_DESC"];
+
+        //Project Workplan Status
+        $this->datajson['project_workplan_status']['project_status'] = $this->datajson["project_detail"]["project_detail"]["PROJECT_STATUS"];
+        $this->datajson['project_workplan_status']['task'] = $this->db->query("select * from cari_task where project_id = ".$this->uri->segment(3))->result();
+
+        //Project Performance Index
+        $this->datajson['project_performance_index']['pv'] = $this->datajson['project_detail']['pv'];
+        $this->datajson['project_performance_index']['ev'] = $this->datajson['project_detail']['ev'];
+        $this->datajson['project_performance_index']['ac'] = $this->datajson['project_detail']['ac'];
+        $this->datajson['project_performance_index']['cpi'] = $this->datajson['project_detail']['cpi'];
+        $this->datajson['project_performance_index']['spi'] = $this->datajson['project_detail']['spi'];
+
+        //Project Team
+        $this->datajson['project_team'] = $this->datajson['project_detail']["dataProject"];
+        unset($this->datajson["project_detail"]);
+
+        print_r(json_encode($this->datajson));
+///
+
+    }
+
+
 }
+
+

@@ -27,7 +27,8 @@ Class M_login extends CI_Model
                     'logged_in'  => TRUE,
                 );
             }
-            $this->session->set_userdata($newdata);
+
+            $_SESSION['userdata']=$newdata;
             return true;
         }
         //return $query->result();
@@ -65,7 +66,7 @@ Class M_login extends CI_Model
                     'logged_in'  => TRUE,
                 );
             }
-            $this->session->set_userdata($newdata);
+            $_SESSION['userdata']=$newdata;
             return true;
         }
         return false;

@@ -37,6 +37,7 @@ Data yang ada di dalam json string :
 -> userdata <= informasi mengenai user
 -> datatimesheet <= persentase hasil dari timesheet untuk bulan ini
 -> task_user <= daftar agenda user
+-> bussines_unit <= Nama bisnis unit dari user tersebut
 ```
 
 Jika user tidak berhasil Login, akan ada error message yang akan di return dalam bentuk json string 
@@ -81,9 +82,8 @@ http://45.77.45.126/dev/login/doRegistration
 Header HTTP method POST :
 ```
 -> submit = 'registSigma' <- dikarnakan registrasi vendor
--> USER_ID
+-> USER_ID => NIK
 -> EMAIL
--> VENDOR
 -> USERNAME
 -> PASSWORD
 ```

@@ -4,6 +4,7 @@ class Login extends CI_Controller {
 
     function __construct()
     {
+        session_start();
         parent::__construct();
         $this->load->model('M_login');
         $this->load->model('M_user');
@@ -12,19 +13,19 @@ class Login extends CI_Controller {
 
     function index($error=null)
     {
+        print_r($_SESSION);
         $error=$this->uri->segment(3,0);
         if(isset($error)||$error!=""){
             $data['error']=$error;
         }
-        $this->load->helper(array('form'));
-        if($this->session->userdata('logged_in'))
+
+        if($_SESSION['userdata']['logged_in'])
         {
-            $this->welcome();
+            //$this->welcome();
         }else{
             $data['title']= 'error';
             $data['message']='username atau password tidak cocok';
             print_r(json_encode($data));
-            //$this->load->view('footer_view',$data);
         }
 
     }
@@ -37,7 +38,7 @@ class Login extends CI_Controller {
         //$data['user_id']=($this->M_login->tampil());
         //$this->load->view('v_home.php', $data);
         //$this->load->view('footer_view',$data);
-        $id=$this->session->userdata('USER_ID');
+        $id=$_SESSION['userdata']['USER_ID'];
         $this->M_user->lastLogin($id);
 
         //print_r($this->session);
@@ -68,9 +69,10 @@ class Login extends CI_Controller {
                 $cek=$this->M_login->validateLogin($user_id,$password);
                 if($cek=='0'){
                     $result=$this->M_login->login($user_id,$password);
-                    if($result)
-
+                    if($result){
                         redirect('/login/welcome');
+                    }
+
                 }
             }
             //print_r($result);
@@ -226,8 +228,7 @@ class Login extends CI_Controller {
             'PASSWORD' => '',
             'logged_in' => FALSE,
         );
-        $this->session->unset_userdata($newdata);
-        $this->session->sess_destroy();
+        session_destroy();
         $data['title']= 'success';
         $data['message']='Berhasil Logout';
         print_r(json_encode($data));
