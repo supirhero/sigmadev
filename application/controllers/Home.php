@@ -20,7 +20,7 @@ class Home extends CI_Controller {
         $this->load->model('M_invite');
         $this->load->model('M_issue');
         $this->load->model('M_Member_Activity');
-
+        //unset($_SESSION['userdata']['PASSWORD']);
         $this->datajson = $_SESSION;
 
     }
@@ -381,7 +381,7 @@ class Home extends CI_Controller {
 
     public function addissue(){
 
-        $config['upload_path']		= './main_upload/';
+        $config['upload_path']		= 'assets/p_issue/';
         $config['allowed_types']	= 'zip|doc|docs|docx|xls|pdf|xlsx';
         $config['max_size']			= 10000000;
         $config['max_width']		= 1024;
@@ -430,7 +430,7 @@ class Home extends CI_Controller {
             $id_det= $this->M_issue->getMaxDetIssue();
             $this->M_issue->insertDetIssue3($data,$id_det);
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
-            print_r($this->db->query("select * from manage_issue where issue_id = $id")->row());
+
 
 
 
@@ -479,8 +479,10 @@ class Home extends CI_Controller {
             $id_det= $this->M_issue->getMaxDetIssue();
             $this->M_issue->insertDetIssue2($data,$id_det);
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
-            print_r($this->db->query("select * from manage_issue where issue_id = $id")->row());
         }
+        $returnmessage['title'] = "success";
+        $returnmessage['message'] = "berhasil tambah issue";
+        print_r(json_encode($returnmessage));
     }
 
     /*Upload Document*/

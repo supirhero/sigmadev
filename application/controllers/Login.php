@@ -43,6 +43,7 @@ class Login extends CI_Controller {
 
         //print_r($this->session);
         //go to home route
+
         redirect('/Home');
     }
 

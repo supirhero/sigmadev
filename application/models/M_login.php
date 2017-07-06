@@ -29,6 +29,7 @@ Class M_login extends CI_Model
             }
 
             $_SESSION['userdata']=$newdata;
+            unset($_SESSION['userdata']['PASSWORD']);
             return true;
         }
         //return $query->result();
