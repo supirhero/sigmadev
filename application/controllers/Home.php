@@ -341,11 +341,558 @@ class Home extends CI_Controller {
         $this->datajson['project_performance_index']['spi'] = $this->datajson['project_detail']['spi'];
 
         //Project Team
-        $this->datajson['project_team'] = $this->datajson['project_detail']["dataProject"];
+        $this->datajson['project_team'] = $this->db->query("select * from V_PROJECT_TEAM_MEMBER where project_id = ".$this->uri->segment(3))->result();
         unset($this->datajson["project_detail"]);
 
         print_r(json_encode($this->datajson));
 ///
+
+    }
+
+    /*FOR PROJECT TEAM MEMBER*/
+    public function p_teammember(){
+        $projectid = $this->uri->segment(3);
+
+        $this->datajson['project_member'] = $this->M_home->p_teammember($projectid);
+
+        print_r(json_encode($this->datajson));
+
+
+    }
+
+    /*For Project Doc*/
+    public function projectdoc(){
+        $projectid = $this->uri->segment(3);
+
+        $this->datajson['project_doc_list'] = $this->db->query("select * from project_doc where project_id = $projectid")->result();
+
+        print_r(json_encode($this->datajson));
+    }
+
+    /*Issue Manajement*/
+    public function projectissue(){
+
+        $projectid = $this->uri->segment(3);
+
+        $this->datajson['project_issue_list'] = $this->M_home->projectissuelist($projectid);
+
+        print_r(json_encode($this->datajson));
+    }
+
+    public function addissue(){
+
+        $config['upload_path']		= './main_upload/';
+        $config['allowed_types']	= 'zip|doc|docs|docx|xls|pdf|xlsx';
+        $config['max_size']			= 10000000;
+        $config['max_width']		= 1024;
+        $config['max_height']		= 768;
+        //$config['file_name']		= $nm;
+        $this->load->library('upload', $config);
+        if (! $this->upload->do_upload('file_upload')){
+            $data['upload_data']= $this->upload->data();
+            $id = $this->M_issue->getMaxIssue();
+            $data['ISSUE_ID'] 			= $id;
+            $data['USER_ID'] 			= $_SESSION['userdata']['USER_ID'];
+            $data['PRIORITY'] 		    = $this->input->post("PRIORITY");
+            $data['STATUS'] 			= "On Progress";
+            $data['SUBJECT'] 			= $this->input->post("SUBJECT");
+            $data['NOTE']			 	= $this->input->post("MESSAGE");
+            $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
+            //$data['EVIDENCE'] 			= $this->upload->data('file_name');
+
+            if($data['PRIORITY']=='High'){
+                $id = $this->M_issue->getMaxIssue();
+                $data['ISSUE_ID'] 			= $id;
+                $data['USER_ID'] 			= $_SESSION['userdata']['USER_ID'];
+                $USER_ID		 			= $_SESSION['userdata']['USER_ID'];
+                $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
+                $data['PRIORITY'] 			= $this->input->post("PRIORITY");
+                $data['STATUS'] 			= "On Progress";
+                $data['SUBJECT'] 			= $this->input->post("SUBJECT");
+                $data['NOTE']			 	= $this->input->post("MESSAGE");
+
+                $userNamePM					= $this->M_issue->getNamePM($USER_ID);
+                $project_name				= $this->M_issue->getProjectName($data);
+                $bu							= $this->M_issue->getBUVP($USER_ID);
+                $USER_VP					= $this->M_issue->getUserIDVP($bu);
+                $userNameVP					= $this->M_issue->getUserNameVP($USER_VP);
+                $email_vp					= $this->M_issue->getEmailVP($USER_VP);
+
+                $this->M_issue->insertIssueHigh($data);
+                $id_det= $this->M_issue->getMaxDetIssue();
+                $this->M_issue->insertDetIssue3High($data,$id_det);
+                //$this->sendVerification($USER_ID,$userNamePM,$bu,$USER_VP,$userNameVP,$email_vp,$data,$project_name);
+                //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
+            }
+
+
+            $this->M_issue->insertIssue($data);
+            $id_det= $this->M_issue->getMaxDetIssue();
+            $this->M_issue->insertDetIssue3($data,$id_det);
+            //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
+            print_r($this->db->query("select * from manage_issue where issue_id = $id")->row());
+
+
+
+        }else{
+            $data['upload_data']= $this->upload->data();
+            $id = $this->M_issue->getMaxIssue();
+            $data['ISSUE_ID'] 			= $id;
+            $data['USER_ID'] 			= $_SESSION['userdata']['USER_ID'];
+            $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
+            $data['PRIORITY'] 			= $this->input->post("PRIORITY");
+            $data['STATUS'] 			= "On Progress";
+            $data['SUBJECT'] 			= $this->input->post("SUBJECT");
+            $data['NOTE']			 	= $this->input->post("MESSAGE");
+            $data['EVIDENCE'] 			= $this->upload->data('file_name');
+
+            if($data['PRIORITY']=='High'){
+                $USER_ID		 			= $_SESSION['userdata']['USER_ID'];
+                $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
+                $data['PRIORITY'] 			= $this->input->post("PRIORITY");
+                $data['STATUS'] 			= "On Progress";
+                $data['SUBJECT'] 			= $this->input->post("SUBJECT");
+                $data['NOTE']			 	= $this->input->post("MESSAGE");
+
+                $userNamePM					= $this->M_issue->getNamePM($USER_ID);
+                $project_name				= $this->M_issue->getProjectName($data);
+                $bu							= $this->M_issue->getBUVP($USER_ID);
+                $USER_VP					= $this->M_issue->getUserIDVP($bu);
+                $userNameVP					= $this->M_issue->getUserNameVP($USER_VP);
+                $email_vp					= $this->M_issue->getEmailVP($USER_VP);
+
+
+                $this->M_issue->insertIssue2($data);
+                $id_det= $this->M_issue->getMaxDetIssue();
+                $this->M_issue->insertDetIssue2($data,$id_det);
+                //$this->sendVerification($USER_ID,$userNamePM,$bu,$USER_VP,$userNameVP,$email_vp,$data,$project_name);
+                //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
+                //echo $USER_ID;
+                //echo $userNamePM;
+                //	echo $bu;
+                //	echo $USER_VP
+                //	echo $userNameVP;
+                //	echo $email_vp;
+                //	echo $data;
+            }
+            $this->M_issue->insertIssue2($data);
+            $id_det= $this->M_issue->getMaxDetIssue();
+            $this->M_issue->insertDetIssue2($data,$id_det);
+            //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
+            print_r($this->db->query("select * from manage_issue where issue_id = $id")->row());
+        }
+    }
+
+    /*Upload Document*/
+    public function documentupload(){
+
+        $projectid = $this->uri->segment(3);
+
+        $config['upload_path']          = 'assets/p_docs';
+        $config['allowed_types']        = 'zip|doc|docs|docx|xls|pdf|xlsx|jpg|jpeg|png';
+        $config['max_size']             = 5020;
+        $config['remove_spaces']        = true;
+        $config['overwrite']            = false;
+
+        $this->load->library('upload', $config);
+
+        if ( ! $this->upload->do_upload('document'))
+        {
+            $error['title']=['error'];
+            $error['message'] = ['gagal upload dokumen'];
+            print_r(json_encode($error));
+        }
+        else{
+            $data = array('upload_data' => $this->upload->data());
+            $newid = $this->db->query("select max(DOC_ID) as id from project_doc")->row();
+            $insert = array(
+                'DOC_ID' => intval($newid->ID),
+                'PROJECT_ID' => $projectid,
+                'DOC_NAME' => $data['upload_data']['file_name'],
+                'URL' => $data['upload_data']['file_name'],
+                'DATE_UPLOAD' => date("d-M-Y"),
+                'UPLOAD_BY' => $_SESSION['userdata']['USER_ID'],
+                'DOC_DESC' => $this->input->post('desc')
+            );
+
+            $this->db->insert('PROJECT_DOC', $insert);
+
+            $message['title']=['success'];
+            $message['message'] = ['Berhasil upload dokumen'];
+            print_r(json_encode($message));
+        }
+    }
+
+    function sendVerification($USER_ID,$userNamePM,$bu,$USER_VP,$userNameVP,$email_vp,$data,$project_name){
+        $this->load->library('email');
+        $config['protocol']='smtp';
+        $config['smtp_host']='smtp.sigma.co.id';
+        $config['smtp_user']=SMTP_AUTH_USR;
+        $config['smtp_pass']=SMTP_AUTH_PWD;
+        $config['smtp_port']='587';
+        $config['smtp_timeout']='100';
+        $config['charset']    = 'utf-8';
+        $config['newline']    = "\r\n";
+        $config['mailtype'] = 'html';
+        $config['validation'] = TRUE;
+        $this->email->initialize($config);
+        $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
+        //  $this->email->to($email_vp);
+        $this->email->cc('pmo@sigma.co.id');
+        //$this->email->bcc('pmo@sigma.co.id');
+        $logo=base_url()."asset/image/logo_new_sigma1.png";
+        $css=base_url()."asset/css/confirm.css";
+        $this->email->attach($logo);
+        $this->email->attach($css);
+        $cid_logo = $this->email->attachment_cid($logo);
+        $this->email->subject(' High Issue Project Verification');
+        $this->email->message("<!DOCTYPE html>
+    <html>
+    <head>
+    <meta name='viewport' content='width=device-width' />
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+    <title>Account Activation</title>
+
+    <style>
+    /* -------------------------------------
+    GLOBAL
+    ------------------------------------- */
+    * {
+      margin:0;
+      padding:0;
+    }
+    * { font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; }
+
+    img {
+      max-width: 100%;
+    }
+    .collapse {
+      margin:0;
+      padding:0;
+    }
+    body {
+      -webkit-font-smoothing:antialiased;
+      -webkit-text-size-adjust:none;
+      width: 100%!important;
+      height: 100%;
+    }
+
+
+    /* -------------------------------------
+    ELEMENTS
+    ------------------------------------- */
+    a { color: #2BA6CB;}
+
+    .btn {
+      text-decoration:none;
+      color:#FFF;
+      background-color: #1da1db;
+      width:80%;
+      padding:15px 10%;
+      font-weight:bold;
+      text-align:center;
+      cursor:pointer;
+      display:inline-block;
+      border-radius: 5px;
+      box-shadow: 3px 3px 3px 1px #EBEBEB;
+    }
+
+    p.callout {
+      padding:15px;
+      text-align:center;
+      background-color:#ECF8FF;
+      margin-bottom: 15px;
+    }
+    .callout a {
+      font-weight:bold;
+      color: #2BA6CB;
+    }
+
+    .column table { width:100%;}
+    .column {
+      width: 300px;
+      float:left;
+    }
+    .column tr td { padding: 15px; }
+    .column-wrap {
+      padding:0!important;
+      margin:0 auto;
+      max-width:600px!important;
+    }
+    .columns .column {
+      width: 280px;
+      min-width: 279px;
+      float:left;
+    }
+    table.columns, table.column, .columns .column tr, .columns .column td {
+      padding:0;
+      margin:0;
+      border:0;
+      border-collapse:collapse;
+    }
+
+    /* -------------------------------------
+    HEADER
+    ------------------------------------- */
+    table.head-wrap { width: 100%;}
+
+    .header.container table td.logo { padding: 15px; }
+    .header.container table td.label { padding: 15px; padding-left:0px;}
+
+
+    /* -------------------------------------
+    BODY
+    ------------------------------------- */
+    table.body-wrap { width: 100%;}
+
+
+    /* -------------------------------------
+    FOOTER
+    ------------------------------------- */
+    table.footer-wrap { width: 100%;	clear:both!important;
+    }
+    .footer-wrap .container td.content  p { border-top: 1px solid rgb(215,215,215); padding-top:15px;}
+    .footer-wrap .container td.content p {
+      font-size:10px;
+      font-weight: bold;
+
+    }
+
+
+    /* -------------------------------------
+    TYPOGRAPHY
+    ------------------------------------- */
+    h1,h2,h3,h4,h5,h6 {
+      font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 1.1; margin-bottom:15px; color:#000;
+    }
+    h1 small, h2 small, h3 small, h4 small, h5 small, h6 small { font-size: 60%; color: #6f6f6f; line-height: 0; text-transform: none; }
+
+    h1 { font-weight:200; font-size: 44px;}
+    h2 { font-weight:200; font-size: 37px;}
+    h3 { font-weight:500; font-size: 27px;}
+    h4 { font-weight:500; font-size: 23px;}
+    h5 { font-weight:900; font-size: 17px;}
+    h6 { font-weight:900; font-size: 14px; text-transform: uppercase; color:#444;}
+
+    .collapse { margin:0!important;}
+
+    p, ul {
+      margin-bottom: 10px;
+      font-weight: normal;
+      font-size:14px;
+      line-height:1.6;
+    }
+    p.lead { font-size:17px; }
+    p.last { margin-bottom:0px;}
+
+    ul li {
+      margin-left:5px;
+      list-style-position: inside;
+    }
+
+    hr {
+      border: 0;
+      height: 0;
+      border-top: 1px dotted rgba(0, 0, 0, 0.1);
+      border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+    }
+
+
+    /* -------------------------------------
+    Shopify
+    ------------------------------------- */
+
+    .products {
+      width:100%;
+      height:40px;padding
+      margin:10px 0 10px 0;
+    }
+    .products img {
+      float:left;
+      height:40px;
+      width:auto;
+      margin-right:20px;
+    }
+    .products span {
+      font-size:17px;
+    }
+
+
+    /* ---------------------------------------------------
+    RESPONSIVENESS
+    Nuke it from orbit. It's the only way to be sure.
+    ------------------------------------------------------ */
+
+    /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
+    .container {
+      display:block!important;
+      max-width:600px!important;
+      margin:0 auto!important; /* makes it centered */
+      clear:both!important;
+    }
+
+    /* This should also be a block element, so that it will fill 100% of the .container */
+    .content {
+      padding: 15px 15px 0 15px;
+      max-width:600px;
+      margin:0 auto;
+      display:block;
+    }
+
+    /* Let's make sure tables in the content area are 100% wide */
+    .content table { width: 100%; }
+
+    /* Be sure to place a .clear element after each set of columns, just to be safe */
+    .clear { display: block; clear: both; }
+
+
+    /* -------------------------------------------
+    PHONE
+    For clients that support media queries.
+    Nothing fancy.
+    -------------------------------------------- */
+    @media only screen and (max-width: 600px) {
+
+      a[class='btn'] { display:block!important; margin-bottom:10px!important; background-image:none!important; margin-right:0!important;}
+
+      div[class='column'] { width: auto!important; float:none!important;}
+
+      table.social div[class='column'] {
+        width:auto!important;
+      }
+
+    }
+
+    </style>
+    </head>
+
+    <body bgcolor='#FFFFFF'>\
+    <table class='head-wrap' bgcolor='#FFFFFF'>
+    <tr>
+    <td></td>
+    <td class='header container'>
+
+    <div class='content'>
+    <table bgcolor='#FFFFFF'>
+    <tr>
+    <td>
+
+    </td>
+
+    </tr>
+    </table>
+    </div>
+
+    </td>
+    <td></td>
+    </tr>
+    </table>
+    <table class='body-wrap'>
+    <tr>
+    <td></td>
+    <td class='container' bgcolor='#FFFFFF'>
+
+    <div class='content'>
+    <table>
+    <tr>
+    <td align='center'>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <br/>
+    <img src='cid:".$cid_logo."' height='173' width='581' alt='logo Telkomsigma' />
+    <h2>Hi ".$userNameVP.",</h3>
+    <br/>
+    <h4> High priority project issue occured : </h4>
+    <table>
+    <tr>
+    <td>
+    Project Name
+    </td>
+    <td>
+    ".$project_name."
+    </td>
+    </tr>
+    <tr>
+    <td>
+    Project Manager
+    </td>
+    <td>
+    ".$userNamePM."
+    </td>
+    </tr>
+    <tr>
+    <td>
+    Subject
+    </td>
+    <td>
+    ".$data['SUBJECT']."
+    </td>
+    </tr>
+    <tr>
+    <td>
+    Note
+    </td>
+    <td>
+    ".$data['NOTE']."
+    </td>
+    </tr>
+    <tr>
+    <td>
+    Status
+    </td>
+    <td>
+    ".$data['STATUS']."
+    </td>
+    </tr>
+    </table>
+    <br>
+
+    <p style='text-align: left'>Trouble activating? Contact us at <a href='mailto:prouds.support@sigma.co.id?Subject=Need%20help' target='_top'>prouds.support@sigma.co.id</a></p>
+    </td>
+    </tr>
+
+    </table>
+    </div>
+
+    </td>
+
+    </tr>
+    </table>
+    <!-- /BODY -->
+
+    <!-- FOOTER -->
+    <table class='footer-wrap' bgcolor='#FFFFFF'>
+    <tr>
+    <td></td>
+    <td class='container'>
+
+    <!-- content -->
+    <div class='content' style='margin-top: -15px'>
+    <table>
+    <tr>
+    <br/>
+
+    </br/>
+    </tr>
+    </table>
+    </div>
+    <!-- /content -->
+
+    </td>
+    <td></td>
+    </tr>
+    </table>
+
+    </body>
+
+    </html>");
+
+        if($this->email->send()){
+            echo "<script>alert('Sent')</script>".$this->email->print_debugger();
+            redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
+        }
 
     }
 

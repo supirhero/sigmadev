@@ -123,4 +123,35 @@ Class M_home extends CI_Model{
         return $this->db->query("select rp.*, pr.project_name
             from resource_pool rp left join projects pr on rp.project_id=pr.project_id where user_id='$user'")->result();
     }
+
+    function p_teammember($idproject){
+        $returndata = $this->db->query("select * from v_project_team_member where project_id = ".$idproject)->result();
+        for($i = 0; $i < count($returndata); $i++){
+            $posisi = $this->db->query("select position from resource_pool 
+                                        where project_id = $idproject and user_id = '".$returndata[$i]->USER_ID."'")->row();
+            $returndata[$i]->position = $posisi->POSITION;
+        }
+        return $returndata;
+    }
+
+    function projectissuelist($id){
+        $query= $this->db->query("select a.ISSUE_ID,
+        a.user_id,
+        c.user_name,
+        a.PROJECT_ID,
+        b.project_name,
+        a.note,
+        a.DATE_ISSUE,
+        a.EVIDENCE,
+        a.STATUS,
+        a.PRIORITY,
+        a.DURATION,
+        a.SUBJECT
+        from MANAGE_ISSUE a JOIN projects b
+        on a.PROJECT_ID=b.PROJECT_ID join USERS c
+        on a.user_id=c.user_id where b.PROJECT_ID='".$id."'");
+
+        $returndata = $query->result_array();
+        return $returndata;
+    }
 }
