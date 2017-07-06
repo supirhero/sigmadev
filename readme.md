@@ -10,6 +10,14 @@ Untuk tahap sekarang api yang tersedia :
     * Project Team And Member
     * Project Docs and Files
     * Project Issue
+    * My Activity
+    * My Assignment
+    * Project Activity
+    
+* REPORT controller
+    * My Performances
+    * My Activity
+    
     
 ## LOGIN CONTROLLER
 
@@ -93,7 +101,7 @@ Header HTTP method POST :
 ## Detail project
 Detail project overview bisa di capai dengan ke url :
 ```
-http://45.77.45.126/dev/detaiproject/<id dari project>
+http://45.77.45.126/dev/home/detaiproject/<id dari project>
 ```
 Return data json object yang di terima adalah :
 ```
@@ -107,7 +115,7 @@ Return data json object yang di terima adalah :
 ## Project Team Member
 URI yang di gunakan untuk akses API ini :
 ```
-http://45.77.45.126/dev/p_teammember/<id dari project>
+http://45.77.45.126/dev/home/p_teammember/<id dari project>
 ```
 
 Return data json object yang di terima adalah :
@@ -120,7 +128,7 @@ Return data json object yang di terima adalah :
 ### View Docs and Files list
 URI yang di gunakan untuk akses API ini :
 ```
-http://45.77.45.126/dev/projectdoc/<id dari project>
+http://45.77.45.126/dev/home/projectdoc/<id dari project>
 ```
 Return data json object yang di terima :
 ```
@@ -130,7 +138,7 @@ Return data json object yang di terima :
 ### Upload Project Doc/Files
 URI yang di gunakan :
 ```
-http://45.77.45.126/dev/documentupload/<id dari project>
+http://45.77.45.126/dev/home/documentupload/<id dari project>
 ```
 
 Input yang harus di provide :
@@ -148,7 +156,7 @@ Return data json object yang di terima
 ### View project issue list
 URI yang di gunakan :
 ```
-http://45.77.45.126/dev/projectissue/<id dari project>
+http://45.77.45.126/dev/home/projectissue/<id dari project>
 ```
 Return data json object yang di terima
 ```
@@ -159,7 +167,7 @@ Return data json object yang di terima
 ### Upload project issue
 URI yang digunakan 
 ```
-http://45.77.45.126/dev/addissue
+http://45.77.45.126/dev/home/addissue
 ```
 
 Input yang harus di provide :
@@ -175,3 +183,58 @@ Return data json object yang di terima :
  -> title 
  -> message
  ```
+ 
+ ## My Activity
+ Daftar 20 aktivitas terakhir user, URI :
+ ```
+  http://45.77.45.126/dev/home/myactivities
+ ```
+ 
+ Return data json object :
+ ```
+ -> activity_timesheet
+ ```
+ 
+ ## My Assignment
+ Daftar assignment user, URI :
+ ```
+  http://45.77.45.126/dev/home/myassignment
+ ```
+ 
+ Return data json object :
+ ```
+ -> activity_timesheet
+ ```
+ ## Project Activity
+ Daftar aktifitas semua user yang berkerja di project bersangkutan. URI :
+  ```
+  http://45.77.45.126/dev/home/projectactivities/<id project>
+  ```
+  Return json object :
+   ```
+   -> project_activities <= Jika belum ada aktifitas ,maka kosong) 
+   ```
+ 
+ # REPORT CONTROLLER
+ ## My Performances
+ Performance user berdasarkan bulan dan tahun, URI yang di gunakan :
+ ```
+ http://45.77.45.126/dev/report/myperformances
+ ```
+Input yang harus di provide :
+ ```
+  ->bulan (ex : 1,2,3...11,12)
+  ->tahun (ex : 2017)
+ ```
+
+
+Return json object yang di terima :
+```
+-> entry
+-> utilization
+-> status Utilization
+-> status
+-> allentry
+-> allhour
+```
+

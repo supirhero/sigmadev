@@ -154,4 +154,5 @@ Class M_home extends CI_Model{
         $returndata = $query->result_array();
         return $returndata;
     }
+
 }

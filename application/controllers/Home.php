@@ -234,13 +234,42 @@ class Home extends CI_Controller {
     }
 
     /*FOR ASSIGNMENT*/
-    /*private function assignment(){
-        $user_id = $this->session->userdata('USER_ID');
+    public function myassignment(){
+        $user_id = $_SESSION['userdata']['USER_ID'];
+        $data=array();
 
+        $data['assignment']=($this->M_home->assignmentView($user_id));
 
+        print_r(json_encode($data));
+    }
 
-        $this->datajson['task_user']=($this->M_home->assignmentView($user_id));
-    }*/
+    /*For Activities*/
+    public function myactivities(){
+        $user_id = $_SESSION['userdata']['USER_ID'];
+        $data=array();
+        //$data['header']=($this->load->view('v_header'));
+        //$data['float_button']=($this->load->view('v_floating_button'));
+        //$data['nav']=($this->load->view('v_nav1'));
+        //$data['assignment']=($this->M_home->assignmentView($user_id));
+        //$data['pr_list']=$this->M_home->assignmentProject($user_id);
+        $data['activity_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+        //$data['task_user']=($this->M_home->assignmentView($user_id));
+
+        //$this->load->view('v_home_activity', $data);
+        //$data['footer']=($this->load->view('v_footer2'));
+        print_r(json_encode($data));
+    }
+
+    public function projectactivities(){
+        $project_id = $this->uri->segment(3);
+
+        $data['project_activities'] =  $this->db->query("SELECT *
+                                FROM USER_TIMESHEET
+                                WHERE project_id = '".$project_id."'
+                                ORDER BY ts_date DESC")->result();
+        print_r(json_encode($data));
+    }
+
     /*FOR PROJECT LIST*/
     private function project(){
         $prof = $_SESSION['userdata']['PROF_ID'];
@@ -897,6 +926,8 @@ class Home extends CI_Controller {
         }
 
     }
+
+
 
 
 }
