@@ -11,12 +11,6 @@ Untuk tahap sekarang api yang tersedia :
     * Project Docs and Files
     * Project Issue
     
-    
-    
-
-    
-
-
 ## LOGIN CONTROLLER
 
 ### Login 
