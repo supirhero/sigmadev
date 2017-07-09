@@ -32,6 +32,7 @@ class Home extends CI_Controller {
         $this->datajson['bussines_unit'] = $query->BU_NAME;
         $this->datatimesheet();
         $this->project();
+        $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
     }
 
@@ -239,7 +240,7 @@ class Home extends CI_Controller {
         $data=array();
 
         $data['assignment']=($this->M_home->assignmentView($user_id));
-
+        $this->transformKeys($data);
         print_r(json_encode($data));
     }
 
@@ -257,6 +258,7 @@ class Home extends CI_Controller {
 
         //$this->load->view('v_home_activity', $data);
         //$data['footer']=($this->load->view('v_footer2'));
+        $this->transformKeys($data);
         print_r(json_encode($data));
     }
 
@@ -266,7 +268,8 @@ class Home extends CI_Controller {
         $data['project_activities'] =  $this->db->query("SELECT *
                                 FROM USER_TIMESHEET
                                 WHERE project_id = '".$project_id."'
-                                ORDER BY ts_date DESC")->result();
+                                ORDER BY ts_date DESC")->result_array();
+        $this->transformKeys($data);
         print_r(json_encode($data));
     }
 
@@ -360,7 +363,11 @@ class Home extends CI_Controller {
 
         //Project Workplan Status
         $this->datajson['project_workplan_status']['project_status'] = $this->datajson["project_detail"]["project_detail"]["PROJECT_STATUS"];
-        $this->datajson['project_workplan_status']['task'] = $this->db->query("select * from cari_task where project_id = ".$this->uri->segment(3))->result();
+        $this->datajson['project_workplan_status']['task'] = $this->db->query("select * from cari_task where project_id = ".$this->uri->segment(3))->result_array();
+
+        foreach ($this->datajson['project_workplan_status']['task'] as $key=>$value){
+            $this->transformKeys($this->datajson['project_workplan_status']['task'][$key]);
+        }
 
         //Project Performance Index
         $this->datajson['project_performance_index']['pv'] = $this->datajson['project_detail']['pv'];
@@ -370,9 +377,13 @@ class Home extends CI_Controller {
         $this->datajson['project_performance_index']['spi'] = $this->datajson['project_detail']['spi'];
 
         //Project Team
-        $this->datajson['project_team'] = $this->db->query("select * from V_PROJECT_TEAM_MEMBER where project_id = ".$this->uri->segment(3))->result();
+        $this->datajson['project_team'] = $this->db->query("select * from V_PROJECT_TEAM_MEMBER where project_id = ".$this->uri->segment(3))->result_array();
+        foreach ($this->datajson['project_team'] as $key=>$value){
+            $this->transformKeys($this->datajson['project_team'][$key]);
+        }
         unset($this->datajson["project_detail"]);
 
+        $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
 ///
 
@@ -383,7 +394,11 @@ class Home extends CI_Controller {
         $projectid = $this->uri->segment(3);
 
         $this->datajson['project_member'] = $this->M_home->p_teammember($projectid);
+        foreach ($this->datajson['project_member'] as $key=>$value){
+            $this->transformKeys($this->datajson['project_member'][$key]);
+        }
 
+        $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
 
 
@@ -393,8 +408,12 @@ class Home extends CI_Controller {
     public function projectdoc(){
         $projectid = $this->uri->segment(3);
 
-        $this->datajson['project_doc_list'] = $this->db->query("select * from project_doc where project_id = $projectid")->result();
+        $this->datajson['project_doc_list'] = $this->db->query("select * from project_doc where project_id = $projectid")->result_array();
+        foreach ($this->datajson['project_doc_list'] as $key=>$value){
+            $this->transformKeys($this->datajson['project_doc_list'][$key]);
+        }
 
+        $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
     }
 
@@ -405,6 +424,7 @@ class Home extends CI_Controller {
 
         $this->datajson['project_issue_list'] = $this->M_home->projectissuelist($projectid);
 
+        $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
     }
 
@@ -927,6 +947,26 @@ class Home extends CI_Controller {
 
     }
 
+    function transformKeys(&$array)
+    {
+        foreach (array_keys($array) as $key):
+
+            # Working with references here to avoid copying the value,
+            # since you said your data is quite large.
+            $value = &$array[$key];
+            unset($array[$key]);
+            # This is what you actually want to do with your keys:
+            #  - remove exclamation marks at the front
+            #  - camelCase to snake_case
+            $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
+            # Work recursively
+            if (is_array($value)) $this->transformKeys($value);
+            # Store with new key
+            $array[$transformedKey] = $value;
+            # Do not forget to unset references!
+            unset($value);
+        endforeach;
+    }
 
 
 

@@ -138,6 +138,7 @@ class Report extends CI_Controller {
         unset($hasil['tahun']);
         unset($hasil['total_hours']);
 
+        $this->transformKeys($hasil);
         echo json_encode($hasil, JSON_NUMERIC_CHECK);
     }
 
@@ -221,6 +222,27 @@ class Report extends CI_Controller {
 
         //$this->load->view('v_home_activity', $data);
         //$data['footer']=($this->load->view('v_footer2'));
+        $this->transformKeys($data);
         print_r(json_encode($data));
+    }
+
+    private function transformKeys(&$array)
+    {
+        foreach (array_keys($array) as $key):
+            # Working with references here to avoid copying the value,
+            # since you said your data is quite large.
+            $value = &$array[$key];
+            unset($array[$key]);
+            # This is what you actually want to do with your keys:
+            #  - remove exclamation marks at the front
+            #  - camelCase to snake_case
+            $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
+            # Work recursively
+            if (is_array($value)) $this->transformKeys($value);
+            # Store with new key
+            $array[$transformedKey] = $value;
+            # Do not forget to unset references!
+            unset($value);
+        endforeach;
     }
 }
