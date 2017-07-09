@@ -430,9 +430,11 @@ class Home extends CI_Controller {
 
     public function addissue(){
 
+        $returnmessage = array();
+
         $config['upload_path']		= 'assets/p_issue/';
         $config['allowed_types']	= 'zip|doc|docs|docx|xls|pdf|xlsx';
-        $config['max_size']			= 10000000;
+        $config['max_size']			= 5020;
         $config['max_width']		= 1024;
         $config['max_height']		= 768;
         //$config['file_name']		= $nm;
@@ -479,7 +481,8 @@ class Home extends CI_Controller {
             $id_det= $this->M_issue->getMaxDetIssue();
             $this->M_issue->insertDetIssue3($data,$id_det);
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
-
+            $returnmessage['title'] = "Success";
+            $returnmessage['message'] = "berhasil tambah issue";
 
 
 
@@ -528,9 +531,10 @@ class Home extends CI_Controller {
             $id_det= $this->M_issue->getMaxDetIssue();
             $this->M_issue->insertDetIssue2($data,$id_det);
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
+            $returnmessage['title'] = "both";
+            $returnmessage['message'] = "berhasil tambah issue,tetapi gagal upload foto";
         }
-        $returnmessage['title'] = "success";
-        $returnmessage['message'] = "berhasil tambah issue";
+
         print_r(json_encode($returnmessage));
     }
 
