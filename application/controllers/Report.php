@@ -8,6 +8,7 @@ class Report extends CI_Controller {
         parent::__construct();
         $this->load->model('M_home');
         $this->load->model('M_timesheet');
+        $this->load->model('M_report');
         $this->datajson = $_SESSION;
     }
 
@@ -244,5 +245,17 @@ class Report extends CI_Controller {
             # Do not forget to unset references!
             unset($value);
         endforeach;
+    }
+
+    public function directoratbu(){
+        $bu = $_POST['bu'];
+        $tahun = $_POST['tahun'];
+        $data =array();
+        $data['project']['completed'] = $this->M_report->Portofolio_completed_Project($bu,$tahun);
+        $data['project']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
+        $data['project']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
+        $data['project']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
+        $data['finance']['total_project_value'] = $this->M_report->Portofolio_Total_Project_Value($bu,$tahun);
+        print_r(json_encode($data));
     }
 }

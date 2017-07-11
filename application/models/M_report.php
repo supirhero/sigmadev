@@ -320,29 +320,64 @@ function dashboard_all(){
               }
 
 
-  function Portofolio_Total_Project($bu,$tahun){
-   return $this->db->query("select count(a.project_id) as jml_project, bu_id from projects a right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias)  where bu_id='$bu' and to_char(date_created,'YYYY')='$tahun' group by bu_id")->row()->JML_PROJECT;
+    function Portofolio_Total_Project($bu,$tahun){
+        $returndata = $this->db->query("select count(a.project_id) as jml_project, bu_id from projects a right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias)  where bu_id='$bu' and to_char(date_created,'YYYY')='$tahun' group by bu_id")->row();
+        if(isset($returndata->JML_PROJECT)){
+            return $returndata->JML_PROJECT;
+        }
+        else{
+            return 0;
+        }
+    }
+    function Portofolio_Total_Project_Value($bu,$tahun){
+        $returndata = $this->db->query("select sum(nvl(usd_wes_idr,0)) as PROJECT_VALUE, bu_id from v_usd_idr c inner join projects a on c.project_id=a.project_id right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias) where bu_id='$bu' and to_char(date_created,'YYYY')='$tahun' group by b.bu_id")->row();
+        if(isset($returndata->PROJECT_VALUE)){
+            return $returndata->PROJECT_VALUE;
+        }
+        else{
+            return 0;
+        }
+    }
 
- }
-
- function Portofolio_Total_Project_Value($bu,$tahun){
-   return $this->db->query("select sum(nvl(usd_wes_idr,0)) as PROJECT_VALUE, bu_id from v_usd_idr c inner join projects a on c.project_id=a.project_id right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias) where bu_id='$bu' and to_char(date_created,'YYYY')='$tahun' group by b.bu_id")->row()->PROJECT_VALUE;
-
- }
 
 
- function Portofolio_Active_Project($bu,$tahun){
-  $result=0;
-      $q=$this->db->query("select nvl(count(a.project_id),0) as jml_project, bu_id from projects a
-right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias)
-where project_status not in('Not Started','Completed') and bu_id='$bu' and to_char(date_created,'YYYY')='$tahun'
-group by bu_id
-");
-      if($q->num_rows() > 0){
-        $result = $q->row()->JML_PROJECT;
-      }
-      return $result;
- }
+
+     function Portofolio_Active_Project($bu,$tahun){
+            $result=0;
+            $q=$this->db->query("select nvl(count(a.project_id),0) as jml_project, bu_id from projects a
+               right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias)
+               where project_status not in('Not Started','Completed') and bu_id='$bu' and to_char(date_created,'YYYY')='$tahun'
+               group by bu_id
+            ");
+          if($q->num_rows() > 0){
+            $result = $q->row()->JML_PROJECT;
+          }
+          return $result;
+     }
+    function Portofolio_completed_Project($bu,$tahun){
+        $result=0;
+        $q=$this->db->query("select nvl(count(a.project_id),0) as jml_project, bu_id from projects a
+               right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias)
+               where project_status = 'Completed' and bu_id='$bu' and to_char(date_created,'YYYY')='$tahun'
+               group by bu_id
+            ");
+        if($q->num_rows() > 0){
+            $result = $q->row()->JML_PROJECT;
+        }
+        return $result;
+    }
+    function Portofolio_notstarted_Project($bu,$tahun){
+        $result=0;
+        $q=$this->db->query("select nvl(count(a.project_id),0) as jml_project, bu_id from projects a
+               right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias)
+               where project_status = 'Not Started' and bu_id='$bu' and to_char(date_created,'YYYY')='$tahun'
+               group by bu_id
+            ");
+        if($q->num_rows() > 0){
+            $result = $q->row()->JML_PROJECT;
+        }
+        return $result;
+    }
 
 
   }

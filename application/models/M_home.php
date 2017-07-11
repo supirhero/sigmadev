@@ -125,7 +125,10 @@ Class M_home extends CI_Model{
     }
 
     function p_teammember($idproject){
-        $returndata = $this->db->query("select * from v_project_team_member where project_id = ".$idproject)->result_array();
+        $returndata = $this->db->query("SELECT users.user_id,users.user_name,users.email,profile.prof_name FROM RESOURCE_POOL
+                      join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+                      join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+                      WHERE PROJECT_ID= ".$idproject)->result_array();
         for($i = 0; $i < count($returndata); $i++){
             $posisi = $this->db->query("select position from resource_pool 
                                         where project_id = $idproject and user_id = '".$returndata[$i]['USER_ID']."'")->row();

@@ -20,11 +20,13 @@ class Home extends CI_Controller {
         $this->load->model('M_invite');
         $this->load->model('M_issue');
         $this->load->model('M_Member_Activity');
+        $this->load->model('M_data');
         //unset($_SESSION['userdata']['PASSWORD']);
         $this->datajson = $_SESSION;
 
     }
 
+    /*For Overview Home*/
     public function index(){
         $bagian_unit = $_SESSION['userdata']['BU_ID'];
 
@@ -262,6 +264,28 @@ class Home extends CI_Controller {
         print_r(json_encode($data));
     }
 
+    /*For Timesheet*/
+    public function timesheet(){
+        //  $this->load->view('v_timesheet', $data);
+        //print_r($_SESSION);
+        $user_id = $_SESSION['userdata']['USER_ID'];
+        $data=array();
+        $data['holidays']=$this->M_data->get_holidays();
+        $data['holidays']=json_decode($data['holidays'],true);
+        //$data['header']=($this->load->view('v_header'));
+        //$data['float_button']=($this->load->view('v_floating_button'));
+        //$data['nav']=($this->load->view('v_nav1'));
+        $data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$id."'");
+        $data['assignment']=($this->M_home->assignmentView($user_id));
+        $data['pr_list']=$this->M_home->assignmentProject($user_id);
+        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+        $data['task_user']=($this->M_home->assignmentView($user_id));
+
+        //$this->load->view('v_home_timesheet', $data);
+        //$data['footer']=($this->load->view('v_footer2'));
+        print_r(json_encode($data));
+    }
+
     public function projectactivities(){
         $project_id = $this->uri->segment(3);
 
@@ -377,7 +401,10 @@ class Home extends CI_Controller {
         $this->datajson['project_performance_index']['spi'] = $this->datajson['project_detail']['spi'];
 
         //Project Team
-        $this->datajson['project_team'] = $this->db->query("select * from V_PROJECT_TEAM_MEMBER where project_id = ".$this->uri->segment(3))->result_array();
+        $this->datajson['project_team'] = $this->db->query("SELECT users.user_id,users.user_name,users.email,profile.prof_name FROM RESOURCE_POOL
+                                                             join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+                                                             join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+                                                             WHERE PROJECT_ID=".$this->uri->segment(3))->result_array();
         foreach ($this->datajson['project_team'] as $key=>$value){
             $this->transformKeys($this->datajson['project_team'][$key]);
         }
