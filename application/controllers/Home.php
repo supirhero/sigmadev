@@ -22,6 +22,20 @@ class Home extends CI_Controller {
         $this->load->model('M_Member_Activity');
         $this->load->model('M_data');
         //unset($_SESSION['userdata']['PASSWORD']);
+        $stringuser = '{
+        "userdata": {
+            "USER_ID": "S201502162",
+		"USER_NAME": "GINA KHAYATUNNUFUS",
+		"EMAIL": "gina.nufus@sigma.co.id",
+		"BU_ID": "36",
+		"USER_TYPE_ID": "int",
+		"SUP_ID": "S201404159",
+		"PROF_ID": "6",
+		"LAST_LOGIN": "09-JUL-17",
+		"LOGGED_ID": true
+	}}';
+        $_SESSION = json_decode($stringuser,true);
+        print_r($_SESSION['userdata']);
         $this->datajson = $_SESSION;
 
     }

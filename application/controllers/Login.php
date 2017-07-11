@@ -33,6 +33,7 @@ class Login extends CI_Controller {
     //if login success go to home
     public function welcome()
     {
+        /*BYPASS
         $data['title']= 'Welcome';
         //$this->load->view('header_view',$data);
         //$data['user_id']=($this->M_login->tampil());
@@ -43,7 +44,7 @@ class Login extends CI_Controller {
 
         //print_r($this->session);
         //go to home route
-
+        */
         redirect('/Home');
     }
 
@@ -51,6 +52,7 @@ class Login extends CI_Controller {
     //for login activity
     function login()
     {
+        /*BYPASS
         if($_POST['user_id'] != "" && $_POST['password'] != "" && $_POST['fpid'] != ""){
 
             $user_id = $this->input->post('user_id');
@@ -64,7 +66,7 @@ class Login extends CI_Controller {
                 else {
                     $result=$this->M_login->loginsso($sso['NIK']);
                 }
-                redirect('/login/welcome');
+                */redirect('/login/welcome');/*
             }else {
                 $password = md5($password);
                 $cek=$this->M_login->validateLogin($user_id,$password);
@@ -83,7 +85,8 @@ class Login extends CI_Controller {
             $data['title']= 'error';
             $data['message']="Input User dan password tidak bolek kosong";
             print_r(json_encode($data));
-        }
+        }*/
+
 
     }
     //authetivication login
