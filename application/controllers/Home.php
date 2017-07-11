@@ -35,7 +35,7 @@ class Home extends CI_Controller {
 		"LOGGED_ID": true
 	}}';
         $_SESSION = json_decode($stringuser,true);
-        print_r($_SESSION['userdata']);
+        //print_r($_SESSION['userdata']);
         $this->datajson = $_SESSION;
 
     }

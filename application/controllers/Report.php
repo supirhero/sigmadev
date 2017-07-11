@@ -9,6 +9,19 @@ class Report extends CI_Controller {
         $this->load->model('M_home');
         $this->load->model('M_timesheet');
         $this->load->model('M_report');
+        $stringuser = '{
+        "userdata": {
+            "USER_ID": "S201502162",
+		"USER_NAME": "GINA KHAYATUNNUFUS",
+		"EMAIL": "gina.nufus@sigma.co.id",
+		"BU_ID": "36",
+		"USER_TYPE_ID": "int",
+		"SUP_ID": "S201404159",
+		"PROF_ID": "6",
+		"LAST_LOGIN": "09-JUL-17",
+		"LOGGED_ID": true
+	}}';
+        $_SESSION = json_decode($stringuser,true);
         $this->datajson = $_SESSION;
     }
 
