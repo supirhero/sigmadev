@@ -9,7 +9,7 @@ Class M_home extends CI_Model{
     }
 
     function assignmentView($user_id){
-        $query = $this->db->query("SELECT * from user_task where user_id='".$user_id."'");
+        $query = $this->db->query("SELECT * from user_task where user_id='".$user_id."' and rownum < 15");
         $hasil = $query->result_array();
         return $hasil;
     }

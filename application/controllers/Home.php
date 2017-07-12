@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 class Home extends CI_Controller {
 
 
@@ -9,9 +8,7 @@ class Home extends CI_Controller {
 
     public function __construct()
     {
-        session_start();
         parent::__construct();
-
         $this->load->model('M_home');
         $this->load->model('M_project');
         $this->load->model('M_business');
@@ -21,29 +18,34 @@ class Home extends CI_Controller {
         $this->load->model('M_issue');
         $this->load->model('M_Member_Activity');
         $this->load->model('M_data');
-        //unset($_SESSION['userdata']['PASSWORD']);
-        $stringuser = '{
-        "userdata": {
-            "USER_ID": "S201502162",
-		"USER_NAME": "GINA KHAYATUNNUFUS",
-		"EMAIL": "gina.nufus@sigma.co.id",
-		"BU_ID": "36",
-		"USER_TYPE_ID": "int",
-		"SUP_ID": "S201404159",
-		"PROF_ID": "6",
-		"LAST_LOGIN": "09-JUL-17",
-		"LOGGED_ID": true
-	}}';
-        $_SESSION = json_decode($stringuser,true);
-        //print_r($_SESSION['userdata']);
-        $this->datajson = $_SESSION;
+
+
+        //TOKEN LOGIN CHECKER
+        if(isset($_POST['token'])){
+            $decoded_user_data =(array) $this->token->decodetoken($_POST['token']);
+            $this->datajson['token'] = $_POST['token'];
+        }
+        else{
+            $decoded_user_data =(array) $this->token->decodetoken($_GET['token']);
+            $this->datajson['token'] = $_GET['token'];
+        }
+        //if login success
+        if(!isset($decoded_user_data[0])){
+            //get user data from token
+            $this->datajson['userdata'] = (array)$decoded_user_data['data'];
+        }
+        //if login fail
+        else {
+            echo $decoded_user_data[0];
+            die();
+        }
 
     }
 
     /*For Overview Home*/
     public function index(){
-        $bagian_unit = $_SESSION['userdata']['BU_ID'];
 
+        $bagian_unit = $this->datajson['userdata']['BU_ID'];
         $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
         $this->datajson['bussines_unit'] = $query->BU_NAME;
         $this->datatimesheet();
@@ -59,7 +61,7 @@ class Home extends CI_Controller {
             $tanggalnow = getdate();
             $_POST['bulan'] = $tanggalnow['mon'];
             $_POST['tahun'] = $tanggalnow['year'];
-            $user_id=$_SESSION['userdata']['USER_ID'];
+            $user_id=$this->datajson['userdata']['USER_ID'];
             if (strlen($this->input->post('bulan'))=='2'){
                 $bulan = $this->input->post('bulan');
             }else {
@@ -252,7 +254,7 @@ class Home extends CI_Controller {
 
     /*FOR ASSIGNMENT*/
     public function myassignment(){
-        $user_id = $_SESSION['userdata']['USER_ID'];
+        $user_id = $this->datajson['userdata']['USER_ID'];
         $data=array();
 
         $data['assignment']=($this->M_home->assignmentView($user_id));
@@ -262,7 +264,7 @@ class Home extends CI_Controller {
 
     /*For Activities*/
     public function myactivities(){
-        $user_id = $_SESSION['userdata']['USER_ID'];
+        $user_id = $this->datajson['userdata']['USER_ID'];
         $data=array();
         //$data['header']=($this->load->view('v_header'));
         //$data['float_button']=($this->load->view('v_floating_button'));
@@ -280,9 +282,7 @@ class Home extends CI_Controller {
 
     /*For Timesheet*/
     public function timesheet(){
-        //  $this->load->view('v_timesheet', $data);
-        //print_r($_SESSION);
-        $user_id = $_SESSION['userdata']['USER_ID'];
+        $user_id = $this->datajson['userdata']['USER_ID'];
         $data=array();
         $data['holidays']=$this->M_data->get_holidays();
         $data['holidays']=json_decode($data['holidays'],true);
@@ -313,8 +313,8 @@ class Home extends CI_Controller {
 
     /*FOR PROJECT LIST*/
     private function project(){
-        $prof = $_SESSION['userdata']['PROF_ID'];
-        $id = $_SESSION['userdata']['USER_ID'];
+        $prof = $this->datajson['userdata']['PROF_ID'];
+        $id = $this->datajson['userdata']['USER_ID'];
         $this->datajson['projects'] = $this->M_project->getUsersProject($id);
         //$id_bu = $this->session->userdata('BU_ID');
         //$this->datajson['tampil_Timesheet']=($this->M_timesheet->selectTimesheet2($id_bu));
@@ -322,7 +322,6 @@ class Home extends CI_Controller {
 
     /*FOR DETAIL PROJECT*/
     public function detailproject(){
-        //print_r($_SESSION);
         $data['error'] = ' ';
         $data['message'] = ' ';
         $id=$this->uri->segment(3);
@@ -484,7 +483,7 @@ class Home extends CI_Controller {
             $data['upload_data']= $this->upload->data();
             $id = $this->M_issue->getMaxIssue();
             $data['ISSUE_ID'] 			= $id;
-            $data['USER_ID'] 			= $_SESSION['userdata']['USER_ID'];
+            $data['USER_ID'] 			= $this->datajson['userdata']['USER_ID'];
             $data['PRIORITY'] 		    = $this->input->post("PRIORITY");
             $data['STATUS'] 			= "On Progress";
             $data['SUBJECT'] 			= $this->input->post("SUBJECT");
@@ -495,8 +494,8 @@ class Home extends CI_Controller {
             if($data['PRIORITY']=='High'){
                 $id = $this->M_issue->getMaxIssue();
                 $data['ISSUE_ID'] 			= $id;
-                $data['USER_ID'] 			= $_SESSION['userdata']['USER_ID'];
-                $USER_ID		 			= $_SESSION['userdata']['USER_ID'];
+                $data['USER_ID'] 			= $this->datajson['userdata']['USER_ID'];
+                $USER_ID		 			= $this->datajson['userdata']['USER_ID'];
                 $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
                 $data['PRIORITY'] 			= $this->input->post("PRIORITY");
                 $data['STATUS'] 			= "On Progress";
@@ -531,7 +530,7 @@ class Home extends CI_Controller {
             $data['upload_data']= $this->upload->data();
             $id = $this->M_issue->getMaxIssue();
             $data['ISSUE_ID'] 			= $id;
-            $data['USER_ID'] 			= $_SESSION['userdata']['USER_ID'];
+            $data['USER_ID'] 			= $this->datajson['userdata']['USER_ID'];
             $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
             $data['PRIORITY'] 			= $this->input->post("PRIORITY");
             $data['STATUS'] 			= "On Progress";
@@ -540,7 +539,7 @@ class Home extends CI_Controller {
             $data['EVIDENCE'] 			= $this->upload->data('file_name');
 
             if($data['PRIORITY']=='High'){
-                $USER_ID		 			= $_SESSION['userdata']['USER_ID'];
+                $USER_ID		 			= $this->datajson['userdata']['USER_ID'];
                 $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
                 $data['PRIORITY'] 			= $this->input->post("PRIORITY");
                 $data['STATUS'] 			= "On Progress";
@@ -607,7 +606,7 @@ class Home extends CI_Controller {
                 'DOC_NAME' => $data['upload_data']['file_name'],
                 'URL' => $data['upload_data']['file_name'],
                 'DATE_UPLOAD' => date("d-M-Y"),
-                'UPLOAD_BY' => $_SESSION['userdata']['USER_ID'],
+                'UPLOAD_BY' => $this->datajson['userdata']['USER_ID'],
                 'DOC_DESC' => $this->input->post('desc')
             );
 

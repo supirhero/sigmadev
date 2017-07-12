@@ -23,14 +23,11 @@ Class M_login extends CI_Model
                     'SUP_ID' => $rows->SUP_ID,
                     'PROF_ID' => $rows->PROF_ID,
                     'LAST_LOGIN' => $rows->LAST_LOGIN,
-                    'PASSWORD' => $rows->PASSWORD,
                     'logged_in'  => TRUE,
                 );
             }
 
-            $_SESSION['userdata']=$newdata;
-            unset($_SESSION['userdata']['PASSWORD']);
-            return true;
+            return $newdata;
         }
         //return $query->result();
         return false;
@@ -63,12 +60,11 @@ Class M_login extends CI_Model
                     'SUP_ID' => $rows->SUP_ID,
                     'PROF_ID' => $rows->PROF_ID,
                     'LAST_LOGIN' => $rows->LAST_LOGIN,
-                    'PASSWORD' => $rows->PASSWORD,
                     'logged_in'  => TRUE,
                 );
             }
-            $_SESSION['userdata']=$newdata;
-            return true;
+            $returndata['userdata']=$newdata;
+            return $returndata;
         }
         return false;
 

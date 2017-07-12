@@ -2,32 +2,39 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Report extends CI_Controller {
+    private $datajson =array();
     public function __construct()
     {
-        session_start();
         parent::__construct();
         $this->load->model('M_home');
         $this->load->model('M_timesheet');
         $this->load->model('M_report');
-        $stringuser = '{
-        "userdata": {
-            "USER_ID": "S201502162",
-		"USER_NAME": "GINA KHAYATUNNUFUS",
-		"EMAIL": "gina.nufus@sigma.co.id",
-		"BU_ID": "36",
-		"USER_TYPE_ID": "int",
-		"SUP_ID": "S201404159",
-		"PROF_ID": "6",
-		"LAST_LOGIN": "09-JUL-17",
-		"LOGGED_ID": true
-	}}';
-        $_SESSION = json_decode($stringuser,true);
-        $this->datajson = $_SESSION;
+
+        //TOKEN LOGIN CHECKER
+        if(isset($_POST['token'])){
+            $decoded_user_data =(array) $this->token->decodetoken($_POST['token']);
+            $this->datajson['token'] = $_POST['token'];
+        }
+        else{
+            $decoded_user_data =(array) $this->token->decodetoken($_GET['token']);
+            $this->datajson['token'] = $_GET['token'];
+        }
+        //if login success
+        if(!isset($decoded_user_data[0])){
+            //get user data from token
+            $this->datajson['userdata'] = (array)$decoded_user_data['data'];
+        }
+        //if login fail
+        else {
+            echo $decoded_user_data[0];
+            die();
+        }
+
     }
 
     public function myperformances(){
         //parameter
-        $user_id=	$_SESSION['userdata']['USER_ID'];
+        $user_id=	$this->datajson['userdata']['USER_ID'];
         if (strlen($this->input->post('bulan'))=='2'){
             $bulan = $this->input->post('bulan');
         }else {
@@ -224,7 +231,7 @@ class Report extends CI_Controller {
     }
 
     public function myactivities(){
-        $user_id = $_SESSION['userdata']['USER_ID'];
+        $user_id = $this->datajson['userdata']['USER_ID'];
         $data=array();
         //$data['header']=($this->load->view('v_header'));
         //$data['float_button']=($this->load->view('v_floating_button'));

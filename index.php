@@ -1,4 +1,12 @@
 <?php
+
+//
+//set post data for input
+$jsonpost = json_decode(file_get_contents('php://input'), true);
+if($jsonpost != "" || $jsonpost != null ){
+    $_POST = $jsonpost;
+};
+
 /**
  * CodeIgniter
  *

@@ -21,6 +21,12 @@ Untuk tahap sekarang api yang tersedia :
     
 ## LOGIN CONTROLLER
 
+
+### IMPORTANT !!
+```
+Login sudah memakai sistem token , mohon provide token untuk setiap request ke api dengan cara menyediakan input method post name 'token', token bisa di dapatkan ketika sudah melakukan login. Token akan expired ketika sudah berumur 2 jam terhitung waktu generate.
+```
+
 ### Login 
 Menggunakan HTTP method POST,URI ajax :
 
@@ -43,6 +49,7 @@ Jika user berhasil Login, maka API akan me-return data user, data timesheet(untu
 Data yang ada di dalam json string :
 ```
 -> userdata <= informasi mengenai user
+-> token
 -> datatimesheet <= persentase hasil dari timesheet untuk bulan ini
 -> project <= daftar Project user
 -> bussines_unit <= String nama bisnis unit dari user tersebut

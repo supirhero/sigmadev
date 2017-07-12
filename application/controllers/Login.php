@@ -4,27 +4,30 @@ class Login extends CI_Controller {
 
     function __construct()
     {
-        session_start();
         parent::__construct();
         $this->load->model('M_login');
         $this->load->model('M_user');
         //$this->load->library("security");
-    }
+        //print_r($_POST);
 
+
+
+    }
     function index($error=null)
     {
-        print_r($_SESSION);
         $error=$this->uri->segment(3,0);
         if(isset($error)||$error!=""){
-            $data['error']=$error;
+            $data['title']= 'error';
+            $data['message']='Anda belum login';
+            print_r(json_encode($data));
         }
 
         if($_SESSION['userdata']['logged_in'])
         {
-            //$this->welcome();
+            $this->welcome();
         }else{
             $data['title']= 'error';
-            $data['message']='username atau password tidak cocok';
+            $data['message']='Anda belum login';
             print_r(json_encode($data));
         }
 
@@ -33,61 +36,69 @@ class Login extends CI_Controller {
     //if login success go to home
     public function welcome()
     {
-        /*BYPASS
-        $data['title']= 'Welcome';
+
+        $token =$_GET['token'];
         //$this->load->view('header_view',$data);
         //$data['user_id']=($this->M_login->tampil());
         //$this->load->view('v_home.php', $data);
         //$this->load->view('footer_view',$data);
-        $id=$_SESSION['userdata']['USER_ID'];
-        $this->M_user->lastLogin($id);
-
+        $id=$this->token->decodetoken($token)->data;
+        $this->M_user->lastLogin($id->USER_ID);
+        //print_r($token);
         //print_r($this->session);
         //go to home route
-        */
-        redirect('/Home');
+        //print_r($_SESSION);
+        //die();
+        redirect('/Home?token='.$_GET['token']);
     }
 
     /*LOGIN ACTIVITY*/
     //for login activity
     function login()
     {
-        /*BYPASS
-        if($_POST['user_id'] != "" && $_POST['password'] != "" && $_POST['fpid'] != ""){
 
+        if($_POST['user_id'] != "" && $_POST['password'] != "" && $_POST['fpid'] != ""){
             $user_id = $this->input->post('user_id');
             $password = $this->input->post('password');
 
             //$sso variable for authetication login value
             $sso =$this->sso($user_id,$password);
+            //print_r($sso);
+            //if status 1 that mean just user
             if($sso['STATUS']=='1'){
                 if(isset($sso['EMP_ID'])){
                     $result=$this->M_login->loginsso($sso['EMP_ID']);}
                 else {
                     $result=$this->M_login->loginsso($sso['NIK']);
                 }
-                */redirect('/login/welcome');/*
-            }else {
+                $token = $this->token->createtoken($result);
+                redirect('/login/welcome?token='.$token);
+            }
+            //if status 0 thats mean wrong password or it can be admin,check to next query
+            else {
                 $password = md5($password);
                 $cek=$this->M_login->validateLogin($user_id,$password);
+                //if validate not error
                 if($cek=='0'){
                     $result=$this->M_login->login($user_id,$password);
-                    if($result){
-                        redirect('/login/welcome');
+                    if($result != false){
+                        //redirect to login as admin
+                        //print_r($_SESSION);
+                        $token = $this->token->createtoken($result);
+
+                        redirect('/login/welcome?token='.$token);
                     }
 
                 }
             }
-            //print_r($result);
+            //redirect to error page
             redirect('/login/index/'.$cek);
         }
         else{
             $data['title']= 'error';
             $data['message']="Input User dan password tidak bolek kosong";
             print_r(json_encode($data));
-        }*/
-
-
+        }
     }
     //authetivication login
     function sso($email,$password)
@@ -1345,6 +1356,9 @@ class Login extends CI_Controller {
       } */
 
     }
+
+
+
 }
 
 ?>
