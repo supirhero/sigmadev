@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e7810168-8987-46ef-8f66-5715999cd04d" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/application/config/config.php" afterPath="$PROJECT_DIR$/application/config/config.php" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -377,7 +378,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Report.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Report.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/application/controllers/Report.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="180">
@@ -394,6 +395,16 @@
                 <element signature="n#directoratbu#0;n#Report#0;n#!!top" expanded="false" />
                 <marker date="1499881760768" expanded="true" signature="7232:7377" ph="select to_ch... p_holiday" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="config.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/application/config/config.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="405">
+              <caret line="27" column="39" lean-forward="false" selection-start-line="27" selection-start-column="39" selection-end-line="27" selection-end-column="39" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -465,32 +476,6 @@
             <state relative-caret-position="1290">
               <caret line="86" column="49" lean-forward="true" selection-start-line="86" selection-start-column="49" selection-end-line="86" selection-end-column="49" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="M_user.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/application/models/M_user.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="750">
-              <caret line="50" column="22" lean-forward="false" selection-start-line="50" selection-start-column="13" selection-end-line="50" selection-end-column="22" />
-              <folding>
-                <marker date="1499544410021" expanded="true" signature="324:372" ph="select * fro... USERS" />
-                <marker date="1499544410021" expanded="true" signature="722:786" ph="update USERS... " />
-                <marker date="1499544410021" expanded="true" signature="930:1072" ph="update USERS... " />
-                <marker date="1499544410021" expanded="true" signature="1452:1529" ph="update USERS... " />
-                <marker date="1499544410021" expanded="true" signature="1660:1753" ph="UPDATE USERS... " />
-                <marker date="1499544410021" expanded="true" signature="1869:1915" ph="delete from " />
-                <marker date="1499544410021" expanded="true" signature="1936:1985" ph="delete from " />
-                <marker date="1499544410021" expanded="true" signature="2344:2411" ph="select USER_... USERS" />
-                <marker date="1499544410021" expanded="true" signature="2622:2690" ph="select USER_... USERS" />
-                <marker date="1499544410021" expanded="true" signature="2903:2973" ph="select PASSW... USERS" />
-                <marker date="1499544410021" expanded="true" signature="3179:3246" ph="select EMAIL... USERS" />
-                <marker date="1499544410021" expanded="true" signature="3450:3518" ph="select SUP_I... USERS" />
-                <marker date="1499544410021" expanded="true" signature="3727:3793" ph="select EMAIL... USERS" />
-                <marker date="1499544410021" expanded="true" signature="4001:4056" ph="update USERS... " />
-                <marker date="1499544410021" expanded="true" signature="4154:4213" ph="UPDATE USERS... " />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -576,7 +561,6 @@
         <option value="$PROJECT_DIR$/application/helpers/jwt_helper.php" />
         <option value="$PROJECT_DIR$/index.php" />
         <option value="$PROJECT_DIR$/vendor/firebase/php-jwt/src/JWT.php" />
-        <option value="$PROJECT_DIR$/application/config/config.php" />
         <option value="$PROJECT_DIR$/application/libraries/TokenCheck_lib.php" />
         <option value="$PROJECT_DIR$/application/libraries/TokenCheck.php" />
         <option value="$PROJECT_DIR$/application/models/M_login.php" />
@@ -586,6 +570,7 @@
         <option value="$PROJECT_DIR$/application/controllers/Report.php" />
         <option value="$PROJECT_DIR$/application/controllers/Home.php" />
         <option value="$PROJECT_DIR$/application/models/M_home.php" />
+        <option value="$PROJECT_DIR$/application/config/config.php" />
       </list>
     </option>
   </component>
@@ -912,12 +897,20 @@
       <workItem from="1499853932899" duration="9255000" />
       <workItem from="1499874072527" duration="9007000" />
       <workItem from="1499954359269" duration="822000" />
-      <workItem from="1500040786630" duration="158000" />
+      <workItem from="1500040786630" duration="263000" />
     </task>
+    <task id="LOCAL-00001" summary="&quot;testing&quot;">
+      <created>1500040973700</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1500040973700</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="162556000" />
+    <option name="totallyTimeSpent" value="162661000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -956,6 +949,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="&quot;testing&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;testing&quot;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1133,14 +1130,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="535">
           <caret line="36" column="32" lean-forward="false" selection-start-line="36" selection-start-column="32" selection-end-line="36" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/application/config/config.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="35" lean-forward="false" selection-start-line="27" selection-start-column="35" selection-end-line="27" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1627,6 +1616,14 @@
             <element signature="n#directoratbu#0;n#Report#0;n#!!top" expanded="false" />
             <marker date="1499881760768" expanded="true" signature="7232:7377" ph="select to_ch... p_holiday" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/application/config/config.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="27" column="39" lean-forward="false" selection-start-line="27" selection-start-column="39" selection-end-line="27" selection-end-column="39" />
+          <folding />
         </state>
       </provider>
     </entry>
