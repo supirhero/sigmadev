@@ -11,13 +11,18 @@ class Report extends CI_Controller {
         $this->load->model('M_report');
 
         //TOKEN LOGIN CHECKER
-        if(isset($_POST['token'])){
-            $decoded_user_data =(array) $this->token->decodetoken($_POST['token']);
-            $this->datajson['token'] = $_POST['token'];
+        if(isset($_SERVER['HTTP_TOKEN'])){
+            $decoded_user_data =(array) $this->token->decodetoken($_SERVER['HTTP_TOKEN']);
+            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
         }
-        else{
+        elseif(isset($_GET['token'])){
             $decoded_user_data =(array) $this->token->decodetoken($_GET['token']);
             $this->datajson['token'] = $_GET['token'];
+        }
+        else{
+            $error['error']="Login First!";
+            echo json_encode($error);
+            die();
         }
         //if login success
         if(!isset($decoded_user_data[0])){

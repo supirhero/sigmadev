@@ -25,7 +25,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 $uribase['dev']='http://localhost/sigmadev';
 $uribase['publish']= 'http://45.77.45.126/dev';
-$config['base_url'] = $uribase['publish'];
+$config['base_url'] = $uribase['dev'];
 
 /*
 |--------------------------------------------------------------------------
