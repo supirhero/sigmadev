@@ -22,7 +22,7 @@ class Login extends CI_Controller {
             print_r(json_encode($data));
         }
 
-        if($_SESSION['userdata']['logged_in'])
+        if($_SERVER['HTTP_TOKEN'])
         {
             $this->welcome();
         }else{
