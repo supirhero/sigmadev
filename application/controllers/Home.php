@@ -321,31 +321,25 @@ class Home extends CI_Controller {
         $prof = $this->datajson['userdata']['PROF_ID'];
         $id = $this->datajson['userdata']['USER_ID'];
         $projecttemp = $this->M_project->getUsersProject($id);
-        //print_r($projecttemp);
-        //die();
-        $temp = [];
-        for($i = 0 ; $i < count($projecttemp) ; $i++){
-            for($j = $i+1; $j < count($projecttemp) ; $j++){
-                if($projecttemp[$i]['BU_NAME'] == $projecttemp[$j]['BU_NAME']){
-                    $project_bu = $projecttemp[$i]['BU_NAME'];
-                    $project_bu = str_replace(" ","_",$project_bu);
-                    if(!isset($temp[$project_bu])){
-                        $temp[$project_bu]=[];
-                    }
-                    if(count($temp[$project_bu]) == 0){
-                        $temp[$project_bu][count($temp[$project_bu])] = $projecttemp[$i];
-                        $temp[$project_bu][count($temp[$project_bu])] = $projecttemp[$j];
-                    }
-                    else{
-                        $temp[$project_bu][count($temp)] = $projecttemp[$j];
-                    }
+        $projecttempfix=[];
 
+        $bu_name = [];
+       foreach ($projecttemp as $data){
+           array_push($bu_name,$data['BU_NAME']);
+       }
+       $bu_name = array_unique($bu_name);
+       foreach ($bu_name as $data){
+           $index_array = count($projecttempfix);
+           $projecttempfix[$index_array]['BU_NAME'] = $data;
+           $projecttempfix[$index_array]['ITEMS']= [];
+           for($i = 0 ; $i < count($projecttemp) ; $i++){
+                if($projecttemp[$i]['BU_NAME'] == $data){
+                    array_push($projecttempfix[$index_array]['ITEMS'],$projecttemp[$i]);
                 }
-
-            }
+           }
         }
-        $this->datajson['projects'] = $temp;
 
+        $this->datajson['project'] = $projecttempfix;
         //$id_bu = $this->session->userdata('BU_ID');
         //$this->datajson['tampil_Timesheet']=($this->M_timesheet->selectTimesheet2($id_bu));
     }

@@ -84,8 +84,8 @@ class Login extends CI_Controller {
                     if($result != false){
                         //redirect to login as admin
                         //print_r($_SESSION);
-                        $token = $this->token->createtoken($result);
 
+                        $token = $this->token->createtoken($result['userdata']);
                         redirect('/login/welcome?token='.$token);
                     }
 
