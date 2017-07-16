@@ -320,7 +320,32 @@ class Home extends CI_Controller {
     private function project(){
         $prof = $this->datajson['userdata']['PROF_ID'];
         $id = $this->datajson['userdata']['USER_ID'];
-        $this->datajson['projects'] = $this->M_project->getUsersProject($id);
+        $projecttemp = $this->M_project->getUsersProject($id);
+        //print_r($projecttemp);
+        //die();
+        $temp = [];
+        for($i = 0 ; $i < count($projecttemp) ; $i++){
+            for($j = $i+1; $j < count($projecttemp) ; $j++){
+                if($projecttemp[$i]['BU_NAME'] == $projecttemp[$j]['BU_NAME']){
+                    $project_bu = $projecttemp[$i]['BU_NAME'];
+                    $project_bu = str_replace(" ","_",$project_bu);
+                    if(!isset($temp[$project_bu])){
+                        $temp[$project_bu]=[];
+                    }
+                    if(count($temp[$project_bu]) == 0){
+                        $temp[$project_bu][count($temp[$project_bu])] = $projecttemp[$i];
+                        $temp[$project_bu][count($temp[$project_bu])] = $projecttemp[$j];
+                    }
+                    else{
+                        $temp[$project_bu][count($temp)] = $projecttemp[$j];
+                    }
+
+                }
+
+            }
+        }
+        $this->datajson['projects'] = $temp;
+
         //$id_bu = $this->session->userdata('BU_ID');
         //$this->datajson['tampil_Timesheet']=($this->M_timesheet->selectTimesheet2($id_bu));
     }
