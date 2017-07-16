@@ -27,7 +27,7 @@ function get_user_on_bu($buid,$usr){
 
 
 function get_utilization_on_bu($buid){
-    $query = $this->db->query("SELECT * FROM USERS WHERE BU_ID='".$buid."'");
+    $query = $this->db->query("SELECT user_name,user_id,email FROM USERS WHERE BU_ID='".$buid."'");
  $hasil = $query->result_array();
  return $hasil;
  //return $this->db->query("SELECT * FROM V_CALCULATE_TASK_PER_USER ")->result();

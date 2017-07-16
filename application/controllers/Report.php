@@ -9,6 +9,7 @@ class Report extends CI_Controller {
         $this->load->model('M_home');
         $this->load->model('M_timesheet');
         $this->load->model('M_report');
+        $this->load->model('M_business');
 
         //TOKEN LOGIN CHECKER
         if(isset($_SERVER['HTTP_TOKEN'])){
@@ -282,5 +283,74 @@ class Report extends CI_Controller {
         $data['project']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
         $data['finance']['total_project_value'] = $this->M_report->Portofolio_Total_Project_Value($bu,$tahun);
         print_r(json_encode($data));
+    }
+
+    //https://marvelapp.com/hj9eb56/screen/29382902
+    public function r_people_bu(){
+        $data_bu = $this->M_business->getAllBU();
+        echo json_encode($data_bu);
+    }
+    public function r_people(){
+        $bu_id = $_POST['BU_ID'];
+        $bulan = $_POST['BULAN'];
+        $tahun = $_POST['TAHUN'];
+
+        $y=(int)date("Y");
+        $m=(int)date("m");
+
+        $datareport=$this->M_report->get_utilization_on_bu($bu_id);
+
+        for($i = 0 ; $i <count($datareport);$i++){
+
+            //utilization
+            $utilization=$this->M_report->getTotalHour($datareport[$i]['USER_ID'],$bulan,$tahun);
+            $entry=$this->M_report->getEntry($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+            //entry
+            if (($bulan==$m)&& ($tahun==$y) ){
+                $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
+            }
+            else{
+                $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
+            }
+
+            if ($persen_entry<100)
+            {
+                $text_entry='Under';
+            }
+            elseif ($persen_entry==100) {
+                $text_entry='Complete';
+            }
+            else {
+                $text_entry='Over';
+            }
+
+            //utilization
+            if (($bulan==$m)&& ($tahun==$y) ){
+                $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
+            }
+            else{
+                $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
+
+            }
+            if ($persen_utilization<70)
+            {
+                $text_utilization='Under';
+            }
+            elseif (($persen_utilization>70)&& ($persen_utilization<=85)   ){
+                $text_utilization='Optimal';
+            }
+            else {
+                $text_utilization='Over';
+            }
+
+
+            $datareport[$i]['utilisasi']=round($persen_utilization,2);
+            $datareport[$i]['status_utilisasi']=$text_utilization;
+            $datareport[$i]['entry']=round($persen_entry,2);
+            $datareport[$i]['status_entry']=$text_entry;
+
+        }
+        echo json_encode($datareport);
     }
 }

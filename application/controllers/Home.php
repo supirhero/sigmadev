@@ -257,6 +257,13 @@ class Home extends CI_Controller {
         return $dates;
     }
 
+    /*For Project Workplan*/
+    public function p_workplan(){
+        $id = $this->uri->segment(3);
+        $returndata = $this->M_detail_project->selectWBS($id);
+        echo json_encode($returndata);
+    }
+
     /*FOR ASSIGNMENT*/
     public function myassignment(){
         $user_id = $this->datajson['userdata']['USER_ID'];
