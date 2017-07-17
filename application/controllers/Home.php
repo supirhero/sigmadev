@@ -346,12 +346,27 @@ class Home extends CI_Controller {
         print_r(json_encode($data));
     }
     /*For Timesheet*/
-    public function timesheet_date(){
+    public function addtimesheet(){
         $user_id = $this->datajson['userdata']['USER_ID'];
-        $data=array();
-        $data['holidays']=$this->M_data->get_holidays();
-        $data['holidays']=json_decode($data['holidays'],true);
-        print_r(json_encode($data));
+
+        $data['SUBJECT'] 		= $this->input->post("SUBJECT");
+        $data['MESSAGE'] 		= $this->input->post("MESSAGE");
+        $data['TS_DATE'] 		= $this->input->post("TS_DATE");
+        $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
+        $data['HOUR_TOTAL'] 			= $this->input->post("HOUR_TOTAL");
+        $data['SUBJECT'] 			= $this->input->post("SUBJECT");
+        $data['WP_ID']			 	= $user_id;
+
+        if(insertTimesheet($data))
+        {
+            $returnmessage['title'] = "Success";
+        $returnmessage['message'] = "berhasil tambah issue";
+        }else
+        {
+            $returnmessage['title'] = "Success";
+            $returnmessage['message'] = "berhasil tambah issue";        }
+
+        print_r(json_encode($returnmessage));
     }
 
     public function projectactivities(){
