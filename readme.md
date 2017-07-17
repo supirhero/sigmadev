@@ -213,6 +213,19 @@ Return data json object yang di terima :
  -> activity_timesheet
  ```
  
+ 
+ ## Timesheet
+ Menampilkan timesheet pada tanggal di parameter dan daftar hari kerja dalam minggu itu  :
+ ```
+  http://45.77.45.126/dev/home/timesheet/<tanggal(defaultnya hari ini)> 
+ ```
+ 
+ Return data json object :
+ ```
+ -> weekday
+ -> activity_timesheet
+ ```
+ 
  ## My Assignment
  Daftar assignment user, URI :
  ```
