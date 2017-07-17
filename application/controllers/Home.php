@@ -292,23 +292,27 @@ class Home extends CI_Controller {
         print_r(json_encode($data));
     }
 
+
     /*For Timesheet*/
+   public function timesheet_old()
+   {
+       //$data=array();
+       //$data['holidays']=$this->M_data->get_holidays();
+       //$data['holidays']=json_decode($data['holidays'],true);
+       //$data['header']=($this->load->view('v_header'));
+       //$data['float_button']=($this->load->view('v_floating_button'));
+       //$data['nav']=($this->load->view('v_nav1'));
+       //$data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
+       //$data['assignment']=($this->M_home->assignmentView($user_id));
+       //$data['pr_list']=$this->M_home->assignmentProject($user_id);
+       //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+       //$data['task_user']=($this->M_home->assignmentView($user_id));
+
+       //$this->load->view('v_home_timesheet', $data);
+       //$data['footer']=($this->load->view('v_footer2'));
+   }
     public function timesheet($date=null){
         $user_id = $this->datajson['userdata']['USER_ID'];
-        //$data=array();
-        //$data['holidays']=$this->M_data->get_holidays();
-        //$data['holidays']=json_decode($data['holidays'],true);
-        //$data['header']=($this->load->view('v_header'));
-        //$data['float_button']=($this->load->view('v_floating_button'));
-        //$data['nav']=($this->load->view('v_nav1'));
-        //$data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
-        //$data['assignment']=($this->M_home->assignmentView($user_id));
-        //$data['pr_list']=$this->M_home->assignmentProject($user_id);
-        //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
-      //  $data['task_user']=($this->M_home->assignmentView($user_id));
-
-        //$this->load->view('v_home_timesheet', $data);
-        //$data['footer']=($this->load->view('v_footer2'));
         if($date == NULL)
             $date = date("Y-m-d", strtotime("today"));
         $date = date("d M Y", strtotime($date));
@@ -352,9 +356,7 @@ class Home extends CI_Controller {
         $data['SUBJECT'] 		= $this->input->post("SUBJECT");
         $data['MESSAGE'] 		= $this->input->post("MESSAGE");
         $data['TS_DATE'] 		= $this->input->post("TS_DATE");
-        $data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
         $data['HOUR_TOTAL'] 			= $this->input->post("HOUR_TOTAL");
-        $data['SUBJECT'] 			= $this->input->post("SUBJECT");
         $data['WP_ID']			 	= $user_id;
 
         if(insertTimesheet($data))
@@ -363,8 +365,8 @@ class Home extends CI_Controller {
         $returnmessage['message'] = "berhasil tambah issue";
         }else
         {
-            $returnmessage['title'] = "Success";
-            $returnmessage['message'] = "berhasil tambah issue";        }
+            $returnmessage['title'] = "Fail";
+            $returnmessage['message'] = "Gagal ditambahkan";        }
 
         print_r(json_encode($returnmessage));
     }
