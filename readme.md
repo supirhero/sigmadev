@@ -23,9 +23,7 @@ Untuk tahap sekarang api yang tersedia :
 
 
 ### IMPORTANT !!
-```
-Login sudah memakai sistem token , mohon provide token untuk setiap request ke api dengan cara menyediakan input method post name 'token', token bisa di dapatkan ketika sudah melakukan login. Token akan expired ketika sudah berumur 2 jam terhitung waktu generate.
-```
+Login sudah memakai sistem token , mohon provide token untuk setiap request ke api dengan cara menyediakan token di , token bisa di dapatkan ketika sudah melakukan login. Token akan expired ketika sudah berumur 2 jam terhitung waktu generate.
 
 ### Login 
 Menggunakan HTTP method POST,URI ajax :

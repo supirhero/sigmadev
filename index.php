@@ -1,6 +1,7 @@
 <?php
+//CORS
+header("Access-Control-Allow-Methods: GET, POST");
 
-//
 //set post data for input
 $jsonpost = json_decode(file_get_contents('php://input'), true);
 if($jsonpost != "" || $jsonpost != null ){
