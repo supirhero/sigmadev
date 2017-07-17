@@ -318,16 +318,18 @@ class Test extends CI_Controller {
         $data=array();
         $data['holidays']=$this->M_data->get_holidays();
         $data['holidays']=json_decode($data['holidays'],true);
-        foreach ($data['holidays'] as $key)
+        foreach ($data['holidays'] as $key=>$val)
         {
-            echo $key;
+             print_r($key);
+             print_r($val);
         }
         echo "\n<br>";
         $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
-        foreach ($data['tampil_Timesheet'] as $key)
+        foreach ($data['tampil_Timesheet'] as $key => $val)
         {
-            echo $key;
-        }
+
+            print_r($key);
+            print_r($val);        }
        // print_r(json_encode($data['holidays']));
     }
 
