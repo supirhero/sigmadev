@@ -317,6 +317,7 @@ class Test extends CI_Controller {
         $user_id = $this->datajson['userdata']['USER_ID'];
         $data=array();
         $data['holidays']=$this->M_data->get_holidays();
+        $data['holidays']=json_decode($data['holidays'],true);
         foreach ($data['holidays'] as $key)
         {
             echo $key;
