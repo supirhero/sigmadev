@@ -313,7 +313,6 @@ class Home extends CI_Controller {
             $date = date("Y-m-d", strtotime("today"));
         $date = date("d M Y", strtotime($date));
 
-        $user_id = $this->datajson['userdata']['user_id'];
         $data=array();
         $holidays=$this->M_data->get_holidays();
         $holidays=array_values(json_decode($holidays,true));
