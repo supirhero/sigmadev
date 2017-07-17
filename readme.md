@@ -23,8 +23,20 @@ Untuk tahap sekarang api yang tersedia :
 
 
 ### IMPORTANT !!
-Login sudah memakai sistem token , mohon provide token untuk setiap request ke api dengan cara menyediakan token di , token bisa di dapatkan ketika sudah melakukan login. Token akan expired ketika sudah berumur 2 jam terhitung waktu generate.
+Login sudah memakai sistem token , mohon provide token untuk setiap request ke 
+api dengan cara menyediakan token di , token bisa di dapatkan ketika sudah
+melakukan login. Token akan expired ketika sudah berumur 2 jam terhitung 
+waktu generate.
+```
+-> Token bisa di dapati ketika proses login berhasil
+-> Untuk mengakses api setelah login, token di sisipi di header 
+      Dengan nama 'token'
+```
 
+jika token tidak bisa di gunakan/ expired , maka return json error :
+```
+->login_error (isi pesan error token)
+```
 ### Login 
 Menggunakan HTTP method POST,URI ajax :
 
@@ -46,11 +58,12 @@ Jika user berhasil Login, maka API akan me-return data user, data timesheet(untu
 
 Data yang ada di dalam json string :
 ```
--> userdata <= informasi mengenai user
 -> token
+-> userdata <= informasi mengenai user
 -> datatimesheet <= persentase hasil dari timesheet untuk bulan ini
 -> project <= daftar Project user
--> bussines_unit <= String nama bisnis unit dari user tersebut
+    {}-> bu_name
+        -> items
 ```
 
 Jika user tidak berhasil Login, akan ada error message yang akan di return dalam bentuk json string 
@@ -243,3 +256,30 @@ Return json object yang di terima :
 -> allhour
 ```
 
+## Directorat / BU
+Sebelum mendapatkan data report Directorat / BU, user di minta untuk memilih 
+Direktorat / bu yang akan di akses datanya, maka di perlukan API untuk mendapatkan 
+data list direktorat/bu. URI API untuk mendapatkan list data direktorat / BU :
+```
+http://45.77.45.126/dev/report/r_list_bu
+```
+Setelah mendapatkan list dari direktorat / bu ,maka API report directorat / bu baru bisa berjalan.
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/report/r_directoratbu
+```
+Input yang harus di provide :
+```
+->bu (ID Bussiness unit)
+->tahun (tahun report untuk bussiness unit)
+```
+Json Return data :
+```
+-> project
+    ->completed
+    ->in_progress
+    ->not_started
+    ->jumlah
+->finance
+    ->total_project_value
+```
