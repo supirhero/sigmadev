@@ -293,7 +293,7 @@ class Home extends CI_Controller {
     }
 
 
-    /*For Timesheet*/
+    /*For  Timesheet*/
    public function timesheet_old()
    {
        //$data=array();
@@ -349,7 +349,7 @@ class Home extends CI_Controller {
 
         print_r(json_encode($data));
     }
-    /*For Timesheet*/
+    /*For add Timesheet*/
     public function addtimesheet(){
         $user_id = $this->datajson['userdata']['USER_ID'];
 
