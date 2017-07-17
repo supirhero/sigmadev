@@ -226,6 +226,27 @@ Return data json object yang di terima :
  -> activity_timesheet
  ```
  
+ 
+### Add new timesheet
+URI yang digunakan 
+```
+http://45.77.45.126/dev/home/addtimesheet
+```
+
+Input yang harus di provide :
+```
+-> TS_DATE
+-> SUBJECT
+-> MESSAGE
+-> HOUR_TOTAL
+
+```
+Return data json object yang di terima :
+ ```
+ -> title 
+ -> message
+ ```
+ 
  ## My Assignment
  Daftar assignment user, URI :
  ```
