@@ -273,7 +273,14 @@ class Report extends CI_Controller {
         endforeach;
     }
 
-    public function directoratbu(){
+    //get list all bu
+    public function r_list_bu(){
+        $data_bu = $this->M_business->getAllBU();
+        echo json_encode($data_bu);
+    }
+
+    //https://marvelapp.com/hj9eb56/screen/29382899
+    public function r_directoratbu(){
         $bu = $_POST['bu'];
         $tahun = $_POST['tahun'];
         $data =array();
@@ -286,10 +293,6 @@ class Report extends CI_Controller {
     }
 
     //https://marvelapp.com/hj9eb56/screen/29382902
-    public function r_people_bu(){
-        $data_bu = $this->M_business->getAllBU();
-        echo json_encode($data_bu);
-    }
     public function r_people(){
         $bu_id = $_POST['BU_ID'];
         $bulan = $_POST['BULAN'];

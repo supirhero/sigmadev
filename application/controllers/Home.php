@@ -21,13 +21,13 @@ class Home extends CI_Controller {
 
 
         //TOKEN LOGIN CHECKER
-        if(isset($_SERVER['HTTP_TOKEN'])){
-            $decoded_user_data =(array) $this->token->decodetoken($_SERVER['HTTP_TOKEN']);
-            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
-        }
-        elseif(isset($_GET['token'])){
+        if(isset($_GET['token'])){
             $decoded_user_data =(array) $this->token->decodetoken($_GET['token']);
             $this->datajson['token'] = $_GET['token'];
+        }
+        elseif(isset($_SERVER['HTTP_TOKEN'])){
+            $decoded_user_data =(array) $this->token->decodetoken($_SERVER['HTTP_TOKEN']);
+            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
         }
         else{
             $error['error']="Login First!";

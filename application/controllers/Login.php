@@ -44,12 +44,12 @@ class Login extends CI_Controller {
         //$this->load->view('footer_view',$data);
         $id=$this->token->decodetoken($token)->data;
         $this->M_user->lastLogin($id->USER_ID);
-        //print_r($token);
+        print_r($token);
         //print_r($this->session);
         //go to home route
         //print_r($_SESSION);
         //die();
-        redirect('/Home?token='.$_GET['token']);
+        redirect('/Home?token='.$token);
     }
 
     /*LOGIN ACTIVITY*/
