@@ -293,22 +293,57 @@ class Home extends CI_Controller {
     }
 
     /*For Timesheet*/
-    public function timesheet(){
+    public function timesheet($date=null){
         $user_id = $this->datajson['userdata']['USER_ID'];
-        $data=array();
-        $data['holidays']=$this->M_data->get_holidays();
-        $data['holidays']=json_decode($data['holidays'],true);
+        //$data=array();
+        //$data['holidays']=$this->M_data->get_holidays();
+        //$data['holidays']=json_decode($data['holidays'],true);
         //$data['header']=($this->load->view('v_header'));
         //$data['float_button']=($this->load->view('v_floating_button'));
         //$data['nav']=($this->load->view('v_nav1'));
-        $data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
-        $data['assignment']=($this->M_home->assignmentView($user_id));
-        $data['pr_list']=$this->M_home->assignmentProject($user_id);
-        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
-        $data['task_user']=($this->M_home->assignmentView($user_id));
+        //$data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
+        //$data['assignment']=($this->M_home->assignmentView($user_id));
+        //$data['pr_list']=$this->M_home->assignmentProject($user_id);
+        //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+      //  $data['task_user']=($this->M_home->assignmentView($user_id));
 
         //$this->load->view('v_home_timesheet', $data);
         //$data['footer']=($this->load->view('v_footer2'));
+        if($date == NULL)
+            $date = date("Y-m-d", strtotime("today"));
+        $date = date("d M Y", strtotime($date));
+
+        $user_id = $this->datajson['userdata']['user_id'];
+        $data=array();
+        $holidays=$this->M_data->get_holidays();
+        $holidays=array_values(json_decode($holidays,true));
+        foreach ($holidays as $key)
+        {
+            $holyday[]=$key["HOLIDAY_DATE"];
+        }
+        $day[]= date('Y-m-d', strtotime($date.' Monday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Tuesday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Wednesday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Thursday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Friday this week'));
+        for ($i=0; $i<5; $i++)
+        {
+            if (in_array($day[$i], $holyday)) {
+                $data["weekdays"][$day[$i]]=array(
+                    "holiday"=>true,
+                    "work_hour"=>false
+                );
+            }
+            else{
+                $data["weekdays"][$day[$i]]=array(
+                    "holiday"=>false,
+                    "work_hour"=>8
+                );
+            }
+        }
+
+        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
+
         print_r(json_encode($data));
     }
     /*For Timesheet*/

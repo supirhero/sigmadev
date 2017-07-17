@@ -13,9 +13,9 @@ Class M_timesheet extends CI_Model{
   SELECT *
   FROM
   (SELECT *
-  FROM USER_TIMESHEET
+  FROM USER_TIMESHEET where ts_date='$date'
   ORDER BY ts_date DESC)
-  WHERE user_id='".$user_id."' and rownum < 20");
+  WHERE user_id='".$user_id."'");
         $hasil = $query->result_array();
         return $hasil;
 
