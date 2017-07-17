@@ -321,8 +321,12 @@ class Test extends CI_Controller {
         {
             echo $key;
         }
+        echo "\n<br>";
         $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
-
+        foreach ($data['tampil_Timesheet'] as $key)
+        {
+            echo $key;
+        }
        // print_r(json_encode($data['holidays']));
     }
 
