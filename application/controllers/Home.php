@@ -301,7 +301,26 @@ class Home extends CI_Controller {
         //$data['header']=($this->load->view('v_header'));
         //$data['float_button']=($this->load->view('v_floating_button'));
         //$data['nav']=($this->load->view('v_nav1'));
-        $data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$id."'");
+        $data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
+        $data['assignment']=($this->M_home->assignmentView($user_id));
+        $data['pr_list']=$this->M_home->assignmentProject($user_id);
+        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+        $data['task_user']=($this->M_home->assignmentView($user_id));
+
+        //$this->load->view('v_home_timesheet', $data);
+        //$data['footer']=($this->load->view('v_footer2'));
+        print_r(json_encode($data));
+    }
+    /*For Timesheet*/
+    public function timesheet_date(){
+        $user_id = $this->datajson['userdata']['USER_ID'];
+        $data=array();
+        $data['holidays']=$this->M_data->get_holidays();
+        $data['holidays']=json_decode($data['holidays'],true);
+        //$data['header']=($this->load->view('v_header'));
+        //$data['float_button']=($this->load->view('v_floating_button'));
+        //$data['nav']=($this->load->view('v_nav1'));
+        $data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
         $data['assignment']=($this->M_home->assignmentView($user_id));
         $data['pr_list']=$this->M_home->assignmentProject($user_id);
         $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
