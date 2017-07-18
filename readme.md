@@ -63,7 +63,7 @@ Data yang ada di dalam json string :
 -> datatimesheet <= persentase hasil dari timesheet untuk bulan ini
 -> project <= daftar Project user
     {}-> bu_name
-        -> items
+        -> project_list
 ```
 
 Jika user tidak berhasil Login, akan ada error message yang akan di return dalam bentuk json string 

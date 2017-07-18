@@ -338,10 +338,10 @@ class Home extends CI_Controller {
        foreach ($bu_name as $data){
            $index_array = count($projecttempfix);
            $projecttempfix[$index_array]['BU_NAME'] = $data;
-           $projecttempfix[$index_array]['ITEMS']= [];
+           $projecttempfix[$index_array]['PROJECT_LIST']= [];
            for($i = 0 ; $i < count($projecttemp) ; $i++){
                 if($projecttemp[$i]['BU_NAME'] == $data){
-                    array_push($projecttempfix[$index_array]['ITEMS'],$projecttemp[$i]);
+                    array_push($projecttempfix[$index_array]['PROJECT_LIST'],$projecttemp[$i]);
                 }
            }
         }
