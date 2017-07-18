@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class Home extends CI_Controller {
+class Test extends CI_Controller {
 
 
     public $datajson = array();
@@ -292,83 +292,45 @@ class Home extends CI_Controller {
         print_r(json_encode($data));
     }
 
-
-    /*For  Timesheet*/
-   public function timesheet_old()
-   {
-       //$data=array();
-       //$data['holidays']=$this->M_data->get_holidays();
-       //$data['holidays']=json_decode($data['holidays'],true);
-       //$data['header']=($this->load->view('v_header'));
-       //$data['float_button']=($this->load->view('v_floating_button'));
-       //$data['nav']=($this->load->view('v_nav1'));
-       //$data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
-       //$data['assignment']=($this->M_home->assignmentView($user_id));
-       //$data['pr_list']=$this->M_home->assignmentProject($user_id);
-       //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
-       //$data['task_user']=($this->M_home->assignmentView($user_id));
-
-       //$this->load->view('v_home_timesheet', $data);
-       //$data['footer']=($this->load->view('v_footer2'));
-   }
-    public function timesheet($date=null){
+    /*For Timesheet*/
+    public function timesheet(){
         $user_id = $this->datajson['userdata']['USER_ID'];
-        if($date == NULL)
-            $date = date("Y-m-d", strtotime("today"));
-        $date = date("d M Y", strtotime($date));
-
         $data=array();
-        $holidays=$this->M_data->get_holidays();
-        $holidays=array_values(json_decode($holidays,true));
-        foreach ($holidays as $key)
-        {
-            $holyday[]=$key["HOLIDAY_DATE"];
-        }
-        $day[]= date('Y-m-d', strtotime($date.' Monday this week'));
-        $day[]= date('Y-m-d', strtotime($date.' Tuesday this week'));
-        $day[]= date('Y-m-d', strtotime($date.' Wednesday this week'));
-        $day[]= date('Y-m-d', strtotime($date.' Thursday this week'));
-        $day[]= date('Y-m-d', strtotime($date.' Friday this week'));
-        for ($i=0; $i<5; $i++)
-        {
-            if (in_array($day[$i], $holyday)) {
-                $data["weekdays"][$day[$i]]=array(
-                    "holiday"=>true,
-                    "work_hour"=>false
-                );
-            }
-            else{
-                $data["weekdays"][$day[$i]]=array(
-                    "holiday"=>false,
-                    "work_hour"=>8
-                );
-            }
-        }
+        $data['holidays']=$this->M_data->get_holidays();
+        $data['holidays']=json_decode($data['holidays'],true);
+        //$data['header']=($this->load->view('v_header'));
+        //$data['float_button']=($this->load->view('v_floating_button'));
+        //$data['nav']=($this->load->view('v_nav1'));
+        $data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
+        $data['assignment']=($this->M_home->assignmentView($user_id));
+        $data['pr_list']=$this->M_home->assignmentProject($user_id);
+        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+        $data['task_user']=($this->M_home->assignmentView($user_id));
 
-        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
-
+        //$this->load->view('v_home_timesheet', $data);
+        //$data['footer']=($this->load->view('v_footer2'));
+        print_r($data);
         print_r(json_encode($data));
     }
-    /*For add Timesheet*/
-    public function addtimesheet(){
+    /*For Timesheet*/
+    public function timesheet_date(){
         $user_id = $this->datajson['userdata']['USER_ID'];
-
-        $data['SUBJECT'] 		= $this->input->post("SUBJECT");
-        $data['MESSAGE'] 		= $this->input->post("MESSAGE");
-        $data['TS_DATE'] 		= $this->input->post("TS_DATE");
-        $data['HOUR_TOTAL'] 			= $this->input->post("HOUR_TOTAL");
-        $data['WP_ID']			 	= $user_id;
-
-        if(insertTimesheet($data))
+        $data=array();
+        $data['holidays']=$this->M_data->get_holidays();
+        $data['holidays']=json_decode($data['holidays'],true);
+        foreach ($data['holidays'] as $key=>$val)
         {
-            $returnmessage['title'] = "Success";
-        $returnmessage['message'] = "berhasil tambah issue";
-        }else
+             print_r($key);
+             print_r($val);
+        }
+        echo "\n<br>";
+        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+        foreach ($data['tampil_Timesheet'] as $key => $val)
         {
-            $returnmessage['title'] = "Fail";
-            $returnmessage['message'] = "Gagal ditambahkan";        }
 
-        print_r(json_encode($returnmessage));
+            print_r($key);
+            print_r($val);        }
+       // print_r(json_encode($data['holidays']));
     }
 
     public function projectactivities(){
@@ -397,10 +359,10 @@ class Home extends CI_Controller {
        foreach ($bu_name as $data){
            $index_array = count($projecttempfix);
            $projecttempfix[$index_array]['BU_NAME'] = $data;
-           $projecttempfix[$index_array]['PROJECT_LIST']= [];
+           $projecttempfix[$index_array]['ITEMS']= [];
            for($i = 0 ; $i < count($projecttemp) ; $i++){
                 if($projecttemp[$i]['BU_NAME'] == $data){
-                    array_push($projecttempfix[$index_array]['PROJECT_LIST'],$projecttemp[$i]);
+                    array_push($projecttempfix[$index_array]['ITEMS'],$projecttemp[$i]);
                 }
            }
         }

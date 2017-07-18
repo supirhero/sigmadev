@@ -7,6 +7,19 @@ Class M_timesheet extends CI_Model{
     $this->db->update('mytable', $data);
   }*/
 
+    function selectTimesheet_bydate($user_id,$date){
+        //ada perubahan
+        $query = $this->db->query("
+  SELECT *
+  FROM
+  (SELECT *
+  FROM USER_TIMESHEET where ts_date='$date'
+  ORDER BY ts_date DESC)
+  WHERE user_id='".$user_id."'");
+        $hasil = $query->result_array();
+        return $hasil;
+
+    }
     function selectTimesheet($user_id){
         //ada perubahan
         $query = $this->db->query("
