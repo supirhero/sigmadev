@@ -4,6 +4,7 @@ Untuk tahap sekarang api yang tersedia :
     * Login
     * Logout
     * Register User/Vendor
+    * Refresh Token
     
 * HOME controller
     * Detail Project overview
@@ -112,6 +113,24 @@ Header HTTP method POST :
 -> EMAIL
 -> USERNAME
 -> PASSWORD
+```
+
+## Refresh Token
+Untuk merefresh token, di capai dengan ke URI :
+```
+http://45.77.45.126/dev/login/refreshtoken
+```
+Input yang harus di provide (POST):
+```
+-> token 
+```
+Return yang akan di terima jika sukses :
+```
+-> token <= token baru
+```
+Jika refresh token error
+```
+-> refresh_error <= pesan error
 ```
 
 # HOME CONTROLLER
