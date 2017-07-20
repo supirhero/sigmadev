@@ -39,7 +39,6 @@ class Token{
         $expire     = $notBefore + 7200; // Adding 2 hours
         $serverName = 'http://45.77.45.126/dev'; /// set your domain name
 
-
         /*
          * Create the token as an array
          */
@@ -59,6 +58,35 @@ class Token{
             'HS256'
         );
         return $jwt;
+    }
+
+    public function refreshtoken_decode($oldtoken){
+        $konfirmasi = $this->decodetoken($oldtoken);
+
+        //if token is valid
+        if(is_object($konfirmasi)){
+            $returndata['refresh_error'] = 'Token Already Valid';
+             return json_encode($returndata);
+        }
+        else{
+            $konfirmasi = json_decode($konfirmasi);
+            //if token is expired
+            if($konfirmasi->login_error == 'Expired token'){
+                $tks = explode('.', $oldtoken);
+                list($headb64, $bodyb64, $cryptob64) = $tks;
+                $arrayreturn = json_decode(base64_decode($bodyb64));
+                $userdata = json_decode(json_encode($arrayreturn->data),true);
+
+                $new_token['token'] = $this->createtoken($userdata);
+                return json_encode($new_token);
+            }
+            else{
+                $returndata['refresh_error'] = 'Not a valid Token';
+                return json_encode($returndata);
+            }
+        }
+
+
     }
 }
 

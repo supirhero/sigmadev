@@ -1357,6 +1357,12 @@ class Login extends CI_Controller {
 
     }
 
+    function refreshtoken(){
+            $oldtoken = $_POST['token'];
+            $newtoken = $this->token->refreshtoken_decode($oldtoken);
+            print_r($newtoken);
+    }
+
 
 
 }
