@@ -281,7 +281,7 @@ class Report extends CI_Controller {
 
     //https://marvelapp.com/hj9eb56/screen/29382899
     public function r_directoratbu(){
-        $bu = $_POST['bu'];
+        $bu = $_POST['bu'   ];
         $tahun = $_POST['tahun'];
         $data =array();
         $data['project']['completed'] = $this->M_report->Portofolio_completed_Project($bu,$tahun);

@@ -19,6 +19,12 @@ Untuk tahap sekarang api yang tersedia :
     * My Performances
     * My Activity
     
+* Project Controller
+    * Add Project View Data
+        * Check If IWO Already Used
+        * Get Account Manager Based On IWO
+        * Check Customer Based On IWO
+        * Check Project Type <- belum digunakan
     
 ## LOGIN CONTROLLER
 
@@ -335,4 +341,63 @@ Json Return data :
     ->jumlah
 ->finance
     ->total_project_value
+```
+
+# Project Controller
+## Add Project View Data
+API ini akan collect data yang berguna untuk mengisi data yang di perlukan form untuk submit project baru. 
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/addProject_view/<Business Unit ID>
+```
+Return JSON data :
+```
+-> business_unit
+-> IWO <= Array , fetching semua iwo
+-> project_manager
+```
+Ketika user mengisi form, ada beberapa validasi input yang harus di lakukan, yaitu :
+* Check If IWO Already Used
+* Get Account Manager Based On IWO
+* Check Customer Based On IWO
+
+Dikarnakan itu di sediakan API untuk fungsi tersebut , berikut api nya.
+### Verify If IWO Already Used
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/checkiwoused/
+```
+Input yang harus di provide (POST):
+```
+-> IWO_NO
+```
+Return JSON data :
+```
+-> jumlah <= 0 berarti belum digunakan
+```
+### Get Account Manager Based On IWO
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/checkAM/
+```
+Input yang harus di provide (POST):
+```
+-> AM_ID <= ACCOUNT_MANAGER_ID , didapatkan di data IWO
+```
+Return JSON data :
+```
+-> username <= null berarti tidak ada nama
+```
+### Check Customer Based On IWO
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/checkCustomer/
+```
+Input yang harus di provide (POST):
+```
+-> CUST_ID <= Customer ID , didapatkan di data IWO
+```
+Return JSON data :
+```
+-> customer_name <= null berarti tidak ada customer name
 ```

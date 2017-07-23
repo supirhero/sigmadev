@@ -707,7 +707,7 @@ class Home extends CI_Controller {
         }
     }
 
-    function sendVerification($USER_ID,$userNamePM,$bu,$USER_VP,$userNameVP,$email_vp,$data,$project_name){
+    private function sendVerification($USER_ID,$userNamePM,$bu,$USER_VP,$userNameVP,$email_vp,$data,$project_name){
         $this->load->library('email');
         $config['protocol']='smtp';
         $config['smtp_host']='smtp.sigma.co.id';
@@ -1080,7 +1080,7 @@ class Home extends CI_Controller {
 
     }
 
-    function transformKeys(&$array)
+    private function transformKeys(&$array)
     {
         foreach (array_keys($array) as $key):
 
@@ -1101,6 +1101,93 @@ class Home extends CI_Controller {
         endforeach;
     }
 
+    public function add_task()
+    {
+        //$id       = $this->M_detail_project->getMaxNumberWBSID();
+        $project_id   = $this->input->post("PROJECT_ID");
+        $IWO      = $this->M_detail_project->getIWO($project_id);
+
+
+        //$data['ID']           = $id;
+        $data['WBS_ID']         = $project_id;
+        $data['WBS_PARENT_ID']      = $this->input->post("WBS_PARENT_ID");
+        //$data['IWO_NO']         = $IWO;
+        $data['PROJECT_ID']       = $this->input->post("PROJECT_ID");
+        $data['WBS_NAME']         = $this->input->post("WBS_NAME");
+        $data['WBS_DESC']         = $this->input->post("WBS_DESC");
+        $data['PRIORITY']         = $this->input->post("PRIORITY");
+        $data['CALCULATION_TYPE']     = $this->input->post("CALCULATION_TYPE");
+        //$data['USER_TAG']         = $this->input->post("USER_TAG");
+        //$data['PHASE']          = $this->input->post("PHASE");
+        $data['EFFORT_DRIVEN']      = $this->input->post("EFFORT_DRIVEN");
+        $data['START_DATE']       = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
+        //$data['ACTUAL_START_DATE']    = "TO_DATE('".$this->input->post("ACTUAL_START_DATE")."','yyyy-mm-dd')";
+        $data['FINISH_DATE']      ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
+        //$data['ACTUAL_FINISH_DATE']   = "TO_DATE('".$this->input->post("ACTUAL_FINISH_DATE")."','yyyy-mm-dd')";
+        $data['DURATION']         = $this->input->post("DURATION");
+        $data['WORK']           = $this->input->post("WORK");
+        $data['MILESTONE']        = $this->input->post("MILESTONE");
+        $data['WORK_COMPLETE']      = $this->input->post("WORK_COMPLETE");
+        $data['WORK_PERCENT_COMPLETE']  = $this->input->post("WORK_PERCENT_COMPLETE");
+        //$data['CONSTRAINT_TYPE']    = $this->input->post("CONSTRAINT_TYPE");
+        //$data['CONSTRAINT_DATE']    = "TO_DATE('".$this->input->post("CONSTRAINT_DATE")."','yyyy-mm-dd')";
+        //$data['DEADLINE']         = "TO_DATE('".$this->input->post("DEADLINE")."','yyyy-mm-dd')";
+        //$data['ACHIEVEMENT']      = $this->input->post("ACHIEVEMENT");
+
+
+
+        if (!isset($data)) {
+            $this->session->set_flashdata("pesan", "<div class=\"alert alert-warning\" id=\"alert\"><i class=\"glyphicon glyphicon-ok\"></i> Data gagal disimpan</div>
+                <script>
+                setTimeout(function(){
+
+             $('#alert').remove();
+      location.reload();
+    },1500);
+    </script>");
+            $project_id = $this->input->post("PROJECT_ID");
+            $r = '/Detail_Project/view/'.$project_id;
+            //  echo $r;
+            redirect($r);
+        } else {
+            $project_id = $this->input->post("PROJECT_ID");
+            $newid=$this->M_detail_project->insertWBS($data,$project_id);
+            $WP_ID= $this->M_detail_project->getMaxWPID();
+            $RP_ID= $this->M_detail_project->getMaxRPID();
+            //$this->M_detail_project->insertWBSPool($data,$RP_ID,$WP_ID,$project_id);
+            $this->session->set_flashdata("pesan", "<div class=\"alert alert-success\" id=\"alert\"><i class=\"glyphicon glyphicon-ok\"></i> Data berhasil disimpan</div><script>
+    setTimeout(function(){
+
+      $('#alert').remove();
+      location.reload();
+    },1500);
+    </script>");
+            $selWBS=$this->getSelectedWBS($newid);
+            $allParent=$this->getAllParent($selWBS->WBS_ID);
+            $dateStartWBS= new DateTime($selWBS->START_DATE);
+            $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+            foreach ($allParent as $ap) {
+                $dateStartParent=new DateTime($ap->START_DATE);
+                $dateEndParent=new DateTime($ap->FINISH_DATE);
+                if ($dateStartWBS<$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
+                }
+                if ($dateEndWBS>$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
+                }
+                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+            }
+            $project_id = $this->input->post("PROJECT_ID");
+            $r = '/Detail_Project/view/'.$project_id.'#tab2';
+            //echo $r;
+            redirect($r);
+
+        }
+        $project_id = $this->input->post("PROJECT_ID");
+        $r = '/Detail_Project/view/'.$project_id;
+        //  echo $r;
+
+    }
 
 
 }
