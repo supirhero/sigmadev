@@ -140,7 +140,7 @@ Class M_home extends CI_Model{
     function projectissuelist($id){
         $query= $this->db->query("select a.ISSUE_ID,
         a.user_id,
-        c.user_name,
+        c.user_name as reported_by,
         a.PROJECT_ID,
         b.project_name,
         a.note,
