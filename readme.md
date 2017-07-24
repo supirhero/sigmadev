@@ -30,10 +30,7 @@ Untuk tahap sekarang api yang tersedia :
 
 
 ### IMPORTANT !!
-Login sudah memakai sistem token , mohon provide token untuk setiap request ke 
-api dengan cara menyediakan token di , token bisa di dapatkan ketika sudah
-melakukan login. Token akan expired ketika sudah berumur 2 jam terhitung 
-waktu generate.
+Sekarang token expired dalam 1 minggu dan tidak perlu lagi ada request/refresh token baru
 ```
 -> Token bisa di dapati ketika proses login berhasil
 -> Untuk mengakses api setelah login, token di sisipi di header 
@@ -121,23 +118,6 @@ Header HTTP method POST :
 -> PASSWORD
 ```
 
-## Refresh Token
-Untuk merefresh token, di capai dengan ke URI :
-```
-http://45.77.45.126/dev/login/refreshtoken
-```
-Input yang harus di provide (POST):
-```
--> token 
-```
-Return yang akan di terima jika sukses :
-```
--> token <= token baru
-```
-Jika refresh token error
-```
--> refresh_error <= pesan error
-```
 
 # HOME CONTROLLER
 
