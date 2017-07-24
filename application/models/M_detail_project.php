@@ -196,43 +196,22 @@ Class M_detail_project extends CI_Model{
           }
           public function insertWBS($data, $project_id){
             $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from WBS_PROJECT where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
-            $wc=$data['DURATION']*8;
             $sql = "INSERT INTO WBS
             (
               WBS_ID,
               WBS_PARENT_ID,
               PROJECT_ID,
               WBS_NAME,
-              WBS_DESC,
-              PRIORITY,
-              CALCULATION_TYPE,
-
-              EFFORT_DRIVEN,
               START_DATE,
-
-              FINISH_DATE,
-              DURATION,
-              WORK,
-              MILESTONE,
-              WORK_COMPLETE,
-              WORK_PERCENT_COMPLETE)
+              FINISH_DATE)
               VALUES
               (
                 '".$data['WBS_ID'].".".$id."',
                 '".$data['WBS_PARENT_ID']."',
-                '".$data['PROJECT_ID']."',
+                '".$data['WBS_ID']."',
                 '".$data['WBS_NAME']."',
-                '".$data['WBS_DESC']."',
-                '".$data['PRIORITY']."',
-                '".$data['CALCULATION_TYPE']."',
-                '".$data['EFFORT_DRIVEN']."',
                 ".$data['START_DATE'].",
-                ".$data['FINISH_DATE'].",
-                '".$data['DURATION']."',
-                '".$data['WORK']."',
-                '".$data['MILESTONE']."',
-                '".$wc."',
-                '".$data['WORK_PERCENT_COMPLETE']."'
+                ".$data['FINISH_DATE']."
                 )";
                 $q = $this->db->query($sql);
                 return $data['WBS_ID'].".".$id;
