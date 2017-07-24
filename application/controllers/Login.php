@@ -7,6 +7,7 @@ class Login extends CI_Controller {
         parent::__construct();
         $this->load->model('M_login');
         $this->load->model('M_user');
+        $this->load->model('M_session');
         //$this->load->library("security");
         //print_r($_POST);
 
@@ -15,6 +16,9 @@ class Login extends CI_Controller {
     }
     function index($error=null)
     {
+    //   print_r($this->M_session->GetDataUser('a3c58756ce0b620e424b5d31df583762'));
+       // $token = $this->M_session->insert_session("S201502162");
+
         $error=$this->uri->segment(3,0);
         if(isset($error)||$error!=""){
             $data['title']= 'error';
@@ -42,9 +46,9 @@ class Login extends CI_Controller {
         //$data['user_id']=($this->M_login->tampil());
         //$this->load->view('v_home.php', $data);
         //$this->load->view('footer_view',$data);
-        $id=$this->token->decodetoken($token)->data;
-        $this->M_user->lastLogin($id->USER_ID);
-        print_r($token);
+     //   $id=$this->token->decodetoken($token)->data;
+    //    $this->M_user->lastLogin($id->USER_ID);
+     //   print_r($token);
         //print_r($this->session);
         //go to home route
         //print_r($_SESSION);
@@ -71,7 +75,9 @@ class Login extends CI_Controller {
                 else {
                     $result=$this->M_login->loginsso($sso['NIK']);
                 }
-                $token = $this->token->createtoken($result);
+               // $token = $this->token->createtoken($result);
+                $token = $this->M_session->insert_session($result["USER_ID"]);
+
                 redirect('/login/welcome?token='.$token);
             }
             //if status 0 thats mean wrong password or it can be admin,check to next query
@@ -85,7 +91,7 @@ class Login extends CI_Controller {
                         //redirect to login as admin
                         //print_r($_SESSION);
 
-                        $token = $this->token->createtoken($result['userdata']);
+                        $token = $this->M_session->insert_session($result["USER_ID"]);
                         redirect('/login/welcome?token='.$token);
                     }
 
@@ -100,6 +106,7 @@ class Login extends CI_Controller {
             print_r(json_encode($data));
         }
     }
+
     //authetivication login
     function sso($email,$password)
     {
