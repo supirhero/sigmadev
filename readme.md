@@ -25,6 +25,12 @@ Untuk tahap sekarang api yang tersedia :
         * Get Account Manager Based On IWO
         * Check Customer Based On IWO
         * Check Project Type <- belum digunakan
+        
+* Task Controller 
+    * Create Task
+    * Workplan View
+    * Edit Task View
+    * Edit Task Percent
     
 ## LOGIN CONTROLLER
 
@@ -380,4 +386,70 @@ Input yang harus di provide (POST):
 Return JSON data :
 ```
 -> customer_name <= null berarti tidak ada customer name
+```
+
+
+# Task Controller
+## Create Task
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/task/checkCustomer/
+```
+Input yang harus di provide :
+```
+-> PROJECT_ID
+-> WBS_NAME
+-> WBS_ID
+-> WBS_PARENT_ID
+-> START_DATE <= ex :2017-07-25
+-> FINISH_DATE <= ex :2017-07-25
+```
+
+Return data json jika proses berhasil/gagal :
+```
+-> status
+```
+
+## Workplan View
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/task/workplan_view/<id_project>
+```
+Return data json :
+```
+-> tampil_detail
+    -> array() <= semua data wbs berdasarkan project
+```
+
+## Edit Task View 
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/task/edittask_view/<wbs_id>
+```
+Return data json :
+```
+-> hasil
+    -> wbs_id
+    -> wbs_parent_id
+    -> project_id
+    -> .. (semua data dari task bersangkutan)
+```
+
+## Edit Task Percent
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/task/editTaskPercent/
+```
+Input yang harus di provide :
+```
+-> PROJECT_ID
+-> WBS_ID
+-> WORK_PERCENT_COMPLETE
+-> START_DATE <= ex :2017-07-25
+-> FINISH_DATE <= ex :2017-07-25
+```
+
+Return data json jika proses berhasil/gagal :
+```
+-> status
 ```
