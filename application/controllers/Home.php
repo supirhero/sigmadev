@@ -59,8 +59,6 @@ class Home extends CI_Controller {
     /*For Overview Home*/
     public function index(){
 
-        print_r($this->datajson['userdata']);
-        die;
         $bagian_unit = $this->datajson['userdata']['BU_ID'];
         $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
         $this->datajson['bussines_unit'] = $query->BU_NAME;
