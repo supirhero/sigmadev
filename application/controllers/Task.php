@@ -3,6 +3,7 @@
 class Task extends CI_Controller
 {
 
+    private $datajson = [];
     function __construct()
     {
         parent::__construct();
@@ -29,7 +30,7 @@ class Task extends CI_Controller
         //if login success
         if(!isset($decoded_user_data[0])){
             //get user data from token
-            $this->datajson['userdata'] = (array)$decoded_user_data['data'];
+            $this->datajson['userdata'] =$decoded_user_data;
         }
         //if login fail
         else {
@@ -60,7 +61,7 @@ class Task extends CI_Controller
 
         // insert into wbs and get new ID
         $newid = $this->M_detail_project->insertWBS($data,$project_id);
-        die();
+
         //get new wbs_pool id
         $WP_ID= $this->M_detail_project->getMaxWPID();
 
@@ -86,7 +87,6 @@ class Task extends CI_Controller
         $data['status'] = "Success add Task";
         echo json_encode($data['status']);
     }
-
 
     //EDIT TASK
     function editTask($wbs_id)
@@ -115,9 +115,11 @@ class Task extends CI_Controller
         $data['WBS_ID']=$this->input->post("WBS_ID");
         $data['PROJECT_ID']=$this->input->post("PROJECT_ID");
         $data['WORK_PERCENT_COMPLETE']=$this->input->post("WORK_PERCENT_COMPLETE");
-        $data['DESCRIPTION']=$this->input->post("DESCRIPTION");
+
+        //data di null kan , supaya input di modal berhasil
+        $data['DESCRIPTION']="";
         $data['DATE']=date("d/m/Y");
-        $data['USER_ID']=$this->session->userdata('USER_ID');
+        $data['USER_ID']=$this->datajson['userdata']['USER_ID'];
         $this->M_detail_project->UpdatePercentWBS($data);
 
         $returndata['status'] = "success";
