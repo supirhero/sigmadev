@@ -24,6 +24,11 @@ $new_session = md5(time().rand(1,999999));
         $this->db->insert("USER_SESSION");
 return $new_session;
     }
+    public function update_session($token){
+        $newexpiry=time()+7*24*60*60;
+        $sql="update USER_SESSION set SESSION_EXPIRED='".$newexpiry."' where SESSION_TOKEN='".$token."'";
+        $q = $this->db->query($sql);
+    }
 
 }
 ?>
