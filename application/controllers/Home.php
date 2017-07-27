@@ -27,6 +27,7 @@ class Home extends CI_Controller {
             $decoded_user_data =$datauser;
         //    print_r($decoded_user_data);
             $this->datajson['token'] = $_GET['token'];
+
         }
         elseif(isset($_SERVER['HTTP_TOKEN'])){
             $decoded_user_data = $this->M_session->GetDataUser($_SERVER['HTTP_TOKEN']);
@@ -53,6 +54,9 @@ class Home extends CI_Controller {
             $error['error']="session is expired";
             echo json_encode($error);
             die();
+        }
+        else{
+            $this->M_session->update_session($this->datajson['token']);
         }
     }
 
