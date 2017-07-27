@@ -31,6 +31,7 @@ Untuk tahap sekarang api yang tersedia :
     * Workplan View
     * Edit Task View
     * Edit Task Percent
+    * Assign Task Member View
     
 ## LOGIN CONTROLLER
 
@@ -452,4 +453,21 @@ Input yang harus di provide :
 Return data json jika proses berhasil/gagal :
 ```
 -> status
+```
+
+## Assign Task Member View
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/task/editTaskPercent/
+```
+Input yang harus di provide :
+```
+-> PROJECT_ID
+-> WBS_ID
+```
+Return data json :
+```
+-> task_name
+-> available_to_assign
+-> currently_assigned
 ```

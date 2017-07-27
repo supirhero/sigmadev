@@ -194,12 +194,12 @@ class Task extends CI_Controller
     }
 
     //View Edit task member project
-    public function assignTaskMember(){
+    public function assignTaskMember_view(){
         $project=$this->input->post('PROJECT_ID');
         $wbs_id=$this->input->post('WBS_ID');
         $data['task_name'] = $this->M_detail_project->getWBSselected($wbs_id)->WBS_NAME;
-        $data['available_user'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id);
-        $data['Used_User']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id);
+        $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id);
+        $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id);
         echo json_encode($data);
     }
 
