@@ -450,13 +450,13 @@ Class M_detail_project extends CI_Model{
                       $wbs=$this->input->post('WBS_ID');
                       $member=$this->input->post('MEMBER');
 
-                      foreach ($member as $m) {
-                        $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from WBS_POOL")->row()->NEW_ID;
-                        $this->db->set('RP_ID', $m);
-                        $this->db->set('WP_ID', $id);
-                        $this->db->set('WBS_ID', $wbs);
-                        $this->db->insert("WBS_POOL");
-                      }
+
+                      $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from WBS_POOL")->row()->NEW_ID;
+                      $this->db->set('RP_ID', $member);
+                      $this->db->set('WP_ID', $id);
+                      $this->db->set('WBS_ID', $wbs);
+                      $this->db->insert("WBS_POOL");
+
                       $res=$this->db->query("select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'")->row()->RES;
                       $dur=$this->db->query("select DURATION as DUR from wbs where wbs_id='$wbs'")->row()->DUR;
                       $this->db->query("update wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'");

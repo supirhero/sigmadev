@@ -206,28 +206,34 @@ class Task extends CI_Controller
     //Remove task from task member
     public function removeTaskMemberProject(){
         $this->M_detail_project->removeAssignement();
+
+        //send email
+        $email=$this->input->post('EMAIL');
+        $user_name=$this->input->post('NAME');
+        $wbs_name=$this->input->post('WBS_NAME');
+        //$this->sendVerificationremoveMember($email,$user_name,$wbs_name);
+
+        //return
         $data['status'] = 'success';
         echo json_encode($data);
     }
 
     //Assign task to project member
     public function assignTaskMemberProject(){
-        //echo var_dump($_POST);
+        //assign process
+        $this->M_detail_project->postAssignment();
+
+        //send email
         $wbs=$this->input->post('WBS_ID');
         $email=$this->input->post('EMAIL');
-        $user_name=$this->input->post('USER_NAME');
+        $user_name=$this->input->post('NAME');
         $wbs_name=$this->input->post('WBS_NAME');
-        $member=array();
-        //echo $this->input->post('test');
-        //print_r($_POST);
-
-
-        //echo $email;
-        //echo $email;
-        //print_r($email);
         $projectid = $this->M_detail_project->getProject_Id($wbs);
-        $this->M_detail_project->postAssignment();
-        $this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
+        //$this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
+
+        //return
+        $data['status'] = 'success';
+        echo json_encode($data);
 
     }
 
