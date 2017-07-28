@@ -417,14 +417,19 @@ Class M_detail_project extends CI_Model{
                     $wbs=$this->input->post('WBS_ID');
                     $member=$this->input->post('MEMBER');
 
-                    foreach ($member as $m) {
-                      $this->db->where('RP_ID', $m);
-                      $this->db->where('WBS_ID', $wbs);
-                      $this->db->delete("WBS_POOL");
-                    }
+                    //delete member from wbs_pool
+                    $this->db->where('RP_ID', $member);
+                    $this->db->where('WBS_ID', $wbs);
+                    $this->db->delete("WBS_POOL");
+
+
+                    //count jumlah member di task
                     $res=$this->db->query("select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'")->row()->RES;
+                    //update resource wbs same as $res
                     $this->db->query("update wbs set resource_wbs=$res where wbs_id='$wbs'");
                     $allParent=$this->getAllParentWBS($wbs);
+                    //print_r($allParent);
+                    //die;
                     foreach ($allParent as $ap) {
                       $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
                       $wc=0;

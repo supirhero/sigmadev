@@ -205,18 +205,9 @@ class Task extends CI_Controller
 
     //Remove task from task member
     public function removeTaskMemberProject(){
-        $wbs=$this->input->post('WBS_ID');
-        $member=array();
-        //echo $this->input->post('test');
-        //print_r($_POST);
-        $email=$this->input->post('EMAIL');
-        $user_name=$this->input->post('NAMA');
-        $wbs_name=$this->input->post('WBS_NAME2');
-        $member=$this->input->post('MEMBER');
-        //  print_r($wbs_name);
-        //echo $wbs_name;
         $this->M_detail_project->removeAssignement();
-        $this->sendVerificationremoveMember($email,$user_name,$wbs_name);
+        $data['status'] = 'success';
+        echo json_encode($data);
     }
 
     //Assign task to project member

@@ -32,6 +32,7 @@ Untuk tahap sekarang api yang tersedia :
     * Edit Task View
     * Edit Task Percent
     * Assign Task Member View
+    * Delete Task Member
     
 ## LOGIN CONTROLLER
 
@@ -470,4 +471,19 @@ Return data json :
 -> task_name
 -> available_to_assign
 -> currently_assigned
+```
+
+## Delete Task Member
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/task/removeTaskMemberProject/
+```
+Input yang harus di provide :
+```
+-> WBS_ID
+-> MEMBER (RP_ID)
+```
+Return data json :
+```
+-> status
 ```
