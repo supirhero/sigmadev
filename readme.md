@@ -134,7 +134,7 @@ Header HTTP method POST :
 ## Detail project
 Detail project overview bisa di capai dengan ke url :
 ```
-http://45.77.45.126/dev/home/detaiproject/<id dari project>
+http://45.77.45.126/dev/home/detailproject/<id dari project>
 ```
 Return data json object yang di terima adalah :
 ```
