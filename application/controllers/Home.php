@@ -30,7 +30,7 @@ class Home extends CI_Controller {
 
         }
         elseif(isset($_SERVER['HTTP_TOKEN'])){
-            $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
+            $datauser["data"] = $this->M_session->GetDataUser($_SERVER['HTTP_TOKEN']);
 
             $decoded_user_data = $datauser["data"];
             $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
