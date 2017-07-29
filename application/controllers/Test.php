@@ -20,30 +20,19 @@ class Test extends CI_Controller {
         $this->load->model('M_data');
 
 
-        //TOKEN LOGIN CHECKER
-        if(isset($_GET['token'])){
-            $decoded_user_data =(array) $this->token->decodetoken($_GET['token']);
-            $this->datajson['token'] = $_GET['token'];
-        }
-        elseif(isset($_SERVER['HTTP_TOKEN'])){
-            $decoded_user_data =(array) $this->token->decodetoken($_SERVER['HTTP_TOKEN']);
-            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
-        }
-        else{
-            $error['error']="Login First!";
-            echo json_encode($error);
-            die();
-        }
-        //if login success
-        if(!isset($decoded_user_data[0])){
+
             //get user data from token
-            $this->datajson['userdata'] = (array)$decoded_user_data['data'];
-        }
-        //if login fail
-        else {
-            echo $decoded_user_data[0];
-            die();
-        }
+            $this->datajson['userdata'] = json_decode("{
+    \"USER_ID\": \"S201502162\",
+    \"USER_NAME\": \"GINA KHAYATUNNUFUS\",
+    \"EMAIL\": \"gina.nufus@sigma.co.id\",
+    \"BU_ID\": \"36\",
+    \"USER_TYPE_ID\": \"int\",
+    \"SUP_ID\": \"S201404159\",
+    \"PROF_ID\": \"6\",
+    \"last_login\": \"17-JUL-17\",
+    \"logged_in\": true
+  }", true);
 
     }
 
@@ -276,7 +265,7 @@ class Test extends CI_Controller {
 
     /*For Activities*/
     public function myactivities(){
-        $user_id = $this->datajson['userdata']['USER_ID'];
+        $user_id = $this->datajson['userdata']['user_id'];
         $data=array();
         //$data['header']=($this->load->view('v_header'));
         //$data['float_button']=($this->load->view('v_floating_button'));
@@ -294,7 +283,7 @@ class Test extends CI_Controller {
 
     /*For Timesheet*/
     public function timesheet(){
-        $user_id = $this->datajson['userdata']['USER_ID'];
+        $user_id = $this->datajson['userdata']['user_id'];
         $data=array();
         $data['holidays']=$this->M_data->get_holidays();
         $data['holidays']=json_decode($data['holidays'],true);
@@ -309,29 +298,52 @@ class Test extends CI_Controller {
 
         //$this->load->view('v_home_timesheet', $data);
         //$data['footer']=($this->load->view('v_footer2'));
-        print_r($data);
+        print_r( $data['tampil_Timesheet']);
+        print_r(json_encode( $data['tampil_Timesheet']));
+    }
+    /*For Timesheet*/
+    public function timesheet_date($date=NULL){
+        if($date == NULL)
+            $date = date("Y-m-d", strtotime("today"));
+        $user_id = $this->datajson['userdata']['user_id'];
+        $date = date("d M Y", strtotime($date));
+
+        $user_id = $this->datajson['userdata']['user_id'];
+        $data=array();
+        $holidays=$this->M_data->get_holidays();
+        $holidays=array_values(json_decode($holidays,true));
+        foreach ($holidays as $key)
+        {
+            $holyday[]=$key["HOLIDAY_DATE"];
+        }
+        $day[]= date('Y-m-d', strtotime($date.' Monday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Tuesday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Wednesday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Thursday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Friday this week'));
+        for ($i=0; $i<5; $i++)
+        {
+            if (in_array($day[$i], $holyday)) {
+                $data["weekdays"][$day[$i]]=array(
+                    "holiday"=>true,
+                    "work_hour"=>false
+                );
+            }
+            else{
+                $data["weekdays"][$day[$i]]=array(
+                    "holiday"=>false,
+                    "work_hour"=>8
+                );
+            }
+        }
+
+        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
+
         print_r(json_encode($data));
     }
     /*For Timesheet*/
-    public function timesheet_date(){
-        $user_id = $this->datajson['userdata']['USER_ID'];
-        $data=array();
-        $data['holidays']=$this->M_data->get_holidays();
-        $data['holidays']=json_decode($data['holidays'],true);
-        foreach ($data['holidays'] as $key=>$val)
-        {
-             print_r($key);
-             print_r($val);
-        }
-        echo "\n<br>";
-        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
-        foreach ($data['tampil_Timesheet'] as $key => $val)
-        {
-
-            print_r($key);
-            print_r($val);        }
-       // print_r(json_encode($data['holidays']));
-    }
+    public function coba($date=NULL){
+       }
 
     public function projectactivities(){
         $project_id = $this->uri->segment(3);
@@ -345,7 +357,7 @@ class Test extends CI_Controller {
     }
 
     /*FOR PROJECT LIST*/
-    private function project(){
+    public function project(){
         $prof = $this->datajson['userdata']['PROF_ID'];
         $id = $this->datajson['userdata']['USER_ID'];
         $projecttemp = $this->M_project->getUsersProject($id);
@@ -368,6 +380,8 @@ class Test extends CI_Controller {
         }
 
         $this->datajson['project'] = $projecttempfix;
+        print_r($this->datajson['project']);
+        return json_encode($this->datajson);
         //$id_bu = $this->session->userdata('BU_ID');
         //$this->datajson['tampil_Timesheet']=($this->M_timesheet->selectTimesheet2($id_bu));
     }
