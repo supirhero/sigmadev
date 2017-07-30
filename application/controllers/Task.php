@@ -30,7 +30,10 @@ class Task extends CI_Controller
         //if login success
         if(count($decoded_user_data) > 0){
             //get user data from token
-            $this->datajson['userdata'] =$decoded_user_data;
+            //for login bypass ,this algorithm is not used
+            //$this->datajson['userdata'] = (array)$decoded_user_data['data'];
+            //this code below for login bypass
+            $this->datajson['userdata'] = $decoded_user_data;
         }
         //if login fail
         else {
