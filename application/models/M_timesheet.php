@@ -68,16 +68,13 @@ Class M_timesheet extends CI_Model{
 
     }
 
+
+
     function selectprojectid($id){
         $query = $this->db->query("SELECT * FROM V_PROJECT_TEAM_MEMBER WHERE USER_ID='".$id."'");
         $hasil = $query->result_array();
         return $hasil;
     }
-
-
-
-
-
 
     function getUser($id){
         $query = $this->db->query("SELECT * FROM USERS WHERE USER_ID='".$id."'");
@@ -85,25 +82,6 @@ Class M_timesheet extends CI_Model{
         return $hasil;
     }
 
-
-    public function insertTimesheet($data){
-
-        $date =	$data['TS_DATE'] ;
-        //$date2 =	$data2['TS_DATE'] ;
-        $tgl=date_format(date_create($data['TS_DATE']),'Ymd');
-        $this->db->set('TS_ID',$data['WP_ID'].".".$tgl);
-        $this->db->set('SUBJECT',$data['SUBJECT']);
-        $this->db->set('MESSAGE',$data['MESSAGE']);
-        $this->db->set('WP_ID',$data['WP_ID']);
-        $this->db->set('HOUR_TOTAL',$data['HOUR_TOTAL']);
-        $this->db->set('TS_DATE',"to_date('$date','YYYY-MM-DD')",false);
-        $this->db->set('SUBMIT_DATE',"to_date('$date','YYYY-MM-DD')",false);
-
-        //$data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
-        $wp=$data['WP_ID'];
-        $this->db->insert("TIMESHEET");
-        $this->updateProgress($data['WP_ID']);
-    }
     function updateProgress($wp){
         $wbs=$this->db->query("SELECT WBS_ID from WBS_POOL WHERE WP_ID='".$wp."'")->row()->WBS_ID;
         $work=$this->db->query("select sum(hour_total) as WORK_H, wbs_id from user_timesheet where wbs_id='$wbs'  group by wbs_id")->row()->WORK_H;
@@ -216,15 +194,6 @@ Class M_timesheet extends CI_Model{
         $wp=$this->db->query("select WP_ID from timesheet where ts_id='".$id."'")->row_array()->WP_ID;
         $this->updateProgress($wp);
     }
-    function checkTSData($wp,$date){
-        $id=$wp.".".date_format(date_create($date),'Ymd');
-        $query=$this->db->query("select HOUR_TOTAL as HOURS from TIMESHEET where TS_ID='".$id."'");
-        if($query->num_rows() > 0){
-            return $query->row()->HOURS;
-        }else{
-            return 'a';
-        }
-    }
 
     function selectCalendar(){
         $sql="select HOLIDAY_ID, HOLIDAY, TO_CHAR(HOLIDAY_START,'yyyy-mm-dd') AS HOLIDAY_START,TO_CHAR(HOLIDAY_END,'yyyy-mm-dd') AS HOLIDAY_END, COLOR FROM P_HOLIDAY where HOLIDAY_START is not null";
@@ -326,4 +295,94 @@ GROUP BY TS_DATE")->result_array();
   AND to_date('".$dt6."','YYYY-MM-DD')")->row()->TOTAL_HOUR;
     }
 
+    public function insertTimesheet($data){
+
+        $date =	$data['TS_DATE'] ;
+        //$date2 =	$data2['TS_DATE'] ;
+        $tgl=date_format(date_create($data['TS_DATE']),'Ymd');
+        $this->db->set('TS_ID',$data['WP_ID'].".".$tgl);
+        $this->db->set('SUBJECT',$data['SUBJECT']);
+        $this->db->set('MESSAGE',$data['MESSAGE']);
+        $this->db->set('WP_ID',$data['WP_ID']);
+        $this->db->set('HOUR_TOTAL',$data['HOUR_TOTAL']);
+        $this->db->set('TS_DATE',"to_date('$date','YYYY-MM-DD')",false);
+        $this->db->set('SUBMIT_DATE',"to_date('$date','YYYY-MM-DD')",false);
+
+        //$data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
+        $wp=$data['WP_ID'];
+        $this->db->insert("TIMESHEET");
+        $this->updateProgress($data['WP_ID']);
+    }
+
+    function inputTimesheet($data){
+
+        //change date input for readable to sql
+        $tgl=date_format(date_create($data['DATE']),'Ymd');
+
+        //check timesheet data for this date ,
+        //0 = no data
+        //-1 = have an old data (Only one data)
+        //1 = have a new data
+        $jumlahts=$this->checkTSData($data['WP_ID'],$tgl);
+
+        if($jumlahts == 0){
+            echo "no data";
+        }
+        elseif($jumlahts == 1){
+            echo "new data";
+        }
+        elseif($jumlahts == -1){
+            $getOldData = $this->db->query("select * from timesheet where TS_DATE = to_date('$tgl','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array();
+            $this->db->set('TS_ID',$getOldData[0]['TS_ID'].".".str_pad(1,2,"0",STR_PAD_LEFT));
+            $this->db->where("TS_DATE = to_date('$tgl','yyyymmdd')");
+            $this->db->like('TS_ID', $data['WP_ID'].'.','after');
+
+            $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01' 
+                              where TS_DATE = to_date('$tgl','yyyymmdd') 
+                              and TS_ID LIKE '".$data['WP_ID'].".%'";
+
+            $runQuery = $this->db->query($queryupdate);
+
+
+
+
+        }
+        die;
+        $id=$data['WP_ID'].".".$tgl;
+        $date=date("Y-m-d");
+    }
+
+    function checkTSData($wp,$date){
+        //for update old data from this date
+        $old_data = $this->db->query("select max(substr(TS_ID,-3,3)) as TS_ID from timesheet where TS_DATE = to_date('$date','yyyymmdd') and TS_ID LIKE '$wp.%'")->result_array();
+        $data = explode('.',$old_data[0]['TS_ID']);
+
+        //if no data from this date
+        if($old_data[0]['TS_ID'] == null ){
+            //echo "No data";
+            return 0;
+        }
+        //if have data but an old data
+        elseif(count($data) == 1){
+            return -1;
+        }
+        //if have data and a new data
+        elseif(count($data) == 2){
+            return 1;
+        }
+
+        /*
+        die;
+        $id=$wp.".".date_format(date_create($date),'Ymd');
+        $query=$this->db->query("select HOUR_TOTAL as HOURS from TIMESHEET where TS_ID='".$id."'");
+
+        if($query->num_rows() > 0){
+            return $query->num_rows();
+        }else{
+            return 'a';
+        }*/
+    }
+
 }
+
+
