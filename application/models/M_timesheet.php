@@ -294,26 +294,6 @@ GROUP BY TS_DATE")->result_array();
   BETWEEN to_date('".$dt0."','YYYY-MM-DD')
   AND to_date('".$dt6."','YYYY-MM-DD')")->row()->TOTAL_HOUR;
     }
-
-    public function insertTimesheet($data){
-
-        $date =	$data['TS_DATE'] ;
-        //$date2 =	$data2['TS_DATE'] ;
-        $tgl=date_format(date_create($data['TS_DATE']),'Ymd');
-        $this->db->set('TS_ID',$data['WP_ID'].".".$tgl);
-        $this->db->set('SUBJECT',$data['SUBJECT']);
-        $this->db->set('MESSAGE',$data['MESSAGE']);
-        $this->db->set('WP_ID',$data['WP_ID']);
-        $this->db->set('HOUR_TOTAL',$data['HOUR_TOTAL']);
-        $this->db->set('TS_DATE',"to_date('$date','YYYY-MM-DD')",false);
-        $this->db->set('SUBMIT_DATE',"to_date('$date','YYYY-MM-DD')",false);
-
-        //$data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
-        $wp=$data['WP_ID'];
-        $this->db->insert("TIMESHEET");
-        $this->updateProgress($data['WP_ID']);
-    }
-
     function inputTimesheet($data){
 
         //change date input for readable to sql
@@ -399,9 +379,8 @@ GROUP BY TS_DATE")->result_array();
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
         }
-        die;
-        $id=$data['WP_ID'].".".$tgl;
-        $date=date("Y-m-d");
+        $data['status'] = "success";
+        echo json_encode($data);
     }
 
     function checkTSData($wp,$date){

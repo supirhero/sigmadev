@@ -34,6 +34,9 @@ Untuk tahap sekarang api yang tersedia :
     * Assign Task Member View
     * Add Task Member
     * Delete Task Member
+
+* Timesheet Controller
+    * Add Timesheet
     
     
 ## LOGIN CONTROLLER
@@ -506,6 +509,27 @@ Input yang harus di provide :
 -> EMAIL
 -> NAME (Nama Anggota yang di delete)
 -> WBS_NAME (Nama Task)
+```
+Return data json :
+```
+-> status
+```
+
+#TIMESHEET CONTROLLER
+## Add Timesheet
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/task/removeTaskMemberProject/
+```
+Input yang harus di provide :
+```
+-> WP_ID (DIDAPATI KETIKA VIEW TIMESHEET)
+-> TS_DATE (ex 2017-07-31)
+-> HOUR
+-> TS_SUBJECT 
+-> TS_MESSAGE
+-> LATITUDE
+-> LONGTITUDE
 ```
 Return data json :
 ```
