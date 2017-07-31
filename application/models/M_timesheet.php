@@ -13,7 +13,7 @@ Class M_timesheet extends CI_Model{
   SELECT *
   FROM
   (SELECT *
-  FROM USER_TIMESHEET where ts_date='$date'
+  FROM USER_TIMESHEET where ts_date= to_date('$date','yyyy-mm-dd')
   ORDER BY ts_date DESC)
   WHERE user_id='".$user_id."'");
         $hasil = $query->result_array();
@@ -22,13 +22,16 @@ Class M_timesheet extends CI_Model{
     }
     function selectTimesheet($user_id){
         //ada perubahan
+        $now = date('Y-m-d');
+        $past = date('Y-m-d', strtotime('-6 days'));
         $query = $this->db->query("
-  SELECT *
-  FROM
-  (SELECT *
-  FROM USER_TIMESHEET
-  ORDER BY ts_date DESC)
-  WHERE user_id='".$user_id."' and rownum < 20");
+                                  SELECT *
+                                  FROM
+                                  (SELECT *
+                                  FROM USER_TIMESHEET
+                                  ORDER BY ts_date DESC)
+                                  WHERE user_id='".$user_id."'
+                                  and ts_date between to_date('$past','yyyy-mm-dd') and to_date('$now','yyyy-mm-dd')");
         $hasil = $query->result_array();
         return $hasil;
 
@@ -272,17 +275,14 @@ GROUP BY TS_DATE")->result_array();
     }
 
     function selectHourAllProject($dt0,$dt6,$user_id){
-        return $this->db->query("
-
-  SELECT SUM(HOUR_TOTAL) as HOUR,to_char(ts_date,'DAY',
-  'NLS_DATE_LANGUAGE=''numeric date language''') as d
-  FROM user_timesheet
-  WHERE user_id ='".$user_id."'
-
-  AND ts_date
-  BETWEEN to_date('".$dt0."','YYYY-MM-DD')
-  AND to_date('".$dt6."','YYYY-MM-DD')
-GROUP BY TS_DATE")->result_array();
+        return $this->db->query(" SELECT SUM(HOUR_TOTAL) as HOUR,ts_date
+                                  FROM user_timesheet
+                                  WHERE user_id ='".$user_id."'
+                                  AND is_approved = 1
+                                  AND ts_date
+                                  BETWEEN to_date('".$dt0."','YYYY-MM-DD')
+                                  AND to_date('".$dt6."','YYYY-MM-DD')
+                                GROUP BY TS_DATE")->result_array();
     }
 
     function selectTotalHourAllProject($dt0,$dt6,$user_id){
@@ -292,8 +292,10 @@ GROUP BY TS_DATE")->result_array();
   WHERE user_id ='".$user_id."'
   AND ts_date
   BETWEEN to_date('".$dt0."','YYYY-MM-DD')
-  AND to_date('".$dt6."','YYYY-MM-DD')")->row()->TOTAL_HOUR;
+  AND to_date('".$dt6."','YYYY-MM-DD')
+  and is_approved = 1")->row()->TOTAL_HOUR;
     }
+
     function inputTimesheet($data){
 
         //change date input for readable to sql
@@ -379,8 +381,6 @@ GROUP BY TS_DATE")->result_array();
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
         }
-        $data['status'] = "success";
-        echo json_encode($data);
     }
 
     function checkTSData($wp,$date){

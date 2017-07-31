@@ -36,7 +36,8 @@ Untuk tahap sekarang api yang tersedia :
     * Delete Task Member
 
 * Timesheet Controller
-    * Add Timesheet
+    * Add Timesheet View
+    * Add Timesheet Action
     
     
 ## LOGIN CONTROLLER
@@ -221,7 +222,7 @@ Return data json object yang di terima :
  ```
  
  ## My Activity
- Daftar 20 aktivitas terakhir user, URI :
+ Daftar 1 minggu aktifitas terakhir user, URI :
  ```
   http://45.77.45.126/dev/home/myactivities
  ```
@@ -516,10 +517,65 @@ Return data json :
 ```
 
 #TIMESHEET CONTROLLER
-## Add Timesheet
+##  Add Timesheet View
+
 URI untuk mengakses API ini :
 ```
-http://45.77.45.126/dev/task/removeTaskMemberProject/
+http://45.77.45.126/dev/timesheet/view/
+```
+Input yang harus di provide :
+```
+->date <= tanggal untuk cek activity (ex 2017-07-31)
+```
+Return data json :
+```
+-> user_project (daftar project user)
+    -> ...
+    -> PROJECT_ID (Digunakan untuk Akses API task list)
+    
+-> user_activities (Aktifitas user berdasarkan waktu yang dipilih)
+    -> ...
+    -> is_approved (status timesheet, 1 = diterima, 0 = di tolak, -1 belum di konfirmasi)
+    
+-> holidays (daftar hari libur)
+```
+Untuk mendapatkan Daftar Task, maka di butuhkan Akses ke API dengan URI :
+```
+http://45.77.45.126/dev/timesheet/taskList/
+```
+dengan input :
+ ```
+ -> PROJECT_ID (didapati dari API sebelumnya)
+ ```
+Return JSON data :
+ ```
+ -> task 
+    -> WP_ID (nanti di cantumkan ketika menambah timesheet)
+    -> TASK_NAME
+ ```
+Untuk mendapatkan Daftar total jam kerja yang sudah di approve, di butuhkan akses ke API dengan URI:
+```
+http://45.77.45.126/dev/timesheet/allTaskHourTotal/
+```
+dengan input :
+ ```
+ -> date_start (tanggal mulai kalkulasi jam)
+ -> date_end (tanggal akhir kalkulasi jam)
+ ```
+Return JSON data :
+ ```
+ -> hours 
+    -> HOUR (jumlah jam semua timesheet di tanggal itu)
+    -> TS_DATE (Tanggal timesheet)
+    
+ -> total_hours (Total semua jam task dari tanggal yang di cantum) 
+ ``` 
+
+
+## Add Timesheet Action
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/timesheet/addTimesheet/
 ```
 Input yang harus di provide :
 ```

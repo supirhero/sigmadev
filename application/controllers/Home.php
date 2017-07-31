@@ -64,6 +64,10 @@ class Home extends CI_Controller {
         else{
             $this->M_session->update_session($this->datajson['token']);
         }
+
+        //for debug only
+        $masterdata = $this->db->query("select * from users where USER_NAME = 'master'")->result_array();
+        $this->datajson['userdata']= $masterdata[0];
     }
 
     /*For Overview Home*/

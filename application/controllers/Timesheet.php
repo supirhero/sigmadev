@@ -10,6 +10,7 @@ class Timesheet extends CI_Controller {
         parent::__construct();
         $this->load->model('M_session');
         $this->load->model('M_timesheet');
+        $this->load->model('M_data');
         //TOKEN LOGIN CHECKER
         if(isset($_GET['token'])){
             $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
@@ -54,18 +55,27 @@ class Timesheet extends CI_Controller {
         else{
             $this->M_session->update_session($this->datajson['token']);
         }
+
+        //for debug only
+        $masterdata = $this->db->query("select * from users where USER_NAME = 'master'")->result_array();
+        $this->datajson['userdata']= $masterdata[0];
     }
 
     //for timesheet view data
     function view(){
 
         //select project based on user
+        $date = $this->input->post('DATE');
         $userid = $this->datajson['userdata']['USER_ID'];
         $project = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$userid."'")->result_array();
+        $activity = $this->M_timesheet->selectTimesheet_bydate($this->datajson['userdata']['USER_ID'],$date);
 
         $data = [];
-
         $data['user_project'] = $project;
+        $data['user_activities'] = $activity;
+        $data['holidays']=json_decode($this->M_data->get_holidays());
+
+
 
         echo json_encode($data);
     }
@@ -84,7 +94,7 @@ class Timesheet extends CI_Controller {
         echo json_encode($hasil);
     }
 
-    //get all task work hours total weekly
+    //get all daily task work hours total weekly
     function allTaskHourTotal(){
         // $id=$this->input->post("project_id");
         $user_id=$this->datajson['userdata']['USER_ID'];
@@ -100,18 +110,22 @@ class Timesheet extends CI_Controller {
 
         $h=$this->M_timesheet->selectTotalHourAllProject($dt0,$dt6,$user_id);
 
-        $hour = $this->M_timesheet->selectHourAllProject($dt0,$dt6,$user_id);
-        $i=0;
+        $hours = $this->M_timesheet->selectHourAllProject($dt0,$dt6,$user_id);
 
+
+        /*
+         $i=0;
         foreach ($hour as $hasilhour) {
-            $data['hours'][$i]=$hasilhour['HOUR'].'.'.($hasilhour['D']-1);
+            $data['hours'][$i]=$hasilhour['HOUR'].'.'.($hasilhour['TS_DATE']-1);
             $i++;
         }
+        */
+        //print_r($data['hours']);
 
-        $data['ab']=$user_id;
+        $data['hours'] = $hours;
+        //$data['user_id']=$user_id;
         $data['total_hours']=$h;
-        $data['dt0']=$dt0;
-        $data['dt6']=$dt6;
+
         echo json_encode($data);
         //echo $h;
     }
@@ -151,18 +165,9 @@ class Timesheet extends CI_Controller {
         $data['LONGITUDE'] = $this->input->post("LONGITUDE");
         $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
         $data['WP_ID'] = $this->input->post("WP_ID");
-
-        /*
-        $check1=$this->M_timesheet->checkTSData($data['WP_ID'],$data1["TS_DATE"]);
-        if ($check1=='a') {
-            $this->M_timesheet->inputWeekly($data1,$data);
-        }else {
-            $this->M_timesheet->updateWeeklyTS($data1,$data);
-        }
-
-        */
         $this->M_timesheet->inputTimesheet($data);
 
-
+        $returndata['status'] = "success";
+        echo json_encode($returndata);
     }
 }
