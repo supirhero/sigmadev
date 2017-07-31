@@ -148,7 +148,7 @@ class Timesheet extends CI_Controller {
         $data['SUBJECT'] = $this->input->post("TS_SUBJECT");
         $data['MESSAGE'] = $this->input->post("TS_MESSAGE");
         $data['LATITUDE'] = $this->input->post("LATITUDE");
-        $data['LONGTITUDE'] = $this->input->post("LONGTITUDE");
+        $data['LONGITUDE'] = $this->input->post("LONGITUDE");
         $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
         $data['WP_ID'] = $this->input->post("WP_ID");
 
