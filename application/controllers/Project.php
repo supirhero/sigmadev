@@ -7,33 +7,7 @@ class Project extends CI_Controller
         parent::__construct();
         $this->load->model('M_project');
         $this->load->model('M_business');
-        //TOKEN LOGIN CHECKER
-        if(isset($_GET['token'])){
-            $decoded_user_data =(array) $this->token->decodetoken($_GET['token']);
-            $this->datajson['token'] = $_GET['token'];
-        }
-        elseif(isset($_SERVER['HTTP_TOKEN'])){
-            $decoded_user_data =(array) $this->token->decodetoken($_SERVER['HTTP_TOKEN']);
-            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
-        }
-        else{
-            $error['error']="Login First!";
-            echo json_encode($error);
-            die();
-        }
-        //if login success
-        if(!isset($decoded_user_data[0])){
-            //get user data from token
-            //for login bypass ,this algorithm is not used
-            //$this->datajson['userdata'] = (array)$decoded_user_data['data'];
-            //this code below for login bypass
-            $this->datajson['userdata'] = $decoded_user_data;
-        }
-        //if login fail
-        else {
-            echo $decoded_user_data[0];
-            die();
-        }
+
     }
 
     function index(){
@@ -172,16 +146,38 @@ class Project extends CI_Controller
     {
 $report = [
   "week1" => [
-      ["start_date"] =>"",
-      ["end_date"] =>"",
-      ["ev"] =>"",
-      ["pev"] =>"",
-      ["pv"] =>"",
-      ["ppv"] =>"",
-      ["ac"] =>"",
-      ["spi"] =>"",
-      ["cpi"] =>"",
-  ]
+      "start_date" =>"01-05-2017",
+      "end_date" =>"05-05-2017",
+      "ev" =>"102",
+      "pev" =>"5",
+      "pv" =>"110",
+      "ppv" =>"5",
+      "ac" =>"110",
+      "spi" =>"0.9",
+      "cpi" =>""
+  ],
+  "week2" => [
+      "start_date" =>"08-05-2017",
+      "end_date" =>"12-05-2017",
+      "ev" =>"202",
+      "pev" =>"10",
+      "pv" =>"230",
+      "ppv" =>"11",
+      "ac" =>"200",
+      "spi" =>"1.4",
+      "cpi" =>"1.1",
+  ],
+  "week3" => [
+      "start_date" =>"15-05-2017",
+      "end_date" =>"19-05-2017",
+      "ev" =>"202",
+      "pev" =>"10",
+      "pv" =>"230",
+      "ppv" =>"11",
+      "ac" =>"200",
+      "spi" =>"1.4",
+      "cpi" =>"1.1",
+  ],
 ];
         echo json_encode($report);
     }

@@ -25,15 +25,12 @@ class Chart extends CI_Controller {
         echo json_encode($wbs);
 
     }
-    function gantt($project_id)
+    function testzzz()
     {
-        $list=$this->M_project->getWBS($project_id);
+       // $list=$this->M_project->v_ac_project();
 
-        /// end here
-        foreach($list as $l){
-            $wbs[]=array('text'=>$l['TEXT'],'id'=>$l['ID'],'parent'=>$l['PARENT'],'start_date'=>date("Y-m-d",strtotime($l['START_DATE'])),'duration'=>$l['DURATION'],'progress'=>$l['PROGRESS']);
-        }
-        echo json_encode($wbs);
+
+        //print_r($list);
 
     }
     function test()
