@@ -158,6 +158,33 @@ class Project extends CI_Controller
         $id=$this->uri->segment(3);
         $this->M_project->update($id);
     }
+    function gantt($project_id)
+    {
+        $list=$this->M_project->getWBS($project_id);
+
+        /// end here
+        foreach($list as $l){
+            $wbs[]=array('text'=>$l['TEXT'],'id'=>$l['ID'],'parent'=>$l['PARENT'],'start_date'=>date("Y-m-d",strtotime($l['START_DATE'])),'duration'=>$l['DURATION'],'progress'=>$l['PROGRESS']);
+        }
+        echo json_encode($wbs);
+    }
+    function report($project_id)
+    {
+$report = [
+  "week1" => [
+      ["start_date"] =>"",
+      ["end_date"] =>"",
+      ["ev"] =>"",
+      ["pev"] =>"",
+      ["pv"] =>"",
+      ["ppv"] =>"",
+      ["ac"] =>"",
+      ["spi"] =>"",
+      ["cpi"] =>"",
+  ]
+];
+        echo json_encode($report);
+    }
 
 
 }
