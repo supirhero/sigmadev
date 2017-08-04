@@ -7,13 +7,21 @@ class Project extends CI_Controller
         parent::__construct();
         $this->load->model('M_project');
         $this->load->model('M_business');
+        $this->load->model('M_session');
+
         //TOKEN LOGIN CHECKER
         if(isset($_GET['token'])){
-            $decoded_user_data =(array) $this->token->decodetoken($_GET['token']);
+            $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
+
+            $decoded_user_data =$datauser;
+            //    print_r($decoded_user_data);
             $this->datajson['token'] = $_GET['token'];
+
         }
         elseif(isset($_SERVER['HTTP_TOKEN'])){
-            $decoded_user_data =(array) $this->token->decodetoken($_SERVER['HTTP_TOKEN']);
+            $datauser["data"] = $this->M_session->GetDataUser($_SERVER['HTTP_TOKEN']);
+
+            $decoded_user_data = $datauser["data"];
             $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
         }
         else{
@@ -24,6 +32,7 @@ class Project extends CI_Controller
         //if login success
         if(!isset($decoded_user_data[0])){
             //get user data from token
+
             //for login bypass ,this algorithm is not used
             //$this->datajson['userdata'] = (array)$decoded_user_data['data'];
             //this code below for login bypass
@@ -33,6 +42,16 @@ class Project extends CI_Controller
         else {
             echo $decoded_user_data[0];
             die();
+        }
+
+        if($datauser["data"]["SESSION_EXPIRED"] <= time())
+        {
+            $error['error']="session is expired";
+            echo json_encode($error);
+            die();
+        }
+        else{
+            $this->M_session->update_session($this->datajson['token']);
         }
     }
 
@@ -157,6 +176,55 @@ class Project extends CI_Controller
     function editProject_Action(){
         $id=$this->uri->segment(3);
         $this->M_project->update($id);
+    }
+    function gantt($project_id)
+    {
+        $list=$this->M_project->getWBS($project_id);
+
+        /// end here
+        foreach($list as $l){
+            $wbs[]=array('text'=>$l['TEXT'],'id'=>$l['ID'],'parent'=>$l['PARENT'],'start_date'=>date("Y-m-d",strtotime($l['START_DATE'])),'duration'=>$l['DURATION'],'progress'=>$l['PROGRESS']);
+        }
+        echo json_encode($wbs);
+    }
+    function report($project_id)
+    {
+$report = [
+  "week1" => [
+      "start_date" =>"01-05-2017",
+      "end_date" =>"05-05-2017",
+      "ev" =>"102",
+      "pev" =>"5",
+      "pv" =>"110",
+      "ppv" =>"5",
+      "ac" =>"110",
+      "spi" =>"0.9",
+      "cpi" =>""
+  ],
+  "week2" => [
+      "start_date" =>"08-05-2017",
+      "end_date" =>"12-05-2017",
+      "ev" =>"202",
+      "pev" =>"10",
+      "pv" =>"230",
+      "ppv" =>"11",
+      "ac" =>"200",
+      "spi" =>"1.4",
+      "cpi" =>"1.1",
+  ],
+  "week3" => [
+      "start_date" =>"15-05-2017",
+      "end_date" =>"19-05-2017",
+      "ev" =>"202",
+      "pev" =>"10",
+      "pv" =>"230",
+      "ppv" =>"11",
+      "ac" =>"200",
+      "spi" =>"1.4",
+      "cpi" =>"1.1",
+  ],
+];
+        echo json_encode($report);
     }
 
 
