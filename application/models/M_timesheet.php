@@ -413,6 +413,20 @@ GROUP BY TS_DATE")->result_array();
         }*/
     }
 
+    function confirmTimesheet($timesheet_id,$approver,$confirm_code){
+        $date = date('Y-m-d');
+        $query = "update timesheet 
+                  set IS_APPROVED = $confirm_code, CONFIRMED_BY = '$approver' , APPROVAL_DATE = to_date('$date','yyyy-mm-dd')
+                  where TS_ID = '$timesheet_id'";
+        $exec = $this->db->query($query);
+        if($exec){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 }
 
 

@@ -154,6 +154,7 @@ class Timesheet extends CI_Controller {
         echo json_encode($data);
     }
 
+    //add timesheet
     function addTimesheet(){
 
         $userid=$this->datajson['userdata']['USER_ID'];
@@ -170,4 +171,25 @@ class Timesheet extends CI_Controller {
         $returndata['status'] = "success";
         echo json_encode($returndata);
     }
+
+    //confirmation timesheet(approve or decline)
+    function confirmationTimesheet(){
+
+        $approver = $this->datajson['USER_ID'];
+        $timesheet_id = $_POST['ts_id'];
+        $confirm_code = $_POST['confirm'];
+
+        if($confirm_code != 0 || $confirm_code != 1){
+            $data['error'] = "confirmation code is incorrect ,choose only 1 for accept and 0 for deny";
+            die();
+        }
+
+        $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
+
+        $data['status'] = $confirmation;
+
+        echo json_encode($data);
+    }
+
+
 }
