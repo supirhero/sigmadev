@@ -57,8 +57,6 @@ class Home extends CI_Controller {
             die();
         }
 
-        print_r($this->datajson);
-        die;
         if($datauser["data"]["SESSION_EXPIRED"] <= time())
         {
             $error['error']="session is expired";
