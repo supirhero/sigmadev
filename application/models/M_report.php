@@ -56,6 +56,7 @@ function getTotalHour ($user_id,$bulan,$tahun){
     user_id = '".$user_id."'
     AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
     AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
+    AND IS_APPROVED = 1
     GROUP BY user_id,TO_CHAR (TS_DATE, 'mm'))
     ")->row()->JML_JAM_BULANAN;
     }
@@ -86,6 +87,7 @@ function getTotalHour ($user_id,$bulan,$tahun){
         user_id = '".$user_id."'
         AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
         AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
+        AND IS_APPROVED = 1
         GROUP BY
         user_id, TO_CHAR (TS_DATE, 'mm'))")->row()->JML_ENTRY_BULANAN;
       }

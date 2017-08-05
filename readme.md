@@ -37,7 +37,10 @@ Untuk tahap sekarang api yang tersedia :
 
 * Timesheet Controller
     * Add Timesheet View
+        * Get Task List
+        * Get Total Approved Hours 
     * Add Timesheet Action
+    * Approve Timesheet
     
     
 ## LOGIN CONTROLLER
@@ -590,4 +593,16 @@ Input yang harus di provide :
 Return data json :
 ```
 -> status
+```
+
+## Approve Timesheet
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/timesheet/confirmationTimesheet/
+```
+
+Input yang harus di provide :
+```
+-> ts_id (id timesheet , di dapati ketika akses API)
+-> confirm (1 untuk approve , 0 untuk deny)
 ```

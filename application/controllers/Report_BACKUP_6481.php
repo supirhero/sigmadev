@@ -19,6 +19,7 @@ class Report extends CI_Controller {
 
             $decoded_user_data =$datauser;
             //    print_r($decoded_user_data);
+<<<<<<< HEAD
             $this->datajson['token'] = $_GET['token'];
 
         }
@@ -69,7 +70,16 @@ class Report extends CI_Controller {
         }
         elseif(isset($_GET['token'])){
             $decoded_user_data =(array) $this->token->decodetoken($_GET['token']);
+=======
+>>>>>>> 88fda8d0d0df2881e7c72d2fdb08ad6da6734bae
             $this->datajson['token'] = $_GET['token'];
+
+        }
+        elseif(isset($_SERVER['HTTP_TOKEN'])){
+            $datauser["data"] = $this->M_session->GetDataUser($_SERVER['HTTP_TOKEN']);
+
+            $decoded_user_data = $datauser["data"];
+            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
         }
         else{
             $error['error']="Login First!";
@@ -79,6 +89,7 @@ class Report extends CI_Controller {
         //if login success
         if(!isset($decoded_user_data[0])){
             //get user data from token
+
             //for login bypass ,this algorithm is not used
             //$this->datajson['userdata'] = (array)$decoded_user_data['data'];
             //this code below for login bypass
@@ -89,6 +100,17 @@ class Report extends CI_Controller {
             echo $decoded_user_data[0];
             die();
         }*/
+
+
+        if($datauser["data"]["SESSION_EXPIRED"] <= time())
+        {
+            $error['error']="session is expired";
+            echo json_encode($error);
+            die();
+        }
+        else{
+            $this->M_session->update_session($this->datajson['token']);
+        }
 
     }
 
