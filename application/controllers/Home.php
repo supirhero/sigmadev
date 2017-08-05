@@ -8,6 +8,8 @@ class Home extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
+        error_reporting(E_ALL & ~E_NOTICE);
+
         $this->load->model('M_home');
         $this->load->model('M_project');
         $this->load->model('M_business');
@@ -55,6 +57,8 @@ class Home extends CI_Controller {
             die();
         }
 
+        print_r($this->datajson);
+        die;
         if($datauser["data"]["SESSION_EXPIRED"] <= time())
         {
             $error['error']="session is expired";
