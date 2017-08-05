@@ -7,6 +7,8 @@ class Task extends CI_Controller
     function __construct()
     {
         parent::__construct();
+        error_reporting(E_ALL & ~E_NOTICE);
+
         $this->load->model('M_detail_project');
         $this->load->model('M_session');
 
