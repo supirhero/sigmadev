@@ -11,6 +11,8 @@ class Timesheet extends CI_Controller {
         $this->load->model('M_session');
         $this->load->model('M_timesheet');
         $this->load->model('M_data');
+        error_reporting(E_ALL & ~E_NOTICE);
+
         //TOKEN LOGIN CHECKER
         if(isset($_GET['token'])){
             $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
