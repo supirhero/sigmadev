@@ -47,12 +47,17 @@ class Task extends CI_Controller
     }
 
     /*START TASK MANAJEMENT*/
-
     //Task View
     function workplan_view(){
         $id_project = $this->uri->segment(3);
-        $data['tampil_DETAIL']=$this->M_detail_project->selectWBS($id_project);
-        echo json_encode($data);
+        $workplan=$this->M_detail_project->selectWBS($id_project);
+        $jumlahArray = count($workplan);
+        $arrayjadi = [];
+        //find super parent
+
+
+
+        echo json_encode($workplan);
     }
 
     //Create Task
