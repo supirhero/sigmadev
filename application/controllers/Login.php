@@ -58,7 +58,7 @@ class Login extends CI_Controller {
             //$sso variable for authetication login value
             $sso =$this->sso($user_id,$password);
             //print_r($sso);
-            //if status 1 that mean just user
+            //if status 1 that mean intern
             if($sso['STATUS']=='1'){
                 if(isset($sso['EMP_ID'])){
                     $result=$this->M_login->loginsso($sso['EMP_ID']);}
@@ -70,7 +70,7 @@ class Login extends CI_Controller {
 
                 redirect('/login/welcome?token='.$token);
             }
-            //if status 0 thats mean wrong password or it can be admin,check to next query
+            //if status 0 maybe it is login extern (VENDOR)
             else {
                 $password = md5($password);
                 $cek=$this->M_login->validateLogin($user_id,$password);
@@ -170,7 +170,7 @@ class Login extends CI_Controller {
     public function doRegistration()
     {
 
-        $regType=$this->input->post('Submit');
+        $regType=$this->input->post('submit');
 
 
         switch($regType){
@@ -205,23 +205,35 @@ class Login extends CI_Controller {
                 break;
             //check if user exist
             case 'registSigma':
+
+                if(substr($_POST['EMAIL'],12) != '@sigma.co.id'){
+                    $data['title'] = 'error';
+                    $data['message'] = 'Email internal harus memakai @sigma.co.id';
+                    echo json_encode($data);
+                    die();
+                };
                 if($this->M_login->validateUser('USER_ID')==TRUE){
+                    //sudah ada user id
                     $errorMsg='err1';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
                 }elseif($this->M_login->validateUser('EMAIL')==TRUE){
+                    //sudah ada email
                     $errorMsg='err2';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
                 }else{
+                    //belum ada user id dan email ,proses lanjut
+                    //tambah user dengan status inactive
                     $this->M_login->add_user();
-
+                    //tambah verification email
                     $this->M_login->recordVerification();
+                    //kirim email
                     $this->sendVerification($this->input->post('EMAIL'));
                     $data['title']= 'success';
-                    $data['message']='Berhasil tambah user';
+                    $data['message']='Email verifikasi telah dikirim';
                     print_r(json_encode($data));
                 }
                 break;
@@ -264,11 +276,11 @@ class Login extends CI_Controller {
         switch($this->M_login->activateRegister($email)){
             case '1':
                 $data['data']=3;
-                $data['text']="Account Anda berhasil terverifikasi. Anda akan otomatis pindah ke halaman login beberapa saat lagi";
+                $data['text']="Account Anda berhasil terverifikasi,silahkan login di website atau aplikasi PRouDS";
                 break;
             case '0':
                 $data['data']=2;
-                $data['text']="Account anda sudah terverifikasi sebelumnya, Silahka klik tombol untuk pindah ke halaman login";
+                $data['text']="Account anda sudah terverifikasi sebelumnya";
                 break;
         }
         print_r(json_encode($data));
@@ -289,7 +301,7 @@ class Login extends CI_Controller {
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to('geryruslan@gmail.com');
+        $this->email->to($email);
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -604,6 +616,12 @@ class Login extends CI_Controller {
 
         if($this->email->send()){
             echo "sent ".$this->email->print_debugger();
+            die;
+        }
+        else{
+            echo "email not send<br>";
+            echo $this->email->print_debugger();
+            die;
         }
 
     }

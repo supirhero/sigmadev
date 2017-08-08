@@ -104,7 +104,7 @@ Register terbagi 2, User dan Vendor. Untuk membedakan antara user dan vendor, di
   * $_POST['submit'] = 'registVendor' <- untuk vendor
   * $_POST['submit'] = 'registSigma'  <- untuk user sigma
 ### Vendor
-Menggunakan HTTP method POST,URI ajax :
+URI untuk mengakses api ini :
 
 ```
 http://45.77.45.126/dev/login/doRegistration
@@ -120,19 +120,27 @@ Input yang harus di provide :
 -> V_PASSWORD
 ```
 ### User
-Menggunakan HTTP method POST,URI ajax :
+Alur login ,setelah user login ,user akan di kirim email verifikasi, untuk login internal(user), user harus terdaftar di API SSO .
+Sehingga setelah login, user bisa menggunakan email untuk login ,tetapi jika tidak ,user memakai user_id untuk login
 
+URI untuk mengakses api ini :
 ```
 http://45.77.45.126/dev/login/doRegistration
 ```
 
-Header HTTP method POST :
+ Input yang harus di provide :
 ```
 -> submit = 'registSigma' <- dikarnakan registrasi vendor
 -> USER_ID => NIK
--> EMAIL
+-> EMAIL => harus mengunakan akhiran @sigma.co.id
 -> USERNAME
 -> PASSWORD
+```
+
+Return Json data :
+```
+-> title <= success/error
+-> message
 ```
 
 
