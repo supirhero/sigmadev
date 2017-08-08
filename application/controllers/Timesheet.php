@@ -158,7 +158,7 @@ class Timesheet extends CI_Controller {
 
     //add timesheet
     function addTimesheet(){
-
+        header("Access-Control-Allow-Methods: ");
         $userid=$this->datajson['userdata']['USER_ID'];
         $data['WORK_HOUR'] = $this->input->post("HOUR");
         $data['DATE'] = $this->input->post("TS_DATE");
