@@ -113,7 +113,7 @@ http://45.77.45.126/dev/login/doRegistration
 Input yang harus di provide :
 ```
 -> submit = 'registVendor' <- dikarnakan registrasi vendor
--> V_EMAIL_SUP
+-> V_EMAIL_SUP => email supervisor
 -> V_EMAIL
 -> V_USER_ID
 -> V_USER_NAME
