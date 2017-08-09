@@ -51,7 +51,6 @@ class Timesheettest extends CI_Controller {
         $user_id = $this->datajson['userdata']['USER_ID'];
 
         $query = $this->db->query("SELECT WP_ID,WBS_NAME as TASK_NAME FROM CARI_TASK WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
-        echo $this->db->last_query();
         //$query = $this->db->query("SELECT * FROM CARI_TASK WHERE PROJECT_ID='900418' and USER_ID='S201506017'");
 
         $hasil['task'] = $query->result_array();
