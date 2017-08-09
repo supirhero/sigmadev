@@ -126,8 +126,6 @@ class Project extends CI_Controller
         $res['type_of_effort'] = $this->M_project->getProjectCat($data);
         echo json_encode($res);
     }
-
-
     //add project if verified
     public function addProject_acion(){
         $test=$this->M_project->addProject($this.$this->datajson['userdata']);
@@ -154,25 +152,41 @@ class Project extends CI_Controller
         $period = new DatePeriod($start, new DateInterval('P1D'), $end);
         return $days;
     }
-
     /*END ADD PROJECT*/
 
     /*Start Edit Project*/
     public function editProject_view(){
+
         $data['project_setting']=$this->M_project->getProject($this->uri->segment(3));
-        $data['project_business_unit_detail'] = $this->M_business->getData($data['bu_id']);
+        $bu_id=$this->M_project->getProjectID($this->uri->segment(3));
+        $data['project_business_unit_detail'] = $this->M_business->getData($bu_id);
+        //$data['pm'] = $this->M_project->getPM($bu_id);
         $data['available_project_type'] = $this->M_project->getProjectType();
         $code = $this->M_project->getBUCodeByProjectID($this->uri->segment(3));
+        //$data['pm'] = $this->M_project->getPM($this->uri->segment(3));
 
         @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_code/' . $code->BU_CODE);
-        $data['available_IWO'] = array();
-        $data['available_IWO'] = json_decode($json, true);
+        $data['IWO_list'] = array();
+        $data['IWO_list'] = json_decode($json, true);
 
-        if (empty($data['IWO'])) {
+        if (empty($data['IWO_list'])) {
             @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_alias/' . $code->BU_CODE);
-            $data['available_IWO'] = array();
-            $data['available_IWO'] = json_decode($json, true);
+            $data['IWO_list'] = array();
+            $data['IWO_list'] = json_decode($json, true);
         }
+
+        /*=================================================================*/
+        //get Project Manager
+        $q="SELECT USER_NAME, USER_ID FROM USERS WHERE BU_ID='".$bu_id."' AND IS_ACTIVE='1' order by USER_NAME";
+        $amq="SELECT USER_NAME, USER_ID FROM USERS WHERE IS_ACTIVE='1' order by USER_NAME";
+
+        $bu =$this->uri->segment(3);
+        $pm=$this->db->query($q)->result_array();
+        $am=$this->db->query($amq)->result_array();
+
+        $data['project_manajer_list'] = $pm;
+        $data['account_manager_list'] = $am;
+
         echo json_encode($data);
     }
 
