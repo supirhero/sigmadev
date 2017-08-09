@@ -344,4 +344,11 @@ class Reporttest extends CI_Controller {
         }
         echo json_encode($datareport);
     }
+
+    //report overview
+    public function r_overview(){
+        $data['report_onprogress_project'] = $this->M_report->dashboard_all();
+
+        echo json_encode($data);
+    }
 }

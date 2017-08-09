@@ -361,6 +361,30 @@ Return JSON data :
 -> IWO <= Array , fetching semua iwo
 -> project_manager
 ```
+
+Jika ingin memilih project status, value yang di tetapkan untuk project status adalah :
+```
+-> Not Started 
+-> In Progress 
+-> On Hold 
+-> Completed 
+-> Proposed  
+-> In Planning 
+-> Cancelled
+```
+Juga value untuk visibility :
+```
+-> (empty) untuk project member only
+-> 1 untuk semua orang di business unit
+-> 2 untuk global
+```
+Value untuk Type Of Expense
+```
+-> Capital Expense
+-> Current Expense
+-> Dedctible Expense
+```
+
 Ketika user mengisi form, ada beberapa validasi input yang harus di lakukan, yaitu :
 * Check If IWO Already Used
 * Get Account Manager Based On IWO
@@ -406,8 +430,58 @@ Return JSON data :
 ```
 -> customer_name <= null berarti tidak ada customer name
 ```
+### Get Type Of Effort
+Jika  telah memilih project type ,untuk mendapatkan project TYPE OF EFFORT adalah :
+```
+http://45.77.45.126/dev/project/checkProjectType/
+```
+input yang harus di provide :
+```
+-> PROJECT_TYPE_ID (Project atau Non Project)
+```
+Return Json Object :
+```
+-> type_of_effort  <= daftar type of efford
+```
 
 
+## Add Project Action
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/addProject_acion/
+```
+Input yang harus di provide :
+```
+-> IWO_NO                                 <= nomor IWO
+-> PROJECT_NAME                    <= Didapati dari get Kode IWO
+-> BU                                           <= kode business unit( Didapati dari get kode IWO)
+-> RELATED                                <= Related Business unit (Didapati dari get kode IWO)
+-> CUST_ID                                 <= id customer (Didapati dari get kode IWO)
+-> END_CUST_ID                         <= ID End Customer (Didapati dari get IWO)
+-> AMOUNT                                 <= Project Value (Didapati dari get kode IWO)
+-> MARGIN                                  <= Didapati dari get kode IWO
+-> DESC                                       <= Project Description
+-> PROJECT_TYPE_ID                       <= Tipe project ('Project' or 'Non Project')
+-> PM                                            <= Project Manager ID (Didapati dari geti IWO)
+-> AM_ID                                      <= ID Account manager (Didapati dari get IWO)
+-> TYPE_OF_EFFORT                  <= Didapati dari API
+-> PRODUCT_TYPE
+-> PROJECT_STATUS
+-> START                                     <= start date create project
+-> END                                         <= planing untuk akhir project
+-> VISIBILITY                               <= Berdasarkan pengaturan atas
+-> TYPE_OF_EXPENSE                <= Berdasarkan pengaturan di atas
+-> OVERHEAD                             <= Project OVerhead
+-> ACTUAL_COST
+-> COGS
+```
+Jika Tidak ada nomor IWO, maka input yang seharusnya didapati dari nomor iwo harus di input manual.
+
+Return json data :
+```
+-> status 
+-> message
+```
 # Task Controller
 ## Create Task
 URI untuk mengakses API ini :

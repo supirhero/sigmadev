@@ -92,14 +92,13 @@ class M_project extends CI_Model {
         return $result;
     }
 
-    function addProject() {
+    function addProject($userdata) {
         $PROJECT_NAME = $this->input->post('PROJECT_NAME');
         $PM_ID = $this->input->post('PM_ID');
         $IWO_NO = $this->input->post('IWO_NO');
         $BU_CODE = $this->input->post('BU');
         $SCHEDULE_START = $this->input->post('START');
         $SCHEDULE_END = $this->input->post('END');
-        $CUR_ID = $this->input->post('CURR');
         $AMOUNT = $this->input->post('AMOUNT');
         $PROJECT_TYPE_ID = $this->input->post('PROJECT_TYPE_ID');
         $AM_ID = $this->input->post('AM_ID');
@@ -107,22 +106,19 @@ class M_project extends CI_Model {
         $CUST_END_ID = $this->input->post('END_CUST_ID');
         //$PROJECT_STATUS = "In Progress";
         $PROJECT_DESC = $this->input->post('DESC');
-        $EXCHANGE_RATE = $this->input->post('RATE');
         $MARGIN = $this->input->post('MARGIN');
-        $FUNCTIONAL_AREA = $this->input->post('FUNC_AREA');
-        $PRIORITY = $this->input->post('PRIORITY');
         $TYPE_OF_EFFORT = $this->input->post('TYPE_OF_EFFORT');
         $PRODUCT_TYPE = $this->input->post('PRODUCT_TYPE');
         $VISIBILITY = $this->input->post('VISIBILITY');
-        $CALCULATION_METHOD = $this->input->post('CALCULATION');
         $TYPE_OF_EXPENSE = $this->input->post('TYPE_OF_EXPENSE');
         $PROJECT_STATUS = $this->input->post('PROJECT_STATUS');
         $PROJECT_OVERHEAD = $this->input->post('OVERHEAD');
         $ACTUAL_COST = $this->input->post('ACTUAL_COST');
-        $COST_CENTER = $this->input->post('COST_CENTER');
         $COGS = $this->input->post('COGS');
         $RELATED_BU = $this->input->post('RELATED');
-        $CREATED_BY = $this->session->userdata('USER_ID');
+        $CREATED_BY = $userdata['USER_ID'];
+        $CUR_ID = 'IDR';
+        $CALCULATION_METHOD =1;
         $today = date("Y-m-d");
 
 
@@ -131,21 +127,21 @@ class M_project extends CI_Model {
     BU_CODE,SCHEDULE_START,SCHEDULE_END,
     CUR_ID,AMOUNT,PROJECT_TYPE_ID,AM_ID,CUST_ID,
     CUST_END_ID,PROJECT_STATUS,PROJECT_DESC,
-    EXCHANGE_RATE,MARGIN,FUNCTIONAL_AREA,
-    PRIORITY,TYPE_OF_EFFORT,PRODUCT_TYPE,
+    MARGIN,
+    TYPE_OF_EFFORT,PRODUCT_TYPE,
     VISIBILITY,CALCULATION_METHOD,TYPE_OF_EXPENSE,
-    PROJECT_OVERHEAD,ACTUAL_COST,COST_CENTER,COGS,
+    PROJECT_OVERHEAD,ACTUAL_COST,COGS,
     RELATED_BU,CREATED_BY,DATE_CREATED) values ((select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS),'"
             . $PROJECT_NAME . "','" . $PM_ID . "','" . $IWO_NO . "','" . $BU_CODE . "',
     to_date('" . $SCHEDULE_START . "','yyyy-mm-dd'),
     to_date('" . $SCHEDULE_END . "','yyyy-mm-dd'),'"
             . $CUR_ID . "','" . $AMOUNT . "','" . $PROJECT_TYPE_ID . "','"
             . $AM_ID . "','" . $CUST_ID . "','" . $CUST_END_ID . "','"
-            . $PROJECT_STATUS . "','" . $PROJECT_DESC . "','" . $EXCHANGE_RATE . "','"
-            . $MARGIN . "','" . $FUNCTIONAL_AREA . "','"
-            . $PRIORITY . "','" . $TYPE_OF_EFFORT . "','" . $PRODUCT_TYPE . "','"
+            . $PROJECT_STATUS . "','" . $PROJECT_DESC . "','"
+            . $MARGIN . "','"
+            . $TYPE_OF_EFFORT . "','" . $PRODUCT_TYPE . "','"
             . $VISIBILITY . "','" . $CALCULATION_METHOD . "','" . $TYPE_OF_EXPENSE . "','"
-            . $PROJECT_OVERHEAD . "','" . $ACTUAL_COST . "','" . $COST_CENTER . "','"
+            . $PROJECT_OVERHEAD . "','" . $ACTUAL_COST . "','"
             . $COGS . "','" . $RELATED_BU . "','" . $CREATED_BY . "',to_date('" . $today . "','yyyy-mm-dd'))";
         $this->db->query($sql);
         $sql = "Select max(cast(PROJECT_ID as int)) as NEW_ID from projects";

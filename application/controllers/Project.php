@@ -2,6 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Project extends CI_Controller
 {
+    public $datajson = array();
+
     function __construct()
     {
         parent::__construct();
@@ -121,20 +123,21 @@ class Project extends CI_Controller
     //checking project type id
     public function checkProjectType(){
         $data = $this->input->post('PROJECT_TYPE_ID');
-        $res = $this->M_project->getProjectCat($data);
-        foreach ($res as $r) {
-            echo '<option value="' . $r->ID .'">' . $r->CATEGORY . '</option>';
-        }
+        $res['type_of_effort'] = $this->M_project->getProjectCat($data);
+        echo json_encode($res);
     }
 
 
     //add project if verified
     public function addProject_acion(){
-        $test=$this->M_project->addProject();
+        $test=$this->M_project->addProject($this.$this->datajson['userdata']);
         $SCHEDULE_START = $this->input->post('START');
         $SCHEDULE_END = $this->input->post('END');
         $dur=$this->countDurationAll($SCHEDULE_START,$SCHEDULE_END);
         $this->M_project->addProjectWBS($test,$dur);
+
+        $returndata['status']='success';
+        $returndata['message'] = 'Project success added';
     }
     private function countDurationAll($start_date, $end_date) {
         if (empty($start_date)) {
@@ -156,21 +159,19 @@ class Project extends CI_Controller
 
     /*Start Edit Project*/
     public function editProject_view(){
-        $data['project']=$this->M_project->getProject($this->uri->segment(3));
-        $data['bu_id']=$this->M_project->getProjectID($this->uri->segment(3));
-        $code = $this->M_project->getBUCode($this->uri->segment(3));
-        $data['name'] = $this->M_business->getData($data['bu_id']);
-        $data['project_type'] = $this->M_project->getProjectType();
+        $data['project_setting']=$this->M_project->getProject($this->uri->segment(3));
+        $data['project_business_unit_detail'] = $this->M_business->getData($data['bu_id']);
+        $data['available_project_type'] = $this->M_project->getProjectType();
         $code = $this->M_project->getBUCodeByProjectID($this->uri->segment(3));
 
         @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_code/' . $code->BU_CODE);
-        $data['IWO'] = array();
-        $data['IWO'] = json_decode($json, true);
+        $data['available_IWO'] = array();
+        $data['available_IWO'] = json_decode($json, true);
 
         if (empty($data['IWO'])) {
             @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_alias/' . $code->BU_CODE);
-            $data['IWO'] = array();
-            $data['IWO'] = json_decode($json, true);
+            $data['available_IWO'] = array();
+            $data['available_IWO'] = json_decode($json, true);
         }
         echo json_encode($data);
     }
