@@ -176,7 +176,7 @@ class Project extends CI_Controller
         }
 
         /*=================================================================*/
-        //get Project Manager
+        //get Project Manager account manager
         $q="SELECT USER_NAME, USER_ID FROM USERS WHERE BU_ID='".$bu_id."' AND IS_ACTIVE='1' order by USER_NAME";
         $amq="SELECT USER_NAME, USER_ID FROM USERS WHERE IS_ACTIVE='1' order by USER_NAME";
 
@@ -189,10 +189,18 @@ class Project extends CI_Controller
 
         echo json_encode($data);
     }
-
-    function editProject_Action(){
+    function editProject_action(){
         $id=$this->uri->segment(3);
-        $this->M_project->update($id);
+        $confirm = $this->M_project->update($id);
+        if($confirm){
+            $returndata['status']='success';
+            $returndata['message'] = 'success edit project';
+        }
+        else{
+            $returndata['status']='error';
+            $returndata['message'] = 'error edit project';
+        }
+        echo json_encode($returndata);
     }
     function gantt($project_id)
     {

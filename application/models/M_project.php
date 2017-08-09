@@ -104,7 +104,6 @@ class M_project extends CI_Model {
         $AM_ID = $this->input->post('AM_ID');
         $CUST_ID = $this->input->post('CUST_ID');
         $CUST_END_ID = $this->input->post('END_CUST_ID');
-        //$PROJECT_STATUS = "In Progress";
         $PROJECT_DESC = $this->input->post('DESC');
         $MARGIN = $this->input->post('MARGIN');
         $TYPE_OF_EFFORT = $this->input->post('TYPE_OF_EFFORT');
@@ -165,7 +164,6 @@ class M_project extends CI_Model {
         $BU_CODE = $this->input->post('BU');
         $SCHEDULE_START = $this->input->post('START');
         $SCHEDULE_END = $this->input->post('END');
-        $CUR_ID = $this->input->post('CURR');
         $AMOUNT = $this->input->post('AMOUNT');
         $PROJECT_TYPE_ID = $this->input->post('PROJECT_TYPE_ID');
         $AM_ID = $this->input->post('AM_ID');
@@ -173,22 +171,17 @@ class M_project extends CI_Model {
         $CUST_END_ID = $this->input->post('END_CUST_ID');
         $PROJECT_STATUS=$this->input->post('PROJECT_STATUS');
         $PROJECT_DESC = $this->input->post('DESC');
-        $EXCHANGE_RATE = $this->input->post('RATE');
         $MARGIN = $this->input->post('MARGIN');
-        //$APPLY_TEMPLATE = $this->input->post('TEMPLATES');
-        $FUNCTIONAL_AREA = $this->input->post('FUNC_AREA');
-        $PRIORITY = $this->input->post('PRIORITY');
         $TYPE_OF_EFFORT = $this->input->post('TYPE_OF_EFFORT');
         $PRODUCT_TYPE = $this->input->post('PRODUCT_TYPE');
         $VISIBILITY = $this->input->post('VISIBILITY');
-        $CALCULATION_METHOD = $this->input->post('CALCULATION');
-        $PROJECT_COMPLETE = $this->input->post('PROJECT_COMPLETE');
         $TYPE_OF_EXPENSE = $this->input->post('TYPE_OF_EXPENSE');
         $PROJECT_OVERHEAD = $this->input->post('OVERHEAD');
         $ACTUAL_COST = $this->input->post('ACTUAL_COST');
-        $COST_CENTER = $this->input->post('COST_CENTER');
         $COGS = $this->input->post('COGS');
         $RELATED_BU = $this->input->post('RELATED');
+        $CALCULATION_METHOD = 1;
+        $CUR_ID = 'IDR';
         $sql="UPDATE PROJECTS SET PROJECT_NAME='".$PROJECT_NAME."',"
             . "PM_ID='".$PM_ID."',"
             . "IWO_NO='".$IWO_NO."',"
@@ -200,12 +193,24 @@ class M_project extends CI_Model {
             . "PROJECT_TYPE_ID='".$PROJECT_TYPE_ID."',"
             . "AM_ID='".$AM_ID."',"
             . "CUST_ID='".$CUST_ID."',CUST_END_ID='".$CUST_END_ID."',
-    PROJECT_DESC='".$PROJECT_DESC."',EXCHANGE_RATE='".$EXCHANGE_RATE."',MARGIN='".$MARGIN."',FUNCTIONAL_AREA='".$FUNCTIONAL_AREA."',PRIORITY='".$PRIORITY."',TYPE_OF_EFFORT='".$TYPE_OF_EFFORT."',PRODUCT_TYPE='".$PRODUCT_TYPE."',VISIBILITY='".$VISIBILITY."',CALCULATION_METHOD='".$CALCULATION_METHOD."',TYPE_OF_EXPENSE='".$TYPE_OF_EXPENSE."',PROJECT_OVERHEAD='".$PROJECT_OVERHEAD."',PROJECT_COMPLETE='".$PROJECT_COMPLETE."',
-    ACTUAL_COST='".$ACTUAL_COST."',COST_CENTER='".$COST_CENTER."',COGS='".$COGS."',RELATED_BU='".$RELATED_BU."' WHERE PROJECT_ID='".$id."'";
-        $this->db->query($sql);
+                PROJECT_DESC='".$PROJECT_DESC."',MARGIN='".$MARGIN."',TYPE_OF_EFFORT='".$TYPE_OF_EFFORT."',PRODUCT_TYPE='".$PRODUCT_TYPE."',VISIBILITY='".$VISIBILITY."',CALCULATION_METHOD='".$CALCULATION_METHOD."',TYPE_OF_EXPENSE='".$TYPE_OF_EXPENSE."',PROJECT_OVERHEAD='".$PROJECT_OVERHEAD."',
+                ACTUAL_COST='".$ACTUAL_COST."',COGS='".$COGS."',RELATED_BU='".$RELATED_BU."' WHERE PROJECT_ID='".$id."'";
+
+        if($this->db->query($sql)){
+            $email=$this->selectemail($PM_ID);
+            $rp_id = $this->db->query("select nvl(max(cast(rp_id as int))+1,1) as NEW_ID from resource_pool")->row()->NEW_ID;
+            if($rp_id != null || $rp_id != ""){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
         //print_r($sql);
-        $email=$this->selectemail($PM_ID);
-        $rp_id = $this->db->query("select nvl(max(cast(rp_id as int))+1,1) as NEW_ID from resource_pool")->row()->NEW_ID;
+
         //$sql2 = "INSERT INTO RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID,EMAIL) VALUES ('" . $rp_id . "','" . $PM_ID . "','" . $result . "','" . $email. "')";
         //$q2 = $this->db->query($sql2);
     }
