@@ -65,22 +65,22 @@ class Project extends CI_Controller
 
     /*START ADD PROJECT*/
     public function addProject_view(){
-        $code = $this->M_project->getBUCode($this->uri->segment(3));
-
+        $code = $this->M_project->getBuBasedCode($_POST['bu_code']);
         //get bussines unit based on uri segment
-        $data['business_unit'] = $this->M_business->getData($this->uri->segment(3));
+        $data['business_unit'] = $this->M_business->getDataByBuCode($_POST['bu_code']);
         //get all iwo from api
-        @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_code/' . $code->BU_CODE);
+
+        @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_code/' . $code['BU_CODE']);
         $data['IWO'] = array();
         $data['IWO'] = json_decode($json, true);
         if (empty($data['IWO'])) {
-            @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_alias/' . $code->BU_CODE);
+            @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_alias/' . $code['BU_CODE']);
             $data['IWO'] = array();
             $data['IWO'] = json_decode($json, true);
         }
 
         //get pm
-        $data['project_manager'] = $this->M_project->getPM($this->uri->segment(3));
+        $data['project_manager'] = $this->M_project->getPMBuCode($_POST['bu_code']);
 
         echo json_encode($data);
     }

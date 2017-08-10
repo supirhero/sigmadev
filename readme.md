@@ -455,7 +455,7 @@ Input yang harus di provide :
 ```
 -> IWO_NO               string           <= nomor IWO
 -> PROJECT_NAME         string           <= Didapati dari get Kode IWO
--> BU                   string           <= kode business unit( Didapati dari get kode IWO)
+-> BU                   string           <= kode business unit( Didapati dari dashboard home)
 -> RELATED              string           <= Related Business unit (Didapati dari get kode IWO)
 -> CUST_ID              string           <= id customer (Didapati dari get kode IWO)
 -> END_CUST_ID          string           <= ID End Customer (Didapati dari get IWO)
@@ -463,7 +463,7 @@ Input yang harus di provide :
 -> MARGIN               FLOAT            <= Didapati dari get kode IWO
 -> DESC                 string           <= Project Description
 -> PROJECT_TYPE_ID      string           <= Tipe project ('Project' or 'Non Project')
--> PM                   string           <= Project Manager ID (Didapati dari geti IWO)
+-> PM                   string           <= Didapati dari view create project
 -> AM_ID                string           <= ID Account manager (Didapati dari get IWO)
 -> TYPE_OF_EFFORT       string           <= Didapati dari API
 -> PRODUCT_TYPE         string

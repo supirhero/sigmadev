@@ -175,8 +175,7 @@ class M_project extends CI_Model {
                 '" . $RELATED_BU . "',
                 '" . $CREATED_BY . "',
                 to_date('" . $today . "','yyyy-mm-dd'))";
-        echo $sql ;
-        die;
+
             $this->db->query($sql);
             $sql = "Select max(cast(PROJECT_ID as int)) as NEW_ID from projects";
             $q = $this->db->query($sql);
@@ -267,16 +266,16 @@ class M_project extends CI_Model {
     }
 
     function getUsersProject($id) {
-        return $this->db->query("SELECT   distinct project_id, project_name,bu_name, project_complete,
+        return $this->db->query("SELECT   distinct project_id, project_name,bu_name, bu_code,project_complete,
             project_status, project_desc, created_by
-       FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name,z.bu_name,
+       FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                     c.project_complete, c.project_status, c.project_desc,
                     c.created_by
                FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                     INNER JOIN projects c ON b.project_id = c.project_id
                     INNER JOIN p_bu z on c.bu_code = z.bu_code
              UNION
-             SELECT a.user_id, a.user_name, b.project_id, b.project_name,z.bu_name,
+             SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
                     b.project_complete, b.project_status, b.project_desc,
                     b.created_by
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
@@ -298,6 +297,36 @@ class M_project extends CI_Model {
         return $this->db->query("select count(*) as CNT from PROJECTS where IWO_NO like '%".$iwo."%' and IWO_NO not in ('none')")->row()->CNT;
     }
 
+    function searchBuCode($bu_name){
+        $bu_jadi = [];
 
+        foreach ($bu_name as $name){
+            $temp = $this->db->query("select BU_CODE from p_bu where bu_name = '$name'")->row();
+            array_push($bu_jadi,array(bu_name=>$name,bu_code=>$temp->BU_CODE));
+
+        }
+        return $bu_jadi;
+    }
+
+    function getBuBasedCode($bucode){
+        $result = $this->db->query("select bu_name,bu_code from p_bu where bu_code = '$bucode'")->result_array();
+        return $result;
+
+    }
+
+    function getPMBuCode($bu_code) {
+        $result = null;
+
+        $findbu = $this->db->query("select bu_id from p_bu where bu_code = '$bu_code'")->row();
+
+        $bu = $findbu->BU_ID;
+
+        $sql = "SELECT USER_NAME, USER_ID FROM USERS WHERE BU_ID='".$bu."' AND IS_ACTIVE='1' order by USER_NAME";
+        $q = $this->db->query($sql);
+        if ($q->num_rows() > 0) {
+            $result = $q->result_array();
+        }
+        return $result;
+    }
 
 }

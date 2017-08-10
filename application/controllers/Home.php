@@ -77,9 +77,9 @@ class Home extends CI_Controller {
 
         $bagian_unit = $this->datajson['userdata']['BU_ID'];
         $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
-        $this->datajson['bussines_unit'] = $query->BU_NAME;
-        $this->datatimesheet();
+        //$this->datajson['bussines_unit'] = $query->BU_NAME;
         $this->project();
+        $this->datatimesheet();
         $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
     }
@@ -419,12 +419,15 @@ class Home extends CI_Controller {
            array_push($bu_name,$data['BU_NAME']);
        }
        $bu_name = array_unique($bu_name);
-       foreach ($bu_name as $data){
+        //search bu code
+        $bu_with_code = $this->M_project->searchBuCode($bu_name);
+        foreach ($bu_with_code as $data){
            $index_array = count($projecttempfix);
-           $projecttempfix[$index_array]['BU_NAME'] = $data;
+           $projecttempfix[$index_array]['BU_NAME'] = $data['bu_name'];
+           $projecttempfix[$index_array]['BU_CODE'] = $data['bu_code'];
            $projecttempfix[$index_array]['PROJECT_LIST']= [];
            for($i = 0 ; $i < count($projecttemp) ; $i++){
-                if($projecttemp[$i]['BU_NAME'] == $data){
+                if($projecttemp[$i]['BU_NAME'] == $data['bu_name']){
                     array_push($projecttempfix[$index_array]['PROJECT_LIST'],$projecttemp[$i]);
                 }
            }
