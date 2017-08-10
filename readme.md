@@ -14,10 +14,13 @@ Untuk tahap sekarang api yang tersedia :
     * My Activity
     * My Assignment
     * Project Activity
+    * Business unit
     
 * REPORT controller
     * My Performances
     * My Activity
+    * Directorat / BU Report
+    * People Report
     
 * Project Controller
     * Add Project View Data
@@ -161,6 +164,22 @@ Return data json object yang di terima adalah :
 -> project_team
 ```
 
+## Detail Business Unit
+Detail project overview bisa di capai dengan ke url :
+```
+http://45.77.45.126/dev/home/buDetail/
+```
+Input yang harus di provide :
+```
+-> bu_code                   <=didapati di home dashboard
+```
+return json data:
+```
+-> project
+-> member
+-> bu_id
+-> bu_code
+```
 ## Project Team Member
 URI yang di gunakan untuk akses API ini :
 ```
