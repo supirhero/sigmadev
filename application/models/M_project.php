@@ -148,30 +148,30 @@ class M_project extends CI_Model {
                 RELATED_BU,
                 CREATED_BY,
                 DATE_CREATED) values 
-                ((select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS),'"
-                . $PROJECT_NAME . "',
+                ((select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS),
+                '". $PROJECT_NAME . "',
                 '" . $PM_ID . "',
                 '" . $IWO_NO . "',
                 '" . $BU_CODE . "',
                 to_date('" . $SCHEDULE_START . "','yyyy-mm-dd'),
-                to_date('" . $SCHEDULE_END . "','yyyy-mm-dd'),'"
-                . $CUR_ID . "',
-                '" . $AMOUNT . "',
-                '" . $PROJECT_TYPE_ID . "','"
-                . $AM_ID . "',
+                to_date('" . $SCHEDULE_END . "','yyyy-mm-dd'),
+                '". $CUR_ID . "',
+                " . $AMOUNT . ",
+                '" . $PROJECT_TYPE_ID . "',
+                '". $AM_ID . "',
                 '" . $CUST_ID . "',
-                '" . $CUST_END_ID . "','"
-                . $PROJECT_STATUS . "',
-                '" . $PROJECT_DESC . "','"
-                . $MARGIN . "','"
-                . $TYPE_OF_EFFORT . "',
-                '" . $PRODUCT_TYPE . "','"
-                . $VISIBILITY . "',
+                '" . $CUST_END_ID . "',
+                '". $PROJECT_STATUS . "',
+                '" . $PROJECT_DESC . "',
+                ". $MARGIN . ",
+                '". $TYPE_OF_EFFORT . "',
+                '" . $PRODUCT_TYPE . "',
+                '". $VISIBILITY . "',
                 '" . $CALCULATION_METHOD . "',
                 '" . $TYPE_OF_EXPENSE . "',
                 '". $PROJECT_OVERHEAD . "',
-                '" . $ACTUAL_COST . "','"
-                . $COGS . "',
+                " . $ACTUAL_COST . ",
+                '". $COGS . "',
                 '" . $RELATED_BU . "',
                 '" . $CREATED_BY . "',
                 to_date('" . $today . "','yyyy-mm-dd'))";

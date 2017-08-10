@@ -474,7 +474,7 @@ Input yang harus di provide :
 -> TYPE_OF_EXPENSE      string           <= Berdasarkan pengaturan di atas
 -> OVERHEAD             string           <= Project OVerhead
 -> ACTUAL_COST          int
--> COGS
+-> COGS                 string
 ```
 Jika Tidak ada nomor IWO, maka input yang seharusnya didapati dari nomor iwo harus di input manual.
 
