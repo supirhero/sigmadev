@@ -309,7 +309,7 @@ class M_project extends CI_Model {
     }
 
     function getBuBasedCode($bucode){
-        $result = $this->db->query("select bu_name,bu_code from p_bu where bu_code = '$bucode'")->result_array();
+        $result = $this->db->query("select bu_id,bu_name,bu_code from p_bu where bu_code = '$bucode'")->result_array();
         return $result;
 
     }
@@ -327,6 +327,26 @@ class M_project extends CI_Model {
             $result = $q->result_array();
         }
         return $result;
+    }
+
+    function getUsersProjectBasedBU($id,$bucode) {
+        return $this->db->query("SELECT   distinct project_id, project_name,bu_name, bu_code,project_complete,
+            project_status, project_desc, created_by
+       FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
+                    c.project_complete, c.project_status, c.project_desc,
+                    c.created_by
+               FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
+                    INNER JOIN projects c ON b.project_id = c.project_id
+                    INNER JOIN p_bu z on c.bu_code = z.bu_code
+             UNION
+             SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
+                    b.project_complete, b.project_status, b.project_desc,
+                    b.created_by
+               FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
+               INNER JOIN p_bu z on b.bu_code = z.bu_code
+                    )
+                    where user_id='" . $id . "' or created_by='" . $id . "' 
+                    and bu_code = '$bucode'")->result_array();
     }
 
 }

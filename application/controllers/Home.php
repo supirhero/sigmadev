@@ -86,9 +86,13 @@ class Home extends CI_Controller {
 
     //bu detail
     public function buDetail(){
-        $bu_code = $_POST['bu_code'];
-        $code = $this->M_project->getBuBasedCode($_POST['bu_code']);
-        $bu_id = $this->db->query("select bu ");
+        $code = ($this->M_project->getBuBasedCode($_POST['bu_code']))[0]['BU_ID'];
+        $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code']);
+        $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code'")->result_array();
+        $data['bu_id'] = $code;
+        $data['bu_code'] = $_POST['bu_code'];
+
+        echo json_encode($data);
     }
 
     /*FOR DATATIMESHEET THIS MONTH*/
