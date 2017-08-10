@@ -51,14 +51,37 @@ class Task extends CI_Controller
     function workplan_view(){
         $id_project = $this->uri->segment(3);
         $workplan=$this->M_detail_project->selectWBS($id_project);
-        $jumlahArray = count($workplan);
-        $arrayjadi = [];
-        //find super parent
+
+        //$created_array = $this->buildTree($workplan);
+
+        //built tree
+        foreach($workplan as $row) {
+            $row['children'] = array();
+            $vn = "row" . $row['WBS_ID'];
+            ${$vn} = $row;
+            if(!is_null($row['WBS_PARENT_ID'])) {
+                $vp = "parent" . $row['WBS_PARENT_ID'];
+                if(isset($data[$row['WBS_PARENT_ID']])) {
+                    ${$vp} = $data[$row['WBS_PARENT_ID']];
+                }
+                else {
+                    ${$vp} = array('n_id' => $row['WBS_PARENT_ID'], 'WBS_PARENT_ID' => null, 'WBS_PARENT_ID' => array());
+                    $data[$row['WBS_PARENT_ID']] = &${$vp};
+                }
+                ${$vp}['children'][] = &${$vn};
+                $data[$row['WBS_PARENT_ID']] = ${$vp};
+            }
+            $data[$row['WBS_ID']] = &${$vn};
+        }
+
+        $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
+        echo json_encode($result);
 
 
-
-        echo json_encode($workplan);
+        //echo var_dump($workplan);
     }
+
+
 
     //Create Task
     function createTask(){
