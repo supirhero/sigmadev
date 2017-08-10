@@ -263,7 +263,7 @@ class Task extends CI_Controller
         $user_name=$this->input->post('NAME');
         $wbs_name=$this->input->post('WBS_NAME');
         $projectid = $this->M_detail_project->getProject_Id($wbs);
-        //$this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
+        $this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
 
         //return
         $data['status'] = 'success';
