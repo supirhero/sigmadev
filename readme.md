@@ -356,6 +356,10 @@ URI untuk mengakses API ini :
 ```
 http://45.77.45.126/dev/project/addProject_view/<Business Unit ID>
 ```
+Input yang harus di provide :
+```
+->bu_code (Kode business unit ,didapat dari dashboard)
+``` 
 Return JSON data :Edit Project View
 ```
 -> business_unit
