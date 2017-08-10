@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Timesheet extends CI_Controller {
+class Timesheettest extends CI_Controller {
 
     public $datajson = array();
 
@@ -13,58 +13,25 @@ class Timesheet extends CI_Controller {
         $this->load->model('M_data');
         error_reporting(E_ALL & ~E_NOTICE);
 
-        //TOKEN LOGIN CHECKER
-        if(isset($_GET['token'])){
-            $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
-
-            $decoded_user_data =$datauser;
-            //    print_r($decoded_user_data);
-            $this->datajson['token'] = $_GET['token'];
-
-        }
-        elseif(isset($_SERVER['HTTP_TOKEN'])){
-            $datauser["data"] = $this->M_session->GetDataUser($_SERVER['HTTP_TOKEN']);
-
-            $decoded_user_data = $datauser["data"];
-            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
-        }
-        else{
-            $error['error']="Login First!";
-            echo json_encode($error);
-            die();
-        }
-        //if login success
-        if(!isset($decoded_user_data[0])){
-            //get user data from token
-
-            //for login bypass ,this algorithm is not used
-            //$this->datajson['userdata'] = (array)$decoded_user_data['data'];
-            //this code below for login bypass
-            $this->datajson['userdata'] = $decoded_user_data;
-        }
-        //if login fail
-        else {
-            echo $decoded_user_data[0];
-            die();
-        }
-
-        if($datauser["data"]["SESSION_EXPIRED"] <= time())
-        {
-            $error['error']="session is expired";
-            echo json_encode($error);
-            die();
-        }
-        else{
-            $this->M_session->update_session($this->datajson['token']);
-        }
-
+        $this->datajson['userdata'] = json_decode("{
+    \"USER_ID\": \"S201502162\",
+    \"USER_NAME\": \"GINA KHAYATUNNUFUS\",
+    \"EMAIL\": \"gina.nufus@sigma.co.id\",
+    \"BU_ID\": \"36\",
+    \"USER_TYPE_ID\": \"int\",
+    \"SUP_ID\": \"S201404159\",
+    \"PROF_ID\": \"6\",
+    \"last_login\": \"17-JUL-17\",
+    \"logged_in\": true
+  }", true);
     }
 
     //for timesheet view data
     function view(){
 
         //select project based on user
-        $date = $this->input->post('date');
+        //print_r($_POST);
+        $date = $_POST['date'];
         $userid = $this->datajson['userdata']['USER_ID'];
         $project = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$userid."'")->result_array();
         $activity = $this->M_timesheet->selectTimesheet_bydate($this->datajson['userdata']['USER_ID'],$date);

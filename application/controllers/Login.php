@@ -22,19 +22,9 @@ class Login extends CI_Controller {
         $error=$this->uri->segment(3,0);
         if(isset($error)||$error!=""){
             $data['title']= 'error';
-            $data['message']='Anda belum login';
+            $data['message']='Username atau password salah';
             print_r(json_encode($data));
         }
-
-        if($_SERVER['HTTP_TOKEN'])
-        {
-            $this->welcome();
-        }else{
-            $data['title']= 'error';
-            $data['message']='Anda belum login';
-            print_r(json_encode($data));
-        }
-
     }
 
     //if login success go to home
@@ -68,7 +58,7 @@ class Login extends CI_Controller {
             //$sso variable for authetication login value
             $sso =$this->sso($user_id,$password);
             //print_r($sso);
-            //if status 1 that mean just user
+            //if status 1 that mean intern
             if($sso['STATUS']=='1'){
                 if(isset($sso['EMP_ID'])){
                     $result=$this->M_login->loginsso($sso['EMP_ID']);}
@@ -80,7 +70,7 @@ class Login extends CI_Controller {
 
                 redirect('/login/welcome?token='.$token);
             }
-            //if status 0 thats mean wrong password or it can be admin,check to next query
+            //if status 0 maybe it is login extern (VENDOR)
             else {
                 $password = md5($password);
                 $cek=$this->M_login->validateLogin($user_id,$password);
@@ -90,8 +80,7 @@ class Login extends CI_Controller {
                     if($result != false){
                         //redirect to login as admin
                         //print_r($_SESSION);
-
-                        $token = $this->M_session->insert_session($result["USER_ID"]);
+                        $token = $this->M_session->insert_session($result['userdata']["USER_ID"]);
                         redirect('/login/welcome?token='.$token);
                     }
 
@@ -181,7 +170,7 @@ class Login extends CI_Controller {
     public function doRegistration()
     {
 
-        $regType=$this->input->post('Submit');
+        $regType=$this->input->post('submit');
 
 
         switch($regType){
@@ -216,23 +205,35 @@ class Login extends CI_Controller {
                 break;
             //check if user exist
             case 'registSigma':
+
+                if(substr($_POST['EMAIL'],12) != '@sigma.co.id'){
+                    $data['title'] = 'error';
+                    $data['message'] = 'Email internal harus memakai @sigma.co.id';
+                    echo json_encode($data);
+                    die();
+                };
                 if($this->M_login->validateUser('USER_ID')==TRUE){
+                    //sudah ada user id
                     $errorMsg='err1';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
                 }elseif($this->M_login->validateUser('EMAIL')==TRUE){
+                    //sudah ada email
                     $errorMsg='err2';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
                 }else{
+                    //belum ada user id dan email ,proses lanjut
+                    //tambah user dengan status inactive
                     $this->M_login->add_user();
-
+                    //tambah verification email
                     $this->M_login->recordVerification();
+                    //kirim email
                     $this->sendVerification($this->input->post('EMAIL'));
                     $data['title']= 'success';
-                    $data['message']='Berhasil tambah user';
+                    $data['message']='Email verifikasi telah dikirim';
                     print_r(json_encode($data));
                 }
                 break;
@@ -275,11 +276,11 @@ class Login extends CI_Controller {
         switch($this->M_login->activateRegister($email)){
             case '1':
                 $data['data']=3;
-                $data['text']="Account Anda berhasil terverifikasi. Anda akan otomatis pindah ke halaman login beberapa saat lagi";
+                $data['text']="Account Anda berhasil terverifikasi,silahkan login di website atau aplikasi PRouDS";
                 break;
             case '0':
                 $data['data']=2;
-                $data['text']="Account anda sudah terverifikasi sebelumnya, Silahka klik tombol untuk pindah ke halaman login";
+                $data['text']="Account anda sudah terverifikasi sebelumnya";
                 break;
         }
         print_r(json_encode($data));
@@ -289,10 +290,10 @@ class Login extends CI_Controller {
     function sendVerification($email){
         $this->load->library('email');
         $config['protocol']='smtp';
-        $config['smtp_host']='smtp.sigma.co.id';
-        $config['smtp_user']=SMTP_AUTH_USR;
-        $config['smtp_pass']=SMTP_AUTH_PWD;
-        $config['smtp_port']='587';
+        $config['smtp_host']='ssl://smtp.gmail.com';
+        $config['smtp_user']='dummysigma@gmail.com';
+        $config['smtp_pass']='asdasdasdasd';
+        $config['smtp_port']='465';
         $config['smtp_timeout']='100';
         $config['charset']    = 'utf-8';
         $config['newline']    = "\r\n";
@@ -300,7 +301,7 @@ class Login extends CI_Controller {
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        //$this->email->to($email);
+        $this->email->to($email);
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -615,16 +616,22 @@ class Login extends CI_Controller {
 
         if($this->email->send()){
             echo "sent ".$this->email->print_debugger();
+            die;
+        }
+        else{
+            echo "email not send<br>";
+            echo $this->email->print_debugger();
+            die;
         }
 
     }
     function sendVerificationV($email){
         $this->load->library('email');
         $config['protocol']='smtp';
-        $config['smtp_host']='smtp.sigma.co.id';
-        $config['smtp_user']=SMTP_AUTH_USR;
-        $config['smtp_pass']=SMTP_AUTH_PWD;
-        $config['smtp_port']='587';
+        $config['smtp_host']='ssl://smtp.gmail.com';
+        $config['smtp_user']='dummysigma@gmail.com';
+        $config['smtp_pass']='asdasdasdasd';
+        $config['smtp_port']='465';
         $config['smtp_timeout']='100';
         $config['charset']    = 'utf-8';
         $config['newline']    = "\r\n";
@@ -632,7 +639,7 @@ class Login extends CI_Controller {
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        //$this->email->to($email);
+        $this->email->to('geryruslan@gmail.com');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -1006,10 +1013,10 @@ class Login extends CI_Controller {
         $name=$this->M_login->getName($email);
         $user_id=$this->M_login->getID($email);
         $config['protocol']='smtp';
-        $config['smtp_host']='smtp.sigma.co.id';
-        $config['smtp_user']=SMTP_AUTH_USR;
-        $config['smtp_pass']=SMTP_AUTH_PWD;
-        $config['smtp_port']='587';
+        $config['smtp_host']='ssl://smtp.gmail.com';
+        $config['smtp_user']='dummysigma@gmail.com';
+        $config['smtp_pass']='asdasdasdasd';
+        $config['smtp_port']='465';
         $config['smtp_timeout']='100';
         $config['charset']    = 'utf-8';
         $config['newline']    = "\r\n";
@@ -1017,7 +1024,7 @@ class Login extends CI_Controller {
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        //$this->email->to($email);
+        $this->email->to('geryruslan@gmail.com');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);

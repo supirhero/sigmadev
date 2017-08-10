@@ -2,6 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Project extends CI_Controller
 {
+    public $datajson = array();
+
     function __construct()
     {
         parent::__construct();
@@ -121,20 +123,19 @@ class Project extends CI_Controller
     //checking project type id
     public function checkProjectType(){
         $data = $this->input->post('PROJECT_TYPE_ID');
-        $res = $this->M_project->getProjectCat($data);
-        foreach ($res as $r) {
-            echo '<option value="' . $r->ID .'">' . $r->CATEGORY . '</option>';
-        }
+        $res['type_of_effort'] = $this->M_project->getProjectCat($data);
+        echo json_encode($res);
     }
-
-
     //add project if verified
     public function addProject_acion(){
-        $test=$this->M_project->addProject();
+        $test=$this->M_project->addProject($this->datajson['userdata']);
         $SCHEDULE_START = $this->input->post('START');
         $SCHEDULE_END = $this->input->post('END');
         $dur=$this->countDurationAll($SCHEDULE_START,$SCHEDULE_END);
         $this->M_project->addProjectWBS($test,$dur);
+
+        $returndata['status']='success';
+        $returndata['message'] = 'Project success added';
     }
     private function countDurationAll($start_date, $end_date) {
         if (empty($start_date)) {
@@ -151,33 +152,55 @@ class Project extends CI_Controller
         $period = new DatePeriod($start, new DateInterval('P1D'), $end);
         return $days;
     }
-
     /*END ADD PROJECT*/
 
     /*Start Edit Project*/
     public function editProject_view(){
-        $data['project']=$this->M_project->getProject($this->uri->segment(3));
-        $data['bu_id']=$this->M_project->getProjectID($this->uri->segment(3));
-        $code = $this->M_project->getBUCode($this->uri->segment(3));
-        $data['name'] = $this->M_business->getData($data['bu_id']);
-        $data['project_type'] = $this->M_project->getProjectType();
+
+        $data['project_setting']=$this->M_project->getProject($this->uri->segment(3));
+        $bu_id=$this->M_project->getProjectID($this->uri->segment(3));
+        $data['project_business_unit_detail'] = $this->M_business->getData($bu_id);
+        //$data['pm'] = $this->M_project->getPM($bu_id);
+        $data['available_project_type'] = $this->M_project->getProjectType();
         $code = $this->M_project->getBUCodeByProjectID($this->uri->segment(3));
+        //$data['pm'] = $this->M_project->getPM($this->uri->segment(3));
 
         @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_code/' . $code->BU_CODE);
-        $data['IWO'] = array();
-        $data['IWO'] = json_decode($json, true);
+        $data['IWO_list'] = array();
+        $data['IWO_list'] = json_decode($json, true);
 
-        if (empty($data['IWO'])) {
+        if (empty($data['IWO_list'])) {
             @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_alias/' . $code->BU_CODE);
-            $data['IWO'] = array();
-            $data['IWO'] = json_decode($json, true);
+            $data['IWO_list'] = array();
+            $data['IWO_list'] = json_decode($json, true);
         }
+
+        /*=================================================================*/
+        //get Project Manager account manager
+        $q="SELECT USER_NAME, USER_ID FROM USERS WHERE BU_ID='".$bu_id."' AND IS_ACTIVE='1' order by USER_NAME";
+        $amq="SELECT USER_NAME, USER_ID FROM USERS WHERE IS_ACTIVE='1' order by USER_NAME";
+
+        $bu =$this->uri->segment(3);
+        $pm=$this->db->query($q)->result_array();
+        $am=$this->db->query($amq)->result_array();
+
+        $data['project_manajer_list'] = $pm;
+        $data['account_manager_list'] = $am;
+
         echo json_encode($data);
     }
-
-    function editProject_Action(){
+    function editProject_action(){
         $id=$this->uri->segment(3);
-        $this->M_project->update($id);
+        $confirm = $this->M_project->update($id);
+        if($confirm){
+            $returndata['status']='success';
+            $returndata['message'] = 'success edit project';
+        }
+        else{
+            $returndata['status']='error';
+            $returndata['message'] = 'error edit project';
+        }
+        echo json_encode($returndata);
     }
     function gantt($project_id)
     {

@@ -47,13 +47,41 @@ class Task extends CI_Controller
     }
 
     /*START TASK MANAJEMENT*/
-
     //Task View
     function workplan_view(){
         $id_project = $this->uri->segment(3);
-        $data['tampil_DETAIL']=$this->M_detail_project->selectWBS($id_project);
-        echo json_encode($data);
+        $workplan=$this->M_detail_project->selectWBS($id_project);
+
+        //$created_array = $this->buildTree($workplan);
+
+        //built tree
+        foreach($workplan as $row) {
+            $row['children'] = array();
+            $vn = "row" . $row['WBS_ID'];
+            ${$vn} = $row;
+            if(!is_null($row['WBS_PARENT_ID'])) {
+                $vp = "parent" . $row['WBS_PARENT_ID'];
+                if(isset($data[$row['WBS_PARENT_ID']])) {
+                    ${$vp} = $data[$row['WBS_PARENT_ID']];
+                }
+                else {
+                    ${$vp} = array('n_id' => $row['WBS_PARENT_ID'], 'WBS_PARENT_ID' => null, 'WBS_PARENT_ID' => array());
+                    $data[$row['WBS_PARENT_ID']] = &${$vp};
+                }
+                ${$vp}['children'][] = &${$vn};
+                $data[$row['WBS_PARENT_ID']] = ${$vp};
+            }
+            $data[$row['WBS_ID']] = &${$vn};
+        }
+
+        $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
+        echo json_encode($result);
+
+
+        //echo var_dump($workplan);
     }
+
+
 
     //Create Task
     function createTask(){
@@ -235,7 +263,7 @@ class Task extends CI_Controller
         $user_name=$this->input->post('NAME');
         $wbs_name=$this->input->post('WBS_NAME');
         $projectid = $this->M_detail_project->getProject_Id($wbs);
-        //$this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
+        $this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
 
         //return
         $data['status'] = 'success';
