@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Projecttest extends CI_Controller
 {
+    public $datajson = array();
     function __construct()
     {
         parent::__construct();
@@ -94,7 +95,7 @@ class Projecttest extends CI_Controller
 
     //add project if verified
     public function addProject_acion(){
-        $test=$this->M_project->addProject();
+        $test=$this->M_project->addProject($this.$this->datajson['userdata']);
         $SCHEDULE_START = $this->input->post('START');
         $SCHEDULE_END = $this->input->post('END');
         $dur=$this->countDurationAll($SCHEDULE_START,$SCHEDULE_END);
