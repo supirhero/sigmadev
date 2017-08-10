@@ -184,7 +184,7 @@ class M_project extends CI_Model {
             }
             $email=$this->selectemail($PM_ID);
             $rp_id = $this->db->query("select nvl(max(cast(rp_id as int))+1,1) as NEW_ID from resource_pool")->row()->NEW_ID;
-            $sql2 = "INSERT INTO RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID,EMAIL) VALUES ('" . $rp_id . "','" . $PM_ID . "','" . $result . "','" . $email. "')";
+            $sql2 = "INSERT INTO RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID) VALUES ('" . $rp_id . "','" . $PM_ID . "','" . $result . "')";
             $q2 = $this->db->query($sql2);
 
             //$project_id=$this->db->query('select PROJECT_ID from PROJECTS WHERE IWO_NO like "%'.$IWO_NO.'%" LIMIT 1')->row()->PROJECT_ID;
@@ -249,7 +249,7 @@ class M_project extends CI_Model {
         //$q2 = $this->db->query($sql2);
     }
     function selectemail($user_id) {
-        return $this->db->query("SELECT * from users where user_id='" . $user_id . "'")->row()->EMAIL;
+         $data = $this->db->query("SELECT * from users where user_id='" . $user_id . "'")->row();
     }
     function addProjectWBS($id,$dur){
         $PROJECT_NAME = $this->input->post('PROJECT_NAME');

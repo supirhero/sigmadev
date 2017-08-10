@@ -84,6 +84,12 @@ class Home extends CI_Controller {
         print_r(json_encode($this->datajson));
     }
 
+    //bu detail
+    public function buDetail(){
+        $bu_code = $_POST['bu_code'];
+        $bu_id = $this->db->query("select bu");
+    }
+
     /*FOR DATATIMESHEET THIS MONTH*/
     private function datatimesheet(){
 

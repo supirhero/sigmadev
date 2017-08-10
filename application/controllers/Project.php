@@ -136,6 +136,7 @@ class Project extends CI_Controller
 
         $returndata['status']='success';
         $returndata['message'] = 'Project success added';
+        echo json_encode($returndata);
     }
     private function countDurationAll($start_date, $end_date) {
         if (empty($start_date)) {
