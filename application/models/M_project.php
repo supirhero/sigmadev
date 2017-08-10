@@ -94,7 +94,7 @@ class M_project extends CI_Model {
 
     function addProject($userdata) {
         $PROJECT_NAME = $this->input->post('PROJECT_NAME');
-        $PM_ID = $this->input->post('PM_ID');
+        $PM_ID = $this->input->post('PM');
         $IWO_NO = $this->input->post('IWO_NO');
         $BU_CODE = $this->input->post('BU');
         $SCHEDULE_START = $this->input->post('START');
@@ -122,39 +122,74 @@ class M_project extends CI_Model {
 
 
         $sql = "insert into PROJECTS (PROJECT_ID,
-    PROJECT_NAME,PM_ID,IWO_NO,
-    BU_CODE,SCHEDULE_START,SCHEDULE_END,
-    CUR_ID,AMOUNT,PROJECT_TYPE_ID,AM_ID,CUST_ID,
-    CUST_END_ID,PROJECT_STATUS,PROJECT_DESC,
-    MARGIN,
-    TYPE_OF_EFFORT,PRODUCT_TYPE,
-    VISIBILITY,CALCULATION_METHOD,TYPE_OF_EXPENSE,
-    PROJECT_OVERHEAD,ACTUAL_COST,COGS,
-    RELATED_BU,CREATED_BY,DATE_CREATED) values ((select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS),'"
-            . $PROJECT_NAME . "','" . $PM_ID . "','" . $IWO_NO . "','" . $BU_CODE . "',
-    to_date('" . $SCHEDULE_START . "','yyyy-mm-dd'),
-    to_date('" . $SCHEDULE_END . "','yyyy-mm-dd'),'"
-            . $CUR_ID . "','" . $AMOUNT . "','" . $PROJECT_TYPE_ID . "','"
-            . $AM_ID . "','" . $CUST_ID . "','" . $CUST_END_ID . "','"
-            . $PROJECT_STATUS . "','" . $PROJECT_DESC . "','"
-            . $MARGIN . "','"
-            . $TYPE_OF_EFFORT . "','" . $PRODUCT_TYPE . "','"
-            . $VISIBILITY . "','" . $CALCULATION_METHOD . "','" . $TYPE_OF_EXPENSE . "','"
-            . $PROJECT_OVERHEAD . "','" . $ACTUAL_COST . "','"
-            . $COGS . "','" . $RELATED_BU . "','" . $CREATED_BY . "',to_date('" . $today . "','yyyy-mm-dd'))";
-        $this->db->query($sql);
-        $sql = "Select max(cast(PROJECT_ID as int)) as NEW_ID from projects";
-        $q = $this->db->query($sql);
-        if ($q->num_rows() > 0) {
-            $result = $q->row()->NEW_ID;
-        }
-        $email=$this->selectemail($PM_ID);
-        $rp_id = $this->db->query("select nvl(max(cast(rp_id as int))+1,1) as NEW_ID from resource_pool")->row()->NEW_ID;
-        $sql2 = "INSERT INTO RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID,EMAIL) VALUES ('" . $rp_id . "','" . $PM_ID . "','" . $result . "','" . $email. "')";
-        $q2 = $this->db->query($sql2);
+                PROJECT_NAME,
+                PM_ID,
+                IWO_NO,
+                BU_CODE,
+                SCHEDULE_START,
+                SCHEDULE_END,
+                CUR_ID,
+                AMOUNT,
+                PROJECT_TYPE_ID,
+                AM_ID,
+                CUST_ID,
+                CUST_END_ID,
+                PROJECT_STATUS,
+                PROJECT_DESC,
+                MARGIN,
+                TYPE_OF_EFFORT,
+                PRODUCT_TYPE,
+                VISIBILITY,
+                CALCULATION_METHOD,
+                TYPE_OF_EXPENSE,
+                PROJECT_OVERHEAD,
+                ACTUAL_COST,
+                COGS,
+                RELATED_BU,
+                CREATED_BY,
+                DATE_CREATED) values 
+                ((select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS),'"
+                . $PROJECT_NAME . "',
+                '" . $PM_ID . "',
+                '" . $IWO_NO . "',
+                '" . $BU_CODE . "',
+                to_date('" . $SCHEDULE_START . "','yyyy-mm-dd'),
+                to_date('" . $SCHEDULE_END . "','yyyy-mm-dd'),'"
+                . $CUR_ID . "',
+                '" . $AMOUNT . "',
+                '" . $PROJECT_TYPE_ID . "','"
+                . $AM_ID . "',
+                '" . $CUST_ID . "',
+                '" . $CUST_END_ID . "','"
+                . $PROJECT_STATUS . "',
+                '" . $PROJECT_DESC . "','"
+                . $MARGIN . "','"
+                . $TYPE_OF_EFFORT . "',
+                '" . $PRODUCT_TYPE . "','"
+                . $VISIBILITY . "',
+                '" . $CALCULATION_METHOD . "',
+                '" . $TYPE_OF_EXPENSE . "',
+                '". $PROJECT_OVERHEAD . "',
+                '" . $ACTUAL_COST . "','"
+                . $COGS . "',
+                '" . $RELATED_BU . "',
+                '" . $CREATED_BY . "',
+                to_date('" . $today . "','yyyy-mm-dd'))";
+        echo $sql ;
+        die;
+            $this->db->query($sql);
+            $sql = "Select max(cast(PROJECT_ID as int)) as NEW_ID from projects";
+            $q = $this->db->query($sql);
+            if ($q->num_rows() > 0) {
+                $result = $q->row()->NEW_ID;
+            }
+            $email=$this->selectemail($PM_ID);
+            $rp_id = $this->db->query("select nvl(max(cast(rp_id as int))+1,1) as NEW_ID from resource_pool")->row()->NEW_ID;
+            $sql2 = "INSERT INTO RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID,EMAIL) VALUES ('" . $rp_id . "','" . $PM_ID . "','" . $result . "','" . $email. "')";
+            $q2 = $this->db->query($sql2);
 
-        //$project_id=$this->db->query('select PROJECT_ID from PROJECTS WHERE IWO_NO like "%'.$IWO_NO.'%" LIMIT 1')->row()->PROJECT_ID;
-        return $result;
+            //$project_id=$this->db->query('select PROJECT_ID from PROJECTS WHERE IWO_NO like "%'.$IWO_NO.'%" LIMIT 1')->row()->PROJECT_ID;
+            return $result;
     }
 
     function update($id) {

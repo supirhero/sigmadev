@@ -128,7 +128,7 @@ class Project extends CI_Controller
     }
     //add project if verified
     public function addProject_acion(){
-        $test=$this->M_project->addProject($this.$this->datajson['userdata']);
+        $test=$this->M_project->addProject($this->datajson['userdata']);
         $SCHEDULE_START = $this->input->post('START');
         $SCHEDULE_END = $this->input->post('END');
         $dur=$this->countDurationAll($SCHEDULE_START,$SCHEDULE_END);
