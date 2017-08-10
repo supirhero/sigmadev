@@ -9,6 +9,8 @@ Class M_timesheet extends CI_Model{
 
     function selectTimesheet_bydate($user_id,$date){
         //ada perubahan
+
+        echo "date : $date<br>";
         $query = $this->db->query("
   SELECT *
   FROM
@@ -17,6 +19,8 @@ Class M_timesheet extends CI_Model{
   ORDER BY ts_date DESC)
   WHERE user_id='".$user_id."'");
         $hasil = $query->result_array();
+        echo $this->db->last_query();
+        die;
         return $hasil;
 
     }
