@@ -100,7 +100,7 @@ select sum(pv) as pv, project_id, min(start_date) as aza, max(start_date) as anu
                       )
           END AS current_duration
      FROM (SELECT c.wbs_id, c.project_id, c.start_date, c.finish_date,
-                  num_business_days c.finish_date, c.finish_date) n_duration,
+                  num_business_days (c.start_date, c.finish_date) n_duration,
                   num_business_days (c.start_date, SYSDATE) n_duration_today
              FROM wbs c) d,
           (SELECT   a.wbs_id, COUNT (b.dt) n_holiday
@@ -171,19 +171,19 @@ SELECT * from wbs_pool WHERE  ROWNUM <= 99
 SELECT * from detail_capture WHERE  project_id='8538862' AND ROWNUM <= 99
      
 ");
-       print_r($query->result());
+     //  print_r($query->result());
         $query = $this->db->query("
 SELECT * from capture_wbs WHERE  project_id='8538862'  AND  ROWNUM <= 99
      
 ");
-        print_r($query->result());
+     //   print_r($query->result());
         $query = $this->db->query("
-SELECT * from users WHERE user_id='S201502162' AND ROWNUM <= 99
+SELECT * from tb_pv_project WHERE  ROWNUM <= 99
      
 ");
-      //  print_r($query->result());
+        print_r($query->result());
         $query = $this->db->query("
-SELECT * from projects WHERE project_id='8532760' AND ROWNUM <= 99
+select * from all_source where name = 'DAILY_UPDATE';
      
 ");
      //   print_r($query->result());
@@ -191,9 +191,28 @@ SELECT * from projects WHERE project_id='8532760' AND ROWNUM <= 99
     }
     function test()
     {
-        $list=$this->M_Member_Activity->selectTimesheet("8790852");
+        //  print_r($query->result());
+        $query = $this->db->query("
+CREATE TABLE tb_rekap_project
+( project_id number(10) NOT NULL,
+  tanggal date default sysdate not null,
+  pv number(10) NOT NULL,
+  ev number(10) NOT NULL,
+  ac number(10) NOT NULL
+)    
+");
+          // print_r($query->result());
 
-print_r($list);
+        $query = $this->db->query("
+SELECT *
+FROM tb_pv_project pv
+ JOIN tb_ev_project ev
+  ON ev.project_id = pv.project_id
+ JOIN  tb_ac_project ac
+  ON ac.project_id = pv.project_id
+WHERE ROWNUM <= 99    
+");
+          print_r($query->result());
     }
 
 
