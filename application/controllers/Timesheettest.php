@@ -30,7 +30,7 @@ class Timesheettest extends CI_Controller {
     function view(){
 
         //select project based on user
-        print_r($_POST);
+        //print_r($_POST);
         $date = $_POST['date'];
         $userid = $this->datajson['userdata']['USER_ID'];
         $project = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$userid."'")->result_array();
