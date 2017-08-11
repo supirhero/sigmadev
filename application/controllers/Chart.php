@@ -192,6 +192,7 @@ select * from all_source where name = 'DAILY_UPDATE';
     function test()
     {
         //  print_r($query->result());
+        /*
         $query = $this->db->query("
 CREATE TABLE tb_rekap_project
 ( project_id number(10) NOT NULL,
@@ -201,8 +202,8 @@ CREATE TABLE tb_rekap_project
   ac number(10) NOT NULL
 )    
 ");
-          // print_r($query->result());
-
+     */     // print_r($query->result());
+/*
         $query = $this->db->query("
 SELECT *
 FROM tb_pv_project pv
@@ -211,6 +212,24 @@ FROM tb_pv_project pv
  JOIN  tb_ac_project ac
   ON ac.project_id = pv.project_id
 WHERE ROWNUM <= 99    
+");
+*/
+       //   print_r($query->result());
+
+        $query = $this->db->query("
+WITH date_range AS (
+select trunc(TS_DATE) as tanggal, count(HOUR_TOTAL) as hour_total
+  from TIMESHEET
+ where TS_DATE between date '2017-01-02' and date '2017-01-31'
+ group by trunc(TS_DATE)
+ order by trunc(TS_DATE)
+    )
+SELECT  LEVEL \"Week\"
+,hour_total,tanggal,
+     (select sum(t1.hour_total) hour_totals from date_range t1 where t1.tanggal <= t2.tanggal )
+
+FROM   date_range t2
+CONNECT BY LEVEL <= (TRUNC(tanggal,'IW') - TRUNC(tanggal,'IW')) / 7 + 1
 ");
           print_r($query->result());
     }
