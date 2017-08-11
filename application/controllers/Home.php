@@ -74,14 +74,25 @@ class Home extends CI_Controller {
 
     /*For Overview Home*/
     public function index(){
-
         $bagian_unit = $this->datajson['userdata']['BU_ID'];
+        $this->datajson['userdata']['PROFILE_NAME'] = ($this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row())->PROF_NAME;
         $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
-        $this->datajson['bussines_unit'] = $query->BU_NAME;
-        $this->datatimesheet();
+        //$this->datajson['bussines_unit'] = $query->BU_NAME;
         $this->project();
+        $this->datatimesheet();
         $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
+    }
+
+    //bu detail
+    public function buDetail(){
+        $code = ($this->M_project->getBuBasedCode($_POST['bu_code']))[0]['BU_ID'];
+        $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code']);
+        $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code'")->result_array();
+        $data['bu_id'] = $code;
+        $data['bu_code'] = $_POST['bu_code'];
+
+        echo json_encode($data);
     }
 
     /*FOR DATATIMESHEET THIS MONTH*/
@@ -419,12 +430,15 @@ class Home extends CI_Controller {
            array_push($bu_name,$data['BU_NAME']);
        }
        $bu_name = array_unique($bu_name);
-       foreach ($bu_name as $data){
+        //search bu code
+        $bu_with_code = $this->M_project->searchBuCode($bu_name);
+        foreach ($bu_with_code as $data){
            $index_array = count($projecttempfix);
-           $projecttempfix[$index_array]['BU_NAME'] = $data;
+           $projecttempfix[$index_array]['BU_NAME'] = $data['bu_name'];
+           $projecttempfix[$index_array]['BU_CODE'] = $data['bu_code'];
            $projecttempfix[$index_array]['PROJECT_LIST']= [];
            for($i = 0 ; $i < count($projecttemp) ; $i++){
-                if($projecttemp[$i]['BU_NAME'] == $data){
+                if($projecttemp[$i]['BU_NAME'] == $data['bu_name']){
                     array_push($projecttempfix[$index_array]['PROJECT_LIST'],$projecttemp[$i]);
                 }
            }

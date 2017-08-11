@@ -338,5 +338,20 @@ order siblings by bu_parent_id";
         $result=$q->result();
         return $result;
     }
+
+    function getDataByBuCode($bu_code){
+        $findbu = $this->db->query("select bu_id from p_bu where bu_code = '$bu_code'")->row();
+
+        $bu_id = $findbu->BU_ID;
+
+        $result=array();
+        $sql="select * from p_bu where bu_id='".$bu_id."'";
+        $q = $this->db->query($sql);
+        if($q->num_rows() > 0){
+            $result = $q->row();
+        }
+
+        return $result;
+    }
 }
 ?>

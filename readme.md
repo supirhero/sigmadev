@@ -14,10 +14,13 @@ Untuk tahap sekarang api yang tersedia :
     * My Activity
     * My Assignment
     * Project Activity
+    * Business unit
     
 * REPORT controller
     * My Performances
     * My Activity
+    * Directorat / BU Report
+    * People Report
     
 * Project Controller
     * Add Project View Data
@@ -161,6 +164,22 @@ Return data json object yang di terima adalah :
 -> project_team
 ```
 
+## Detail Business Unit
+Detail project overview bisa di capai dengan ke url :
+```
+http://45.77.45.126/dev/home/buDetail/
+```
+Input yang harus di provide :
+```
+-> bu_code                   <=didapati di home dashboard
+```
+return json data:
+```
+-> project
+-> member
+-> bu_id
+-> bu_code
+```
 ## Project Team Member
 URI yang di gunakan untuk akses API ini :
 ```
@@ -356,6 +375,10 @@ URI untuk mengakses API ini :
 ```
 http://45.77.45.126/dev/project/addProject_view/<Business Unit ID>
 ```
+Input yang harus di provide :
+```
+->bu_code (Kode business unit ,didapat dari dashboard)
+``` 
 Return JSON data :Edit Project View
 ```
 -> business_unit
@@ -455,7 +478,7 @@ Input yang harus di provide :
 ```
 -> IWO_NO               string           <= nomor IWO
 -> PROJECT_NAME         string           <= Didapati dari get Kode IWO
--> BU                   string           <= kode business unit( Didapati dari get kode IWO)
+-> BU                   string           <= kode business unit( Didapati dari dashboard home)
 -> RELATED              string           <= Related Business unit (Didapati dari get kode IWO)
 -> CUST_ID              string           <= id customer (Didapati dari get kode IWO)
 -> END_CUST_ID          string           <= ID End Customer (Didapati dari get IWO)
@@ -463,7 +486,7 @@ Input yang harus di provide :
 -> MARGIN               FLOAT            <= Didapati dari get kode IWO
 -> DESC                 string           <= Project Description
 -> PROJECT_TYPE_ID      string           <= Tipe project ('Project' or 'Non Project')
--> PM                   string           <= Project Manager ID (Didapati dari geti IWO)
+-> PM                   string           <= Didapati dari view create project
 -> AM_ID                string           <= ID Account manager (Didapati dari get IWO)
 -> TYPE_OF_EFFORT       string           <= Didapati dari API
 -> PRODUCT_TYPE         string
