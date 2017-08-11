@@ -12,6 +12,7 @@ class Test extends CI_Controller {
         //error_reporting(1);
 
 
+        error_reporting(E_ALL & ~E_NOTICE);
 
 
             //get user data from token
