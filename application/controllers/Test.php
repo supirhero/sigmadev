@@ -11,6 +11,17 @@ class Test extends CI_Controller {
         parent::__construct();
         //error_reporting(1);
 
+        $this->load->model('M_home');
+        $this->load->model('M_project');
+        $this->load->model('M_business');
+        $this->load->model('M_detail_project');
+        $this->load->model('M_timesheet');
+        $this->load->model('M_invite');
+        $this->load->model('M_issue');
+        $this->load->model('M_Member_Activity');
+        $this->load->model('M_data');
+        $this->load->model('M_session');
+
 
         error_reporting(E_ALL & ~E_NOTICE);
 
