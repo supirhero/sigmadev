@@ -28,8 +28,6 @@ class Test extends CI_Controller {
     \"logged_in\": true
   }", true);
 
-            print_r[$this->datajson['userdata']];
-            die;
     }
 
     /*For Overview Home*/
