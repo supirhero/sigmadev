@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Report extends CI_Controller {
+
     private $datajson =array();
     public function __construct()
     {
@@ -225,7 +226,7 @@ class Report extends CI_Controller {
             else{
                 $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
             }
-            $hasil['allentry'][$hasilAllentry['MONTH_VALUE']] = $hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100;
+            array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
 
         }
 
@@ -246,7 +247,7 @@ class Report extends CI_Controller {
                 $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
             }
             //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-            $hasil['allhour'][$hasilAllhour['MONTH_VALUE']]=$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100;
+            array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
         }
         echo json_encode($hasil);
     }
