@@ -374,7 +374,7 @@ class Report extends CI_Controller {
 
             $this->transformKeys($hasil);
             //echo json_encode($hasil, JSON_NUMERIC_CHECK);
-            array_push($returndata,['bulan'=>$databulan['bulan'],
+            array_push($returndata,['bulan'=>$databulan['angka'],
                                     'entry'=>$hasil['entry'],
                                     'entry_status'=>$hasil['status'],
                                     'utilization'=>$hasil['utilization'],
