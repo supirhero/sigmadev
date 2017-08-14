@@ -166,6 +166,8 @@ class Report extends CI_Controller {
             $hasil['status']='Over';
         }
 
+
+
         $allentry=$this->M_home->getAllEntry($user_id,$tahun);
         //$hasil['JML_ENTRY_BULANAN']=$allentry;
         $hasil['allentry'][0]=array('Month', 'Entry');
@@ -174,7 +176,6 @@ class Report extends CI_Controller {
             $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
             // March
             if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
                 $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
             }
             else{
@@ -183,27 +184,6 @@ class Report extends CI_Controller {
             $hasil['allentry'][$i][0]= $dateObj->format('M');
             //$dateObj->format('m');
             $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
-
-            $i++;
-        }
-
-        $allhour=$this->M_home->getAllHour($user_id,$tahun);
-        $hasil['allhour'][0]=array('Month', 'Hour');
-        $i=1;
-        foreach ($allhour as $hasilAllhour) {
-
-            $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
-            // March
-            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
-                $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
-            }
-            else{
-                $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
-            }
-            //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-            $hasil['allhour'][$i][0]= $dateObj->format('M');
-            $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
             $i++;
         }
         $hasil['bulan']=$bulan;
@@ -224,163 +204,54 @@ class Report extends CI_Controller {
         echo json_encode($hasil, JSON_NUMERIC_CHECK);
     }
 
-    public function myperfromances_yearly(){
+    public function myperformances_yearly(){
+        $y=(int)date("Y");
+        $m=(int)date("m");
 
-        //parameter
+        $tahun = $this->input->post('tahun');
         $user_id=	$this->datajson['userdata']['USER_ID'];
-        $returndata =[];
 
-        $bulandesc = [  ['angka'=>1,'bulan'=>'Januari'],
-                        ['angka'=>2,'bulan'=>'Februari'],
-                        ['angka'=>3,'bulan'=>'Maret'],
-                        ['angka'=>4,'bulan'=>'April'],
-                        ['angka'=>5,'bulan'=>'Mey'],
-                        ['angka'=>6,'bulan'=>'Juni'],
-                        ['angka'=>7,'bulan'=>'Juli'],
-                        ['angka'=>8,'bulan'=>'Agustus'],
-                        ['angka'=>9,'bulan'=>'September'],
-                        ['angka'=>10,'bulan'=>'Oktober'],
-                        ['angka'=>11,'bulan'=>'November'],
-                        ['angka'=>12,'bulan'=>'Desember']
-        ];
+        /************************************************/
+        /*entry*/
+        $allentry=$this->M_home->getAllEntry($user_id,$tahun);
+        $hasil['allentry'] = [];
+        foreach ($allentry as $hasilAllentry) {
+            $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
+            // March
+            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
 
-        foreach($bulandesc as $databulan){
-
-            $_POST['bulan'] = $databulan['angka'];
-            if (strlen($this->input->post('bulan'))=='2'){
-                $bulan = $this->input->post('bulan');
-            }else {
-                $bulan = '0'.$this->input->post('bulan');
-            }
-
-            $hasil['bulan']=$bulan;
-            $tahun = $this->input->post('tahun');
-            $y=(int)date("Y");
-            $m=(int)date("m");
-            // get Util data
-            $total_hours=$this->M_home->getTotalHour($user_id,$bulan,$tahun);
-            // get Entry Data
-            $entry=$this->M_home->getEntry($user_id,$bulan,$tahun);
-
-            //echo json_encode($entry);
-            $a_date = "2009-11-23";
-            $o=11;
-            //if( (!isset($entry))&&(!isset($total_hours)) ){
-            //$entry=0;$total_hours=0;
-            //}
-            //  if (($entry)&&($total_hours)){
-            //  $entry=0;$total_hours=0;
-            //  }
-            //echo date("d-m-Y", strtotime('1-'.$o.'-2016'))."<br />";
-            //echo "hu".date("t", strtotime($a_date))."hh";
-            //echo $entry;
-            //echo $this->countDuration('2016/11/1', '2016/11/30') /$entry*100;
-
-            //Entry calculation
-            //$hasil['e']=$entry;
-            //$hasil['t']=$total_hours;
-            if (($bulan==$m)&& ($tahun==$y) ){
-                $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
+                $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
             }
             else{
-                $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
+                $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
             }
-            //Utilization calculation
-            if (($bulan==$m)&& ($tahun==$y) ){
-                $hasil['utilization']=$total_hours/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
-                $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8);
-            }
-            else{
-                $hasil['utilization']=$total_hours/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
-                $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8);
+            $hasil['allentry'][$hasilAllentry['MONTH_VALUE']] = $hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100;
 
-            }
-            //Utilization text
-            if ($hasil['utilization']<70)
-            {
-                $hasil['status_utilization']='Under';
-            }
-            elseif (($hasil['utilization']>70)&& ($hasil['utilization']<=85)   ){
-                $hasil['status_utilization']='Optimal';
-            }
-            else {
-                $hasil['status_utilization']='Over';
-            }
-            // Entry text
-            if ($hasil['entry']<100)
-            {
-                $hasil['status']='Under';
-            }
-            elseif ($hasil['entry']==100) {
-                $hasil['status']='Complete';
-            }
-            else {
-                $hasil['status']='Over';
-            }
-
-            $allentry=$this->M_home->getAllEntry($user_id,$tahun);
-            //$hasil['JML_ENTRY_BULANAN']=$allentry;
-            $hasil['allentry'][0]=array('Month', 'Entry');
-            $i=1;
-            foreach ($allentry as $hasilAllentry) {
-                $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
-                // March
-                if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
-                    $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
-                }
-                else{
-                    $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
-                }
-                $hasil['allentry'][$i][0]= $dateObj->format('M');
-                //$dateObj->format('m');
-                $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
-
-                $i++;
-            }
-
-            $allhour=$this->M_home->getAllHour($user_id,$tahun);
-            $hasil['allhour'][0]=array('Month', 'Hour');
-            $i=1;
-            foreach ($allhour as $hasilAllhour) {
-
-                $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
-                // March
-                if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
-                    $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
-                }
-                else{
-                    $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
-                }
-                //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-                $hasil['allhour'][$i][0]= $dateObj->format('M');
-                $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
-                $i++;
-            }
-            $hasil['bulan']=$bulan;
-            $hasil['tahun']=$tahun;
-            $hasil['a']=$entry;
-            $hasil['total_hours']=$total_hours;
-            $hasil['b']= $this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun));
-
-            /*remove unused variable*/
-            unset($hasil['a']);
-            unset($hasil['b']);
-            unset($hasil['c']);
-            unset($hasil['bulan']);
-            unset($hasil['tahun']);
-            unset($hasil['total_hours']);
-
-            $this->transformKeys($hasil);
-            //echo json_encode($hasil, JSON_NUMERIC_CHECK);
-            array_push($returndata,['bulan'=>$databulan['angka'],
-                                    'entry'=>$hasil['entry'],
-                                    'entry_status'=>$hasil['status'],
-                                    'utilization'=>$hasil['utilization'],
-                                    'utilization_status'=> $hasil['status_utilization']]);
         }
-        echo json_encode($returndata);
+
+        /************************************************/
+        /*utilization*/
+        $hasil['allhour']=[];
+        $allhour=$this->M_home->getAllHour($user_id,$tahun);
+        foreach ($allhour as $hasilAllhour) {
+
+            $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
+            // March
+            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
+
+                $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
+            }
+            else{
+                $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
+            }
+            //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
+            $hasil['allhour'][$hasilAllhour['MONTH_VALUE']]=$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100;
+        }
+
+
+        print_r($hasil);
+        die;
+        echo json_encode($hasil['allentry']);
     }
 
     private function countDuration($start_date, $end_date) {
