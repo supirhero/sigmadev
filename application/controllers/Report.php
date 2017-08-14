@@ -229,6 +229,7 @@ class Report extends CI_Controller {
 
         }
 
+
         /************************************************/
         /*utilization*/
         $hasil['allhour']=[];
