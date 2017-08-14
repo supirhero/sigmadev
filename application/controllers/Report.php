@@ -248,10 +248,6 @@ class Report extends CI_Controller {
             //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
             $hasil['allhour'][$hasilAllhour['MONTH_VALUE']]=$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100;
         }
-
-
-        print_r($hasil);
-        die;
         echo json_encode($hasil['allentry']);
     }
 
