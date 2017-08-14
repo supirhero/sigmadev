@@ -248,7 +248,7 @@ class Report extends CI_Controller {
             //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
             $hasil['allhour'][$hasilAllhour['MONTH_VALUE']]=$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100;
         }
-        echo json_encode($hasil['allentry']);
+        echo json_encode($hasil);
     }
 
     private function countDuration($start_date, $end_date) {
