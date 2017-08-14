@@ -65,10 +65,12 @@ class Project extends CI_Controller
 
     /*START ADD PROJECT*/
     public function addProject_view(){
+
+
+
         $code = $this->M_project->getBuBasedCode($_POST['bu_code']);
         //get bussines unit based on uri segment
         $data['business_unit'] = $this->M_business->getDataByBuCode($_POST['bu_code']);
-
 
         //get pm
         $data['project_manager'] = $this->M_project->getPMBuCode($_POST['bu_code']);

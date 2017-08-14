@@ -145,11 +145,11 @@ class Report extends CI_Controller {
 
         }
         //Utilization text
-        if ($hasil['utilization']<70)
+        if ($hasil['utilization']<80)
         {
             $hasil['status_utilization']='Under';
         }
-        elseif (($hasil['utilization']>70)&& ($hasil['utilization']<=85)   ){
+        elseif (($hasil['utilization']>=80)&& ($hasil['utilization']<=100)   ){
             $hasil['status_utilization']='Optimal';
         }
         else {
@@ -419,11 +419,11 @@ class Report extends CI_Controller {
                 $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
 
             }
-            if ($persen_utilization<70)
+            if ($persen_utilization<80)
             {
                 $text_utilization='Under';
             }
-            elseif (($persen_utilization>70)&& ($persen_utilization<=85)   ){
+            elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
                 $text_utilization='Optimal';
             }
             else {
