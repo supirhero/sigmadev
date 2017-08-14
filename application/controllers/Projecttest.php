@@ -215,6 +215,52 @@ class Projecttest extends CI_Controller
         ];
         echo json_encode($report);
     }
+    function spi($project_id)
+    {
+        $query = $this->db->query("
+WITH date_range AS (
+    SELECT  ACTUAL_START_DATE as start_date
+           ,ACTUAL_END_DATE as end_date
+    FROM    PROJECTS where project_id='$project_id'
+    )
+SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
+            (select sum(t1.pv) pv from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
+            (select sum(t1.ev) ev from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+            (select sum(t1.ev)/sum(t1.pv) spi from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
+
+            FROM   (SELECT  LEVEL \"Week\"
+       ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
+       ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
+       ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
+FROM   date_range t2
+CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
+");
+        $result = $query->result();
+        echo json_encode($result);
+    }
+    function cpi($project_id)
+    {
+        $query = $this->db->query("
+WITH date_range AS (
+    SELECT  ACTUAL_START_DATE as start_date
+           ,ACTUAL_END_DATE as end_date
+    FROM    PROJECTS where project_id='$project_id'
+    )
+SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
+            (select sum(t1.ac) ac from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
+            (select sum(t1.ev) ev from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+            (select sum(t1.ev)/sum(t1.ac) spi from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as cpi
+
+            FROM   (SELECT  LEVEL \"Week\"
+       ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
+       ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
+       ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
+FROM   date_range t2
+CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
+");
+        $result = $query->result();
+        echo json_encode($result);
+    }
 
 
 }
