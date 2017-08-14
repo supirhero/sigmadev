@@ -45,6 +45,9 @@ Untuk tahap sekarang api yang tersedia :
         * Get Total Approved Hours 
     * Add Timesheet Action
     * Approve Timesheet
+ 
+* IWO Controller
+    * Get iwo with offset
     
     
 ## LOGIN CONTROLLER
@@ -385,7 +388,10 @@ Return JSON data :Edit Project View
 -> IWO <= Array , fetching semua iwo
 -> project_manager
 ```
-
+IMPORTANT(IWO Number)!!
+```
+Untuk Mendapatkan IWO number, silahkan melihat dokumentasi controller IWO.
+```
 Jika ingin memilih project status, value yang di tetapkan untuk project status adalah :
 ```
 -> Not Started 
@@ -767,3 +773,22 @@ Input yang harus di provide :
 -> ts_id (id timesheet , di dapati ketika akses API)
 -> confirm (1 untuk approve , 0 untuk deny)
 ```
+
+# IWO Controller
+ ## Get iwo with offset
+ URI untuk mengakses API ini :
+ ```
+ http://45.77.45.126/dev/iwo/getIwo/<offset>
+ ```
+ keterangan : 
+   * jika offset tidak di isi maka default offset nya adalah 0
+   * array return berjumlah 50 , sehingga jika ingit mendapatkan iwo selanjutnya , offset selanjutnya adalah 50.
+  
+ Return Json :
+ ```
+ []=>Array
+    ->IWO_NO
+    ->PROJECT_NAME
+    ->PROJECT_MANAGER_ID
+    ->...
+ ```
