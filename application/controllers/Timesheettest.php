@@ -30,8 +30,7 @@ class Timesheettest extends CI_Controller {
     function view(){
 
         //select project based on user
-        //print_r($_POST);
-        $date = $_POST['date'];
+        $date = $this->input->post('date');
         $userid = $this->datajson['userdata']['USER_ID'];
         $project = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$userid."'")->result_array();
         $activity = $this->M_timesheet->selectTimesheet_bydate($this->datajson['userdata']['USER_ID'],$date);
@@ -39,15 +38,22 @@ class Timesheettest extends CI_Controller {
         $data = [];
         $data['user_project'] = $project;
         $data['user_activities'] = $activity;
-        $data['holidays']=json_decode($this->M_data->get_holidays());
+        $data['holidays']=json_decode($this->M_data->get_holidays(),True);
 
 
+        if(isset($_POST['mobile'])){
+            $this->transformKeys($data);
+        }
 
         echo json_encode($data);
     }
 
     //get task from project
     function taskList(){
+
+        if(isset($_POST['mobile'])){
+            $_POST = array_change_key_case($_POST,CASE_UPPER);
+        }
         $id=$this->input->post("PROJECT_ID");
         $user_id = $this->datajson['userdata']['USER_ID'];
 
@@ -55,6 +61,10 @@ class Timesheettest extends CI_Controller {
         //$query = $this->db->query("SELECT * FROM CARI_TASK WHERE PROJECT_ID='900418' and USER_ID='S201506017'");
 
         $hasil['task'] = $query->result_array();
+
+        if(isset($_POST['MOBILE'])){
+            $this->transformKeys($hasil);
+        }
 
         echo json_encode($hasil);
     }
@@ -91,6 +101,10 @@ class Timesheettest extends CI_Controller {
         //$data['user_id']=$user_id;
         $data['total_hours']=$h;
 
+        if(isset($_POST['mobile'])){
+            $this->transformKeys($data);
+        }
+
         echo json_encode($data);
         //echo $h;
     }
@@ -121,7 +135,12 @@ class Timesheettest extends CI_Controller {
 
     //add timesheet
     function addTimesheet(){
-        header("Access-Control-Allow-Methods: ");
+        header("Access-Control-Allow-Methods: * ");
+
+        if(isset($_POST['mobile'])){
+            $_POST = array_change_key_case($_POST,CASE_UPPER);
+        }
+
         $userid=$this->datajson['userdata']['USER_ID'];
         $data['WORK_HOUR'] = $this->input->post("HOUR");
         $data['DATE'] = $this->input->post("TS_DATE");
@@ -154,6 +173,28 @@ class Timesheettest extends CI_Controller {
         $data['status'] = $confirmation;
 
         echo json_encode($data);
+    }
+
+    //transform key
+    private function transformKeys(&$array)
+    {
+        foreach (array_keys($array) as $key):
+
+            # Working with references here to avoid copying the value,
+            # since you said your data is quite large.
+            $value = &$array[$key];
+            unset($array[$key]);
+            # This is what you actually want to do with your keys:
+            #  - remove exclamation marks at the front
+            #  - camelCase to snake_case
+            $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
+            # Work recursively
+            if (is_array($value)) $this->transformKeys($value);
+            # Store with new key
+            $array[$transformedKey] = $value;
+            # Do not forget to unset references!
+            unset($value);
+        endforeach;
     }
 
 
