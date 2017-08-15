@@ -26,6 +26,7 @@ Class M_home extends CI_Model{
       WHERE
       user_id = '".$user_id."'
       AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
+      AND IS_APPROVED = 1
       AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
       GROUP BY user_id,TO_CHAR (TS_DATE, 'mm')
       UNION ALL
@@ -37,7 +38,6 @@ Class M_home extends CI_Model{
       user_id = '".$user_id."'
       AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
       AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
-      AND IS_APPROVED = 1
       GROUP BY user_id,TO_CHAR (TS_DATE, 'mm'))
       ")->row()->JML_JAM_BULANAN;
     }
@@ -51,6 +51,7 @@ Class M_home extends CI_Model{
         WHERE
         user_id = '".$user_id."'
         AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
+        AND IS_APPROVED = 1
         AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
         AND (HOUR_TOTAL is not null and HOUR_TOTAL!='0')
         GROUP BY
@@ -68,7 +69,6 @@ Class M_home extends CI_Model{
         AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
         AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
         AND (HOUR_TOTAL is not null and HOUR_TOTAL!='0')
-        AND IS_APPROVED = 1
         GROUP BY
         user_id, TO_CHAR (TS_DATE, 'mm'))")->row()->JML_ENTRY_BULANAN;
     }
