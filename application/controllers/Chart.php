@@ -139,7 +139,7 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
       sum(RESOURCE_WBS) > 0
       AND sum(RESOURCE_WBS) IS NOT NULL
     ) THEN
-      sum(RESOURCE_WBS)
+      sum(RESOURCE_WBS)*sum(duration)
     ELSE
       1
       END from wbs  WHERE project_id='$project_id'
@@ -153,6 +153,26 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 ");
+        print_r($query->result());
+
+    }
+    function test_pv_total()
+    {
+        $project_id = "8538862";
+        $start = "2016-12-01";
+        $end = "2016-12-30";
+        $query = $this->db->query("
+(SELECT CASE
+    WHEN (
+      sum(RESOURCE_WBS) > 0
+      AND sum(RESOURCE_WBS) IS NOT NULL
+    ) THEN
+      sum(RESOURCE_WBS)*sum(duration)
+    ELSE
+      1
+      END from wbs  WHERE project_id='$project_id'
+      GROUP BY project_id 
+     )");
         print_r($query->result());
 
     }
@@ -213,10 +233,18 @@ SELECT * from detail_capture WHERE  project_id='8538862' AND ROWNUM <= 99
 SELECT * from wbs WHERE  project_id='7778226'  AND  ROWNUM <= 99
      
 ");
-        print_r($query->result());
+       // print_r($query->result());
         $query = $this->db->query("
-SELECT * from projects WHERE ROWNUM <= 99 AND ACTUAL_START_DATE BETWEEN TO_DATE('2016-09-09','YYYY-MM-DD') AND TO_DATE('2016-12-09','YYYY-MM-DD')
-     
+with sample_data as ( SELECT 1 AS rate FROM dual
+UNION ALL SELECT 2 FROM dual
+UNION ALL SELECT 3 FROM dual
+UNION ALL SELECT 4 FROM dual
+UNION ALL SELECT 6 FROM dual
+UNION ALL SELECT 6 FROM dual
+UNION ALL SELECT 7 FROM dual)
+select 
+       rate, rate - lag(rate, 1, rate) over ( order by rate) issue
+from   sample_data 
 ");
         print_r($query->result());
         $query = $this->db->query("
@@ -228,7 +256,7 @@ SELECT    COUNT (b1.dt) n_holiday_today
 ");
       //  print_r($query->result());
         $query = $this->db->query("
-select * from all_source where name = 'DAILY_UPDATE';
+select * from all_source where name = 'DAILY_UPDATE'
      
 ");
      //   print_r($query->result());
