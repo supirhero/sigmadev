@@ -235,8 +235,16 @@ SELECT * from wbs WHERE  project_id='7778226'  AND  ROWNUM <= 99
 ");
        // print_r($query->result());
         $query = $this->db->query("
-SELECT * from projects WHERE ROWNUM <= 99 AND ACTUAL_START_DATE BETWEEN TO_DATE('2016-09-09','YYYY-MM-DD') AND TO_DATE('2016-12-09','YYYY-MM-DD')
-     
+with sample_data as ( SELECT 1 AS rate FROM dual
+UNION ALL SELECT 2 FROM dual
+UNION ALL SELECT 3 FROM dual
+UNION ALL SELECT 4 FROM dual
+UNION ALL SELECT 6 FROM dual
+UNION ALL SELECT 6 FROM dual
+UNION ALL SELECT 7 FROM dual)
+select 
+       rate, rate - lag(rate, 1, rate) over ( order by rate) issue
+from   sample_data 
 ");
         print_r($query->result());
         $query = $this->db->query("
@@ -248,7 +256,7 @@ SELECT    COUNT (b1.dt) n_holiday_today
 ");
       //  print_r($query->result());
         $query = $this->db->query("
-select * from all_source where name = 'DAILY_UPDATE';
+select * from all_source where name = 'DAILY_UPDATE'
      
 ");
      //   print_r($query->result());
