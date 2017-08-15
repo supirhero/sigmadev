@@ -9,9 +9,82 @@ Class M_home extends CI_Model{
     }
 
     function assignmentView($user_id){
-        $query = $this->db->query("SELECT * from user_task where user_id='".$user_id."' and rownum < 15");
+        $query = $this->db->query(" SELECT a.USER_ID, c.USER_NAME, f.bu_name ,a.RP_ID, a.PROJECT_ID, b.PROJECT_NAME, d.WP_ID, d.WBS_ID, e.WBS_NAME, e.START_DATE, e.FINISH_DATE
+                                    FROM RESOURCE_POOL a LEFT JOIN PROJECTS b
+                                    ON a.PROJECT_ID=b.PROJECT_ID LEFT JOIN USERS c
+                                    ON a.USER_ID=c.USER_ID LEFT JOIN WBS_POOL d
+                                    ON a.RP_ID=d.RP_ID LEFT JOIN WBS e
+                                    ON d.WBS_ID=e.WBS_ID join p_bu f
+                                    on b.bu_code = f.bu_code
+                                    where a.user_id='".$user_id."'");
         $hasil = $query->result_array();
-        return $hasil;
+
+        //reserve variable
+        $array_fix = [];
+        $bu_temp_sort = [];
+        $project_temp_sort = [];
+        $bu_temp = [];
+        $project_temp = [];
+
+        //get bu name and project name
+        foreach ($hasil as $data){
+            array_push($bu_temp,$data['BU_NAME']);
+            array_push($project_temp,$data['PROJECT_NAME']);
+        }
+
+        //filter bu nane and project name with unique
+        $bu_temp = array_unique($bu_temp);
+        $project_temp = array_unique($project_temp);
+
+        //sorting bu_name and project array
+        foreach ($bu_temp as $data){
+            array_push($bu_temp_sort,$data);
+        }
+        foreach ($project_temp as $data){
+            array_push($project_temp_sort,$data);
+        }
+
+
+        //merging assignment with same project
+        $project_assignment_merge = [];
+        foreach ($project_temp_sort as $data){
+            $penampung = [];
+            for($i = 0; $i < count($hasil) ; $i++){
+                if($data == $hasil[$i]['PROJECT_NAME']){
+                    if(count($penampung) == 0){
+                        $penampung['project_name']=$data;
+                        $penampung['bu_name'] = $hasil[$i]['BU_NAME'];
+                        $penampung['assignment_list'] = [$hasil[$i]];
+                    }
+                    else{
+                        array_push($penampung['assignment_list'],$hasil[$i]);
+                    }
+                }
+            }
+            array_push($project_assignment_merge,$penampung);
+
+        }
+
+        //merging $project_assignment_merge with same bu
+        foreach ($bu_temp_sort as $data){
+            $penampung = [];
+            foreach ($project_assignment_merge as $data2){
+                if($data == $data2['bu_name']){
+                    if(count($penampung) == 0){
+                        $penampung['bu_name'] = $data;
+                        $penampung['project_detail'] = [];
+                        array_push($penampung['project_detail'],$data2);
+                    }
+                    else{
+                        array_push($penampung['project_detail'],$data2);
+                    }
+                }
+            }
+            array_push($array_fix,$penampung);
+        }
+
+
+        return $array_fix;
     }
     function assignmentProject($id){
         return $this->db->query("select * from v_project_team_member where user_id='". $id ."'")->result_array();

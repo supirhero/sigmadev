@@ -52,6 +52,7 @@ class Test extends CI_Controller {
         $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
     }
+
     public function buDetail(){
         $code = ($this->M_project->getBuBasedCode($_POST['bu_code']))[0]['BU_ID'];
         $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code']);

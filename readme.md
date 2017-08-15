@@ -308,7 +308,12 @@ Return data json object yang di terima :
  
  Return data json object :
  ```
- -> activity_timesheet
+ -> assignment []
+        ->bu_name                <=nama business unit
+        ->project_detail []      <=Array project detail
+            ->project_name
+            ->bu_name
+            ->assignment_list    <= list assignment 
  ```
  ## Project Activity
  Daftar aktifitas semua user yang berkerja di project bersangkutan. URI :
