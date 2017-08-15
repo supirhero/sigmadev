@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Report extends CI_Controller {
+
     private $datajson =array();
     public function __construct()
     {
@@ -144,11 +145,11 @@ class Report extends CI_Controller {
 
         }
         //Utilization text
-        if ($hasil['utilization']<70)
+        if ($hasil['utilization']<80)
         {
             $hasil['status_utilization']='Under';
         }
-        elseif (($hasil['utilization']>70)&& ($hasil['utilization']<=85)   ){
+        elseif (($hasil['utilization']>=80)&& ($hasil['utilization']<=100)   ){
             $hasil['status_utilization']='Optimal';
         }
         else {
@@ -166,6 +167,8 @@ class Report extends CI_Controller {
             $hasil['status']='Over';
         }
 
+
+
         $allentry=$this->M_home->getAllEntry($user_id,$tahun);
         //$hasil['JML_ENTRY_BULANAN']=$allentry;
         $hasil['allentry'][0]=array('Month', 'Entry');
@@ -174,7 +177,6 @@ class Report extends CI_Controller {
             $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
             // March
             if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
                 $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
             }
             else{
@@ -183,27 +185,6 @@ class Report extends CI_Controller {
             $hasil['allentry'][$i][0]= $dateObj->format('M');
             //$dateObj->format('m');
             $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
-
-            $i++;
-        }
-
-        $allhour=$this->M_home->getAllHour($user_id,$tahun);
-        $hasil['allhour'][0]=array('Month', 'Hour');
-        $i=1;
-        foreach ($allhour as $hasilAllhour) {
-
-            $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
-            // March
-            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
-                $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
-            }
-            else{
-                $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
-            }
-            //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-            $hasil['allhour'][$i][0]= $dateObj->format('M');
-            $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
             $i++;
         }
         $hasil['bulan']=$bulan;
@@ -222,6 +203,53 @@ class Report extends CI_Controller {
 
         $this->transformKeys($hasil);
         echo json_encode($hasil, JSON_NUMERIC_CHECK);
+    }
+
+    public function myperformances_yearly(){
+        $y=(int)date("Y");
+        $m=(int)date("m");
+
+        $tahun = $this->input->post('tahun');
+        $user_id=	$this->datajson['userdata']['USER_ID'];
+
+        /************************************************/
+        /*entry*/
+        $allentry=$this->M_home->getAllEntry($user_id,$tahun);
+        $hasil['allentry'] = [];
+        foreach ($allentry as $hasilAllentry) {
+            $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
+            // March
+            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
+
+                $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
+            }
+            else{
+                $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
+            }
+            array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
+
+        }
+
+
+        /************************************************/
+        /*utilization*/
+        $hasil['allhour']=[];
+        $allhour=$this->M_home->getAllHour($user_id,$tahun);
+        foreach ($allhour as $hasilAllhour) {
+
+            $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
+            // March
+            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
+
+                $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
+            }
+            else{
+                $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
+            }
+            //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
+            array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+        }
+        echo json_encode($hasil);
     }
 
     private function countDuration($start_date, $end_date) {
@@ -331,7 +359,20 @@ class Report extends CI_Controller {
     //get list all bu
     public function r_list_bu(){
         $data_bu = $this->M_business->getAllBU();
-        echo json_encode($data_bu);
+        $fixdata = ['directorat'=>[],'company'=>[],'business_unit'=>[]];
+        foreach($data_bu as $data){
+
+            if ($data['BU_ID'] == 0){
+                array_push($fixdata['company'],$data);
+            }
+            elseif($data['BU_PARENT_ID'] == 0){
+                array_push($fixdata['directorat'],$data);
+            }
+            else{
+                array_push($fixdata['business_unit'],$data);
+            }
+        }
+        echo json_encode($fixdata);
     }
 
     //https://marvelapp.com/hj9eb56/screen/29382899
@@ -391,11 +432,11 @@ class Report extends CI_Controller {
                 $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
 
             }
-            if ($persen_utilization<70)
+            if ($persen_utilization<80)
             {
                 $text_utilization='Under';
             }
-            elseif (($persen_utilization>70)&& ($persen_utilization<=85)   ){
+            elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
                 $text_utilization='Optimal';
             }
             else {

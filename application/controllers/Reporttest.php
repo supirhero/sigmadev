@@ -264,7 +264,20 @@ class Reporttest extends CI_Controller {
     //get list all bu
     public function r_list_bu(){
         $data_bu = $this->M_business->getAllBU();
-        echo json_encode($data_bu);
+        $fixdata = ['directorat'=>[],'company'=>[],'business_unit'=>[]];
+        foreach($data_bu as $data){
+
+            if ($data['BU_ID'] == 0){
+                array_push($fixdata['company'],$data);
+            }
+            elseif($data['BU_PARENT_ID'] == 0){
+                array_push($fixdata['directorat'],$data);
+            }
+            else{
+                array_push($fixdata['business_unit'],$data);
+            }
+        }
+        echo json_encode($fixdata);
     }
 
     //https://marvelapp.com/hj9eb56/screen/29382899

@@ -151,11 +151,11 @@ class Home extends CI_Controller {
 
             }
             //Utilization text
-            if ($hasil['utilization']<70)
+            if ($hasil['utilization'] < 80)
             {
                 $hasil['status_utilization']='Under';
             }
-            elseif (($hasil['utilization']>70)&& ($hasil['utilization']<=85)   ){
+            elseif (($hasil['utilization']>=80)&& ($hasil['utilization']<=100)   ){
                 $hasil['status_utilization']='Optimal';
             }
             else {
