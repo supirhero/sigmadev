@@ -114,6 +114,9 @@ class Home extends CI_Controller {
             $m=(int)date("m");
             // get Util data
             $total_hours=$this->M_home->getTotalHour($user_id,$bulan,$tahun);
+            echo $this->db->last_query()."<br>";
+            echo "$user_id $bulan $tahun $total_hours";
+            die;
             // get Entry Data
             $entry=$this->M_home->getEntry($user_id,$bulan,$tahun);
 
@@ -151,7 +154,7 @@ class Home extends CI_Controller {
 
             }
             //Utilization text
-            if ($hasil['utilization']<80)
+            if ($hasil['utilization'] < 80)
             {
                 $hasil['status_utilization']='Under';
             }

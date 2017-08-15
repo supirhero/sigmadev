@@ -292,5 +292,14 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         echo json_encode($result);
     }
 
+    /*Baseline*/
+    function baseline(){
+        $project=$this->uri->segment(3);
+
+        $this->db->query("Update projects set PROJECT_STATUS='In Progress' where project_id='$project'");
+        $data['status'] = "success";
+        echo json_encode($data);
+    }
+
 
 }
