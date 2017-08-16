@@ -736,9 +736,6 @@ class Home extends CI_Controller {
         {
             $error['title']='error';
             $error['message'] = 'gagal upload dokumen';
-
-            print_r($this->upload->display_errors());
-            die;
             print_r(json_encode($error));
         }
         else{
