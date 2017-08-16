@@ -398,7 +398,7 @@ class Home extends CI_Controller {
         if(insertTimesheet($data))
         {
             $returnmessage['title'] = "Success";
-        $returnmessage['message'] = "berhasil tambah issue";
+        $returnmessage['message'] = "berhasil tambah timesheet";
         }else
         {
             $returnmessage['title'] = "Fail";
@@ -613,7 +613,7 @@ class Home extends CI_Controller {
 
         $returnmessage = array();
 
-        $config['upload_path']		= 'assets/p_issue/';
+        $config['upload_path']		= 'document_assets/issue/';
         $config['allowed_types']	= 'zip|doc|docs|docx|xls|pdf|xlsx';
         $config['max_size']			= 5020;
         $config['max_width']		= 1024;
@@ -724,7 +724,7 @@ class Home extends CI_Controller {
 
         $projectid = $this->uri->segment(3);
 
-        $config['upload_path']          = 'assets/p_docs';
+        $config['upload_path']          = 'document_assets/document';
         $config['allowed_types']        = 'zip|doc|docs|docx|xls|pdf|xlsx|jpg|jpeg|png';
         $config['max_size']             = 5020;
         $config['remove_spaces']        = true;
@@ -756,8 +756,8 @@ class Home extends CI_Controller {
 
             $this->db->insert('PROJECT_DOC', $insert);
 
-            $message['title']=['success'];
-            $message['message'] = ['Berhasil upload dokumen'];
+            $message['title']='success';
+            $message['message'] = 'Berhasil upload dokumen';
             print_r(json_encode($message));
         }
     }
