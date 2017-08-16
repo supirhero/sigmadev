@@ -81,7 +81,7 @@ class Home extends CI_Controller {
         $this->project();
         $this->datatimesheet();
         $this->transformKeys($this->datajson);
-        print_r(json_encode($this->datajson));
+        echo json_encode($this->datajson);
     }
 
     //bu detail
@@ -423,6 +423,20 @@ class Home extends CI_Controller {
         $prof = $this->datajson['userdata']['PROF_ID'];
         $id = $this->datajson['userdata']['USER_ID'];
         $projecttemp = $this->M_project->getUsersProject($id);
+        for($i = 0 ; $i < count($projecttemp) ; $i++){
+            if(substr($projecttemp[$i]['PROJECT_COMPLETE'],0,1 ) == '.'){
+                if(strlen($projecttemp[$i]['PROJECT_COMPLETE']) == 3){
+                    $projecttemp[$i]['PROJECT_COMPLETE'] = str_pad($projecttemp[$i]['PROJECT_COMPLETE'],4,'0',STR_PAD_LEFT);
+                }
+                else{
+                    $projecttemp[$i]['PROJECT_COMPLETE'] = str_pad($projecttemp[$i]['PROJECT_COMPLETE'],3,'0',STR_PAD_LEFT);
+                }
+
+            }
+        }
+
+
+        print_r($projecttemp);
         $projecttempfix=[];
 
         $bu_name = [];
