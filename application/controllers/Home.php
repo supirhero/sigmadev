@@ -435,8 +435,6 @@ class Home extends CI_Controller {
             }
         }
 
-
-        print_r($projecttemp);
         $projecttempfix=[];
 
         $bu_name = [];
