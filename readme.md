@@ -576,7 +576,7 @@ Return json data :
 ## Create Task
 URI untuk mengakses API ini :
 ```
-http://45.77.45.126/dev/task/checkCustomer/
+http://45.77.45.126/dev/task/createTask/
 ```
 Input yang harus di provide :
 ```
