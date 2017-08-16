@@ -69,9 +69,9 @@ class Iwo extends CI_Controller {
         $IWO = array();
         $IWO = json_decode($json, true);
 
-        $IWO_VIEW = [];
+        $IWO_VIEW['iwo'] = [];
         for($i = $offset;$i < $offset+49 ; $i++){
-            array_push($IWO_VIEW,$IWO[$i]);
+            array_push($IWO_VIEW['iwo'],$IWO[$i]);
         }
 
         echo json_encode($IWO_VIEW);
