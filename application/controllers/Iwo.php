@@ -9,6 +9,7 @@ class Iwo extends CI_Controller {
     {
         parent::__construct();
 
+        /*
 
         $this->load->model('M_user');
         $this->load->model('M_session');
@@ -55,7 +56,7 @@ class Iwo extends CI_Controller {
         }
         else{
             $this->M_session->update_session($this->datajson['token']);
-        }
+        }*/
     }
 
     public function getIwo(){
