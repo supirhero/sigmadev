@@ -266,7 +266,7 @@ class M_project extends CI_Model {
     }
 
     function getUsersProject($id) {
-        return $this->db->query("SELECT   distinct project_id, project_name,bu_name, bu_code,project_complete,
+        return $this->db->query("SELECT   distinct project_id, project_name,bu_name, bu_code,round(project_complete,2),
             project_status, project_desc, created_by
        FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                     c.project_complete, c.project_status, c.project_desc,
