@@ -326,6 +326,17 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 
 ");
           print_r($query->result());
+
+          $sql = "CREATE OR REPLACE PROCEDURE PROUDS.insert_tb_rekap_project as
+begin
+commit;
+insert into tb_rekap_project 
+select * from tb_pv_project;
+select * from tb_ev_project;
+select * from tb_ac_project;
+commit;
+end;
+";
     }
 
 
