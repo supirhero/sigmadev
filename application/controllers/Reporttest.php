@@ -26,6 +26,7 @@ class Reporttest extends CI_Controller {
 
     }
 
+
     public function myperformances(){
         //parameter
         $user_id=	$this->datajson['userdata']['USER_ID'];
@@ -77,11 +78,11 @@ class Reporttest extends CI_Controller {
 
         }
         //Utilization text
-        if ($hasil['utilization']<70)
+        if ($hasil['utilization']<80)
         {
             $hasil['status_utilization']='Under';
         }
-        elseif (($hasil['utilization']>70)&& ($hasil['utilization']<=85)   ){
+        elseif (($hasil['utilization']>=80)&& ($hasil['utilization']<=100)   ){
             $hasil['status_utilization']='Optimal';
         }
         else {
@@ -99,6 +100,8 @@ class Reporttest extends CI_Controller {
             $hasil['status']='Over';
         }
 
+
+
         $allentry=$this->M_home->getAllEntry($user_id,$tahun);
         //$hasil['JML_ENTRY_BULANAN']=$allentry;
         $hasil['allentry'][0]=array('Month', 'Entry');
@@ -107,7 +110,6 @@ class Reporttest extends CI_Controller {
             $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
             // March
             if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
                 $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
             }
             else{
@@ -116,27 +118,6 @@ class Reporttest extends CI_Controller {
             $hasil['allentry'][$i][0]= $dateObj->format('M');
             //$dateObj->format('m');
             $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
-
-            $i++;
-        }
-
-        $allhour=$this->M_home->getAllHour($user_id,$tahun);
-        $hasil['allhour'][0]=array('Month', 'Hour');
-        $i=1;
-        foreach ($allhour as $hasilAllhour) {
-
-            $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
-            // March
-            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
-                $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
-            }
-            else{
-                $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
-            }
-            //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-            $hasil['allhour'][$i][0]= $dateObj->format('M');
-            $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
             $i++;
         }
         $hasil['bulan']=$bulan;
@@ -155,6 +136,53 @@ class Reporttest extends CI_Controller {
 
         $this->transformKeys($hasil);
         echo json_encode($hasil, JSON_NUMERIC_CHECK);
+    }
+
+    public function myperformances_yearly(){
+        $y=(int)date("Y");
+        $m=(int)date("m");
+
+        $tahun = $this->input->post('tahun');
+        $user_id=	$this->datajson['userdata']['USER_ID'];
+
+        /************************************************/
+        /*entry*/
+        $allentry=$this->M_home->getAllEntry($user_id,$tahun);
+        $hasil['allentry'] = [];
+        foreach ($allentry as $hasilAllentry) {
+            $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
+            // March
+            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
+
+                $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
+            }
+            else{
+                $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
+            }
+            array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
+
+        }
+
+
+        /************************************************/
+        /*utilization*/
+        $hasil['allhour']=[];
+        $allhour=$this->M_home->getAllHour($user_id,$tahun);
+        foreach ($allhour as $hasilAllhour) {
+
+            $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
+            // March
+            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
+
+                $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
+            }
+            else{
+                $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
+            }
+            //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
+            array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+        }
+        echo json_encode($hasil);
     }
 
     private function countDuration($start_date, $end_date) {
@@ -282,7 +310,7 @@ class Reporttest extends CI_Controller {
 
     //https://marvelapp.com/hj9eb56/screen/29382899
     public function r_directoratbu(){
-        $bu = $_POST['bu'   ];
+        $bu = $_POST['bu'];
         $tahun = $_POST['tahun'];
         $data =array();
         $data['project']['completed'] = $this->M_report->Portofolio_completed_Project($bu,$tahun);
@@ -337,11 +365,11 @@ class Reporttest extends CI_Controller {
                 $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
 
             }
-            if ($persen_utilization<70)
+            if ($persen_utilization<80)
             {
                 $text_utilization='Under';
             }
-            elseif (($persen_utilization>70)&& ($persen_utilization<=85)   ){
+            elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
                 $text_utilization='Optimal';
             }
             else {
@@ -357,6 +385,7 @@ class Reporttest extends CI_Controller {
         }
         echo json_encode($datareport);
     }
+
 
     //report overview
     public function r_overview(){
