@@ -9,6 +9,7 @@ class Tasktest extends CI_Controller
         parent::__construct();
         $this->load->model('M_detail_project');
         $this->load->model('M_session');
+        error_reporting(E_ALL & ~E_NOTICE);
 
         $this->datajson['userdata'] = json_decode("{
     \"USER_ID\": \"S201502162\",
