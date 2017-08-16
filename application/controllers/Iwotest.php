@@ -1,7 +1,7 @@
 <?php
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 //
-class Iwo extends CI_Controller {
+class Iwotest extends CI_Controller {
 
     public $datajson = array();
 
