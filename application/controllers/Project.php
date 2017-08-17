@@ -336,7 +336,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             $results[$key]["ev_percent"]=round($val->EV/$total_pv*100);
         }
 
-        print_r($results);
+        echo json_encode($results);
     }
 
     /*Baseline*/

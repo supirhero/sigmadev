@@ -14,8 +14,10 @@ class Chart extends CI_Controller {
         $this->load->model('M_Member_Activity');
         $this->load->helper(array('form', 'url'));
     }
-    function gantt($project_id)
+    function gantt()
     {
+        $project_id = "8538862";
+
         $list=$this->M_project->getWBS($project_id);
 
         /// end here
@@ -429,6 +431,29 @@ $results = [];
         }
 
 print_r($results);
+    }
+    function monthly()
+    {
+        $project_id = "8538862";
+        $sql="select b.bu_name,b.bu_code, b.bu_alias,b.bu_id, round(sum(ev)/count(c.project_id),2) as EV, round(sum(pv)/count(c.project_id),2) as PV,
+                round(sum(AC)/count(c.project_id),2) as AC,
+                case when round((sum(ev)/count(c.project_id))/(sum(pv)/count(c.project_id)),2) between 0 and 1 then '0'||round((sum(ev)/count(c.project_id))/(sum(pv)/count(c.project_id)),2) else to_char(round((sum(ev)/count(c.project_id))/(sum(pv)/count(c.project_id)),2)) end as SPI,
+                round((sum(ev)/count(c.project_id))/case when sum(ac)/count(c.project_id)=0 then 1 else sum(ac)/count(c.project_id) end,2) as CPI
+                from
+                (select ev, pv, case when pv=0 then 0 else round(ev/pv,2) end as spi,case when ev=0 then 0 else ac end as ac,case when ac=0 then 1 else round(ev/ac,2) end as cpi, a.project_id
+                from tb_ev_project a
+                left join tb_pv_project b
+                on a.project_id=b.project_id
+                left join tb_ac_project c on
+                a.project_id=c.project_id) a inner join
+                projects c on c.project_id=a.project_id
+                inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+                where project_status='In Progress'
+                group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+                order by b.bu_name";
+        $query = $this->db->query($sql);
+        $hasil = $query->result_array();
+        print_r($hasil);
     }
 
 
