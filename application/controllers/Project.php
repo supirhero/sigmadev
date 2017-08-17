@@ -289,6 +289,55 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2"
         $result = $query->result();
         echo json_encode($result);
     }
+    function s_curve($project_id)
+    {
+        $query = $this->db->query("
+(SELECT CASE
+    WHEN (
+      sum(RESOURCE_WBS) > 0
+      AND sum(RESOURCE_WBS) IS NOT NULL
+    ) THEN
+      sum(RESOURCE_WBS*duration*8)
+    ELSE
+      sum(duration*8)
+
+      END as total from wbs  WHERE project_id='$project_id'
+      GROUP BY project_id 
+     )");
+        $total_pv = $query->row()->TOTAL;
+        $query = $this->db->query("
+WITH date_range AS (
+    SELECT  ACTUAL_START_DATE as start_date
+           ,ACTUAL_END_DATE as end_date
+    FROM    PROJECTS where project_id='$project_id'
+    )
+
+        
+SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
+            (select sum(t1.pv) ac from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
+            (select sum(t1.ev) ev from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev
+
+            FROM   (SELECT  LEVEL \"Week\"
+       ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
+       ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 4 \"enddate\"
+       ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
+FROM   date_range t2
+CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
+");
+        $result = $query->result();
+        $results = [];
+        foreach ($result as $key => $val)
+        {
+            foreach ($val as $week => $valz)
+            {
+                $results[$key][$week]= $valz;
+            }
+            $results[$key]["pv_percent"]=round($val->PV/$total_pv*100);
+            $results[$key]["ev_percent"]=round($val->EV/$total_pv*100);
+        }
+
+        print_r($results);
+    }
 
     /*Baseline*/
     function baseline(){
