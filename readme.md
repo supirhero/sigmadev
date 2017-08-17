@@ -29,6 +29,9 @@ Untuk tahap sekarang api yang tersedia :
         * Check Customer Based On IWO
         * Get Type Of Effort
     * Edit Project View
+    * SPI & CPI
+    * S-Curve
+    * Gantt Chart
         
 * Task Controller 
     * Create Task
@@ -571,6 +574,72 @@ Return json data :
 -> message
 ```
 
+## Get SPI
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/spi/<ID Project>
+```
+Return json data :
+```
+-> week
+-> project_id
+-> start_date
+-> end_date
+-> pv
+-> ev
+-> spi
+```
+
+## Get CPI
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/cpi/<ID Project>
+```
+Return json data :
+```
+-> week
+-> project_id
+-> start_date
+-> end_date
+-> pv
+-> ev
+-> cpi
+
+```
+
+## Get S-Curve
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/s_curve/<ID Project>
+```
+Return json data :
+```
+-> week
+-> project_id
+-> start_date
+-> end_date
+-> pv
+-> ev
+-> pv_percent
+-> ev_percent
+
+```
+
+## Get Gantt Chart
+URI untuk mengakses API ini :
+```
+http://45.77.45.126/dev/project/gantt/<ID Project>
+```
+Return json data :
+```
+-> text
+-> id
+-> parent
+-> start_date
+-> duration
+-> progress
+
+```
 
 # Task Controller
 ## Create Task
