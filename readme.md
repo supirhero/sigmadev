@@ -731,7 +731,7 @@ http://45.77.45.126/dev/task/assignTaskMemberProject/
 Input yang harus di provide :
 ```
 -> WBS_ID (ID Task)
--> MEMBER (RP_ID)
+-> MEMBER (RP_ID)                       <= didapat dari assign task member view
 -> EMAIL
 -> NAME (Nama Anggota yang di delete)
 -> WBS_NAME (Nama Task)
