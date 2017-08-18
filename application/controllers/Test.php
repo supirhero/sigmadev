@@ -695,7 +695,7 @@ class Test extends CI_Controller {
 
         $config['upload_path']          = 'document_assets/document';
         $config['allowed_types']        = 'zip|doc|docs|docx|xls|pdf|xlsx|jpg|jpeg|png';
-        $config['max_size']             = 5020;
+        $config['max_size']             = 20000;
         $config['remove_spaces']        = true;
         $config['overwrite']            = false;
 
