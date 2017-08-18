@@ -163,9 +163,10 @@ class Timesheettest extends CI_Controller {
         $timesheet_id = $_POST['ts_id'];
         $confirm_code = $_POST['confirm'];
 
-        if($confirm_code != 0 || $confirm_code != 1){
+        if($confirm_code != 1 || $confirm_code != 0 || $confirm_code != '1' || $confirm_code != '0'){
             $data['error'] = "confirmation code is incorrect ,choose only 1 for accept and 0 for deny";
-            die();
+            echo json_encode($data);
+            die;
         }
 
         $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);

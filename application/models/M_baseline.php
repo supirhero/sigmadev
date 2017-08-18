@@ -51,19 +51,11 @@ Class M_baseline extends CI_Model{
 
     public function insertRebaseline($data){
         $delivDate = date('Y-m-d');
-        $old_start =	$data['OLD_START_DATE'] ;
-        $old_finish = $data['OLD_END_DATE'] ;
-        $new_start =$data['NEW_START_DATE'];
-        $new_end	=$data['NEW_END_DATE'];
 
         $this->db->set('RH_ID',$data['RH_ID']);
         $this->db->set('PROJECT_ID',$data['PROJECT_ID']);
         $this->db->set('REASON',$data['REASON']);
         $this->db->set('EVIDENCE',$data['fileup']);
-        $this->db->set('OLD_START_DATE',"to_date('$old_start','YYYY-MM-DD')",false);
-        $this->db->set('OLD_END_DATE',"to_date('$old_finish','YYYY-MM-DD')",false);
-        $this->db->set('NEW_START_DATE',"to_date('$new_start','YYYY-MM-DD')",false);
-        $this->db->set('NEW_END_DATE',"to_date('$new_end','YYYY-MM-DD')",false);
         $this->db->set('SUBMIT_DATE',"to_date('$delivDate','YYYY-MM-DD')",false);
         //$data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
 

@@ -582,7 +582,7 @@ class Test extends CI_Controller {
 
         $returnmessage = array();
 
-        $config['upload_path']		= 'assets/p_issue/';
+        $config['upload_path']		= 'document_assets/issue/';
         $config['allowed_types']	= 'zip|doc|docs|docx|xls|pdf|xlsx';
         $config['max_size']			= 5020;
         $config['max_width']		= 1024;
@@ -693,7 +693,7 @@ class Test extends CI_Controller {
 
         $projectid = $this->uri->segment(3);
 
-        $config['upload_path']          = 'assets/p_docs';
+        $config['upload_path']          = 'document_assets/document';
         $config['allowed_types']        = 'zip|doc|docs|docx|xls|pdf|xlsx|jpg|jpeg|png';
         $config['max_size']             = 5020;
         $config['remove_spaces']        = true;

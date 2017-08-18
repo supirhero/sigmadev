@@ -75,6 +75,8 @@ class Project extends CI_Controller
         //get pm
         $data['project_manager'] = $this->M_project->getPMBuCode($_POST['bu_code']);
 
+        $data['type'] = $this->M_project->getProjectType();
+
         echo json_encode($data);
     }
     //Check if iwo already used
@@ -158,16 +160,6 @@ class Project extends CI_Controller
         $data['available_project_type'] = $this->M_project->getProjectType();
         $code = $this->M_project->getBUCodeByProjectID($this->uri->segment(3));
         //$data['pm'] = $this->M_project->getPM($this->uri->segment(3));
-
-        @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_code/' . $code->BU_CODE);
-        $data['IWO_list'] = array();
-        $data['IWO_list'] = json_decode($json, true);
-
-        if (empty($data['IWO_list'])) {
-            @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_alias/' . $code->BU_CODE);
-            $data['IWO_list'] = array();
-            $data['IWO_list'] = json_decode($json, true);
-        }
 
         /*=================================================================*/
         //get Project Manager account manager
@@ -303,68 +295,47 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 
     //rebaseline
     public function rebaseline() {
-        $config['upload_path']		= './assets/image/';
+
+        //setting variable
+        $user_id = $this->datajson['userdata']['USER_ID'];
+        $project=$this->input->post("project_id");
+
+        //setting for upload libary
+        $config['upload_path']		= './document_assets/rebaseline_evidence/';
         $config['allowed_types']	= 'zip|doc|docs|docx|xls|pdf|xlsx';
         $config['max_size']			= 100000;
         $config['max_width']		= 1024;
-        $config['max_height']		= 768;
-        //$config['file_name']		= $nm;
-        $this->load->library('upload', $config);
-        //$project='141';
+        $config['max_height']		= 768;$this->load->library('upload', $config);
 
-        $user_id = $this->datajson['userdata']['USER_ID'];
-        $p_bu=$this->M_baseline->selectBUid($user_id);
-        $bu_head=$this->M_baseline->selectBUhead($p_bu);
-        $vp_bu=$this->M_baseline->selectVPBU($bu_head);
-
-        // echo $vp_bu;
-        $project=$this->uri->segment(3);
+        /*for send verification email
         $project_name=$this->M_baseline->selectProjectName($project);
         $pm_name=$this->M_baseline->selectProjectPmName($project);
         $bu_name=$this->M_baseline->selectProjectBUName($project);
-
-
-
-        //$this->sendVerificationPMO($project_name,$project,$pm_name,$bu_name,$vp_bu);
+        $this->sendVerificationPMO($project_name,$project,$pm_name,$bu_name,$vp_bu);
+        */
+        //set project status to onhold
         $this->db->query("Update projects set PROJECT_STATUS='On Hold' where project_id='$project'");
         //jika gagal upload/ tidak ada file
-        if (! $this->upload->do_upload('fileup')){
+        if (! $this->upload->do_upload('evidence')){
+            //get id rebaseline history
             $id = $this->M_baseline->getMaxBaselineID();
             $data['RH_ID'] = $id;
-            $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
-            $data['REASON'] = $this->input->post("REASON");
-            $data['EVIDENCE'] = $this->input->post("EVIDENCE");
-            $data['OLD_START_DATE'] = $this->input->post("SCHEDULE_START");
-            $data['OLD_END_DATE'] = $this->input->post("SCHEDULE_END");
-            $data['NEW_START_DATE'] = $this->input->post("NEW_START_DATE");
-            $data['NEW_END_DATE'] = $this->input->post("NEW_END_DATE");
-            $data['SUBMIT_DATE'] 			= $this->input->post("SUBMIT_DATE");
+            $data['PROJECT_ID'] = $this->input->post("project_id");
+            $data['SUBMIT_DATE']= date('Y-m-d');
 
-            $id2 =$this->uri->segment(3);
-            $data2['PROJECT_ID'] =$id2;
-            $update['SCHEDULE_START'] = $this->input->post("NEW_START_DATE");
-            $update['SCHEDULE_END'] = $this->input->post("NEW_END_DATE");
-
+            //insert rebaseline history
             $this->M_baseline->insertRebaseline($data);
-            $this->M_baseline->editProject2($update,$id2);
 
-
-
-
-            //  print_r($data);
+            //edit table project
+            //$this->M_baseline->editProject2($update,$id2);
 
         }
+        // jika ada file evidence / berhasil upload
         else {
             $id = $this->M_baseline->getMaxBaselineID();
             $data['RH_ID'] = $id;
             $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
-            $data['REASON'] = $this->input->post("REASON");
-            $data['fileup']			= $this->upload->data('fileup');
-            $data['OLD_START_DATE'] = $this->input->post("SCHEDULE_START");
-            $data['OLD_END_DATE'] = $this->input->post("SCHEDULE_END");
-            $data['NEW_START_DATE'] = $this->input->post("NEW_START_DATE");
-            $data['NEW_END_DATE'] = $this->input->post("NEW_END_DATE");
-            $data['SUBMIT_DATE'] 			= $this->input->post("SUBMIT_DATE");
+            $data['SUBMIT_DATE']= date('Y-m-d');
 
             $id2 =$this->uri->segment(3);
             $data2['PROJECT_ID'] =$id2;
