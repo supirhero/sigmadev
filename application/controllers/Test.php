@@ -590,6 +590,8 @@ class Test extends CI_Controller {
         //$config['file_name']		= $nm;
         $this->load->library('upload', $config);
         if (! $this->upload->do_upload('file_upload')){
+
+            print_r($this->upload->display_errors());
             $data['upload_data']= $this->upload->data();
             $id = $this->M_issue->getMaxIssue();
             $data['ISSUE_ID'] 			= $id;
@@ -637,6 +639,7 @@ class Test extends CI_Controller {
 
 
         }else{
+            print_r($this->upload->display_errors());
             $data['upload_data']= $this->upload->data();
             $id = $this->M_issue->getMaxIssue();
             $data['ISSUE_ID'] 			= $id;
@@ -682,7 +685,7 @@ class Test extends CI_Controller {
             $this->M_issue->insertDetIssue2($data,$id_det);
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
             $returnmessage['title'] = "both";
-            $returnmessage['message'] = "berhasil tambah issue,tetapi gagal upload foto";
+            $returnmessage['message'] = "berhasil tambah issue dan upload foto";
         }
 
         print_r(json_encode($returnmessage));

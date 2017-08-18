@@ -50,13 +50,13 @@ Class M_baseline extends CI_Model{
     }
 
     public function insertRebaseline($data){
-        $delivDate = date('Y-m-d');
+        $delivDate = $data['SUBMIT_DATE'];
 
         $this->db->set('RH_ID',$data['RH_ID']);
         $this->db->set('PROJECT_ID',$data['PROJECT_ID']);
         $this->db->set('REASON',$data['REASON']);
-        $this->db->set('EVIDENCE',$data['fileup']);
-        $this->db->set('SUBMIT_DATE',"to_date('$delivDate','YYYY-MM-DD')",false);
+        $this->db->set('EVIDENCE',$data['EVIDENCE']);
+        $this->db->set('SUBMIT_DATE',"to_timestamp('$delivDate','YYYY-MM-DD HH24:MI:SS')",false);
         //$data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
 
         $this->db->insert("REBASELINE_HISTORY");

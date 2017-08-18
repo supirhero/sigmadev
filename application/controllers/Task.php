@@ -91,17 +91,12 @@ class Task extends CI_Controller
         $data['WBS_NAME'] = $this->input->post("WBS_NAME");
         $data['WBS_ID'] = $project_id;
         $data['WBS_PARENT_ID'] = $this->input->post("WBS_PARENT_ID");
-        $data['START_DATE']       = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
-        $data['FINISH_DATE']      ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
+        $data['START_DATE']   = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
+        $data['FINISH_DATE']  ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
 
         // insert into wbs and get new ID
         $newid = $this->M_detail_project->insertWBS($data,$project_id);
 
-        //get new wbs_pool id
-        $WP_ID= $this->M_detail_project->getMaxWPID();
-
-        //get new resource_pool id
-        $RP_ID= $this->M_detail_project->getMaxRPID();
         //get all wbs data from new wbs
         $selWBS=$this->M_detail_project->getWBSselected($newid);
         $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
@@ -119,8 +114,8 @@ class Task extends CI_Controller
             }
             $this->M_detail_project->updateNewDuration($ap->WBS_ID);
         }
-        $data['status'] = "Success add Task";
-        echo json_encode($data['status']);
+        $returndata['status'] = "Success add Task";
+        echo json_encode($returndata);
     }
 
     //EDIT TASK

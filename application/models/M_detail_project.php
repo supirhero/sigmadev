@@ -807,7 +807,39 @@ Class M_detail_project extends CI_Model{
                                 }
                               }
                             }
-public function clearAll($project){
+    public function clearAll($project){
   $this->db->query("UPDATE wbs SET wbs_desc = NULL, work = 0, milestone = NULL, work_complete = 0, work_percent_complete = 0, progress_wbs = 0, resource_wbs = 0 WHERE wbs_id = '$project.0'");
 }
-                          }
+
+    public function insertWBSTemp($data, $project_id){
+
+        $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from WBS_PROJECT where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
+        $sql = "INSERT INTO TEMPORARY_WBS
+            (
+              WBS_ID,
+              WBS_PARENT_ID,
+              PROJECT_ID,
+              WBS_NAME,
+              START_DATE,
+              FINISH_DATE,
+              IS_VALID,
+              RH_ID)
+              VALUES
+              (
+                '".$data['WBS_ID'].".".$id."',
+                '".$data['WBS_PARENT_ID']."',
+                '".$data['WBS_ID']."',
+                '".$data['WBS_NAME']."',
+                ".$data['START_DATE'].",
+                ".$data['FINISH_DATE'].",
+                1,
+                ".$data['RH_ID']."
+                )";
+        $q = $this->db->query($sql);
+        return $data['WBS_ID'].".".$id;
+    }
+
+
+}
+
+

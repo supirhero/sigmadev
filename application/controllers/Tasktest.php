@@ -75,14 +75,10 @@ class Tasktest extends CI_Controller
         // insert into wbs and get new ID
         $newid = $this->M_detail_project->insertWBS($data,$project_id);
 
-        //get new wbs_pool id
-        $WP_ID= $this->M_detail_project->getMaxWPID();
-
-        //get new resource_pool id
-        $RP_ID= $this->M_detail_project->getMaxRPID();
         //get all wbs data from new wbs
         $selWBS=$this->M_detail_project->getWBSselected($newid);
         $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
+
 
         $dateStartWBS= new DateTime($selWBS->START_DATE);
         $dateEndWBS= new DateTime($selWBS->FINISH_DATE);

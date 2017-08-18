@@ -346,6 +346,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         //setting variable
         $user_id = $this->datajson['userdata']['USER_ID'];
         $project=$this->input->post("project_id");
+        $rh_id = null;
 
         //setting for upload libary
         $config['upload_path']		= './document_assets/rebaseline_evidence/';
@@ -366,13 +367,17 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         if (! $this->upload->do_upload('evidence')){
             //get id rebaseline history
             $id = $this->M_baseline->getMaxBaselineID();
+            $rh_id = $id;
             $data['RH_ID'] = $id;
             $data['PROJECT_ID'] = $this->input->post("project_id");
-            $data['SUBMIT_DATE']= date('Y-m-d');
+            $data['SUBMIT_DATE']= date('Y-m-d h:i:s');
+            $data['REASON'] = $this->input->post("reason");
+            $data['EVIDENCE'] = null;
 
             //insert rebaseline history
             $this->M_baseline->insertRebaseline($data);
 
+            $data['message_rebaseline'] = 'no file or file failed uploaded';
             //edit table project
             //$this->M_baseline->editProject2($update,$id2);
 
@@ -380,24 +385,83 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         // jika ada file evidence / berhasil upload
         else {
             $id = $this->M_baseline->getMaxBaselineID();
+            $rh_id = $id;
             $data['RH_ID'] = $id;
-            $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
-            $data['SUBMIT_DATE']= date('Y-m-d');
-
-            $id2 =$this->uri->segment(3);
-            $data2['PROJECT_ID'] =$id2;
-            $update['SCHEDULE_START'] = $this->input->post("NEW_START_DATE");
-            $update['SCHEDULE_END'] = $this->input->post("NEW_END_DATE");
+            $data['PROJECT_ID'] = $this->input->post("project_id");
+            $data['SUBMIT_DATE']= date('Y-m-d h:i:s');
+            $data['REASON'] = $this->input->post("reason");
+            $data['EVIDENCE'] = $this->upload->data()['file_name'];
 
             $this->M_baseline->insertRebaseline($data);
-            $this->M_baseline->editProject2($update,$id2);
 
+            $data['message_rebaseline'] = 'file success uploaded';
         }
-        $project=$this->uri->segment(3);
         $this->db->query("Update projects set PROJECT_STATUS='On Hold' where project_id='$project'");
-        $data['status'] = 'success';
+        $datareturn['status_project'] = 'success';
 
-        echo json_encode($data);
+
+        /*===========================================================*/
+        //add modified task to temporary table
+        $data['modified_task'] = $_POST['modified_task'];
+
+        if(count($data['modified_task']) != 0){
+            foreach ($data['modified_task'] as $modtask){
+
+            }
+        }
+
+
+        /*===========================================================*/
+        //add new task to temporary table
+        $data['new_task'] = $_POST['new_task'];
+
+        if(count($data['new_task']) != 0){
+            foreach ($data['new_task'] as $newtask){
+                $project_id   = $newtask['project_id'];
+
+                //wbs id same with project id
+                $data['RH_ID'] = $rh_id;
+                $data['WBS_NAME'] = $newtask["wbs_name"];
+                $data['WBS_ID'] = $project_id;
+                $data['WBS_PARENT_ID'] = $newtask["wbs_parent_id"];
+                $data['START_DATE']   = "TO_DATE('".$newtask['start_date']."','yyyy-mm-dd')";
+                $data['FINISH_DATE']  ="TO_DATE('".$newtask["finish_date"]."','yyyy-mm-dd')";
+
+                // insert into wbs temporary and get new ID
+                $newid = $this->M_detail_project->insertWBSTemp($data,$project_id);
+
+
+                $datareturn['status_new_task'] = "Success";
+            }
+        }
+
+
+        echo json_encode($datareturn);
+    }
+
+    public function accept_rebaseline(){
+        /*===========================================================*/
+        //add new task to temporary table
+
+        //get all wbs data from new wbs
+        /*
+        $selWBS=$this->M_detail_project->getWBSselected($newid);
+        $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
+
+        $dateStartWBS= new DateTime($selWBS->START_DATE);
+        $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+        foreach ($allParent as $ap) {
+            $dateStartParent=new DateTime($ap->START_DATE);
+            $dateEndParent=new DateTime($ap->FINISH_DATE);
+            if ($dateStartWBS<$dateStartParent) {
+                $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
+            }
+            if ($dateEndWBS>$dateStartParent) {
+                $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
+            }
+            $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+        }
+        */
     }
 
 
