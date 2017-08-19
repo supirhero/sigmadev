@@ -778,7 +778,10 @@ Class M_detail_project extends CI_Model{
 
     public function insertWBSTemp($data, $project_id){
 
-        $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from WBS_PROJECT where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
+        $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from 
+                                (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID from wbs
+                                UNION 
+                                SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID from temporary_wbs) where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
         $sql = "INSERT INTO TEMPORARY_WBS
             (
               WBS_ID,
@@ -802,6 +805,33 @@ Class M_detail_project extends CI_Model{
                 )";
         $q = $this->db->query($sql);
         return $data['WBS_ID'].".".$id;
+    }
+
+    public function Edit_WBSTemp(
+        $WBS_ID,
+        $WBS_PARENT_ID,
+        $PROJECT_ID,
+        $WBS_NAME,
+        $START_DATE,
+        $FINISH_DATE){
+        /*NOT USED QUERY BECAUSE WE USE TEMPORARY TABLE*/
+        /*
+         * $sql = "UPDATE WBS SET
+                  WBS_PARENT_ID='".$WBS_PARENT_ID."',
+                  PROJECT_ID='".$PROJECT_ID."',
+                  WBS_NAME='".$WBS_NAME."',
+                  "."START_DATE=to_date('".$START_DATE."','yyyy-mm-dd'),
+                  FINISH_DATE=to_date('".$FINISH_DATE."','yyyy-mm-dd'),
+                  WHERE WBS_ID='".$WBS_ID."'
+                  ";*/
+
+        $sqltemp = "insert into temporary_wbs (wbs_id,wbs_parent_id,project_id,wbs_name,start_date,finish_date)
+                    value(
+                    '$WBS_ID','$WBS_PARENT_ID','$PROJECT_ID','$WBS_NAME',to_date('".$START_DATE."','yyyy-mm-dd'),to_date('".$FINISH_DATE."','yyyy-mm-dd')
+                    )";
+        $q = $this->db->query($sqltemp);
+
+
     }
 
 

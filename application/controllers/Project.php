@@ -429,18 +429,22 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         /*===========================================================*/
         //add modified task to temporary table
         $data['modified_task'] = $_POST['modified_task'];
-
         if(count($data['modified_task']) != 0){
             foreach ($data['modified_task'] as $modtask){
-
+                $this->M_detail_project->Edit_WBSTemp(
+                    $modtask["WBS_ID"],
+                    $modtask["WBS_PARENT_ID"],
+                    $modtask["PROJECT_ID"],
+                    $modtask["WBS_NAME"],
+                    $modtask['START_DATE'],
+                    $modtask['FINISH_DATE']
+                );
             }
         }
-
 
         /*===========================================================*/
         //add new task to temporary table
         $data['new_task'] = $_POST['new_task'];
-
         if(count($data['new_task']) != 0){
             foreach ($data['new_task'] as $newtask){
                 $project_id   = $newtask['project_id'];
@@ -457,7 +461,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                 $newid = $this->M_detail_project->insertWBSTemp($data,$project_id);
 
 
-                $datareturn['status_new_task'] = "Success";
+                $datareturn['status_new_task'] = "success";
             }
         }
 
@@ -466,9 +470,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     }
 
     public function accept_rebaseline(){
+        /*BATCH MOVING ALL TEMP WBS TO ITS ORIGIN TABLE (CREATE WBS)*/
         /*===========================================================*/
-        //add new task to temporary table
-
         //get all wbs data from new wbs
         /*
         $selWBS=$this->M_detail_project->getWBSselected($newid);
@@ -488,6 +491,45 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             $this->M_detail_project->updateNewDuration($ap->WBS_ID);
         }
         */
+        /*===========================================================*/
+
+
+        /*BATCH MOVING ALL TEMP WBS TO ITS ORIGIN TABLE (EDIT WBS)*/
+        /*===========================================================*/
+        /*
+        $allParent=$this->getAllParentWBS($WBS_ID);
+        foreach ($allParent as $ap) {
+            $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
+            $wc=0;
+            $wp=0;
+            $allChild=$this->getAllChildWBS($ap->WBS_ID);
+            foreach ($allChild as $ac) {
+                $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
+                $wc=$wc+$works;
+                $works_p=$this->db->query("select case
+                      when (WORK_COMPLETE=0 OR WORK_COMPLETE is null) then 0 when (WORK_PERCENT_COMPLETE=0 or WORK_PERCENT_COMPLETE is null) then round(WORK*100/WORK_COMPLETE,2)  else WORK_PERCENT_COMPLETE END as WP from wbs where wbs_id='$ac->WBS_ID'")->row()->WP;
+                if ($works_p>100) {
+                    $works_p=100;
+                }
+                $wp=$wp+$works_p;
+            }
+            $count = count($allChild);
+            $wp_total=$wp/$count;
+            //echo "alert('".$wp."')";
+            if ($wp_total>100) {
+                $wp_total=100;
+            }
+            $this->db->query("update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc', WORK_PERCENT_COMPLETE='$wp_total' where wbs_id='$ap->WBS_ID'");
+            if($this->endsWith($ap->WBS_ID,'.0')==true){
+                $pc=$this->db->query("select WORK_PERCENT_COMPLETE, PROJECT_ID from wbs where wbs_id='$ap->WBS_ID' ")->row();
+                if ($pc->WORK_PERCENT_COMPLETE>100) {
+                    $this->db->query("update projects set project_complete='100' where project_id='$pc->PROJECT_ID' ");
+                }else{
+                    $this->db->query("update projects set project_complete='$pc->WORK_PERCENT_COMPLETE' where project_id='$pc->PROJECT_ID' ");
+                }
+
+            }
+        }*/
     }
 
     private function transformKeys(&$array)
