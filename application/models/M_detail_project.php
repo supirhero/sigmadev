@@ -834,6 +834,16 @@ Class M_detail_project extends CI_Model{
 
     }
 
+    function selectWBSRebaseline($id){
+        $query = $this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,wbs_id,wbs_parent_id,project_id,wbs_name,start_date,finish_date as end_date, duration,work,work_complete as work_total,work_percent_complete, connect_by_isleaf as LEAF from wbs connect by  wbs_parent_id = prior wbs_id
+      start with wbs_id='$id.0'
+      order siblings by regexp_substr(orde, '^\D*') nulls first,
+      to_number(regexp_substr(orde, '\d+'))
+      ");
+        $hasil = $query->result_array();
+        return $hasil;
+    }
+
 
 }
 

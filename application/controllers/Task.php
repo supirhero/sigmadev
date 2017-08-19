@@ -50,7 +50,15 @@ class Task extends CI_Controller
     //Task View
     function workplan_view(){
         $id_project = $this->uri->segment(3);
-        $workplan=$this->M_detail_project->selectWBS($id_project);
+
+        $statusProject = $this->db->query("select project_status from projects where project_id = '$id_project'")->row()->PROJECT_STATUS;
+        if($statusProject == 'On Hold'){
+            $workplan=$this->M_detail_project->selectWBSRebaseline($id_project);
+        }
+        else{
+            $workplan=$this->M_detail_project->selectWBS($id_project);
+        }
+
 
         //$created_array = $this->buildTree($workplan);
 
