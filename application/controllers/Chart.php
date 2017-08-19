@@ -429,7 +429,7 @@ $results = [];
             $results[$key]["pv_percent"]=round($val->PV/$total_pv*100);
             $results[$key]["ev_percent"]=round($val->EV/$total_pv*100);
         }
-
+//aaa
 print_r($results);
     }
     function monthly()
