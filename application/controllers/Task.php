@@ -131,8 +131,7 @@ class Task extends CI_Controller
 
     function editTask_action(){
         $wbs=$this->input->post("WBS_ID");
-        if(isset($_POST["submit"])) {
-            $this->M_detail_project->Edit_WBS(
+        $this->M_detail_project->Edit_WBS(
                 $_POST["WBS_ID"],
                 $_POST["WBS_PARENT_ID"],
                 $_POST["PROJECT_ID"],
@@ -148,50 +147,24 @@ class Task extends CI_Controller
                 $_POST["WORK_COMPLETE"],
                 $_POST["WORK_PERCENT_COMPLETE"]
             );
-            $project_id = $this->input->post("PROJECT_ID");
-            //$this->M_detail_project->insertWBS($data,$project_id);
-            //$WP_ID= $this->M_detail_project->getMaxWPID();
-            //$RP_ID= $this->M_detail_project->getMaxRPID();
-            //$this->M_detail_project->insertWBSPool($data,$RP_ID,$WP_ID,$project_id);
-            $this->session->set_flashdata("pesan", "<div class=\"alert alert-success\" id=\"alert\"><i class=\"glyphicon glyphicon-ok\"></i> Data berhasil disimpan</div><script>
-    setTimeout(function(){
-
-      $('#alert').remove();
-      location.reload();
-    },1500);
-    </script>");
-            $project_id = $this->input->post("PROJECT_ID");
-            $r = '/Detail_Project/view/'.$project_id.'#tab2';
-            //echo $r;
-            $selWBS=$this->getSelectedWBS($wbs);
-            $allParent=$this->getAllParent($selWBS->WBS_ID);
-            $dateStartWBS= new DateTime($selWBS->START_DATE);
-            $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
-            foreach ($allParent as $ap) {
-                $dateStartParent=new DateTime($ap->START_DATE);
-                $dateEndParent=new DateTime($ap->FINISH_DATE);
-                if ($dateStartWBS<$dateStartParent) {
-                    $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
-                }
-                if ($dateEndWBS>$dateStartParent) {
-                    $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
-                }
-                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+        //$this->M_detail_project->insertWBS($data,$project_id);
+        //$WP_ID= $this->M_detail_project->getMaxWPID();
+        //$RP_ID= $this->M_detail_project->getMaxRPID();
+        //$this->M_detail_project->insertWBSPool($data,$RP_ID,$WP_ID,$project_id);
+        $selWBS=$this->getSelectedWBS($wbs);
+        $allParent=$this->getAllParent($selWBS->WBS_ID);
+        $dateStartWBS= new DateTime($selWBS->START_DATE);
+        $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+        foreach ($allParent as $ap) {
+            $dateStartParent=new DateTime($ap->START_DATE);
+            $dateEndParent=new DateTime($ap->FINISH_DATE);
+            if ($dateStartWBS<$dateStartParent) {
+                $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
             }
-            redirect($r);
-            //echo $dateStartWBS.$dateEndWBS;
-
-        }else{
-            $this->session->set_flashdata("pesan", "<div class=\"alert alert-warning\" id=\"alert\"><i class=\"glyphicon glyphicon-ok\"></i> Data gagal disimpan</div><script>
-    setTimeout(function(){
-
-      $('#alert').remove();
-      location.reload();
-    },1500);
-    </script>");
-            $project_id = $this->input->post("PROJECT_ID");
-            $r = '/Detail_Project/view/'.$project_id;
-
+            if ($dateEndWBS>$dateStartParent) {
+                $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
+            }
+            $this->M_detail_project->updateNewDuration($ap->WBS_ID);
         }
     }
 

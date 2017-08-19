@@ -173,10 +173,32 @@ class Project extends CI_Controller
         $data['project_manajer_list'] = $pm;
         $data['account_manager_list'] = $am;
 
+        $data['type_of_expense'] = ['Capital Expense','Current Expense','Dedctible Expense'];
+        $data['type_of_effort'] =[[
+            value=>1,
+            name=>'CR'
+        ],[
+            value=>2,
+            name=>'project'
+        ],[
+            value=>3,
+            name=>'Manage Operation'
+        ],[
+            value=>4,
+            name=>'Maintenance'
+        ],[
+            value=>7,
+            name=>'Manage Service'
+        ],[
+            value=>8,
+            name=>'Non Project'
+        ]];
+        $data['project_status'] = ['Not Started','In Progress','On Hold','Completed','Cancelled'];
+
         echo json_encode($data);
     }
-    function editProject_action(){
-        $id=$this->uri->segment(3);
+    public function editProject_action(){
+        $id=$_POST['PROJECT_ID'];
         $confirm = $this->M_project->update($id);
         if($confirm){
             $returndata['status']='success';
@@ -188,6 +210,8 @@ class Project extends CI_Controller
         }
         echo json_encode($returndata);
     }
+    /*End Edit Project*/
+
     function gantt($project_id)
     {
         $list=$this->M_project->getWBS($project_id);

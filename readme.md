@@ -512,6 +512,7 @@ Input yang harus di provide :
 -> OVERHEAD             string           <= Project OVerhead
 -> ACTUAL_COST          int
 -> COGS                 string
+-> HO                   string           <= HO Operation ('yes' or 'no')
 ```
 Jika Tidak ada nomor IWO, maka input yang seharusnya didapati dari nomor iwo harus di input manual.
 
@@ -544,6 +545,7 @@ http://45.77.45.126/dev/project/editProject_action/
 ```
 Input yang harus di provide :
 ```
+-> PROJECT_ID
 -> IWO_NO                          <= nomor IWO
 -> PROJECT_NAME                    <= Didapati dari get Kode IWO
 -> BU                              <= kode business unit( Didapati dari get kode IWO)
@@ -566,6 +568,7 @@ Input yang harus di provide :
 -> OVERHEAD                        <= Project OVerhead
 -> ACTUAL_COST
 -> COGS
+-> HO                              <= HO operation ('yes' dan 'no')
 ```
 
 Return json data :
@@ -760,7 +763,7 @@ Return data json :
 -> status
 ```
 
-#TIMESHEET CONTROLLER
+# TIMESHEET CONTROLLER
 ##  Add Timesheet View
 
 URI untuk mengakses API ini :

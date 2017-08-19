@@ -116,6 +116,7 @@ class M_project extends CI_Model {
         $COGS = $this->input->post('COGS');
         $RELATED_BU = $this->input->post('RELATED');
         $CREATED_BY = $userdata['USER_ID'];
+        $HO = $this->input->post('HO');
         $CUR_ID = 'IDR';
         $CALCULATION_METHOD =1;
         $today = date("Y-m-d");
@@ -147,7 +148,8 @@ class M_project extends CI_Model {
                 COGS,
                 RELATED_BU,
                 CREATED_BY,
-                DATE_CREATED) values 
+                DATE_CREATED,
+                HO_OPERATION) values 
                 ((select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS),
                 '". $PROJECT_NAME . "',
                 '" . $PM_ID . "',
@@ -174,7 +176,8 @@ class M_project extends CI_Model {
                 '". $COGS . "',
                 '" . $RELATED_BU . "',
                 '" . $CREATED_BY . "',
-                to_date('" . $today . "','yyyy-mm-dd'))";
+                to_date('" . $today . "','yyyy-mm-dd'),
+                '$HO')";
 
             $this->db->query($sql);
             $sql = "Select max(cast(PROJECT_ID as int)) as NEW_ID from projects";
@@ -198,7 +201,7 @@ class M_project extends CI_Model {
         $BU_CODE = $this->input->post('BU');
         $SCHEDULE_START = $this->input->post('START');
         $SCHEDULE_END = $this->input->post('END');
-        $AMOUNT = $this->input->post('AMOUNT');
+        //$AMOUNT = $this->input->post('AMOUNT');
         $PROJECT_TYPE_ID = $this->input->post('PROJECT_TYPE_ID');
         $AM_ID = $this->input->post('AM_ID');
         $CUST_ID = $this->input->post('CUST_ID');
@@ -214,6 +217,7 @@ class M_project extends CI_Model {
         $ACTUAL_COST = $this->input->post('ACTUAL_COST');
         $COGS = $this->input->post('COGS');
         $RELATED_BU = $this->input->post('RELATED');
+        $ho_operation = $this->input->post('HO');
         $CALCULATION_METHOD = 1;
         $CUR_ID = 'IDR';
         $sql="UPDATE PROJECTS SET PROJECT_NAME='".$PROJECT_NAME."',"
@@ -223,22 +227,14 @@ class M_project extends CI_Model {
             . "SCHEDULE_START=to_date('".$SCHEDULE_START."','YYYY-MM-DD'),"
             . "SCHEDULE_END=to_date('".$SCHEDULE_END."','YYYY-MM-DD'),"
             . "CUR_ID='".$CUR_ID."',"
-            . "AMOUNT='".$AMOUNT."',"
             . "PROJECT_TYPE_ID='".$PROJECT_TYPE_ID."',"
             . "AM_ID='".$AM_ID."',"
             . "CUST_ID='".$CUST_ID."',CUST_END_ID='".$CUST_END_ID."',
                 PROJECT_DESC='".$PROJECT_DESC."',MARGIN='".$MARGIN."',TYPE_OF_EFFORT='".$TYPE_OF_EFFORT."',PRODUCT_TYPE='".$PRODUCT_TYPE."',VISIBILITY='".$VISIBILITY."',CALCULATION_METHOD='".$CALCULATION_METHOD."',TYPE_OF_EXPENSE='".$TYPE_OF_EXPENSE."',PROJECT_OVERHEAD='".$PROJECT_OVERHEAD."',
-                ACTUAL_COST='".$ACTUAL_COST."',COGS='".$COGS."',RELATED_BU='".$RELATED_BU."' WHERE PROJECT_ID='".$id."'";
+                ACTUAL_COST='".$ACTUAL_COST."',COGS='".$COGS."',RELATED_BU='".$RELATED_BU."',ho_operation='$ho_operation' WHERE PROJECT_ID='".$id."'";
 
         if($this->db->query($sql)){
-            $email=$this->selectemail($PM_ID);
-            $rp_id = $this->db->query("select nvl(max(cast(rp_id as int))+1,1) as NEW_ID from resource_pool")->row()->NEW_ID;
-            if($rp_id != null || $rp_id != ""){
-                return true;
-            }
-            else{
-                return false;
-            }
+            return true;
         }
         else{
             return false;
