@@ -136,16 +136,8 @@ class Task extends CI_Controller
                 $_POST["WBS_PARENT_ID"],
                 $_POST["PROJECT_ID"],
                 $_POST["WBS_NAME"],
-                $_POST["WBS_DESC"],
-                $_POST["PRIORITY"],
-                $_POST["CALCULATION_TYPE"],
                 $_POST['START_DATE'],
-                $_POST['FINISH_DATE'],
-                $_POST["DURATION"],
-                $_POST["WORK"],
-                $_POST["MILESTONE"],
-                $_POST["WORK_COMPLETE"],
-                $_POST["WORK_PERCENT_COMPLETE"]
+                $_POST['FINISH_DATE']
             );
         //$this->M_detail_project->insertWBS($data,$project_id);
         //$WP_ID= $this->M_detail_project->getMaxWPID();

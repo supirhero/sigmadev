@@ -123,16 +123,6 @@ class Projecttest extends CI_Controller
         $code = $this->M_project->getBUCodeByProjectID($this->uri->segment(3));
         //$data['pm'] = $this->M_project->getPM($this->uri->segment(3));
 
-        @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_code/' . $code->BU_CODE);
-        $data['IWO_list'] = array();
-        $data['IWO_list'] = json_decode($json, true);
-
-        if (empty($data['IWO_list'])) {
-            @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo_by_bu_alias/' . $code->BU_CODE);
-            $data['IWO_list'] = array();
-            $data['IWO_list'] = json_decode($json, true);
-        }
-
         /*=================================================================*/
         //get Project Manager account manager
         $q="SELECT USER_NAME, USER_ID FROM USERS WHERE BU_ID='".$bu_id."' AND IS_ACTIVE='1' order by USER_NAME";
@@ -145,6 +135,30 @@ class Projecttest extends CI_Controller
         $data['project_manajer_list'] = $pm;
         $data['account_manager_list'] = $am;
 
+        $data['type_of_expense'] = ['Capital Expense','Current Expense','Dedctible Expense'];
+        $data['type_of_effort'] =[[
+            value=>1,
+            name=>'CR'
+        ],[
+            value=>2,
+            name=>'project'
+        ],[
+            value=>3,
+            name=>'Manage Operation'
+        ],[
+            value=>4,
+            name=>'Maintenance'
+        ],[
+            value=>7,
+            name=>'Manage Service'
+        ],[
+            value=>8,
+            name=>'Non Project'
+        ]];
+        $data['project_status'] = ['Not Started','In Progress','On Hold','Completed','Cancelled'];
+
+
+        $this->transformKeys($data);
         echo json_encode($data);
     }
     function editProject_action(){

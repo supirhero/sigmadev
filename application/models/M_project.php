@@ -44,7 +44,7 @@ class M_project extends CI_Model {
         $q = $this->db->query($sql);
 
         if ($q->num_rows() > 0) {
-            $result = $q->result();
+            $result = $q->result_array();
         }
         return $result;
     }

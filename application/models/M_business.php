@@ -277,7 +277,7 @@ order siblings by bu_parent_id";
         $sql="select * from p_bu where bu_id='".$bu_id."'";
         $q = $this->db->query($sql);
         if($q->num_rows() > 0){
-            $result = $q->row();
+            $result = $q->row_array();
         }
 
         return $result;

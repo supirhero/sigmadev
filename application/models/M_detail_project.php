@@ -259,50 +259,15 @@ Class M_detail_project extends CI_Model{
                 $WBS_PARENT_ID,
                 $PROJECT_ID,
                 $WBS_NAME,
-                $WBS_DESC,
-                $PRIORITY,
-                $CALCULATION_TYPE,
                 $START_DATE,
-                $FINISH_DATE,
-                $DURATION,
-                $WORK,
-                $MILESTONE,
-                $WORK_COMPLETE,
-                $WORK_PERCENT_COMPLETE){
-                  /*
-                  $_POST["WBS_ID"],
-                  $_POST["WBS_PARENT_ID"],
-                  $_POST["PROJECT_ID"],
-                  $_POST["WBS_NAME"],
-                  $_POST["WBS_DESC"],
-                  $_POST["PRIORITY"],
-                  $_POST["CALCULATION_TYPE"],
-                  $_POST['START_DATE'],
-                  $_POST['FINISH_DATE'],
-                  $_POST["DURATION"],
-                  $_POST["WORK"],
-                  $_POST["MILESTONE"],
-                  $_POST["WORK_COMPLETE"],
-                  $_POST["WORK_PERCENT_COMPLETE"]
-                  */
-                  $res=$this->db->query("select case when resource_wbs is null then 1
-                  when  resource_wbs=0 then 1
-                    else resource_wbs end as RES from wbs where wbs_id='$WBS_ID'")->row()->RES;
-                  $WORK_COMPLETE=$DURATION*$res*8;
+                $FINISH_DATE){
+
                   $sql = "UPDATE WBS SET
                   WBS_PARENT_ID='".$WBS_PARENT_ID."',
                   PROJECT_ID='".$PROJECT_ID."',
                   WBS_NAME='".$WBS_NAME."',
-                  WBS_DESC='".$WBS_DESC."',
-                  PRIORITY='".$PRIORITY."',
-                  CALCULATION_TYPE='".$CALCULATION_TYPE."',
                   "."START_DATE=to_date('".$START_DATE."','yyyy-mm-dd'),
                   FINISH_DATE=to_date('".$FINISH_DATE."','yyyy-mm-dd'),
-                  DURATION='".$DURATION."',
-                  WORK='".$WORK."',
-                  MILESTONE='".$MILESTONE."',
-                  WORK_COMPLETE='".$WORK_COMPLETE."',
-                  WORK_PERCENT_COMPLETE='".$WORK_PERCENT_COMPLETE."'
                   WHERE WBS_ID='".$WBS_ID."'
                   ";
                   $q = $this->db->query($sql);
