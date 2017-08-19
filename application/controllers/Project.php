@@ -194,6 +194,11 @@ class Project extends CI_Controller
             name=>'Non Project'
         ]];
         $data['project_status'] = ['Not Started','In Progress','On Hold','Completed','Cancelled'];
+        $data['project_type'] = [];
+        $project_type = $this->db->query('select project_type from p_project_type')->result_array();
+        foreach ($project_type as $type){
+            array_push($data['project_type'],$type['PROJECT_TYPE']);
+        }
 
 
         $this->transformKeys($data);
