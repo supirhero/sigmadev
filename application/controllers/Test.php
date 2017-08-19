@@ -558,7 +558,9 @@ class Test extends CI_Controller {
     public function projectdoc(){
         $projectid = $this->uri->segment(3);
 
-        $this->datajson['project_doc_list'] = $this->db->query("select * from project_doc where project_id = $projectid")->result_array();
+        $this->datajson['project_doc_list'] = $this->db->query("select a.*,b.user_name from project_doc a 
+                                                                join users b
+                                                                on a.upload_by = b.user_id where project_id = $projectid")->result_array();
         foreach ($this->datajson['project_doc_list'] as $key=>$value){
             $this->transformKeys($this->datajson['project_doc_list'][$key]);
         }
