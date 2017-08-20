@@ -65,6 +65,11 @@ class Tasktest extends CI_Controller
 
 
     //Create Task
+    function createTask_view($wbs_id){
+        $project_id = explode(".",$wbs_id);
+        $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline from (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs union select wbs_id,wbs_name,project_id,wbs_parent_id,'yes' as rebaseline from temporary_wbs) where PROJECT_ID='".$project_id[0]."' connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id[0].".0' order siblings by wbs_parent_id")->result_array();
+    }
+
     function createTask(){
         $project_id   = $this->input->post("PROJECT_ID");
 
@@ -106,7 +111,7 @@ class Tasktest extends CI_Controller
         $project_id = explode(".",$wbs_id);
         $query = $this->db->query("select * from wbs where WBS_ID='".$wbs_id."'");
         $data['detail_task'] = $query->result_array();
-        $data['parent']=$this->db->query("select wbs_id, wbs_name from wbs where PROJECT_ID='".$project_id[0]."' connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id[0].".0' order siblings by wbs_parent_id")->result_array();
+        $data['parent']=$this->db->query("select wbs_id, wbs_name from (select wbs_id,wbs_name,'no' as rebaseline from wbs union select wbs_id,wbs_name,'yes' as rebaseline from temporary_wbs) where PROJECT_ID='".$project_id[0]."' connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id[0].".0' order siblings by wbs_parent_id")->result_array();
         echo json_encode($data);
     }
 
