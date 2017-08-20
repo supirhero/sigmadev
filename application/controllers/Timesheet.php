@@ -91,7 +91,7 @@ class Timesheet extends CI_Controller {
         $id=$this->input->post("PROJECT_ID");
         $user_id = $this->datajson['userdata']['USER_ID'];
 
-        $query = $this->db->query("SELECT WP_ID,WBS_NAME as TASK_NAME FROM CARI_TASK WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
+        $query = $this->db->query("SELECT WP_ID,WBS_NAME,TASK_MEMBER_REBASELINE,TASK_REBASELINE FROM CARI_TASK_NEW WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
         //$query = $this->db->query("SELECT * FROM CARI_TASK WHERE PROJECT_ID='900418' and USER_ID='S201506017'");
 
         $hasil['task'] = $query->result_array();
@@ -183,7 +183,18 @@ class Timesheet extends CI_Controller {
         $data['LONGITUDE'] = $this->input->post("LONGITUDE");
         $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
         $data['WP_ID'] = $this->input->post("WP_ID");
-        $this->M_timesheet->inputTimesheet($data);
+
+        $project_id   = $this->input->post("PROJECT_ID");
+
+        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+        if($statusProject == 'On Hold'){
+            $this->M_timesheet->inputTimesheetTemp($data);
+        }
+        elseif($statusProject == 'In Progress'){
+            $this->M_timesheet->inputTimesheet($data);
+        }
+
+
 
         $returndata['status'] = "success";
         echo json_encode($returndata);

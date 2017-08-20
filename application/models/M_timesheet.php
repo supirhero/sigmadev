@@ -433,6 +433,98 @@ GROUP BY TS_DATE")->result_array();
         }
     }
 
+    function inputTimesheetTemp($data){
+
+        //change date input for readable to sql
+        $tgl=date_format(date_create($data['DATE']),'Ymd');
+
+        //check timesheet data for this date ,
+        //0 = no data
+        //-1 = have an old data (Only one data)
+        //1 = have a new data
+        $jumlahts=$this->checkTSData($data['WP_ID'],$tgl);
+        //insert new data
+
+        if($jumlahts == 0){
+            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
+
+            //data for insert
+            $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
+            $SUBJECT = $data['SUBJECT'];
+            $MESSAGE = $data['MESSAGE'];
+            $HOUR_TOTAL = $data['WORK_HOUR'];
+            $TS_DATE = "to_date('$tgl','yyyymmdd')";
+            $WP_ID = $data['WP_ID'];
+            $LATITUDE = $data['LATITUDE'];
+            $LONGITUDE = $data['LONGITUDE'];
+
+            $this->db->query("INSERT INTO TIMESHEET 
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
+                              VALUES
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
+
+
+        }
+        //insert new data with add prefix number at primary key
+        elseif($jumlahts == 1){
+            //get timesheet total this day
+            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from (
+                                                      select TS_ID from timesheet union select TS_ID from temporary_timesheet
+                                                    ) where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
+
+            //data for insert
+            $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
+            $SUBJECT = $data['SUBJECT'];
+            $MESSAGE = $data['MESSAGE'];
+            $HOUR_TOTAL = $data['WORK_HOUR'];
+            $TS_DATE = "to_date('$tgl','yyyymmdd')";
+            $WP_ID = $data['WP_ID'];
+            $LATITUDE = $data['LATITUDE'];
+            $LONGITUDE = $data['LONGITUDE'];
+
+            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET 
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION) 
+                              VALUES
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create')");
+            echo $this->db->last_query();
+
+
+        }
+        //change old primary key style first if data detected as old data
+        elseif($jumlahts == -1){
+
+            //update query
+            $getOldData = $this->db->query("select * from timesheet where TS_DATE = to_date('$tgl','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array();
+            $this->db->set('TS_ID',$getOldData[0]['TS_ID'].".".str_pad(1,2,"0",STR_PAD_LEFT));
+            $this->db->where("TS_DATE = to_date('$tgl','yyyymmdd')");
+            $this->db->like('TS_ID', $data['WP_ID'].'.','after');
+
+            $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01' 
+                              where TS_DATE = to_date('$tgl','yyyymmdd') 
+                              and TS_ID LIKE '".$data['WP_ID'].".%'";
+            $this->db->query($queryupdate);
+
+
+            //insert query
+            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
+
+            //data for insert
+            $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
+            $SUBJECT = $data['SUBJECT'];
+            $MESSAGE = $data['MESSAGE'];
+            $HOUR_TOTAL = $data['WORK_HOUR'];
+            $TS_DATE = "to_date('$tgl','yyyymmdd')";
+            $WP_ID = $data['WP_ID'];
+            $LATITUDE = $data['LATITUDE'];
+            $LONGITUDE = $data['LONGITUDE'];
+
+            $this->db->query("INSERT INTO TIMESHEET 
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
+                              VALUES
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
+        }
+    }
+
 }
 
 
