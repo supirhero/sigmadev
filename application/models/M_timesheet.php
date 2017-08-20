@@ -15,7 +15,7 @@ Class M_timesheet extends CI_Model{
   SELECT *
   FROM
   (SELECT *
-  FROM USER_TIMESHEET where ts_date= to_date('$date','yyyy-mm-dd')
+  FROM USER_TIMESHEET_NEW where ts_date= to_date('$date','yyyy-mm-dd')
   ORDER BY ts_date DESC)
   WHERE user_id='".$user_id."'");
         $hasil = $query->result_array();
