@@ -143,8 +143,10 @@ class Task extends CI_Controller
     //EDIT TASK
     function editTask_view($wbs_id)
     {
+        $project_id = explode(".",$wbs_id);
         $query = $this->db->query("select * from wbs where WBS_ID='".$wbs_id."'");
-        $data['hasil'] = $query->result_array();
+        $data['detail_task'] = $query->result_array();
+        $data['parent']=$this->db->query("select wbs_id, wbs_name from wbs where PROJECT_ID='".$project_id[0]."' connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id[0].".0' order siblings by wbs_parent_id")->result_array();
         echo json_encode($data);
     }
 
