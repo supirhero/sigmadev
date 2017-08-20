@@ -52,7 +52,10 @@ class Tasktest extends CI_Controller
             $data[$row['WBS_ID']] = &${$vn};
         }
 
+
         $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
+        $result['workplan'] = $result[$id_project.'.0'];
+        unset($result[$id_project.'.0']);
         echo json_encode($result);
 
 
