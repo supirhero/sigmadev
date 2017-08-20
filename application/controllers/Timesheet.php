@@ -169,7 +169,6 @@ class Timesheet extends CI_Controller {
 
     //add timesheet
     function addTimesheet(){
-        header("Access-Control-Allow-Methods: * ");
 
         if(isset($_POST['mobile'])){
             $_POST = array_change_key_case($_POST,CASE_UPPER);
