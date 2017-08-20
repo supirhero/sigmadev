@@ -50,15 +50,7 @@ class Task extends CI_Controller
     //Task View
     function workplan_view(){
         $id_project = $this->uri->segment(3);
-
-        $statusProject = $this->db->query("select project_status from projects where project_id = '$id_project'")->row()->PROJECT_STATUS;
-        if($statusProject == 'On Hold'){
-            $workplan=$this->M_detail_project->selectWBSRebaseline($id_project);
-        }
-        else{
-            $workplan=$this->M_detail_project->selectWBS($id_project);
-        }
-
+        $workplan=$this->M_detail_project->selectWBS($id_project);
 
         //$created_array = $this->buildTree($workplan);
 
@@ -95,37 +87,53 @@ class Task extends CI_Controller
     function createTask(){
         $project_id   = $this->input->post("PROJECT_ID");
 
-        //wbs id same with project id
-        $data['WBS_NAME'] = $this->input->post("WBS_NAME");
-        $data['WBS_ID'] = $project_id;
-        $data['WBS_PARENT_ID'] = $this->input->post("WBS_PARENT_ID");
-        $data['START_DATE']   = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
-        $data['FINISH_DATE']  ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
+        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+        if($statusProject == 'On Hold'){
+            //wbs id same with project id
+            $data['WBS_NAME'] = $this->input->post("WBS_NAME");
+            $data['WBS_ID'] = $project_id;
+            $data['WBS_PARENT_ID'] = $this->input->post("WBS_PARENT_ID");
+            $data['START_DATE']   = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
+            $data['FINISH_DATE']  ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
 
-        // insert into wbs and get new ID
-        $newid = $this->M_detail_project->insertWBS($data,$project_id);
 
-        $WP_ID= $this->M_detail_project->getMaxWPID();
-        $RP_ID= $this->M_detail_project->getMaxRPID();
-
-        //get all wbs data from new wbs
-        $selWBS=$this->M_detail_project->getWBSselected($newid);
-        $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
-
-        $dateStartWBS= new DateTime($selWBS->START_DATE);
-        $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
-        foreach ($allParent as $ap) {
-            $dateStartParent=new DateTime($ap->START_DATE);
-            $dateEndParent=new DateTime($ap->FINISH_DATE);
-            if ($dateStartWBS<$dateStartParent) {
-                $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
-            }
-            if ($dateEndWBS>$dateStartParent) {
-                $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
-            }
-            $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+            // insert into wbs and get new ID
+            $newid = $this->M_detail_project->insertWBSTemp($data,$project_id);
         }
-        $returndata['status'] = "Success add Task";
+        else{
+            //wbs id same with project id
+            $data['WBS_NAME'] = $this->input->post("WBS_NAME");
+            $data['WBS_ID'] = $project_id;
+            $data['WBS_PARENT_ID'] = $this->input->post("WBS_PARENT_ID");
+            $data['START_DATE']   = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
+            $data['FINISH_DATE']  ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
+
+            // insert into wbs and get new ID
+            $newid = $this->M_detail_project->insertWBS($data,$project_id);
+
+            $WP_ID= $this->M_detail_project->getMaxWPID();
+            $RP_ID= $this->M_detail_project->getMaxRPID();
+
+            //get all wbs data from new wbs
+            $selWBS=$this->M_detail_project->getWBSselected($newid);
+            $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
+
+            $dateStartWBS= new DateTime($selWBS->START_DATE);
+            $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+            foreach ($allParent as $ap) {
+                $dateStartParent=new DateTime($ap->START_DATE);
+                $dateEndParent=new DateTime($ap->FINISH_DATE);
+                if ($dateStartWBS<$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
+                }
+                if ($dateEndWBS>$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
+                }
+                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+            }
+        }
+
+        $returndata['status'] = "success";
         echo json_encode($returndata);
     }
 
@@ -138,8 +146,14 @@ class Task extends CI_Controller
     }
 
     function editTask_action(){
-        $wbs=$this->input->post("WBS_ID");
-        $this->M_detail_project->Edit_WBS(
+
+
+        $project_id   = $this->input->post("PROJECT_ID");
+
+        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+        if($statusProject == 'On Hold'){
+            $wbs=$this->input->post("WBS_ID");
+            $this->M_detail_project->Edit_WBSTemp(
                 $_POST["WBS_ID"],
                 $_POST["WBS_PARENT_ID"],
                 $_POST["PROJECT_ID"],
@@ -147,38 +161,59 @@ class Task extends CI_Controller
                 $_POST['START_DATE'],
                 $_POST['FINISH_DATE']
             );
-        //$this->M_detail_project->insertWBS($data,$project_id);
-        //$WP_ID= $this->M_detail_project->getMaxWPID();
-        //$RP_ID= $this->M_detail_project->getMaxRPID();
-        //$this->M_detail_project->insertWBSPool($data,$RP_ID,$WP_ID,$project_id);
-        $selWBS=$this->getSelectedWBS($wbs);
-        $allParent=$this->getAllParent($selWBS->WBS_ID);
-        $dateStartWBS= new DateTime($selWBS->START_DATE);
-        $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
-        foreach ($allParent as $ap) {
-            $dateStartParent=new DateTime($ap->START_DATE);
-            $dateEndParent=new DateTime($ap->FINISH_DATE);
-            if ($dateStartWBS<$dateStartParent) {
-                $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
-            }
-            if ($dateEndWBS>$dateStartParent) {
-                $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
-            }
-            $this->M_detail_project->updateNewDuration($ap->WBS_ID);
         }
+        else{
+            $wbs=$this->input->post("WBS_ID");
+            $this->M_detail_project->Edit_WBS(
+                $_POST["WBS_ID"],
+                $_POST["WBS_PARENT_ID"],
+                $_POST["PROJECT_ID"],
+                $_POST["WBS_NAME"],
+                $_POST['START_DATE'],
+                $_POST['FINISH_DATE']
+            );
+            //$this->M_detail_project->insertWBS($data,$project_id);
+            //$WP_ID= $this->M_detail_project->getMaxWPID();
+            //$RP_ID= $this->M_detail_project->getMaxRPID();
+            //$this->M_detail_project->insertWBSPool($data,$RP_ID,$WP_ID,$project_id);
+            $selWBS=$this->getSelectedWBS($wbs);
+            $allParent=$this->getAllParent($selWBS->WBS_ID);
+            $dateStartWBS= new DateTime($selWBS->START_DATE);
+            $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+            foreach ($allParent as $ap) {
+                $dateStartParent=new DateTime($ap->START_DATE);
+                $dateEndParent=new DateTime($ap->FINISH_DATE);
+                if ($dateStartWBS<$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
+                }
+                if ($dateEndWBS>$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
+                }
+                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+            }
+        }
+
     }
 
     //delete task
     public function deleteTask()
     {
-        $id = $this->uri->segment(3);
-        $wbs_id = $this->uri->segment(3);
-        $project_id = $this->M_detail_project->getProjectTask($id);
-        //$this->M_detail_project->deleteWBSID($id);
-        //$this->M_detail_project->deleteWBSPoolID($id);
-        $this->M_detail_project->updateProgressDeleteTask($wbs_id);
 
-        $returndata['status'] = "success delete task";
+        $id = $_POST['WBS_ID'];
+        $wbs_id = $_POST['WBS_ID'];
+        $project_id = $this->M_detail_project->getProjectTask($id);
+
+        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+        if($statusProject == 'On Hold'){
+            $this->M_detail_project->updateProgressDeleteTaskTemp($wbs_id);
+        }
+        else{
+            //$this->M_detail_project->deleteWBSID($id);
+            //$this->M_detail_project->deleteWBSPoolID($id);
+            $this->M_detail_project->updateProgressDeleteTask($wbs_id);
+        }
+
+        $returndata['status'] = "success";
         echo json_encode($returndata);
     }
 
@@ -210,32 +245,52 @@ class Task extends CI_Controller
 
     //Remove task from task member
     public function removeTaskMemberProject(){
-        $this->M_detail_project->removeAssignement();
 
-        //send email
-        $email=$this->input->post('EMAIL');
-        $user_name=$this->input->post('NAME');
-        $wbs_name=$this->input->post('WBS_NAME');
-        //$this->sendVerificationremoveMember($email,$user_name,$wbs_name);
+        $project_id = explode(".",$_POST['WBS_ID']);
+        $project_id = $project_id[0];
+        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
 
-        //return
+        if($statusProject == 'On Hold'){
+            $this->M_detail_project->removeAssignementTemp();
+        }
+        elseif($statusProject['In Progress']){
+            $this->M_detail_project->removeAssignement();
+
+            //send email
+            $email=$this->input->post('EMAIL');
+            $user_name=$this->input->post('NAME');
+            $wbs_name=$this->input->post('WBS_NAME');
+            //$this->sendVerificationremoveMember($email,$user_name,$wbs_name);
+
+            //return
+        }
         $data['status'] = 'success';
         echo json_encode($data);
     }
 
     //Assign task to project member
     public function assignTaskMemberProject(){
-        //assign process
-        $this->M_detail_project->postAssignment();
 
-        //send email
-        $wbs=$this->input->post('WBS_ID');
-        $email=$this->input->post('EMAIL');
-        $user_name=$this->input->post('NAME');
-        $wbs_name=$this->input->post('WBS_NAME');
-        $projectid = $this->M_detail_project->getProject_Id($wbs);
-        $this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
+        $project_id = explode(".",$_POST['WBS_ID']);
+        $project_id = $project_id[0];
+        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
 
+        if($statusProject == 'On Hold'){
+            $this->M_detail_project->postAssignmentTemp();
+        }
+        elseif($statusProject['In Progress']){
+
+            //assign process
+            $this->M_detail_project->postAssignment();
+
+            //send email
+            $wbs=$this->input->post('WBS_ID');
+            $email=$this->input->post('EMAIL');
+            $user_name=$this->input->post('NAME');
+            $wbs_name=$this->input->post('WBS_NAME');
+            $projectid = $this->M_detail_project->getProject_Id($wbs);
+            //$this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
+        }
         //return
         $data['status'] = 'success';
         echo json_encode($data);

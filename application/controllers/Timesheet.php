@@ -197,16 +197,21 @@ class Timesheet extends CI_Controller {
         $timesheet_id = $_POST['ts_id'];
         $confirm_code = $_POST['confirm'];
 
-        if($confirm_code != 0 || $confirm_code != 1){
+        if($confirm_code == 1 || $confirm_code  == 0){
+            $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
+            //if timesheet confirmed ,calculation for workplan complete hours process execute
+            if($confirm_code == 1){
+
+            }
+            $data['status'] = $confirmation;
+
+            echo json_encode($data);
+        }
+        else{
             $data['error'] = "confirmation code is incorrect ,choose only 1 for accept and 0 for deny";
+            echo json_encode($data);
             die();
         }
-
-        $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
-
-        $data['status'] = $confirmation;
-
-        echo json_encode($data);
     }
 
     //transform key

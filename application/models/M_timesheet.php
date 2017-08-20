@@ -19,6 +19,8 @@ Class M_timesheet extends CI_Model{
   ORDER BY ts_date DESC)
   WHERE user_id='".$user_id."'");
         $hasil = $query->result_array();
+        echo $this->db->last_query();
+        die;
         //echo $this->db->last_query();
         //die;
         return $hasil;
@@ -424,10 +426,10 @@ GROUP BY TS_DATE")->result_array();
                   where TS_ID = '$timesheet_id'";
         $exec = $this->db->query($query);
         if($exec){
-            return true;
+            return 'success';
         }
         else{
-            return false;
+            return 'failed';
         }
     }
 

@@ -100,10 +100,20 @@ Class M_detail_project extends CI_Model{
 
     }
     function selectWBS($id){
-      $query = $this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,wbs.*, connect_by_isleaf as LEAF from wbs connect by  wbs_parent_id = prior wbs_id
-      start with wbs_id='$id.0'
-      order siblings by regexp_substr(orde, '^\D*') nulls first,
-      to_number(regexp_substr(orde, '\d+'))
+      $query = $this->db->query("select * from (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
+                                   wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
+                                   finish_date as end_date, duration,work,work_complete as work_total,
+                                   work_percent_complete, 'no' as rebaseline, 'not rebaseline' as action, connect_by_isleaf as LEAF 
+                                   from wbs connect by  wbs_parent_id = prior wbs_id
+                                   start with wbs_id='$id.0'
+                                   UNION 
+                                   select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
+                                   wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
+                                   finish_date as end_date, duration,work,work_complete as work_total,
+                                   work_percent_complete, 'yes' as rebaseline,action, connect_by_isleaf as LEAF 
+                                   from temporary_wbs connect by  wbs_parent_id = prior wbs_id
+                                   start with wbs_id='$id.0')
+                                   where action != 'delete'
       ");
       $hasil = $query->result_array();
       return $hasil;
@@ -160,18 +170,57 @@ Class M_detail_project extends CI_Model{
 
 
     function getWBSAvailableUser($project,$wbs_id){
-      return $this->db->query("SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email FROM RESOURCE_POOL
+      return $this->db->query("SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
         join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
         join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
-        WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(select user_id from wbs_pool inner join resource_pool on wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
-        group by RESOURCE_POOL.RP_ID, users.user_name,users.email")->result();
+        WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(
+          select user_id 
+          from wbs_pool 
+          inner join resource_pool 
+          on wbs_pool.rp_id=resource_pool.rp_id 
+          where wbs_id='$wbs_id')
+        group by RESOURCE_POOL.RP_ID, users.user_name,users.email
+        
+        union
+        
+        SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline FROM RESOURCE_POOL
+        join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+        join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+        WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(
+          select user_id 
+          from wbs_pool 
+          inner join resource_pool 
+          on wbs_pool.rp_id=resource_pool.rp_id 
+          where wbs_id='$wbs_id')
+          and resource_pool.user_id not in(
+            SELECT RESOURCE_POOL.user_id FROM RESOURCE_POOL
+            join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+            join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+            WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(
+            select user_id 
+            from temporary_wbs_pool 
+            inner join resource_pool 
+            on temporary_wbs_pool.rp_id=resource_pool.rp_id 
+            where wbs_id='$wbs_id')
+            group by RESOURCE_POOL.user_id
+          )
+        group by RESOURCE_POOL.RP_ID, users.user_name,users.email
+        
+        ")->result();
       }
       function getWBSselectedUser($project,$wbs_id){
-        return $this->db->query("SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email FROM RESOURCE_POOL
+        return $this->db->query("SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
           join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
           join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
           WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
           (select user_id from wbs_pool inner join resource_pool on wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
+          group by RESOURCE_POOL.RP_ID, users.user_name,users.email
+          UNION 
+          SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline FROM RESOURCE_POOL
+          join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+          join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+          WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
+          (select user_id from temporary_wbs_pool inner join resource_pool on temporary_wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
           group by RESOURCE_POOL.RP_ID, users.user_name,users.email")->result();
         }
         //Get Project Detail
@@ -395,6 +444,8 @@ Class M_detail_project extends CI_Model{
                     $allParent=$this->getAllParentWBS($wbs);
                     //print_r($allParent);
                     //die;
+
+                    //Recalculation Work Complete Hours
                     foreach ($allParent as $ap) {
                       $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
                       $wc=0;
@@ -791,7 +842,7 @@ Class M_detail_project extends CI_Model{
               START_DATE,
               FINISH_DATE,
               IS_VALID,
-              RH_ID)
+              RH_ID,ACTION)
               VALUES
               (
                 '".$data['WBS_ID'].".".$id."',
@@ -801,19 +852,14 @@ Class M_detail_project extends CI_Model{
                 ".$data['START_DATE'].",
                 ".$data['FINISH_DATE'].",
                 1,
-                ".$data['RH_ID']."
+                ".$data['RH_ID'].",
+                'create'
                 )";
         $q = $this->db->query($sql);
         return $data['WBS_ID'].".".$id;
     }
 
-    public function Edit_WBSTemp(
-        $WBS_ID,
-        $WBS_PARENT_ID,
-        $PROJECT_ID,
-        $WBS_NAME,
-        $START_DATE,
-        $FINISH_DATE){
+    public function Edit_WBSTemp($WBS_ID,$WBS_PARENT_ID,$PROJECT_ID,$WBS_NAME,$START_DATE,$FINISH_DATE){
         /*NOT USED QUERY BECAUSE WE USE TEMPORARY TABLE*/
         /*
          * $sql = "UPDATE WBS SET
@@ -825,24 +871,46 @@ Class M_detail_project extends CI_Model{
                   WHERE WBS_ID='".$WBS_ID."'
                   ";*/
 
-        $sqltemp = "insert into temporary_wbs (wbs_id,wbs_parent_id,project_id,wbs_name,start_date,finish_date)
+        $sqltemp = "insert into temporary_wbs (wbs_id,wbs_parent_id,project_id,wbs_name,start_date,finish_date,is_valid,action)
                     value(
-                    '$WBS_ID','$WBS_PARENT_ID','$PROJECT_ID','$WBS_NAME',to_date('".$START_DATE."','yyyy-mm-dd'),to_date('".$FINISH_DATE."','yyyy-mm-dd')
+                    '$WBS_ID','$WBS_PARENT_ID','$PROJECT_ID','$WBS_NAME',to_date('".$START_DATE."','yyyy-mm-dd'),to_date('".$FINISH_DATE."','yyyy-mm-dd'),1,'update'
                     )";
         $q = $this->db->query($sqltemp);
 
 
     }
 
-    function selectWBSRebaseline($id){
-        $query = $this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,wbs_id,wbs_parent_id,project_id,wbs_name,start_date,finish_date as end_date, duration,work,work_complete as work_total,work_percent_complete, connect_by_isleaf as LEAF from wbs connect by  wbs_parent_id = prior wbs_id
-      start with wbs_id='$id.0'
-      order siblings by regexp_substr(orde, '^\D*') nulls first,
-      to_number(regexp_substr(orde, '\d+'))
-      ");
-        $hasil = $query->result_array();
-        return $hasil;
+    function updateProgressDeleteTaskTemp($wbs_id){
+        $this->db->query("insert into temporary_wbs(wbs_id,is_valid,action) values('$wbs_id',1,'delete')");
     }
+
+    function removeAssignementTemp(){
+    $wbs=$this->input->post('WBS_ID');
+    $member=$this->input->post('MEMBER');
+
+    //Assign primary key of wbs pool id to temporary with status delete ,so in the future
+    //if rebaseline acc ,calucation will happen
+    $action = $this->db->query("insert into temporary_wbs_pool (RP_ID,WBS_ID,IS_VALID,ACTION ) values('$member','$wbs',1,'delete')");
+}
+
+    function postAssignmentTemp(){
+        $wbs=$this->input->post('WBS_ID');
+        $member=$this->input->post('MEMBER');
+
+        $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+                                select WP_ID from WBS_POOL
+                                UNION 
+                                select WP_ID from TEMPORARY_WBS_POOL)")->row()->NEW_ID;
+        $this->db->set('RP_ID', $member);
+        $this->db->set('WP_ID', $id);
+        $this->db->set('WBS_ID', $wbs);
+        $this->db->set('IS_VALID', 1);
+        $this->db->set('ACTION', 'create');
+        $this->db->insert("TEMPORARY_WBS_POOL");
+
+
+    }
+
 
 
 }
