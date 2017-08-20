@@ -375,6 +375,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     //rebaseline
     public function rebaseline() {
 
+        print_r(json_decode($_POST['array']));
+        die;
         //setting variable
         $user_id = $this->datajson['userdata']['USER_ID'];
         $project=$this->input->post("project_id");
