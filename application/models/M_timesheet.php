@@ -311,6 +311,7 @@ GROUP BY TS_DATE")->result_array();
         //1 = have a new data
         $jumlahts=$this->checkTSData($data['WP_ID'],$tgl);
         //insert new data
+
         if($jumlahts == 0){
             $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
 
@@ -350,6 +351,8 @@ GROUP BY TS_DATE")->result_array();
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
+            echo $this->db->last_query();
+
 
         }
         //change old primary key style first if data detected as old data

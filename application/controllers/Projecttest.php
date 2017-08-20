@@ -136,26 +136,32 @@ class Projecttest extends CI_Controller
         $data['account_manager_list'] = $am;
 
         $data['type_of_expense'] = ['Capital Expense','Current Expense','Dedctible Expense'];
-        $data['type_of_effort'] =[[
-            value=>1,
-            name=>'CR'
+        $data['type_of_effort'] =[
+          [
+            'value'=>1,
+            'name'=>'CR'
         ],[
-            value=>2,
-            name=>'project'
+            'value'=>2,
+            'name'=>'project'
         ],[
-            value=>3,
-            name=>'Manage Operation'
+            'value'=>3,
+            'name'=>'Manage Operation'
         ],[
-            value=>4,
-            name=>'Maintenance'
+            'value'=>4,
+            'name'=>'Maintenance'
         ],[
-            value=>7,
-            name=>'Manage Service'
+            'value'=>7,
+            'name'=>'Manage Service'
         ],[
-            value=>8,
-            name=>'Non Project'
+            'value'=>8,
+            'name'=>'Non Project'
         ]];
         $data['project_status'] = ['Not Started','In Progress','On Hold','Completed','Cancelled'];
+        $data['project_type'] = [];
+        $project_type = $this->db->query('select project_type from p_project_type')->result_array();
+        foreach ($project_type as $type){
+            array_push($data['project_type'],$type['PROJECT_TYPE']);
+        }
 
 
         $this->transformKeys($data);
@@ -405,6 +411,27 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         $data['status'] = 'success';
 
         echo json_encode($data);
+    }
+
+    private function transformKeys(&$array)
+    {
+        foreach (array_keys($array) as $key):
+
+            # Working with references here to avoid copying the value,
+            # since you said your data is quite large.
+            $value = &$array[$key];
+            unset($array[$key]);
+            # This is what you actually want to do with your keys:
+            #  - remove exclamation marks at the front
+            #  - camelCase to snake_case
+            $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
+            # Work recursively
+            if (is_array($value)) $this->transformKeys($value);
+            # Store with new key
+            $array[$transformedKey] = $value;
+            # Do not forget to unset references!
+            unset($value);
+        endforeach;
     }
 
 
