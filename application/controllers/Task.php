@@ -74,7 +74,7 @@ class Task extends CI_Controller
             $data[$row['WBS_ID']] = &${$vn};
         }
 
-        $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
+        $result['workplan'] = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
         echo json_encode($result);
 
 
