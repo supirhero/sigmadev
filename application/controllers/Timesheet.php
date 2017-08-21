@@ -90,7 +90,7 @@ class Timesheet extends CI_Controller {
         }
         $id=$this->input->post("PROJECT_ID");
         $user_id = $this->datajson['userdata']['USER_ID'];
-        $query = $this->db->query("SELECT WP_ID,WBS_NAME,TASK_MEMBER_REBASELINE,TASK_REBASELINE FROM CARI_TASK_NEW WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
+        $query = $this->db->query("SELECT WP_ID,PROJECT_ID,WBS_NAME,TASK_MEMBER_REBASELINE,TASK_REBASELINE FROM CARI_TASK_NEW WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
         //$query = $this->db->query("SELECT * FROM CARI_TASK WHERE PROJECT_ID='900418' and USER_ID='S201506017'");
 
         $hasil['task'] = $query->result_array();
@@ -183,22 +183,34 @@ class Timesheet extends CI_Controller {
         $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
         $data['WP_ID'] = $this->input->post("WP_ID");
 
-        $project_id   = $this->input->post("PROJECT_ID");
+        $project_id   = $_POST['PROJECT_ID'];
+        $wp_id = $_POST['WP_ID'];
 
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         //check rebaseline status for task
 
-        $checkmember = $this->db->query("select 'no' as rebaseline 
-                                        from wbs_pool
-                                        where wp_id = '".$_POST['WP_ID']."'
-                                        union
-                                        select 'yes' as rebaseline
-                                        from temporary_wbs_pool
-                                        where wp_id = '".$_POST['WP_ID']."'")->row()->REBASELINE;
-
 
 
         if($statusProject == 'On Hold'){
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+            $checkmember = $this->db->query("
+                                        select 'yes' as rebaseline
+                                        from temporary_wbs_pool
+                                        where wp_id = '".$_POST['WP_ID']."'
+                                        and rh_id = '$rh_id'
+                                        union
+                                        select 'no' as rebaseline 
+                                        from wbs_pool
+                                        where wp_id = '".$_POST['WP_ID']."'")->row()->REBASELINE;
+
+            $checktask = $this->db->query("
+                                          select 'no' as rebaseline
+                                          from wbs 
+                                          JOIN 
+                                          (select wbs_id 
+                                          from wbs_pool 
+                                          where wp_id = '$wp_id')
+                                        ");
             $this->M_timesheet->inputTimesheetTemp($data);
         }
         elseif($statusProject == 'Not Started'){
