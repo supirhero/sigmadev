@@ -100,18 +100,12 @@ Class M_detail_project extends CI_Model{
 
     }
     function selectWBS($id){
-      $query = $this->db->query("select * from (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
+      $query = $this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
                                    wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
                                    finish_date as end_date, duration,work,work_complete as work_total,
-                                   work_percent_complete, 'no' as rebaseline, 'not rebaseline' as action 
-                                   from wbs where project_id = '$id'
-                                   UNION 
-                                   select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
-                                   wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
-                                   finish_date as end_date, duration,work,work_complete as work_total,
-                                   work_percent_complete, 'yes' as rebaseline,action 
-                                   from temporary_wbs where project_id ='$id')
-                                   where action != 'delete'
+                                   work_percent_complete, 'no' as rebaseline, 'not rebaseline' as action, connect_by_isleaf as LEAF 
+                                   from wbs connect by  wbs_parent_id = prior wbs_id
+                                   start with wbs_id='$id.0'
       ");
       $hasil = $query->result_array();
       return $hasil;
