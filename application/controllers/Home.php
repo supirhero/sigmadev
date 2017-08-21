@@ -734,7 +734,7 @@ class Home extends CI_Controller {
 
         $this->load->library('upload', $config);
 
-        if ( !$this->upload->do_upload('file_upload'))
+        if ( !$this->upload->do_upload('document'))
         {
             $error['error_display'] = $this->upload->display_errors();
             $error['title']='error';

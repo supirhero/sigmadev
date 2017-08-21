@@ -586,6 +586,33 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         }
         */
 
+
+
+        /*BATCH Recalculating Work Complete because some user removed from task member*/
+        /*===========================================================*/
+        /*
+             //count jumlah member di task
+            $res=$this->db->query("select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'")->row()->RES;
+            //update resource wbs same as $res
+            $this->db->query("update wbs set resource_wbs=$res where wbs_id='$wbs'");
+            $allParent=$this->getAllParentWBS($wbs);
+            //print_r($allParent);
+            //die;
+
+            //Recalculation Work Complete Hours
+            foreach ($allParent as $ap) {
+              $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
+              $wc=0;
+              $allChild=$this->getAllChildWBS($ap->WBS_ID);
+              foreach ($allChild as $ac) {
+                $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
+                $wc=$wc+$works;
+              }
+              $this->db->query("update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'");
+            }
+
+
+        */
     }
 
     private function transformKeys(&$array)

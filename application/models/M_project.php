@@ -345,8 +345,6 @@ class M_project extends CI_Model {
                     )
                     where user_id='" . $id . "' or created_by='" . $id . "' 
                     ")->result_array();
-        echo $this->db->last_query();
-        die;
     }
 
 }

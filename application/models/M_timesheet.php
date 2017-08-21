@@ -12,12 +12,12 @@ Class M_timesheet extends CI_Model{
 
         //echo "date : $date<br>";
         $query = $this->db->query("
-  SELECT *
-  FROM
-  (SELECT *
-  FROM USER_TIMESHEET_NEW where ts_date= to_date('$date','yyyy-mm-dd')
-  ORDER BY ts_date DESC)
-  WHERE user_id='".$user_id."'");
+          SELECT *
+          FROM
+          (SELECT *
+          FROM USER_TIMESHEET_NEW where ts_date= to_date('$date','yyyy-mm-dd')
+          ORDER BY ts_date DESC)
+          WHERE user_id='".$user_id."'");
         $hasil = $query->result_array();
         //echo $this->db->last_query();
         //die;

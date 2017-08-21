@@ -90,7 +90,6 @@ class Timesheet extends CI_Controller {
         }
         $id=$this->input->post("PROJECT_ID");
         $user_id = $this->datajson['userdata']['USER_ID'];
-
         $query = $this->db->query("SELECT WP_ID,WBS_NAME,TASK_MEMBER_REBASELINE,TASK_REBASELINE FROM CARI_TASK_NEW WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
         //$query = $this->db->query("SELECT * FROM CARI_TASK WHERE PROJECT_ID='900418' and USER_ID='S201506017'");
 
@@ -187,16 +186,29 @@ class Timesheet extends CI_Controller {
         $project_id   = $this->input->post("PROJECT_ID");
 
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+        //check rebaseline status for task
+
+        $checkmember = $this->db->query("select 'no' as rebaseline 
+                                        from wbs_pool
+                                        where wp_id = '".$_POST['WP_ID']."'
+                                        union
+                                        select 'yes' as rebaseline
+                                        from temporary_wbs_pool
+                                        where wp_id = '".$_POST['WP_ID']."'")->row()->REBASELINE;
+
+
+
         if($statusProject == 'On Hold'){
             $this->M_timesheet->inputTimesheetTemp($data);
         }
-        elseif($statusProject == 'In Progress'){
+        elseif($statusProject == 'Not Started'){
             $this->M_timesheet->inputTimesheet($data);
         }
+        else{
+            $returndata['status'] = "failed";
+            $returndata['status'] = "failed";
+        }
 
-
-
-        $returndata['status'] = "success";
         echo json_encode($returndata);
     }
 

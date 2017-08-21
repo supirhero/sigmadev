@@ -99,6 +99,7 @@ class Task extends CI_Controller
 
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         if($statusProject == 'On Hold'){
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
             //wbs id same with project id
             $data['WBS_NAME'] = $this->input->post("WBS_NAME");
             $data['WBS_ID'] = $project_id;
@@ -108,7 +109,7 @@ class Task extends CI_Controller
 
 
             // insert into wbs and get new ID
-            $newid = $this->M_detail_project->insertWBSTemp($data,$project_id);
+            $newid = $this->M_detail_project->insertWBSTemp($data,$project_id,$rh_id);
             $status['status'] = 'success';
             $status['message'] = 'Task berhasil di tambah temporary';
         }
@@ -152,9 +153,6 @@ class Task extends CI_Controller
             $status['message'] = 'Project sudah on progress';
         }
         echo json_encode($status);
-
-        $returndata['status'] = "success";
-        echo json_encode($returndata);
     }
 
     //EDIT TASK
@@ -174,6 +172,7 @@ class Task extends CI_Controller
 
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         if($statusProject == 'On Hold'){
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
             $wbs=$this->input->post("WBS_ID");
             $this->M_detail_project->Edit_WBSTemp(
                 $_POST["wbs_id"],
@@ -181,10 +180,11 @@ class Task extends CI_Controller
                 $_POST["project_id"],
                 $_POST["wbs_name"],
                 $_POST['start_date'],
-                $_POST['finish_date']
+                $_POST['finish_date'],
+                $rh_id
             );
             $status['status']= 'success';
-            $status['message'] = 'Task berhasil temporary di edit';
+            $status['message'] = 'Task berhasil di edit temporary';
 
         }
         elseif($statusProject == 'Not Started'){
@@ -231,21 +231,29 @@ class Task extends CI_Controller
     public function deleteTask()
     {
 
-        $id = $_POST['WBS_ID'];
-        $wbs_id = $_POST['WBS_ID'];
+        $id = $_POST['wbs_id'];
+        $wbs_id = $_POST['wbs_id'];
         $project_id = $this->M_detail_project->getProjectTask($id);
-
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         if($statusProject == 'On Hold'){
-            $this->M_detail_project->updateProgressDeleteTaskTemp($wbs_id);
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+            $this->M_detail_project->updateProgressDeleteTaskTemp($wbs_id,$rh_id);
+            $returndata['status'] = "success";
+            $returndata['message'] = "Task temporary deleted success";
         }
-        else{
+        elseif($statusProject == 'Not Started'){
             //$this->M_detail_project->deleteWBSID($id);
             //$this->M_detail_project->deleteWBSPoolID($id);
             $this->M_detail_project->updateProgressDeleteTask($wbs_id);
+            $returndata['status'] = "success";
+            $returndata['message'] = "Task delete success";
+        }
+        else{
+            $returndata['status'] = "failed";
+            $returndata['message'] = "Project still on progress";
         }
 
-        $returndata['status'] = "success";
+
         echo json_encode($returndata);
     }
 
@@ -272,6 +280,18 @@ class Task extends CI_Controller
         $data['task_name'] = $this->M_detail_project->getWBSselected($wbs_id)->WBS_NAME;
         $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id);
         $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id);
+        $data['rebaseline'] = $this->db->query("
+                                                SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline,action FROM RESOURCE_POOL
+                                                join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+                                                join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+                                                join TEMPORARY_WBS_POOL on TEMPORARY_WBS_POOL.RP_ID = RESOURCE_POOL.RP_ID
+                                                WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id in(
+                                                  select user_id
+                                                  from temporary_wbs_pool 
+                                                  inner join resource_pool 
+                                                  on temporary_wbs_pool.rp_id=resource_pool.rp_id 
+                                                  where wbs_id='$wbs_id')
+                                                group by RESOURCE_POOL.RP_ID, users.user_name,users.email,action")->result_array();
         echo json_encode($data);
     }
 
@@ -284,8 +304,10 @@ class Task extends CI_Controller
 
         if($statusProject == 'On Hold'){
             $this->M_detail_project->removeAssignementTemp();
+            $data['status'] = 'success';
+            $data['message'] = 'Task member berhasil di hapus temporary';
         }
-        elseif($statusProject['In Progress']){
+        elseif($statusProject['Not Started']){
             $this->M_detail_project->removeAssignement();
 
             //send email
@@ -293,10 +315,14 @@ class Task extends CI_Controller
             $user_name=$this->input->post('NAME');
             $wbs_name=$this->input->post('WBS_NAME');
             //$this->sendVerificationremoveMember($email,$user_name,$wbs_name);
-
-            //return
+            $data['status'] = 'success';
+            $data['message'] = 'Task member berhasil di hapus';
         }
-        $data['status'] = 'success';
+        else{
+
+            $data['status'] = 'failed';
+            $data['message'] = 'Project status masih on progress';
+        }
         echo json_encode($data);
     }
 
@@ -308,10 +334,12 @@ class Task extends CI_Controller
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
 
         if($statusProject == 'On Hold'){
-            $this->M_detail_project->postAssignmentTemp();
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+            $this->M_detail_project->postAssignmentTemp($rh_id);
+            $data['status'] = 'success';
+            $data['message'] = 'member di tambah temporary';
         }
-        elseif($statusProject['In Progress']){
-
+        elseif($statusProject['Not Started']){
             //assign process
             $this->M_detail_project->postAssignment();
 
@@ -321,10 +349,18 @@ class Task extends CI_Controller
             $user_name=$this->input->post('NAME');
             $wbs_name=$this->input->post('WBS_NAME');
             $projectid = $this->M_detail_project->getProject_Id($wbs);
-            //$this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);
+            //$this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);$data['status'] = 'success';
+
+            $data['status'] = 'success';
+            $data['message'] = 'member di tambah';
+
+        }
+        else{
+            $data['status'] = 'failed';
+            $data['message'] = 'Project status masih on progress';
         }
         //return
-        $data['status'] = 'success';
+
         echo json_encode($data);
 
     }

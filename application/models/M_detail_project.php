@@ -168,7 +168,8 @@ Class M_detail_project extends CI_Model{
 
 
     function getWBSAvailableUser($project,$wbs_id){
-      return $this->db->query("SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
+      return $this->db->query("
+        SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
         join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
         join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
         WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(
@@ -176,34 +177,14 @@ Class M_detail_project extends CI_Model{
           from wbs_pool 
           inner join resource_pool 
           on wbs_pool.rp_id=resource_pool.rp_id 
-          where wbs_id='$wbs_id')
-        group by RESOURCE_POOL.RP_ID, users.user_name,users.email
-        
-        union
-        
-        SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline FROM RESOURCE_POOL
-        join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
-        join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
-        WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(
+          where wbs_id='$wbs_id'
+          UNION 
           select user_id 
-          from wbs_pool 
+          from temporary_wbs_pool 
           inner join resource_pool 
-          on wbs_pool.rp_id=resource_pool.rp_id 
+          on temporary_wbs_pool.rp_id=resource_pool.rp_id 
           where wbs_id='$wbs_id')
-          and resource_pool.user_id not in(
-            SELECT RESOURCE_POOL.user_id FROM RESOURCE_POOL
-            join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
-            join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
-            WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(
-            select user_id 
-            from temporary_wbs_pool 
-            inner join resource_pool 
-            on temporary_wbs_pool.rp_id=resource_pool.rp_id 
-            where wbs_id='$wbs_id')
-            group by RESOURCE_POOL.user_id
-          )
         group by RESOURCE_POOL.RP_ID, users.user_name,users.email
-        
         ")->result();
       }
       function getWBSselectedUser($project,$wbs_id){
@@ -613,6 +594,14 @@ Class M_detail_project extends CI_Model{
                             $result = $q->row()->PROJECT_ID;
                             return $result;
                           }
+                          else{
+                              $sql = "select PROJECT_ID from TEMPORARY_WBS where WBS_ID='".$id."'";
+                              $q = $this->db->query($sql);
+                              if($q->num_rows() > 0){
+                                  $result = $q->row()->PROJECT_ID;
+                                  return $result;
+                              }
+                          }
                         }
                         function getProjecCalc($project){
                           return $this->db->query("select ev, pv, case when pv=0 then round(ev/1,2) else round(ev/pv,2) end as spi,case when ev=0 then 0 else ac end as ac,case when ac=0 then round(ev/1,2) else round(ev/ac,2) end as cpi, a.project_id
@@ -825,12 +814,12 @@ Class M_detail_project extends CI_Model{
   $this->db->query("UPDATE wbs SET wbs_desc = NULL, work = 0, milestone = NULL, work_complete = 0, work_percent_complete = 0, progress_wbs = 0, resource_wbs = 0 WHERE wbs_id = '$project.0'");
 }
 
-    public function insertWBSTemp($data, $project_id){
+    public function insertWBSTemp($data, $project_id,$rh_id){
 
         $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from 
                                 (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from wbs
                                 UNION 
-                                SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from temporary_wbs) where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
+                                SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from temporary_wbs where rh_id = '$rh_id') where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
         $sql = "INSERT INTO TEMPORARY_WBS
             (
               WBS_ID,
@@ -850,7 +839,7 @@ Class M_detail_project extends CI_Model{
                 ".$data['START_DATE'].",
                 ".$data['FINISH_DATE'].",
                 1,
-                ".$data['RH_ID'].",
+                ".$rh_id.",
                 'create'
                 )";
         $q = $this->db->query($sql);
@@ -878,8 +867,8 @@ Class M_detail_project extends CI_Model{
 
     }
 
-    function updateProgressDeleteTaskTemp($wbs_id){
-        $this->db->query("insert into temporary_wbs(wbs_id,is_valid,action) values('$wbs_id',1,'delete')");
+    function updateProgressDeleteTaskTemp($wbs_id,$rh_id){
+        $this->db->query("insert into temporary_wbs(wbs_id,is_valid,rh_id,action) values('$wbs_id',1,$rh_id,'delete')");
     }
 
     function removeAssignementTemp(){
@@ -891,7 +880,7 @@ Class M_detail_project extends CI_Model{
     $action = $this->db->query("insert into temporary_wbs_pool (RP_ID,WBS_ID,IS_VALID,ACTION ) values('$member','$wbs',1,'delete')");
 }
 
-    function postAssignmentTemp(){
+    function postAssignmentTemp($rh_id){
         $wbs=$this->input->post('WBS_ID');
         $member=$this->input->post('MEMBER');
 
@@ -904,6 +893,7 @@ Class M_detail_project extends CI_Model{
         $this->db->set('WBS_ID', $wbs);
         $this->db->set('IS_VALID', 1);
         $this->db->set('ACTION', 'create');
+        $this->db->set('RH_ID',$rh_id);
         $this->db->insert("TEMPORARY_WBS_POOL");
 
 
