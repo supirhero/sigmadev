@@ -120,9 +120,10 @@ class M_project extends CI_Model {
         $CUR_ID = 'IDR';
         $CALCULATION_METHOD =1;
         $today = date("Y-m-d");
+        $PROJECT_ID = $this->db->query("select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS")->row()->NEW_ID;
 
 
-        /*$sql = "insert into PROJECTS (PROJECT_ID,
+        $sql = "insert into PROJECTS (PROJECT_ID,
                 PROJECT_NAME,
                 PM_ID,
                 IWO_NO,
@@ -140,7 +141,6 @@ class M_project extends CI_Model {
                 MARGIN,
                 TYPE_OF_EFFORT,
                 PRODUCT_TYPE,
-                VISIBILITY,
                 CALCULATION_METHOD,
                 TYPE_OF_EXPENSE,
                 PROJECT_OVERHEAD,
@@ -150,7 +150,7 @@ class M_project extends CI_Model {
                 CREATED_BY,
                 DATE_CREATED,
                 HO_OPERATION) values 
-                ((select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS),
+                ('$PROJECT_ID',
                 '". $PROJECT_NAME . "',
                 '" . $PM_ID . "',
                 '" . $IWO_NO . "',
@@ -168,7 +168,6 @@ class M_project extends CI_Model {
                 ". $MARGIN . ",
                 '". $TYPE_OF_EFFORT . "',
                 '" . $PRODUCT_TYPE . "',
-                '". $VISIBILITY . "',
                 '" . $CALCULATION_METHOD . "',
                 '" . $TYPE_OF_EXPENSE . "',
                 '". $PROJECT_OVERHEAD . "',
@@ -178,39 +177,8 @@ class M_project extends CI_Model {
                 '" . $CREATED_BY . "',
                 to_date('" . $today . "','yyyy-mm-dd'),
                 '$HO')";
-            $this->db->query($sql);*/
-        $project_id = $this->db->query("select NVL(max(cast(PROJECT_ID as int))+1, 1) as NEW_ID from PROJECTS")->row()->NEW_ID;
-        $insertdata = [
-            'PROJECT_ID'=>$project_id,
-            'PROJECT_NAME'=>$PROJECT_NAME,
-            'PM_ID'=>$PM_ID,
-            'IWO_NO'=>$IWO_NO,
-            'BU_CODE'=>$BU_CODE,
-            'SCHEDULE_START'=>"to_date('$SCHEDULE_START','yyyy-mm-dd')",
-            'SCHEDULE_END'=>"to_date('$SCHEDULE_END','yyyy-mm-dd')",
-            'CUR_ID'=>$CUR_ID,
-            'AMOUNT'=>$AMOUNT,
-            'PROJECT_TYPE_ID'=>$PROJECT_TYPE_ID,
-            'AM_ID'=>$AM_ID,
-            'CUST_ID'=>$CUST_ID,
-            'CUST_END_ID'=>$CUST_END_ID,
-            'PROJECT_STATUS'=>$PROJECT_STATUS,
-            'PROJECT_DESC'=>$PROJECT_DESC,
-            'MARGIN'=>$MARGIN,
-            'TYPE_OF_EFFORT'=>$TYPE_OF_EFFORT,
-            'PRODUCT_TYPE'=>$PRODUCT_TYPE,
-            'VISIBILITY'=>$VISIBILITY,
-            'CALCULATION_METHOD'=>$CALCULATION_METHOD,
-            'TYPE_OF_EXPENSE'=>$TYPE_OF_EXPENSE,
-            'PROJECT_OVERHEAD'=>$PROJECT_OVERHEAD,
-            'ACTUAL_COST'=>$ACTUAL_COST,
-            'COGS'=>$COGS,
-            'RELATED_BU'=>$RELATED_BU,
-            'CREATED_BY'=>$CREATED_BY,
-            'DATE_CREATED'=>"to_date('$today','yyyy-mm-dd')",
-            'HO_OPERATION'=>$HO
-        ];
-        $this->db->insert('PROJECTS',$insertdata);
+            $this->db->query($sql);
+
             $sql = "Select max(cast(PROJECT_ID as int)) as NEW_ID from projects";
             $q = $this->db->query($sql);
             if ($q->num_rows() > 0) {
