@@ -238,9 +238,9 @@ WITH date_range AS (
     FROM    PROJECTS where project_id='$project_id'
     )
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
-            (select sum(t1.pv)- lag(sum(t1.pv), 1, sum(t1.pv)) over (order by t2.\"startdate\") from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
-            (select sum(t1.ev)- lag(sum(t1.ev), 1, sum(t1.ev)) over (order by t2.\"startdate\") from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
-            (select (sum(t1.ev)- lag(sum(t1.ev), 1, sum(t1.ev)) over (order by t2.\"startdate\"))/(sum(t1.pv)- lag(sum(t1.pv), 1, sum(t1.pv)) over (order by t2.\"startdate\"))  from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
+            (select max(t1.pv)-min(t1.pv) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
+            (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+            (select (max(t1.ev)-min(t1.ev))/nullif(max(t1.pv)-min(t1.pv), 0) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
 
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
@@ -249,7 +249,7 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 ");
-        $result = $query->result();
+        $result["spi"] = $query->result();
         echo json_encode($result);
     }
     function cpi($project_id)
@@ -260,9 +260,9 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     FROM    PROJECTS where project_id='$project_id'
     )
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
-            (select sum(t1.ac)- lag(sum(t1.ac), 1, sum(t1.ac)) over ( order by t2.\"startdate\") from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
-            (select sum(t1.ev)- lag(sum(t1.ev), 1, sum(t1.ev)) over ( order by t2.\"startdate\") from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
-            (select (sum(t1.ev)- lag(sum(t1.ev), 1, sum(t1.ev)) over ( order by t2.\"startdate\"))/(sum(t1.ac)- lag(sum(t1.ac), 1, sum(t1.ac)) over ( order by t2.\"startdate\")) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as cpi
+            (select max(t1.ac)-min(t1.ac) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+            (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+            (select (max(t1.ev)-min(t1.ev))/nullif(max(t1.ac)-min(t1.ac), 0) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
 
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
@@ -270,7 +270,7 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
        ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2");
-        $result = $query->result();
+        $result["cpi"] = $query->result();
         echo json_encode($result);
     }
     function s_curve($project_id)
