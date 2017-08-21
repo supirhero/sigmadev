@@ -103,16 +103,14 @@ Class M_detail_project extends CI_Model{
       $query = $this->db->query("select * from (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
                                    wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
                                    finish_date as end_date, duration,work,work_complete as work_total,
-                                   work_percent_complete, 'no' as rebaseline, 'not rebaseline' as action, connect_by_isleaf as LEAF 
-                                   from wbs connect by  wbs_parent_id = prior wbs_id
-                                   start with wbs_id='$id.0'
+                                   work_percent_complete, 'no' as rebaseline, 'not rebaseline' as action 
+                                   from wbs where project_id = '$id'
                                    UNION 
                                    select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
                                    wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
                                    finish_date as end_date, duration,work,work_complete as work_total,
-                                   work_percent_complete, 'yes' as rebaseline,action, connect_by_isleaf as LEAF 
-                                   from temporary_wbs connect by  wbs_parent_id = prior wbs_id
-                                   start with wbs_id='$id.0')
+                                   work_percent_complete, 'yes' as rebaseline,action 
+                                   from temporary_wbs where project_id ='$id')
                                    where action != 'delete'
       ");
       $hasil = $query->result_array();
@@ -316,7 +314,7 @@ Class M_detail_project extends CI_Model{
                   PROJECT_ID='".$PROJECT_ID."',
                   WBS_NAME='".$WBS_NAME."',
                   "."START_DATE=to_date('".$START_DATE."','yyyy-mm-dd'),
-                  FINISH_DATE=to_date('".$FINISH_DATE."','yyyy-mm-dd'),
+                  FINISH_DATE=to_date('".$FINISH_DATE."','yyyy-mm-dd')
                   WHERE WBS_ID='".$WBS_ID."'
                   ";
                   $q = $this->db->query($sql);
@@ -830,9 +828,9 @@ Class M_detail_project extends CI_Model{
     public function insertWBSTemp($data, $project_id){
 
         $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from 
-                                (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID from wbs
+                                (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from wbs
                                 UNION 
-                                SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID from temporary_wbs) where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
+                                SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from temporary_wbs) where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
         $sql = "INSERT INTO TEMPORARY_WBS
             (
               WBS_ID,
@@ -859,7 +857,7 @@ Class M_detail_project extends CI_Model{
         return $data['WBS_ID'].".".$id;
     }
 
-    public function Edit_WBSTemp($WBS_ID,$WBS_PARENT_ID,$PROJECT_ID,$WBS_NAME,$START_DATE,$FINISH_DATE){
+    public function Edit_WBSTemp($WBS_ID,$WBS_PARENT_ID,$PROJECT_ID,$WBS_NAME,$START_DATE,$FINISH_DATE,$RH_ID){
         /*NOT USED QUERY BECAUSE WE USE TEMPORARY TABLE*/
         /*
          * $sql = "UPDATE WBS SET
@@ -871,9 +869,9 @@ Class M_detail_project extends CI_Model{
                   WHERE WBS_ID='".$WBS_ID."'
                   ";*/
 
-        $sqltemp = "insert into temporary_wbs (wbs_id,wbs_parent_id,project_id,wbs_name,start_date,finish_date,is_valid,action)
-                    value(
-                    '$WBS_ID','$WBS_PARENT_ID','$PROJECT_ID','$WBS_NAME',to_date('".$START_DATE."','yyyy-mm-dd'),to_date('".$FINISH_DATE."','yyyy-mm-dd'),1,'update'
+        $sqltemp = "insert into temporary_wbs (wbs_id,wbs_parent_id,project_id,wbs_name,start_date,finish_date,is_valid,action,rh_id)
+                    values(
+                    '$WBS_ID','$WBS_PARENT_ID','$PROJECT_ID','$WBS_NAME',to_date('".$START_DATE."','yyyy-mm-dd'),to_date('".$FINISH_DATE."','yyyy-mm-dd'),1,'update','$RH_ID'
                     )";
         $q = $this->db->query($sqltemp);
 

@@ -106,8 +106,10 @@ class Task extends CI_Controller
 
             // insert into wbs and get new ID
             $newid = $this->M_detail_project->insertWBSTemp($data,$project_id);
+            $status['status'] = 'success';
+            $status['message'] = 'Task berhasil di tambah temporary';
         }
-        else{
+        elseif($statusProject == 'Not Started'){
             //wbs id same with project id
             $data['WBS_NAME'] = $this->input->post("WBS_NAME");
             $data['WBS_ID'] = $project_id;
@@ -138,7 +140,15 @@ class Task extends CI_Controller
                 }
                 $this->M_detail_project->updateNewDuration($ap->WBS_ID);
             }
+
+            $status['status'] = 'success';
+            $status['message'] = 'Task berhasil di tambah';
         }
+        else{
+            $status['status'] = 'failed';
+            $status['message'] = 'Project sudah on progress';
+        }
+        echo json_encode($status);
 
         $returndata['status'] = "success";
         echo json_encode($returndata);
@@ -157,29 +167,32 @@ class Task extends CI_Controller
     function editTask_action(){
 
 
-        $project_id   = $this->input->post("PROJECT_ID");
+        $project_id   = $this->input->post("project_id");
 
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         if($statusProject == 'On Hold'){
             $wbs=$this->input->post("WBS_ID");
             $this->M_detail_project->Edit_WBSTemp(
-                $_POST["WBS_ID"],
-                $_POST["WBS_PARENT_ID"],
-                $_POST["PROJECT_ID"],
-                $_POST["WBS_NAME"],
-                $_POST['START_DATE'],
-                $_POST['FINISH_DATE']
+                $_POST["wbs_id"],
+                $_POST["wbs_parent_id"],
+                $_POST["project_id"],
+                $_POST["wbs_name"],
+                $_POST['start_date'],
+                $_POST['finish_date']
             );
+            $status['status']= 'success';
+            $status['message'] = 'Task berhasil temporary di edit';
+
         }
-        else{
+        elseif($statusProject == 'Not Started'){
             $wbs=$this->input->post("WBS_ID");
             $this->M_detail_project->Edit_WBS(
-                $_POST["WBS_ID"],
-                $_POST["WBS_PARENT_ID"],
-                $_POST["PROJECT_ID"],
-                $_POST["WBS_NAME"],
-                $_POST['START_DATE'],
-                $_POST['FINISH_DATE']
+                $_POST["wbs_id"],
+                $_POST["wbs_parent_id"],
+                $_POST["project_id"],
+                $_POST["wbs_name"],
+                $_POST['start_date'],
+                $_POST['finish_date']
             );
             //$this->M_detail_project->insertWBS($data,$project_id);
             //$WP_ID= $this->M_detail_project->getMaxWPID();
@@ -200,7 +213,14 @@ class Task extends CI_Controller
                 }
                 $this->M_detail_project->updateNewDuration($ap->WBS_ID);
             }
+            $status['status']= 'success';
+            $status['message'] = 'Task berhasil di edit';
         }
+        else{
+            $status['status']= 'failed';
+            $status['message'] = 'Project sudah on progress';
+        }
+        echo json_encode($status);
 
     }
 
@@ -966,6 +986,14 @@ class Task extends CI_Controller
         if($this->email->send()){
             echo "sent ".$this->email->print_debugger();
         }
+    }
+
+    private function getSelectedWBS($id){
+        return $this->M_detail_project->getWBSselected($id);
+    }
+
+    private function getAllParent($id){
+        return $this->M_detail_project->getAllParentWBS($id);
     }
 
 

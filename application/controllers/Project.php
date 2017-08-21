@@ -13,6 +13,7 @@ class Project extends CI_Controller
         $this->load->model('M_business');
         $this->load->model('M_session');
         $this->load->model('M_detail_project');
+        $this->load->model('M_baseline');
 
         //TOKEN LOGIN CHECKER
         if(isset($_GET['token'])){
@@ -375,8 +376,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     //rebaseline
     public function rebaseline() {
 
-        print_r(json_decode($_POST['array']));
-        die;
+        $array_data = json_decode($_POST['array'],true);
+
         //setting variable
         $user_id = $this->datajson['userdata']['USER_ID'];
         $project=$this->input->post("project_id");
@@ -395,8 +396,6 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         $bu_name=$this->M_baseline->selectProjectBUName($project);
         $this->sendVerificationPMO($project_name,$project,$pm_name,$bu_name,$vp_bu);
         */
-        //set project status to onhold
-        $this->db->query("Update projects set PROJECT_STATUS='On Hold' where project_id='$project'");
         //jika gagal upload/ tidak ada file
         if (! $this->upload->do_upload('evidence')){
             //get id rebaseline history
@@ -411,7 +410,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             //insert rebaseline history
             $this->M_baseline->insertRebaseline($data);
 
-            $data['message_rebaseline'] = 'no file or file failed uploaded';
+            $data['message_evidence'] = 'no file or file failed uploaded';
             //edit table project
             //$this->M_baseline->editProject2($update,$id2);
 
@@ -428,33 +427,33 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 
             $this->M_baseline->insertRebaseline($data);
 
-            $data['message_rebaseline'] = 'file success uploaded';
+            $data['message_evidence'] = 'file success uploaded';
         }
-        $this->db->query("Update projects set PROJECT_STATUS='On Hold' where project_id='$project'");
+        //set project status to onhold
+        $this->db->query("Update projects set PROJECT_STATUS='On Hold',RH_ID = $rh_id where project_id='$project'");
         $datareturn['status_project'] = 'success';
-
 
         /*===========================================================*/
         //add modified task to temporary table
-        $data['modified_task'] = $_POST['modified_task'];
-        if(count($data['modified_task']) != 0){
-            foreach ($data['modified_task'] as $modtask){
+        if(count($array_data['modified_task']) != 0){
+            foreach ($array_data['modified_task'] as $modtask){
                 $this->M_detail_project->Edit_WBSTemp(
-                    $modtask["WBS_ID"],
-                    $modtask["WBS_PARENT_ID"],
-                    $modtask["PROJECT_ID"],
-                    $modtask["WBS_NAME"],
-                    $modtask['START_DATE'],
-                    $modtask['FINISH_DATE']
+                    $modtask["wbs_id"],
+                    $modtask["wbs_parent_id"],
+                    $modtask["project_id"],
+                    $modtask["wbs_name"],
+                    $modtask['start_date'],
+                    $modtask['finish_date'],
+                    $rh_id
                 );
             }
+            $datareturn['status_edit_task'] = "success";
         }
 
         /*===========================================================*/
         //add new task to temporary table
-        $data['new_task'] = $_POST['new_task'];
-        if(count($data['new_task']) != 0){
-            foreach ($data['new_task'] as $newtask){
+        if(count($array_data['new_task']) != 0){
+            foreach ($array_data['new_task'] as $newtask){
                 $project_id   = $newtask['project_id'];
 
                 //wbs id same with project id
@@ -468,9 +467,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                 // insert into wbs temporary and get new ID
                 $newid = $this->M_detail_project->insertWBSTemp($data,$project_id);
 
-
-                $datareturn['status_new_task'] = "success";
             }
+            $datareturn['status_add_new_task'] = "success";
         }
 
 
@@ -506,39 +504,35 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         /*BATCH MOVING ALL TEMP WBS TO ITS ORIGIN TABLE (EDIT WBS)*/
         /*===========================================================*/
         /*
-        $allParent=$this->getAllParentWBS($WBS_ID);
-        foreach ($allParent as $ap) {
-            $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
-            $wc=0;
-            $wp=0;
-            $allChild=$this->getAllChildWBS($ap->WBS_ID);
-            foreach ($allChild as $ac) {
-                $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
-                $wc=$wc+$works;
-                $works_p=$this->db->query("select case
-                      when (WORK_COMPLETE=0 OR WORK_COMPLETE is null) then 0 when (WORK_PERCENT_COMPLETE=0 or WORK_PERCENT_COMPLETE is null) then round(WORK*100/WORK_COMPLETE,2)  else WORK_PERCENT_COMPLETE END as WP from wbs where wbs_id='$ac->WBS_ID'")->row()->WP;
-                if ($works_p>100) {
-                    $works_p=100;
+            $wbs=$this->input->post("WBS_ID");
+            $this->M_detail_project->Edit_WBS(
+                $_POST["wbs_id"],
+                $_POST["wbs_parent_id"],
+                $_POST["project_id"],
+                $_POST["wbs_name"],
+                $_POST['start_date'],
+                $_POST['finish_date']
+            );
+            //$this->M_detail_project->insertWBS($data,$project_id);
+            //$WP_ID= $this->M_detail_project->getMaxWPID();
+            //$RP_ID= $this->M_detail_project->getMaxRPID();
+            //$this->M_detail_project->insertWBSPool($data,$RP_ID,$WP_ID,$project_id);
+            $selWBS=$this->getSelectedWBS($wbs);
+            $allParent=$this->getAllParent($selWBS->WBS_ID);
+            $dateStartWBS= new DateTime($selWBS->START_DATE);
+            $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+            foreach ($allParent as $ap) {
+                $dateStartParent=new DateTime($ap->START_DATE);
+                $dateEndParent=new DateTime($ap->FINISH_DATE);
+                if ($dateStartWBS<$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
                 }
-                $wp=$wp+$works_p;
-            }
-            $count = count($allChild);
-            $wp_total=$wp/$count;
-            //echo "alert('".$wp."')";
-            if ($wp_total>100) {
-                $wp_total=100;
-            }
-            $this->db->query("update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc', WORK_PERCENT_COMPLETE='$wp_total' where wbs_id='$ap->WBS_ID'");
-            if($this->endsWith($ap->WBS_ID,'.0')==true){
-                $pc=$this->db->query("select WORK_PERCENT_COMPLETE, PROJECT_ID from wbs where wbs_id='$ap->WBS_ID' ")->row();
-                if ($pc->WORK_PERCENT_COMPLETE>100) {
-                    $this->db->query("update projects set project_complete='100' where project_id='$pc->PROJECT_ID' ");
-                }else{
-                    $this->db->query("update projects set project_complete='$pc->WORK_PERCENT_COMPLETE' where project_id='$pc->PROJECT_ID' ");
+                if ($dateEndWBS>$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
                 }
-
+                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
             }
-        }*/
+        */
 
 
         /*BATCH DELETE ALL WBS REFERENCED FROM TEMP WBS WITH DELETE STATUS ACTION*/
