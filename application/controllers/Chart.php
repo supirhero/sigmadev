@@ -310,9 +310,8 @@ CONNECT BY LEVEL <= (TRUNC(tanggal,'IW') - TRUNC(tanggal,'IW')) / 7 + 1
         //  print_r($query->result());
 $project_id = "8538862";
         $query = $this->db->query("
-
 insert into tb_rekap_project 
-select tb_pv_project.project_id as project_id,SYSDATE as tanggal,tb_pv_project.pv as pv, tb_ev_project.ev as ev, tb_ac_project.ac as ac from tb_pv_project
+select tb_pv_project.project_id as project_id,SYSDATE as tanggal,tb_pv_project.pv as pv, tb_ev_project.ev as ev, nvl(tb_ac_project.ac, 0) as ac from tb_pv_project
 left join tb_ev_project
 on tb_ev_project.project_id=tb_pv_project.project_id
 left join tb_ac_project
@@ -324,7 +323,7 @@ on tb_ac_project.project_id=tb_pv_project.project_id
 begin
 commit;
 insert into tb_rekap_project 
-select * from tb_pv_project
+select tb_pv_project.project_id as project_id,SYSDATE as tanggal,nvl(tb_pv_project.pv, 0) as pv, nvl(tb_ev_project.ev, 0) as ev, nvl(tb_ac_project.ac, 0) as ac from tb_pv_project
 left join tb_ev_project
 on tb_ev_project.project_id=tb_pv_project.project_id
 left join tb_ac_project

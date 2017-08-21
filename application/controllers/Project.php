@@ -291,7 +291,7 @@ FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 ");
         $result = $query->result();
-        echo print_r($result);
+        echo json_encode($result);
     }
     function cpi($project_id)
     {
