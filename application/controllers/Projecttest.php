@@ -260,9 +260,9 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     FROM    PROJECTS where project_id='$project_id'
     )
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
-            (select sum(t1.ac)- lag(sum(t1.ac), 1, sum(t1.ac)) over ( order by t2.\"startdate\") from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
-            (select sum(t1.ev)- lag(sum(t1.ev), 1, sum(t1.ev)) over ( order by t2.\"startdate\") from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
-            (select (sum(t1.ev)- lag(sum(t1.ev), 1, sum(t1.ev)) over ( order by t2.\"startdate\"))/(sum(t1.ac)- lag(sum(t1.ac), 1, sum(t1.ac)) over ( order by t2.\"startdate\")) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as cpi
+            (select max(t1.ac)-min(t1.ac) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+            (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+            (select (max(t1.ev)-min(t1.ev))/nullif(max(t1.ac)-min(t1.ac), 0) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
 
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
