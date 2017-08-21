@@ -249,7 +249,7 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 ");
-        $result = $query->result();
+        $result["spi"] = $query->result();
         echo json_encode($result);
     }
     function cpi($project_id)
@@ -270,7 +270,7 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
        ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2");
-        $result = $query->result();
+        $result["cpi"] = $query->result();
         echo json_encode($result);
     }
     function s_curve($project_id)
