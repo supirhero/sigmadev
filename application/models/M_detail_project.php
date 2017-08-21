@@ -99,13 +99,19 @@ Class M_detail_project extends CI_Model{
       }
 
     }
-    function selectWBS($id){
+    function selectWBS($id,$rh_id){
       $query = $this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
                                    wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
                                    finish_date as end_date, duration,work,work_complete as work_total,
-                                   work_percent_complete, 'no' as rebaseline, 'not rebaseline' as action, connect_by_isleaf as LEAF 
+                                   work_percent_complete, 'no' as rebaseline, 'not rebaseline' as action 
                                    from wbs connect by  wbs_parent_id = prior wbs_id
                                    start with wbs_id='$id.0'
+                                   union
+                                   select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
+                                   wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
+                                   finish_date as end_date, duration,work,work_complete as work_total,
+                                   work_percent_complete, 'yes' as rebaseline, action from temporary_wbs
+                                   where rh_id = '$rh_id' and action = 'create'
       ");
       $hasil = $query->result_array();
       return $hasil;
@@ -903,7 +909,13 @@ Class M_detail_project extends CI_Model{
 
     }
 
-
+    function getRebaselineTask($id){
+        $query = "select wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
+                    finish_date as end_date, duration,work,work_complete as work_total,
+                    work_percent_complete, 'yes' as rebaseline, action from temporary_wbs
+                    where rh_id = '$id' and action != 'create'";
+        return $this->db->query($query)->result_array();
+    }
 
 }
 

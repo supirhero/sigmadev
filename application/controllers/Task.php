@@ -50,7 +50,9 @@ class Task extends CI_Controller
     //Task View
     function workplan_view(){
         $id_project = $this->uri->segment(3);
-        $workplan=$this->M_detail_project->selectWBS($id_project);
+        $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
+        $workplan=$this->M_detail_project->selectWBS($id_project,$rh_id);
+        $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
         //$created_array = $this->buildTree($workplan);
 
@@ -77,6 +79,7 @@ class Task extends CI_Controller
 
         $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
         $result['workplan'] = $result[$id_project.'.0'];
+        $result['rebaseline_task'] = $rebaseline;
         unset($result[$id_project.'.0']);
         echo json_encode($result);
 
