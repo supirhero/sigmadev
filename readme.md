@@ -52,6 +52,11 @@ Untuk tahap sekarang api yang tersedia :
 * IWO Controller
     * Get iwo with offset
     
+* Rebaseline
+    * Accept Rebaseline
+    * Deny Rebaseline
+    
+    
     
 ## LOGIN CONTROLLER
 
@@ -868,4 +873,32 @@ Input yang harus di provide :
     ->PROJECT_NAME
     ->PROJECT_MANAGER_ID
     ->...
+ ```
+ 
+# REBASELINE
+## Accept Rebaseline
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/project/accept_rebaseline
+ ```
+ Input yang harus di provide :
+ ```
+ ->project_id
+ ```
+ Return Json :
+ ```
+ -> status
+ ```
+## Deny Rebaseline
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/project/deny_rebaseline
+ ```
+ Input yang harus di provide :
+ ```
+ ->project_id
+ ```
+ Return Json :
+ ```
+ -> status
  ```

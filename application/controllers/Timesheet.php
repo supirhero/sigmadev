@@ -302,8 +302,16 @@ class Timesheet extends CI_Controller {
                                                    where ts_id = '$timesheet_id'
                                                     ")->row()->REBASELINE;
 
+            if($rebaseline_status == null){
+                $data['status'] = 'error';
+                $data['message'] = 'timesheet id wrong';
+                echo json_encode($data);
+                die;
+            }
+
             if($rebaseline_status == 'yes'){
                 $confirmation = $this->M_timesheet->confirmTimesheetTemp($timesheet_id,$approver,$confirm_code);
+                $data['message'] = 'rebaseline';
             }
             else{
                 $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
@@ -311,6 +319,7 @@ class Timesheet extends CI_Controller {
                 if($confirm_code == 1){
                     $this->M_timesheet->updateProgress($timesheet_id);
                 }
+                $data['message'] = 'not rebaseline';
             }
 
             $data['status'] = $confirmation;
