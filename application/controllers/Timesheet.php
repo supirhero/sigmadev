@@ -248,13 +248,13 @@ class Timesheet extends CI_Controller {
 
             //insert timesheet to temporary timesheet if member task need rebaseline approval
             if($checkmember == 'yes'){
-                $this->M_timesheet->inputTimesheetTemp($data);
+                $this->M_timesheet->inputTimesheetTemp($data,$rh_id);
                 $returndata['status'] = "success";
                 $returndata['message'] = "add timesheet temporary succcess ";
             }
             //insert timesheet to temporary timesheet if member not need rebaseline but task need rebaseline approval
             elseif ($checktask == 'yes'){
-                $this->M_timesheet->inputTimesheetTemp($data);
+                $this->M_timesheet->inputTimesheetTemp($data,$rh_id);
 
                 $returndata['status'] = "success";
                 $returndata['message'] = "add timesheet temporary succcess ";
@@ -286,13 +286,33 @@ class Timesheet extends CI_Controller {
         $approver = $this->datajson['USER_ID'];
         $timesheet_id = $_POST['ts_id'];
         $confirm_code = $_POST['confirm'];
+        $project_id = $_POST['project_id'];
+        $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
 
         if($confirm_code == 1 || $confirm_code  == 0){
-            $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
-            //if timesheet confirmed ,calculation for workplan complete hours process execute
-            if($confirm_code == 1){
 
+            $rebaseline_status = $this->db->query("
+                                                   select 'yes' as rebaseline
+                                                   from temporary_timesheet
+                                                   where ts_id = '$timesheet_id'
+                                                   and rh_id = '$rh_id'
+                                                   union 
+                                                   select 'no' as rebaseline
+                                                   from timesheet
+                                                   where ts_id = '$timesheet_id'
+                                                    ")->row()->REBASELINE;
+
+            if($rebaseline_status == 'yes'){
+                $confirmation = $this->M_timesheet->confirmTimesheetTemp($timesheet_id,$approver,$confirm_code);
             }
+            else{
+                $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
+                //if timesheet confirmed ,calculation for workplan complete hours process execute
+                if($confirm_code == 1){
+                    $this->M_timesheet->updateProgress($timesheet_id);
+                }
+            }
+
             $data['status'] = $confirmation;
 
             echo json_encode($data);

@@ -89,7 +89,8 @@ Class M_timesheet extends CI_Model{
         return $hasil;
     }
 
-    function updateProgress($wp){
+    function updateProgress($ts_id){
+        $wp = $this->db->query("select wp_id from timesheet where ts_id = '$ts_id'")->row()->WP_ID;
         $wbs=$this->db->query("SELECT WBS_ID from WBS_POOL WHERE WP_ID='".$wp."'")->row()->WBS_ID;
         $work=$this->db->query("select sum(hour_total) as WORK_H, wbs_id from user_timesheet where wbs_id='$wbs'  group by wbs_id")->row()->WORK_H;
         $wc=$this->db->query("select work_complete from wbs where wbs_id='$wbs'")->row()->WORK_COMPLETE;
@@ -432,7 +433,7 @@ GROUP BY TS_DATE")->result_array();
         }
     }
 
-    function inputTimesheetTemp($data){
+    function inputTimesheetTemp($data,$rh_id){
 
         //change date input for readable to sql
         $tgl=date_format(date_create($data['DATE']),'Ymd');
@@ -445,7 +446,9 @@ GROUP BY TS_DATE")->result_array();
         //insert new data
 
         if($jumlahts == 0){
-            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
+            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from 
+                                                    ( select TS_ID,TS_DATE from timesheet union select TS_ID,TS_DATE from temporary_timesheet)
+                                                    where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
 
             //data for insert
             $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
@@ -457,10 +460,10 @@ GROUP BY TS_DATE")->result_array();
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
 
-            $this->db->query("INSERT INTO TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
+            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET 
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION,RH_ID) 
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create','$rh_id')");
 
 
         }
@@ -482,9 +485,9 @@ GROUP BY TS_DATE")->result_array();
             $LONGITUDE = $data['LONGITUDE'];
 
             $this->db->query("INSERT INTO TEMPORARY_TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION) 
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION,RH_ID) 
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create')");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create','$rh_id')");
 
 
         }
@@ -504,7 +507,9 @@ GROUP BY TS_DATE")->result_array();
 
 
             //insert query
-            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
+            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from (
+                                                      select TS_ID,TS_DATE from timesheet union select TS_ID,TS_DATE from temporary_timesheet
+                                                    ) where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
 
             //data for insert
             $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
@@ -516,10 +521,23 @@ GROUP BY TS_DATE")->result_array();
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
 
-            $this->db->query("INSERT INTO TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
+            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET 
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION,RH_ID)) 
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create','$rh_id')");
+        }
+    }
+    function confirmTimesheetTemp($timesheet_id,$approver,$confirm_code){
+        $date = date('Y-m-d');
+        $query = "update temporary_timesheet 
+                  set IS_APPROVED = $confirm_code, CONFIRMED_BY = '$approver' , APPROVAL_DATE = to_date('$date','yyyy-mm-dd')
+                  where TS_ID = '$timesheet_id'";
+        $exec = $this->db->query($query);
+        if($exec){
+            return 'success';
+        }
+        else{
+            return 'failed';
         }
     }
 
