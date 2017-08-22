@@ -469,7 +469,7 @@ GROUP BY TS_DATE")->result_array();
         elseif($jumlahts == 1){
             //get timesheet total this day
             $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from (
-                                                      select TS_ID from timesheet union select TS_ID from temporary_timesheet
+                                                      select TS_ID,TS_DATE from timesheet union select TS_ID,TS_DATE from temporary_timesheet
                                                     ) where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
 
             //data for insert
@@ -486,7 +486,6 @@ GROUP BY TS_DATE")->result_array();
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION) 
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create')");
-            echo $this->db->last_query();
 
 
         }

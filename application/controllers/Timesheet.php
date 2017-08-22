@@ -192,7 +192,9 @@ class Timesheet extends CI_Controller {
 
 
         if($statusProject == 'On Hold'){
+
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+            //check member wbs_pool status if it need rebaseline approval
             $checkmember = $this->db->query("
                                         select 'yes' as rebaseline
                                         from temporary_wbs_pool
@@ -203,22 +205,76 @@ class Timesheet extends CI_Controller {
                                         from wbs_pool
                                         where wp_id = '".$_POST['WP_ID']."'")->row()->REBASELINE;
 
-            $checktask = $this->db->query("
-                                          select 'no' as rebaseline
-                                          from wbs 
-                                          JOIN 
-                                          (select wbs_id 
-                                          from wbs_pool 
-                                          where wp_id = '$wp_id')
-                                        ");
-            $this->M_timesheet->inputTimesheetTemp($data);
+            //check task status if it need rebaseline approval
+            if($checkmember == 'yes'){
+                $checktask = $this->db->query("
+                                                select rebaseline from (
+                                                  select 'yes' as rebaseline 
+                                                  from temporary_wbs
+                                                  join temporary_wbs_pool
+                                                  on temporary_wbs.wbs_id = temporary_wbs_pool.wbs_id
+                                                  where temporary_wbs_pool.wp_id = '$wp_id'
+                                                  and temporary_wbs.rh_id = '$rh_id'
+                                                  and temporary_wbs_pool.rh_id = '$rh_id'
+                                                  UNION 
+                                                  select 'no' as rebaseline 
+                                                  from wbs a
+                                                  join temporary_wbs_pool b
+                                                  on a.wbs_id = b.wbs_id
+                                                  where b.wp_id = '$wp_id'
+                                                  and b.rh_id = '$rh_id'
+                                                )
+                                                ")->row()->REBASELINE;
+            }
+            elseif($checkmember == 'no'){
+                $checktask = $this->db->query("
+                                                select rebaseline from (
+                                                  select 'yes' as rebaseline 
+                                                  from temporary_wbs a
+                                                  join wbs_pool b
+                                                  on a.wbs_id = b.wbs_id
+                                                  where b.wp_id = '$wp_id'
+                                                  and a.rh_id = '$rh_id'
+                                                  UNION 
+                                                  select 'no' as rebaseline 
+                                                  from wbs a
+                                                  join wbs_pool b
+                                                  on a.wbs_id = b.wbs_id
+                                                  where b.wp_id = '$wp_id'
+                                                  and b.rh_id = '$rh_id'
+                                                )
+                                                ")->row()->REBASELINE;
+            }
+
+            //insert timesheet to temporary timesheet if member task need rebaseline approval
+            if($checkmember == 'yes'){
+                $this->M_timesheet->inputTimesheetTemp($data);
+                $returndata['status'] = "success";
+                $returndata['message'] = "add timesheet temporary succcess ";
+            }
+            //insert timesheet to temporary timesheet if member not need rebaseline but task need rebaseline approval
+            elseif ($checktask == 'yes'){
+                $this->M_timesheet->inputTimesheetTemp($data);
+
+                $returndata['status'] = "success";
+                $returndata['message'] = "add timesheet temporary succcess ";
+            }
+            //insert timesheet to original timesheet table because his member status and task status not need rebaseline approval
+            else{
+                $this->M_timesheet->inputTimesheet($data);
+                $returndata['status'] = "success";
+                $returndata['message'] = "add timesheet succcess ";
+            }
+
         }
-        elseif($statusProject == 'Not Started'){
+        elseif($statusProject == 'In Progress'){
             $this->M_timesheet->inputTimesheet($data);
+            $returndata['status'] = "success";
+            $returndata['message'] = "add timesheet succcess ";
         }
         else{
             $returndata['status'] = "failed";
-            $returndata['status'] = "failed";
+            $returndata['message'] = "project status is not in progress";
         }
 
         echo json_encode($returndata);
