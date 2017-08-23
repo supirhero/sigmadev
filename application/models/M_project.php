@@ -108,12 +108,8 @@ class M_project extends CI_Model {
         $MARGIN = $this->input->post('MARGIN');
         $TYPE_OF_EFFORT = $this->input->post('TYPE_OF_EFFORT');
         $PRODUCT_TYPE = $this->input->post('PRODUCT_TYPE');
-        $VISIBILITY = $this->input->post('VISIBILITY');
         $TYPE_OF_EXPENSE = $this->input->post('TYPE_OF_EXPENSE');
         $PROJECT_STATUS = $this->input->post('PROJECT_STATUS');
-        $PROJECT_OVERHEAD = $this->input->post('OVERHEAD');
-        $ACTUAL_COST = $this->input->post('ACTUAL_COST');
-        $COGS = $this->input->post('COGS');
         $RELATED_BU = $this->input->post('RELATED');
         $CREATED_BY = $userdata['USER_ID'];
         $HO = $this->input->post('HO');
@@ -143,9 +139,6 @@ class M_project extends CI_Model {
                 PRODUCT_TYPE,
                 CALCULATION_METHOD,
                 TYPE_OF_EXPENSE,
-                PROJECT_OVERHEAD,
-                ACTUAL_COST,
-                COGS,
                 RELATED_BU,
                 CREATED_BY,
                 DATE_CREATED,
@@ -170,9 +163,6 @@ class M_project extends CI_Model {
                 '" . $PRODUCT_TYPE . "',
                 '" . $CALCULATION_METHOD . "',
                 '" . $TYPE_OF_EXPENSE . "',
-                '". $PROJECT_OVERHEAD . "',
-                " . $ACTUAL_COST . ",
-                '". $COGS . "',
                 '" . $RELATED_BU . "',
                 '" . $CREATED_BY . "',
                 to_date('" . $today . "','yyyy-mm-dd'),
