@@ -19,7 +19,7 @@ class Project extends CI_Controller
         if(isset($_GET['token'])){
             $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
 
-            $decoded_user_data =$datauser;
+            $decoded_user_data =$datauser['data'];
             //    print_r($decoded_user_data);
             $this->datajson['token'] = $_GET['token'];
 

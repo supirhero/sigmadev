@@ -19,7 +19,7 @@ class Report extends CI_Controller {
         if(isset($_GET['token'])){
             $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
 
-            $decoded_user_data =$datauser;
+            $decoded_user_data =$datauser['data'];
             //    print_r($decoded_user_data);
             $this->datajson['token'] = $_GET['token'];
 
@@ -38,6 +38,7 @@ class Report extends CI_Controller {
         //if login success
         if(!isset($decoded_user_data[0])){
             //get user data from token
+
 
             //for login bypass ,this algorithm is not used
             //$this->datajson['userdata'] = (array)$decoded_user_data['data'];
