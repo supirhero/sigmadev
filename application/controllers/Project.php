@@ -135,6 +135,7 @@ class Project extends CI_Controller
         $returndata['message'] = 'Project success added';
         echo json_encode($returndata);
     }
+    //function for count days
     private function countDurationAll($start_date, $end_date) {
         if (empty($start_date)) {
             $start_date=date('Y-m-d');
@@ -151,6 +152,18 @@ class Project extends CI_Controller
         return $days;
     }
     /*END ADD PROJECT*/
+
+    //Add project member view
+    public function ProjectMember_view(){
+        $id = $this->uri->segment(3);
+        $data['project_member']=$this->M_detail_project->getDataProject($id);
+    }
+    //Add project member action
+    public function ProjectMember_action(){
+
+    }
+
+
 
     /*Start Edit Project*/
     public function editProject_view(){
@@ -221,6 +234,8 @@ class Project extends CI_Controller
     }
     /*End Edit Project*/
 
+
+    /*REPORT PROJECT*/
     function gantt($project_id)
     {
         $list=$this->M_project->getWBS($project_id);
@@ -361,6 +376,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         $resultz["s-curve"]=$results;
         print_r($resultz);
     }
+    /*END REPORT PROJECT*/
+
 
     /*Baseline*/
     function baseline(){

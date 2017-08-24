@@ -49,8 +49,8 @@ Class M_user extends CI_Model{
     }
 
     function lastLogin($user_id){
-        $delivDate = date('d-m-Y');
-        $sql="UPDATE USERS SET LAST_LOGIN=to_date('".$delivDate."','dd-mm-yy') WHERE USER_ID='".$user_id."'";
+        $delivDate = date('d-m-Y h:i:s');
+        $sql="UPDATE USERS SET LAST_LOGIN=to_date('".$delivDate."','dd-mm-yy hh:mi:ss') WHERE USER_ID='".$user_id."'";
         $q = $this->db->query($sql);
     }
 

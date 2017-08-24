@@ -52,6 +52,8 @@ class Task extends CI_Controller
         $id_project = $this->uri->segment(3);
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
         $workplan=$this->M_detail_project->selectWBS($id_project,$rh_id);
+
+
         $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
         //$created_array = $this->buildTree($workplan);
@@ -81,7 +83,7 @@ class Task extends CI_Controller
         $result['workplan'] = $result[$id_project.'.0'];
         $result['rebaseline_task'] = $rebaseline;
         unset($result[$id_project.'.0']);
-        echo json_encode($result);
+        echo json_encode($workplan);
 
 
         //echo var_dump($workplan);

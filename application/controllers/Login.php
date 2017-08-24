@@ -30,8 +30,9 @@ class Login extends CI_Controller {
     //if login success go to home
     public function welcome()
     {
-
+        $id = $_GET['id'];
         $token =$_GET['token'];
+        $this->M_user->lastLogin($id);
         //$this->load->view('header_view',$data);
         //$data['user_id']=($this->M_login->tampil());
         //$this->load->view('v_home.php', $data);
@@ -68,7 +69,7 @@ class Login extends CI_Controller {
                // $token = $this->token->createtoken($result);
                 $token = $this->M_session->insert_session($result["USER_ID"]);
 
-                redirect('/login/welcome?token='.$token);
+                redirect('/login/welcome?token='.$token.'&id='.$result['USER_ID']);
             }
             //if status 0 maybe it is login extern (VENDOR)
             else {
@@ -81,7 +82,7 @@ class Login extends CI_Controller {
                         //redirect to login as admin
                         //print_r($_SESSION);
                         $token = $this->M_session->insert_session($result['userdata']["USER_ID"]);
-                        redirect('/login/welcome?token='.$token);
+                        redirect('/login/welcome?token='.$token.'&id='.$result['userdata']['USER_ID']);
                     }
 
                 }

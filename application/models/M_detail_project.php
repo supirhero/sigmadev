@@ -100,21 +100,26 @@ Class M_detail_project extends CI_Model{
 
     }
     function selectWBS($id,$rh_id){
-      $query = $this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
-                                   wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
-                                   finish_date as end_date, duration,work,work_complete as work_total,
-                                   work_percent_complete, 'no' as rebaseline, 'not rebaseline' as action 
-                                   from wbs connect by  wbs_parent_id = prior wbs_id
-                                   start with wbs_id='$id.0'
-                                   union
-                                   select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
-                                   wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
-                                   finish_date as end_date, duration,work,work_complete as work_total,
-                                   work_percent_complete, 'yes' as rebaseline, action from temporary_wbs
-                                   where rh_id = '$rh_id' and action = 'create'
-      ");
-      $hasil = $query->result_array();
-      return $hasil;
+        return $this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
+                                          WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                          WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                          DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,rebaseline,
+                                          connect_by_isleaf as LEAF,LEVEL from (
+                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                                  DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'no' as rebaseline
+                                            from wbs
+                                            union
+                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                                  DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'yes' as rebaseline
+                                             from temporary_wbs
+                                              where action = 'create'
+                                              and rh_id = '$rh_id'
+                                          ) connect by  wbs_parent_id = prior wbs_id
+                                          start with wbs_id='$id.0'
+                                          order siblings by regexp_substr(orde, '^\D*') nulls first,
+                                          to_number(regexp_substr(orde, '\d+'))")->result_array();
     }
     function getAllBU(){
       return $this->db->query("SELECT BU_CODE, BU_ALIAS, BU_NAME FROM P_BU")->result_array();
@@ -469,9 +474,9 @@ Class M_detail_project extends CI_Model{
                     }
                     function getDataProject($id){
                       $query = $this->db->query("
-                      SELECT * FROM RESOURCE_POOL
-                      join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
-                      join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+                      SELECT b.user_name,c.prof_name, b.email , b.last_login FROM RESOURCE_POOL a
+                      join USERS b on a.USER_ID=b.USER_ID
+                      join PROFILE c ON c.PROF_ID=b.PROF_ID
                       WHERE PROJECT_ID='".$id."'
                       ");
                       $hasil = $query->result_array();
