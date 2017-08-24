@@ -406,8 +406,7 @@ class Task extends CI_Controller
             $data = $this->excel_reader->sheets[0] ;
             $coba = $data['numRows'];
             $dataexcel = Array();
-            
-            for ($i = 1; $i <= $data['numRows']; $i++) {
+            for ($i = 2; $i <= $data['numRows']; $i++) {
                 if($data['cells'][$i][1] == '')
                     break;
 

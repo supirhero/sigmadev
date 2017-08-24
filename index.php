@@ -2,9 +2,8 @@
 //CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: *");
-header("Access-Control-Allow-Credentials: true ");
-header("Access-Control-Allow-Headers: Content-Type, Depth, User-Agent, X-File-Size, 
-    X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control, token, TOKEN, Token, HTTP_TOKEN");
+header("Access-Control-Allow-Headers: *");
+
 
 //set post data for input
 $jsonpost = json_decode(file_get_contents('php://input'), true);

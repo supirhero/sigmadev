@@ -8,9 +8,6 @@ class M_wbs extends CI_Model {
 
     function tambahwbs($dataarray)
     {
-        print_r($dataarray);
-
-        die;
         for($x=1;$x<count($dataarray);$x++){
             $number []= $dataarray[$x]['anjay'];
 
