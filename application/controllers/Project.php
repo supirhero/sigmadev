@@ -423,7 +423,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             $results[$key]["pv_percent"]=round($val->PV/$total_pv*100);
             $results[$key]["ev_percent"]=round($val->EV/$total_pv*100);
         }
-        $resultz["s-curve"]=$results;
+        $resultz["s_curve"]=$results;
         print_r(json_encode($resultz));
     }
     /*END REPORT PROJECT*/
