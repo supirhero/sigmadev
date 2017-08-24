@@ -367,6 +367,113 @@ class Task extends CI_Controller
 
     }
 
+
+    public function upload_wbs() {
+
+        $config['upload_path'] = 'document_assets/temp_upload';
+        $config['allowed_types'] = 'xlsx|xls|csv';
+
+        $this->load->library('upload', $config);
+
+        if ( ! $this->upload->do_upload('document'))
+        {
+            $data = array('error' => $this->upload->display_errors());
+            //    $data['nav']=($this->load->view('v_nav1'));
+            //  $data['header']=($this->load->view('v_header'));
+
+            $datajson['status'] = "failed";
+            $datajson['message']= "gagal upload file";
+            //echo "<script>alert('berhasil')</script>";
+            //$this->load->view('uploadwbs', $data);
+
+            //$this->load->view('uploadwbs', $data);
+            //redirect('/Importwbs');
+            echo json_encode($data);
+        }
+        else
+        {
+            $this->load->model('M_wbs');
+            $data = array('error' => false);
+            $upload_data = $this->upload->data();
+            $this->load->library('excel_reader');
+            $this->excel_reader->setOutputEncoding('230787');
+            $file =  $upload_data['full_path'];
+            $this->excel_reader->read($file);
+            error_reporting(E_ALL ^ E_NOTICE);
+
+
+            // Sheet 1
+            $data = $this->excel_reader->sheets[0] ;
+            $coba = $data['numRows'];
+            $dataexcel = Array();
+            for ($i = 1; $i <= $data['numRows']; $i++) {
+                if($data['cells'][$i][1] == '')
+                    break;
+
+                $cars = $data['cells'][$i][1];
+                $array[]=$data['cells'][$i][1];
+                $dataexcel[$i-1]['anjay']=$array;
+                $dataexcel[$i-1]['PROJECT_ID']=$this->input->post('project_id');
+                //}
+                //$dataexcel[$i-1]['WBS_ID']= $data['cells'][$i][1];
+                //  $dataexcel[$i-1]['WBS_PARENT_ID']= $data['cells'][$i][2];
+                //$dataexcel[$i-1]['IWO_NO']= $data['cells'][$i][3];
+                //$dataexcel[$i-1]['USER_ID']= $data['cells'][$i][2];
+                $dataexcel[$i-1]['WBS_NAME']= $data['cells'][$i][4];
+                //$dataexcel[$i-1]['WBS_DESC']= $data['cells'][$i][];
+                //$dataexcel[$i-1]['PRIORITY']= $data['cells'][$i][5];
+                //  $dataexcel[$i-1]['CALCULATION_TYPE']= $data['cells'][$i][6];
+                //    $dataexcel[$i-1]['USER_TAG']= $data['cells'][$i][7];
+                //  $dataexcel[$i-1]['PHASE']= $data['cells'][$i][8];
+                //$dataexcel[$i-1]['EFFORT_DRIVEN']= $data['cells'][$i][9];
+                //$dataexcel[$i-1]['WORK']=trim($data['cells'][$i][5]," hrs");
+                $dur =$this->countDuration(date_format(date_create($data['cells'][$i][6]),"Y/m/d"), date_format(date_create($data['cells'][$i][7]),"Y/m/d"));
+                //$dataexcel[$i-1]['DURATION']= floor(trim($data['cells'][$i][5]," days"));
+                $dataexcel[$i-1]['DURATION']= $dur;
+                //$dataexcel[$i-1]['START_DATE']= date('d/m/Y',strtotime($data['cells'][$i][6]));
+                $dataexcel[$i-1]['START_DATE']= date_format(date_create($data['cells'][$i][6]),"d/m/Y");
+                $dataexcel[$i-1]['START_DATEs']= $data['cells'][$i][6];
+                //$dataexcel[$i-1]['ACTUAL_START_DATE']= $data['cells'][$i][11];
+                $dataexcel[$i-1]['FINISH_DATE']= date_format(date_create($data['cells'][$i][7]),"d/m/Y");
+                //$dataexcel[$i-1]['FINISH_DATE']= date('d/m/Y',strtotime($data['cells'][$i][7]));
+                $dataexcel[$i-1]['FINISH_DATEs']= $data['cells'][$i][7];
+                //$dataexcel[$i-1]['ACTUAL_FINISH_DATE']= $data['cells'][$i][13];
+
+
+                //$dataexcel[$i-1]['MILESTONE']= $data['cells'][$i][16];
+                //$dataexcel[$i-1]['WORK_COMPLETE']= $data['cells'][$i][7];
+                //    $dataexcel[$i-1]['WORK_PERCENT_COMPLETE']= $data['cells'][$i][18];
+                //  $dataexcel[$i-1]['CONSTRAINT_TYPE']= $data['cells'][$i][19];
+                //  $dataexcel[$i-1]['CONSTRAINT_DATE']= $data['cells'][$i][20];
+                //  $dataexcel[$i-1]['DEADLINE']= $data['cells'][$i][21];
+                //    $dataexcel[$i-1]['WBS_PARENT_ID']= $data['cells'][$i][22];
+                //    $dataexcel[$i-1]['ACHIEVEMENT']= $data['cells'][$i][23];
+                //  $dataexcel[$i-1]['ID']= $data['cells'][$i][24];
+                //$dataexcel[$i-1]['TEXT']= $data['cells'][$i][25];
+                //$dataexcel[$i-1]['PROGRESS']= $data['cells'][$i][26];
+                //$dataexcel[$i-1]['SORTORDER']= $data['cells'][$i][27];
+                //$dataexcel[$i-1]['PARENT']= $data['cells'][$i][28];
+                //  $dataexcel[$i-1]['PLANNED_START']= $data['cells'][$i][29];
+                //$dataexcel[$i-1]['PLANNED_END']= $data['cells'][$i][30];
+                //$dataexcel[$i-1]['END_DATE']= $data['cells'][$i][31];
+            }
+            //echo json_encode($dataexcel);
+            $this->M_wbs->tambahwbs($dataexcel);
+            //$data['ini']=$dataexcel;
+            //$data['nav']=($this->load->view('v_nav1'));
+            //  $data['header']=($this->load->view('v_header'));
+            delete_files($file);
+            $datajson['status'] = 'success';
+            $datajson['message'] = 'Data berhasil di upload';
+            echo json_encode($datajson);
+            //$this->session->set_flashdata("bukanpesan",json_encode($dataexcel));
+            //$this->session->set_flashdata("bukanpesan",$this->M_wbs->tambahwbs($dataexcel));
+            //echo "<script>alert('berhasil')</script>";
+            //$this->load->view('uploadwbs', $data);
+        }
+
+    }
+
     //Email information remove user from task
     private function sendVerificationremoveMember($email,$user_name,$wbs_name){
 
@@ -1035,6 +1142,80 @@ class Task extends CI_Controller
 
     private function getAllParent($id){
         return $this->M_detail_project->getAllParentWBS($id);
+    }
+
+    function last_day($month = '', $year = '')
+    {
+        if (empty($month))
+        {
+            $month = date('m');
+        }
+
+        if (empty($year))
+        {
+            $year = date('Y');
+        }
+
+        $result = strtotime("{$year}-{$month}-01");
+        $result = strtotime('-1 second', strtotime('+1 month', $result));
+
+        return date('Y/m/d', $result);
+    }
+    function getHolidays() {
+        $var = $this->db->query("select to_char(HOLIDAY_START,'YYYY-MM-DD') as H_START, to_char(HOLIDAY_END,'YYYY-MM-DD') as H_END  from p_holiday where HOLIDAY_START is not null")->result_array();
+
+        $w = array();
+        foreach ($var as $v) {
+            $x = $this->dateRange($v['H_START'], $v['H_END']);
+            $w = array_merge($w, $x);
+            $w = array_unique($w);
+        }
+        //print_r($w);
+        return $w;
+    }
+
+    function countDuration($start_date, $end_date) {
+        $start = new DateTime($start_date);
+        $end = new DateTime($end_date);
+        $end->modify('+1 day');
+        $interval = $end->diff($start);
+        $days = $interval->days;
+        $period = new DatePeriod($start, new DateInterval('P1D'), $end);
+        $holidays = $this->getHolidays();
+        foreach ($period as $dt) {
+            $curr = $dt->format('D');
+            if (in_array($dt->format('Y-m-d'), $holidays)) {
+                $days--;
+            }
+            if ($curr == 'Sat' || $curr == 'Sun') {
+                $days--;
+            }
+        }
+        return $days;
+    }
+    function countDurationAll($start_date, $end_date) {
+        $start = new DateTime($start_date);
+        $end = new DateTime($end_date);
+        $end->modify('+1 day');
+        $interval = $end->diff($start);
+        $days = $interval->days;
+        $period = new DatePeriod($start, new DateInterval('P1D'), $end);
+        return $days;
+    }
+    function dateRange($first, $last, $step = '+1 day', $output_format = 'Y-m-d') {
+
+        $dates = array();
+        $current = strtotime($first);
+        $last = strtotime($last);
+
+        while ($current <= $last) {
+            if (date("D", $current) != "Sun" && date("D", $current) != "Sat") {
+                $dates[] = date($output_format, $current);
+            }
+            $current = strtotime($step, $current);
+        }
+
+        return $dates;
     }
 
 
