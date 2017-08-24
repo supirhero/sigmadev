@@ -157,12 +157,62 @@ class Project extends CI_Controller
     public function ProjectMember_view(){
         $id = $this->uri->segment(3);
         $data['project_member']=$this->M_detail_project->getDataProject($id);
+
+        echo json_encode($data);
     }
-    //Add project member action
-    public function ProjectMember_action(){
+    //get project member
+    public function ProjectMember_get(){
+        $id =$this->input->post('BU_ID');
+        $project_id =$this->input->post('PROJECT_ID');
+
+        //load available project member from external
+        if(empty($id)){
+            $query = $this->db->query("
+                SELECT DISTINCT USERS.USER_ID, USERS.BU_ID, USER_TYPE_ID, IS_ACTIVE,USER_NAME,users.EMAIL
+                FROM USERS LEFT JOIN RESOURCE_POOL ON USERS.USER_ID=RESOURCE_POOL.USER_ID
+                WHERE USER_TYPE_ID='ext' AND IS_ACTIVE='1' AND NOT EXISTS
+                (SELECT USER_ID FROM RESOURCE_POOL WHERE USERS.USER_ID=RESOURCE_POOL.USER_ID AND PROJECT_ID='".$project_id."')");
+            $hasil = $query->result_array();
+
+            $data['project_member'] = $hasil;
+        }
+        //load available project member from internal
+        else{
+            $bu_id  =   $this->M_detail_project->getBU($id);
+            $query = $this->db->query("
+                SELECT DISTINCT USERS.USER_ID, USERS.BU_ID, USER_TYPE_ID, IS_ACTIVE,USER_NAME,users.EMAIL
+                FROM USERS LEFT JOIN RESOURCE_POOL ON USERS.USER_ID=RESOURCE_POOL.USER_ID
+                WHERE USERS.BU_ID='".$bu_id."' AND USER_TYPE_ID='int' AND IS_ACTIVE='1' AND NOT EXISTS
+                (SELECT USER_ID FROM RESOURCE_POOL WHERE USERS.USER_ID=RESOURCE_POOL.USER_ID AND PROJECT_ID='".$project_id."')
+                ORDER BY USER_NAME ASC");
+            $hasil = $query->result_array();
+
+            $data['project_member'] = $hasil;
+        }
+        echo json_encode($data['project_member']);
 
     }
+    //action add project member
+    public function ProjectMember_add(){
+        $id       = $this->M_detail_project->getMaxNumberResource();
+        $project_id   = $this->input->post('PROJECT_ID');
+        //  $email  = $this->input->post('EMAIL');
+        //  $USER_ID    = $this->input->post("USER_ID");
+        $user_id 	= $this->input->post('USER_ID');
+        $ya       = count($_POST['USER_ID']);
+        //$send     = count($USER_ID);
+        $email				= $this->M_detail_project->selectemail($user_id[0]);
+        $project_name = $this->M_detail_project->selectProjectName($project_id);
 
+        for($i=0; $i<$ya; $i++){
+            $data = $_POST['USER_ID'][$i];
+            $email=$this->M_detail_project->selectemail($data);
+            $query = "insert into RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID ) values ((select nvl(max(RP_ID)+1,1) from RESOURCE_POOL),'".$data."','".$project_id."')";
+            $this->db->query($query);
+        }
+        //print_r ($email);
+        $this->sendVerificationinviteMember($email,$project_name,$project_id);
+    }
 
 
     /*Start Edit Project*/
