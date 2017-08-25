@@ -164,7 +164,7 @@ class Home extends CI_Controller {
         $this->project();
         $this->datatimesheet();
         $this->transformKeys($this->datajson);
-        echo json_encode($this->datajson);
+        echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
 
     //bu detail
@@ -506,6 +506,12 @@ class Home extends CI_Controller {
         $prof = $this->datajson['userdata']['PROF_ID'];
         $id = $this->datajson['userdata']['USER_ID'];
         $projecttemp = $this->M_project->getUsersProject($id);
+        for($iter = 0 ; $iter < count($projecttemp) ; $iter ++){
+            if($projecttemp[$iter]['PROJECT_COMPLETE'] == null){
+                $projecttemp[$iter]['PROJECT_COMPLETE'] = 0;
+            }
+        }
+
         for($i = 0 ; $i < count($projecttemp) ; $i++){
             if(substr($projecttemp[$i]['PROJECT_COMPLETE'],0,1 ) == '.'){
                 if(strlen($projecttemp[$i]['PROJECT_COMPLETE']) == 3){
