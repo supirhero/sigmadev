@@ -397,6 +397,7 @@ class Home extends CI_Controller {
     public function myactivities(){
         $user_id = $this->datajson['userdata']['USER_ID'];
         $data=array();
+
         //$data['header']=($this->load->view('v_header'));
         //$data['float_button']=($this->load->view('v_floating_button'));
         //$data['nav']=($this->load->view('v_nav1'));
@@ -494,7 +495,7 @@ class Home extends CI_Controller {
         $project_id = $this->uri->segment(3);
 
         $data['project_activities'] =  $this->db->query("SELECT *
-                                FROM USER_TIMESHEET
+                                FROM USER_TIMESHEET_NEW
                                 WHERE project_id = '".$project_id."'
                                 ORDER BY ts_date DESC")->result_array();
         $this->transformKeys($data);
