@@ -66,43 +66,8 @@ class Home extends CI_Controller {
         else{
             $this->M_session->update_session($this->datajson['token']);
         }
-        //PRIVILEGE CHECKER
-        $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
-        $privilege = $this->db->query("select al.type,au.access_url,pal.privilege
-                                        from access_list al
-                                        join access_url au
-                                        on al.access_id = au.access_id
-                                        join profile_access_list pal
-                                        on
-                                        pal.access_id = au.access_id
-                                        where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
-                                        ")->result_array();
 
-        foreach($privilege as $priv){
-            //jika akses url ada di dalam db
-            if($priv['ACCESS_URL'] == $url_dest){
-                //jika akses tipe nya business
-                if($priv['TYPE'] == 'BUSINESS'){
-                    if($priv['privilege'] == 'all_bu'){
 
-                    }
-                    elseif($priv['privilege'] == 'bu_only'){
-                        switch ($url_dest){
-                            case '':
-
-                                $bu_project = $this->db->query('select ');
-
-                                break;
-
-                        }
-                    }
-                    else{
-
-                    }
-
-                }
-            }
-        }
     }
 
     /*For Overview Home*/

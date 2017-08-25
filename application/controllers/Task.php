@@ -11,6 +11,7 @@ class Task extends CI_Controller
 
         $this->load->model('M_detail_project');
         $this->load->model('M_session');
+        $this->load->helper('file');
 
         //TOKEN LOGIN CHECKER
         if(isset($_GET['token'])){
@@ -406,7 +407,7 @@ class Task extends CI_Controller
             $data = $this->excel_reader->sheets[0] ;
             $coba = $data['numRows'];
             $dataexcel = Array();
-            for ($i = 2; $i <= $data['numRows']; $i++) {
+            for ($i = 1; $i <= $data['numRows']; $i++) {
                 if($data['cells'][$i][1] == '')
                     break;
 
@@ -457,6 +458,9 @@ class Task extends CI_Controller
                 //$dataexcel[$i-1]['PLANNED_END']= $data['cells'][$i][30];
                 //$dataexcel[$i-1]['END_DATE']= $data['cells'][$i][31];
             }
+
+            print($data);
+            die;
             //echo json_encode($dataexcel);
             $this->M_wbs->tambahwbs($dataexcel);
             //$data['ini']=$dataexcel;
