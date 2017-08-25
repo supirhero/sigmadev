@@ -80,16 +80,16 @@ class Home extends CI_Controller {
                                     ")->result_array();
 
         foreach($privilege as $priv){
-                //jika akses url ada di dalam db
-                if($priv['ACCESS_URL'] == $url_dest){
-                    //jika akses tipe nya business
-                    if($priv['TYPE'] == 'BUSINESS'){
-                        if($priv['PRIVILEGE'] == 'all_bu'){
-                        }
-                        elseif($priv['PRIVILEGE'] == 'only_bu'){
-                            switch ($priv['ACCESS_ID']){
-                                case '1':
-                                    $bu_id = $this->db->query(" select p_bu.bu_id 
+            //jika akses url ada di dalam db
+            if($priv['ACCESS_URL'] == $url_dest){
+                //jika akses tipe nya business
+                if($priv['TYPE'] == 'BUSINESS'){
+                    if($priv['PRIVILEGE'] == 'all_bu'){
+                    }
+                    elseif($priv['PRIVILEGE'] == 'only_bu'){
+                        switch ($priv['ACCESS_ID']){
+                            case '1':
+                                $bu_id = $this->db->query(" select p_bu.bu_id 
                                                             from (select wp_id,wbs_id from wbs_pool
                                                             union 
                                                             select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
@@ -100,34 +100,57 @@ class Home extends CI_Controller {
                                                             join p_bu
                                                             on projects.bu_code = p_bu.bu_code
                                                             where wbs_pool.wp_id = '".$_POST['WP_ID']."'
-                                                            ");
+                                                            ")->row()->BU_ID;
+                                break;
+                            case '2':
+                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
+                                break;
+                            case '3':
+                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                break;
+                            case '4' :
+                                break;
+                            case '5' :
+                                $bu_id = $this->db->query("select p_bu.bu_id from 
+                                                            (select ts_id,wp_id from timesheet union select ts_id,wp_id from temporary_timesheet) timesheet
+                                                            JOIN 
+                                                            (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
+                                                            on timesheet.wp_id = wbs_pool.wp_id
+                                                            JOIN 
+                                                            (select project_id,wbs_id from wbs union select project_id,wbs_id from temporary_wbs) wbs
+                                                            on wbs_pool.wbs_id = wbs.wbs_id
+                                                            JOIN projects
+                                                            on wbs.project_id = projects.project_id
+                                                            JOIN p_bu 
+                                                            on projects.bu_code = p_bu.bu_code
+                                                            where timesheet.ts_id = '".$_POST['ts_id']."'
+                                                            ")->row()->BU_ID;
+                                break;
+                            case '6' :
+                                $this->bu_id = $this->db->query("select p_bu.bu_alias from p_bu where p_bu.bu_id = '".$this->datajson['userdata']['BU_ID']."'")->BU_ALIAS;
+                                break;
 
-                                    break;
-                                case '2':
-                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
-                                    if($this->datajson['userdata']['BU_ID'] == $bu_id){
+                        }
 
-                                    }
-                                    else{
-                                        $returndata['status'] = 'denied';
-                                        $returndata['message'] = 'you dont have permission to access this api';
-                                        echo json_encode($returndata);
-                                        //die;
-                                    }
-                                    break;
-                                case '3':
+                        if($this->datajson['userdata']['BU_ID'] == $bu_id || $bu_id == 'masuk'){
 
-                                    break;
-
-                            }
                         }
                         else{
-
+                            $returndata['status'] = 'denied';
+                            $returndata['message'] = 'you dont have permission to access this action';
+                            echo json_encode($returndata);
+                            die;
                         }
 
+
                     }
+                    else{
+
+                    }
+
                 }
             }
+        }
 
 
     }
