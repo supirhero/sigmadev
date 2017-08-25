@@ -355,9 +355,15 @@ Return json object yang di terima :
   ## Report Monthly
  Menampilkan report per BU berdasarkan bulan dan tahun yg diinputkan :
  ```
- http://45.77.45.126/dev/report/r_montly/
+ http://45.77.45.126/dev/report/r_monthly/
  ```
 
+
+Input yang harus di provide :
+```
+-> bulan
+-> tahun
+```
 
 Return json object yang di terima :
 ```
