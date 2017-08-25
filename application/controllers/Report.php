@@ -767,7 +767,6 @@ and pv!='0'
 and b.BU_CODE !='PROUDS'
 and b.BU_code !='GTS'
 and b.BU_code !='NSM' 
-and b.BU_alias in ($listBU)
 group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
     $result["r_yearly"][$i] = $query->result();
