@@ -87,7 +87,12 @@ class Home extends CI_Controller {
 
                     }
                     elseif($priv['privilege'] == 'bu_only'){
-                        if($url_dest = 'home/budetail'){
+                        switch ($url_dest){
+                            case '':
+
+                                $bu_project = $this->db->query('select ');
+
+                                break;
 
                         }
                     }
