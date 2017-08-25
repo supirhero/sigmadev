@@ -742,7 +742,6 @@ $listBU=explode(",",$this->input->post('bu_aliases'));
         foreach ($listBU as &$value) {
             $list[] = "'".$value."'";
         }
-$listBU = implode(",",$list);
         for($i=1; $i<=12; $i++)
 {
     $month = date("M", mktime(0, 0, 0, $i, 10));
@@ -769,8 +768,8 @@ and b.BU_code !='GTS'
 and b.BU_code !='NSM' 
 group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
-    $result["r_yearly"][$i] = $query->result();
-    $result["r_yearly"][$i]["month_name"] = $month;
+    $result["r_yearly"][] = $query->result();
+   // $result["r_yearly"][]["month_name"] = $month;
 }
         echo json_encode($result);
     }
