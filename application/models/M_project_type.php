@@ -1,8 +1,8 @@
 <?php
 
 Class M_project_type extends CI_Model{
-    function selectProjectType(){
-        $query = $this->db->get('P_PROJECT_TYPE');
+    function selectProjectType($keyword=null){
+        $query = $this->db->query('SELECT ID, PROJECT_TYPE, CATEGORY AS TYPE_EFFORT FROM P_PROJECT_CATEGORY');
         $hasil = $query->result_array();
         return $hasil;
 

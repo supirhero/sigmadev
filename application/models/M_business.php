@@ -166,6 +166,12 @@ select distinct tahun from tb_project_bu where bu_id='".$bu_id."' order by tahun
             'BU_HEAD'=>$this->input->post('BU_HEAD')
         );
         $this->db->insert('P_BU',$bu);
+        $res=$this->db->query("select a.*,b.user_name as bu_head_name from p_bu a join users b on a.bu_head=b.user_id where a.bu_id='".$bu_id."'");
+        if($res->num_rows()>0){
+          return $res->row_array();
+        }else{
+          return false;
+        }
     }
     function getUserList(){
         $result=array();
@@ -224,6 +230,7 @@ order siblings by bu_parent_id";
 
         return $result;
     }
+
     function getBUParent($id){
         $result=array();
         $sql="select * from p_bu where bu_id='".$id."'";
@@ -303,13 +310,29 @@ order siblings by bu_parent_id";
         $alias=$this->input->post('BU_ALIAS');
         $head=$this->input->post('BU_HEAD');
         $sql="update p_bu set BU_CODE='".$code."', BU_ALIAS='".$alias."', BU_NAME='".$name."', BU_HEAD='".$head."' where BU_ID='".$id."'";
-        $q = $this->db->query($sql);
+        $this->db->query($sql);
+        if ($this->db->affected_rows()>0) {
+          $res=$this->db->query("select a.*,b.user_name as bu_head_name from p_bu a join users b on a.bu_head=b.user_id where a.bu_id='".$id."'");
+          if($res->num_rows()>0){
+            return $res->row_array();
+          }else{
+            return false;
+          }
+        }
     }
     function updateBULevel(){
         $bu_id=$this->input->post('BU_ID');
         $bu_parent_id=$this->input->post('BU_PARENT_ID');
         $sql="update p_bu set BU_PARENT_ID='".$bu_parent_id."' where BU_ID='".$bu_id."'";
-        $q = $this->db->query($sql);
+        $this->db->query($sql);
+        if ($this->db->affected_rows()>0) {
+          $res=$this->db->query("select a.*,b.user_name as bu_head_name from p_bu a join users b on a.bu_head=b.user_id where a.bu_id='".$bu_id."'");
+          if($res->num_rows()>0){
+            return $res->row_array();
+          }else{
+            return false;
+          }
+        }
     }
     function updateBUStatus(){
 
@@ -331,6 +354,12 @@ order siblings by bu_parent_id";
             $sql="update p_bu set IS_ACTIVE='".$stat."' where BU_ID='".$bu_id."'";
             $q = $this->db->query($sql);
         }
+        $res=$this->db->query("select a.*,b.user_name as bu_head_name from p_bu a join users b on a.bu_head=b.user_id where a.bu_id='".$bu_id."'");
+        if($res->num_rows()>0){
+          return $res->row_array();
+        }else{
+          return false;
+        }
     }
     function getBUTest(){
         $sql="SELECT * FROM P_BU";
@@ -349,6 +378,30 @@ order siblings by bu_parent_id";
         $q = $this->db->query($sql);
         if($q->num_rows() > 0){
             $result = $q->row();
+        }
+
+        return $result;
+    }
+    ////////////////////////////
+    function buListDet($keyword=null){
+
+        $result=array();
+        $sql="select a.*, b.user_name as bu_head_name from (select p_bu.*, LEVEL from p_bu  connect by  bu_parent_id = prior bu_id
+start with bu_id=0
+order siblings by bu_parent_id) a join users b on a.bu_head=b.user_id";
+        if ($keyword!=null) {
+          $keyword=strtolower($keyword);
+          $sql.=" where ";
+          $sql.=" lower(a.bu_name) like '%".$keyword."%' or";
+          $sql.=" lower(a.bu_code) like '%".$keyword."%' or";
+          $sql.=" lower(a.bu_name) like '%".$keyword."%' or";
+          $sql.=" lower(a.bu_head) like '%".$keyword."%' or";
+          $sql.=" lower(b.user_name) like '%".$keyword."%' ";
+        }
+        $q = $this->db->query($sql);
+
+        if($q->num_rows() > 0){
+            $result = $q->result();
         }
 
         return $result;

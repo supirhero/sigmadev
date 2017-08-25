@@ -13,7 +13,12 @@ START WITH bu_ID='$buid') order by bu_id");
  //return $id;
  //return "SELECT * FROM V_CALCULATE_TASK_PER_USER WHERE wbs_id='".$id."'";
  }
-
+ public function getbu($bu_id){
+   return $this->db->get_where('P_BU',array('BU_ID'=>$bu_id))->row_array();
+ }
+ public function getbuchild($bu_id){
+   return $this->db->get_where('P_BU',array('BU_PARENT_ID'=>$bu_id))->result_array();
+ }
 
 
 function get_user_on_bu($buid,$usr){
@@ -358,6 +363,7 @@ function dashboard_all(){
      }
     function Portofolio_completed_Project($bu,$tahun){
         $result=0;
+
         $q=$this->db->query("select nvl(count(a.project_id),0) as jml_project, bu_id from projects a
                right join p_bu b on (a.bu_code=b.bu_code or a.bu_code=b.bu_alias)
                where project_status = 'Completed' and bu_id='$bu' and to_char(date_created,'YYYY')='$tahun'
