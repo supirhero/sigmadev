@@ -10,7 +10,7 @@ class Report extends CI_Controller {
         parent::__construct();
         error_reporting(E_ALL & ~E_NOTICE);
         $this->load->model('M_home');
-        $this->load->model('M_timesheet');
+     //   $this->load->model('M_timesheet');
         $this->load->model('M_report');
         $this->load->model('M_business');
         $this->load->model('M_session');
@@ -791,7 +791,7 @@ group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
     }
 
     //report monthly overview
-    public function r_monthly(){
+    public function r_month(){
         $tahun = $this->input->post('tahun');
         $month = date("M", mktime(0, 0, 0, $this->input->post('bulan'), 10));
 
