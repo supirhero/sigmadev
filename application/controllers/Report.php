@@ -120,16 +120,24 @@ class Report extends CI_Controller {
                                                             JOIN p_bu 
                                                             on projects.bu_code = p_bu.bu_code
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
+                                                            and projects.project_type_id = 'Non Project'
                                                             ")->row()->BU_ID;
                                 break;
-                            case '6' :/*
+                            case '6' :
                                 $databu = $this->db->query("select p_bu.bu_id,bu_parent_id from p_bu where p_bu.bu_id = '".$this->datajson['userdata']['BU_ID']."'")->row_array();
-                                if($databu['BU_PARENT_ID'] == null){
-                                    $this->bu_id = $this->db->query('select bu_id from p_bu');
+                                if($databu['BU_ID'] == 0){
+                                    $this->bu_id = $this->db->query('select bu_id from p_bu')->result_array();
                                 }
-
-                                die;*/
+                                elseif ($databu['BU_PARENT_ID'] == 0){
+                                    $this->bu_id = $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID']."")->result_array();
+                                }
+                                else{
+                                    $this->bu_id[0]['BU_ID'] = $this->datajson['userdata']['BU_ID'];
+                                }
                                 $bu_id = 'masuk';
+                                break;
+                            case '7':
+
                                 break;
 
                         }
@@ -138,6 +146,7 @@ class Report extends CI_Controller {
 
                         }
                         else{
+
                             $returndata['status'] = 'denied';
                             $returndata['message'] = 'you dont have permission to access this action';
                             echo json_encode($returndata);
@@ -458,9 +467,6 @@ class Report extends CI_Controller {
 
 
         $tree = $this->buildTree($data_bu);
-
-        print_r($tree);
-        die;
         /*
         foreach($data_bu as $data){
 
@@ -477,7 +483,7 @@ class Report extends CI_Controller {
         echo json_encode($tree);
     }
 
-    function buildTree(array $elements, $parentId = null) {
+    private function buildTree(array $elements, $parentId = null) {
         $branch = array();
 
         foreach ($elements as $element) {
