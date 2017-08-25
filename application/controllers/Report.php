@@ -489,7 +489,7 @@ class Report extends CI_Controller {
         $y=(int)date("Y");
         $m=(int)date("m");
 
-        $datareport=$this->M_report->get_utilization_on_bu($bu_id);
+        $datareport['report_people']=$this->M_report->get_utilization_on_bu($bu_id);
 
         for($i = 0 ; $i <count($datareport);$i++){
 
