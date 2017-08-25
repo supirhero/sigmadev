@@ -4,6 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Timesheet extends CI_Controller {
 
     public $datajson = array();
+    public $bu_id = null;
 
     function __construct()
     {
@@ -92,27 +93,48 @@ class Timesheet extends CI_Controller {
                                                             on projects.bu_code = p_bu.bu_code
                                                             where wbs_pool.wp_id = '".$_POST['WP_ID']."'
                                                             ")->row()->BU_ID;
-
-
                                 break;
                             case '2':
                                 $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
                                 break;
                             case '3':
-
+                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                break;
+                            case '4' :
+                                break;
+                            case '5' :
+                                $bu_id = $this->db->query("select p_bu.bu_id from 
+                                                            (select ts_id,wp_id from timesheet union select ts_id,wp_id from temporary_timesheet) timesheet
+                                                            JOIN 
+                                                            (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
+                                                            on timesheet.wp_id = wbs_pool.wp_id
+                                                            JOIN 
+                                                            (select project_id,wbs_id from wbs union select project_id,wbs_id from temporary_wbs) wbs
+                                                            on wbs_pool.wbs_id = wbs.wbs_id
+                                                            JOIN projects
+                                                            on wbs.project_id = projects.project_id
+                                                            JOIN p_bu 
+                                                            on projects.bu_code = p_bu.bu_code
+                                                            where timesheet.ts_id = '".$_POST['ts_id']."'
+                                                            ")->row()->BU_ID;
+                                break;
+                            case '6' :
+                                $this->bu_id = $this->db->query("select p_bu.bu_alias from p_bu where p_bu.bu_id = '".$this->datajson['userdata']['BU_ID']."'")->BU_ALIAS;
                                 break;
 
                         }
 
-                        if($this->datajson['userdata']['BU_ID'] == $bu_id){
+                        if($this->datajson['userdata']['BU_ID'] == $bu_id || $bu_id == 'masuk'){
 
                         }
                         else{
                             $returndata['status'] = 'denied';
-                            $returndata['message'] = 'you dont have permission to access this api';
+                            $returndata['message'] = 'you dont have permission to access this action';
                             echo json_encode($returndata);
-                            //die;
+                            die;
                         }
+
+
                     }
                     else{
 
