@@ -122,11 +122,14 @@ class Report extends CI_Controller {
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
                                                             ")->row()->BU_ID;
                                 break;
-                            case '6' :
-                                $this->bu_id = $this->db->query("select p_bu.bu_id from p_bu where p_bu.bu_id = '".$this->datajson['userdata']['BU_ID']."'")->result_array();
+                            case '6' :/*
+                                $databu = $this->db->query("select p_bu.bu_id,bu_parent_id from p_bu where p_bu.bu_id = '".$this->datajson['userdata']['BU_ID']."'")->row_array();
+                                if($databu['BU_PARENT_ID'] == null){
+                                    $this->bu_id = $this->db->query('select bu_id from p_bu');
+                                }
+
+                                die;*/
                                 $bu_id = 'masuk';
-                                echo $this->bu_id;
-                                die;
                                 break;
 
                         }
