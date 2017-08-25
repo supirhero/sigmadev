@@ -452,6 +452,13 @@ class Report extends CI_Controller {
     public function r_list_bu(){
         $data_bu = $this->M_business->getAllBU();
         $fixdata = ['directorat'=>[],'company'=>[],'business_unit'=>[]];
+
+
+        $tree = $this->buildTree($data_bu);
+
+        print_r($tree);
+        die;
+        /*
         foreach($data_bu as $data){
 
             if ($data['BU_ID'] == 0){
@@ -463,8 +470,24 @@ class Report extends CI_Controller {
             else{
                 array_push($fixdata['business_unit'],$data);
             }
+        }*/
+        echo json_encode($tree);
+    }
+
+    function buildTree(array $elements, $parentId = null) {
+        $branch = array();
+
+        foreach ($elements as $element) {
+            if ($element['BU_PARENT_ID'] == $parentId) {
+                $children = $this->buildTree($elements, $element['BU_ID']);
+                if ($children) {
+                    $element['children'] = $children;
+                }
+                $branch[] = $element;
+            }
         }
-        echo json_encode($fixdata);
+
+        return $branch;
     }
 
     //https://marvelapp.com/hj9eb56/screen/29382899
