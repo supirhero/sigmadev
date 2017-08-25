@@ -98,7 +98,6 @@ class Home extends CI_Controller {
                 }
             }
         }
-        die;
     }
 
     /*For Overview Home*/
