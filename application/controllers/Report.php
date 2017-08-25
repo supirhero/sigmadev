@@ -768,7 +768,9 @@ and b.BU_code !='GTS'
 and b.BU_code !='NSM' 
 group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
-    $result["r_yearly"][] = $query->result();
+    $hasil =$query->result();
+    $result["r_yearly_cpi"][] = array("name" => $month,$hasil["bu_alias"]=>$hasil["cpi"]);
+    $result["r_yearly_spi"][] = array("name" => $month,$hasil["bu_alias"]=>$hasil["spi"]);
    // $result["r_yearly"][]["month_name"] = $month;
 }
         echo json_encode($result);
