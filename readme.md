@@ -17,6 +17,9 @@ Untuk tahap sekarang api yang tersedia :
     * Business unit
     
 * REPORT controller
+    * Report Overview
+    * Monthly Perfomance
+    * Yearly Perfomance
     * My Performances
     * My Activity
     * Directorat / BU Report
@@ -334,6 +337,63 @@ Return data json object yang di terima :
    ```
  
  # REPORT CONTROLLER
+  ## Report Overview
+ Menampilkan overview berupa daftar BU, current month report per BU dan  current Year per BU, URI yang di gunakan :
+ ```
+ http://45.77.45.126/dev/report/r_overview
+ ```
+
+
+Return json object yang di terima :
+```
+-> list_BU (Daftar BU available)
+-> r_monthly (daftar report BU permonth seperti fungsi Report Monthly dibawah)
+-> r_yearly (daftar report BU peryear seperti fungsi dibawah)
+```
+
+
+  ## Report Monthly
+ Menampilkan report per BU berdasarkan bulan dan tahun yg diinputkan :
+ ```
+ http://45.77.45.126/dev/report/r_montly/<Bulan dan tahun misal(Jan-2017)>
+ ```
+
+
+Return json object yang di terima :
+```
+-> bu_name
+-> bu_alias
+-> bu_id
+-> pv
+-> ev
+-> ac
+-> spi
+-> cpi
+```
+
+  ## Report Yearly
+ Menampilkan report per BU berdasarkan bulan dan tahun yg diinputkan :
+ ```
+ http://45.77.45.126/dev/report/r_montly/<tahun (2017)>
+ ```
+Input yang harus di provide :
+ ```
+  ->bu_aliases (daftar bu aliases dipisahkan dengan koma ex : BSD,FSD,SSI)
+ ```
+
+Return json object yang di terima :
+```
+->list bulan ke brp (ex: 1 , 2, ...12)
+  -> bu_name
+  -> bu_alias
+  -> bu_id
+  -> pv
+  -> ev
+  -> ac
+  -> spi
+  -> cpi
+```
+
  ## My Performances
  Performance user berdasarkan bulan dan tahun, URI yang di gunakan :
  ```
