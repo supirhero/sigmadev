@@ -857,11 +857,22 @@ and b.BU_code !='NSM'
 group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
     $hasil =$query->result();
-    $result["r_yearly_cpi"][] = array("name" => $month,$hasil["BU_ALIAS"]=>$hasil["CPI"]);
-    $result["r_yearly_spi"][] = array("name" => $month,$hasil["BU_ALIAS"]=>$hasil["SPI"]);
-   // $result["r_yearly"][]["month_name"] = $month;
+    $anu = array("name" => $month);
+    $anuz = array("name" => $month);
+
+    for($o=0; $o<count($hasil); $o++)
+    {
+        $anu[$hasil[$o]->BU_ALIAS]=$hasil[$o]->CPI;
+        $anuz[$hasil[$o]->BU_ALIAS]=$hasil[$o]->SPI;
+    }
+
+    $result["r_yearly_cpi"][]=$anu;
+    $result["r_yearly_spi"][]=$anuz;
+
+    // $result["r_yearly"][]["month_name"] = $month;
 }
         echo json_encode($result);
+
     }
 
 
