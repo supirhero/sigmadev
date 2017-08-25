@@ -88,7 +88,10 @@ class Login extends CI_Controller {
                 }
             }
             //redirect to error page
-            redirect('/login/index/'.$cek);
+            set_status_header(400,'Login Failed');
+            $codeerror['status'] = 'Failed';
+            $codeerror['message'] = 'Username Atau Password salah';
+            echo json_encode($codeerror);
         }
         else{
             $data['title']= 'error';
