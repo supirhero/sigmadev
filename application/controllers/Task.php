@@ -84,7 +84,7 @@ class Task extends CI_Controller
         $result['workplan'] = $result[$id_project.'.0'];
         $result['rebaseline_task'] = $rebaseline;
         unset($result[$id_project.'.0']);
-        echo json_encode($workplan);
+        echo json_encode($result);
 
 
         //echo var_dump($workplan);
