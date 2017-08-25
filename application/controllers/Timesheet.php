@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Timesheet extends CI_Controller {
 
     public $datajson = array();
-    public $bu_id = null;
+
 
     function __construct()
     {
