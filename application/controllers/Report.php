@@ -61,9 +61,7 @@ class Report extends CI_Controller {
             $this->M_session->update_session($this->datajson['token']);
         }
 
-        //for debug only
-        $masterdata = $this->db->query("select * from users where USER_NAME = 'master'")->result_array();
-        $this->datajson['userdata']= $masterdata[0];
+
 
         /*//TOKEN LOGIN CHECKER
         if(isset($_SERVER['HTTP_TOKEN'])){
