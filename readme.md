@@ -355,7 +355,7 @@ Return json object yang di terima :
   ## Report Monthly
  Menampilkan report per BU berdasarkan bulan dan tahun yg diinputkan :
  ```
- http://45.77.45.126/dev/report/r_montly/<Bulan dan tahun misal(Jan-2017)>
+ http://45.77.45.126/dev/report/r_montly/
  ```
 
 
@@ -376,10 +376,7 @@ Return json object yang di terima :
  ```
  http://45.77.45.126/dev/report/r_montly/<tahun (2017)>
  ```
-Input yang harus di provide :
- ```
-  ->bu_aliases (daftar bu aliases dipisahkan dengan koma ex : BSD,FSD,SSI)
- ```
+
 
 Return json object yang di terima :
 ```
