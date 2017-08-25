@@ -485,11 +485,11 @@ class Report extends CI_Controller {
         $bu_id = $_POST['BU_ID'];
         $bulan = $_POST['BULAN'];
         $tahun = $_POST['TAHUN'];
-
         $y=(int)date("Y");
         $m=(int)date("m");
 
         $datareport=$this->M_report->get_utilization_on_bu($bu_id);
+
 
         for($i = 0 ; $i <count($datareport);$i++){
 
@@ -542,7 +542,8 @@ class Report extends CI_Controller {
             $datareport[$i]['status_entry']=$text_entry;
 
         }
-        echo json_encode($datareport);
+        $wrap['report_people'] = $datareport;
+        echo json_encode($wrap);
     }
     //resource per bu
     public function r_entry_bu(){
