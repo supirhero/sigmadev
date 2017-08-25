@@ -457,6 +457,97 @@ class Report extends CI_Controller {
         echo json_encode($datareport);
     }
 
+    public function r_resourcesbu(){
+
+        $tahun = $this->input->post('tahun');
+        // $tahun = '2016';
+        //  $bu = 37;
+        $bu = $this->input->post('bu_id');
+
+        $y=(int)date("Y");
+        // $m=(int)date("m");
+        //echo print_r ($thn);
+
+
+        $count_user=$this->M_report->getCountUser($bu);
+        //echo print_r($tahun);
+
+        if (($tahun==$y)){
+            $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
+            $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
+        }
+        else{
+            $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
+            $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
+
+        }
+
+
+        //Utilization text
+        if ($res['jml_util']<80)
+        {
+            $res['status_utilization']='Under';
+        }
+        elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
+            $res['status_utilization']='Optimal';
+        }
+        else {
+            $res['status_utilization']='Over';
+        }
+        // Entry text
+        if ($res['jml_entry']<100)
+        {
+            $res['status']='Under';
+        }
+        elseif ($res['jml_entry']==100) {
+            $res['status']='Complete';
+        }
+        else {
+            $res['status']='Over';
+        }
+
+
+        $allentry=$this->M_report->gettahunanbu($bu,$tahun);
+        $res['allentry'][0]=array('Month', 'Entry');
+        $i=1;
+        foreach ($allentry as $has) {
+
+            $res['allentry'][$i][0]= $has['BULAN'];
+            $res['allentry'][$i][1]=$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun));
+            $i++;
+        }
+
+        $allhour=$this->M_report->getAllHourBU($bu,$tahun);
+        $res['allhour'][0]=array('Month', 'Hour');
+        $i=1;
+        foreach ($allhour as $hus) {
+            $res['allhour'][$i][0]= $hus['BULAN'];
+            $res['allhour'][$i][1]=$hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($has['BULAN'],$tahun));
+            $i++;
+        }
+
+        //   json_encode($res,JSON_NUMERIC_CHECK);
+        //$i=1;
+        /*  $data['res'][0]=array('Month','Entry');
+
+        foreach ($res as $r) {
+
+
+
+        //  $hasil['res'][$i][0]=  $dateObj->format('M');
+        $data['res'][$i][0]=  $r['JML_ENTRY_BULANAN'];
+        $data['res'][$i][1]=  $r['BULAN'];
+
+        $i++;
+
+
+      }*/
+        echo json_encode($res,JSON_NUMERIC_CHECK);
+
+
+
+
+    }
 
     //report overview
     public function r_overview(){
