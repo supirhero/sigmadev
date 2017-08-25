@@ -1,8 +1,16 @@
 <?php
 
 Class M_holiday extends CI_Model{
-    function selectHoliday(){
-        $query = $this->db->get('P_HOLIDAY');
+    function selectHoliday($keyword=null){
+      $sql="select * from P_HOLIDAY";
+      if ($keyword!=null) {
+        $keyword=strtolower($keyword);
+        $sql.=" where ";
+        $sql.=" lower(HOLIDAY) like '%".$keyword."%' or";
+        $sql.=" lower(HOLIDAY_START) like '%".$keyword."%' or";
+        $sql.=" lower(HOLIDAY_END) like '%".$keyword."%' ";
+      }
+        $query = $this->db->query($sql);
         $hasil = $query->result_array();
         return $hasil;
 
@@ -26,6 +34,12 @@ Class M_holiday extends CI_Model{
   ".$data['HOLIDAY_END'].",
   '".$data['COLOR']."')";
         $q=$this->db->query($sql);
+        $res=$this->db->query("select * from P_HOLIDAY where HOLIDAY_ID='".$data['HOLIDAY_ID']."'");
+        if ($res->num_rows()>0) {
+          return $res->row_array();
+        }else{
+          return false;
+        }
     }
 
     function lastLogin($data){
@@ -41,6 +55,12 @@ Class M_holiday extends CI_Model{
     function editHoliday($data){
         $sql="UPDATE P_HOLIDAY SET HOLIDAY='".$data['HOLIDAY']."', HOLIDAY_START=to_date('".$data['HOLIDAY_START']."','yyyy-mm-dd'),HOLIDAY_END=to_date('".$data['HOLIDAY_END']."','yyyy-mm-dd') WHERE HOLIDAY_ID='".$data['HOLIDAY_ID']."'";
         $q = $this->db->query($sql);
+        $res=$this->db->query("select * from P_HOLIDAY where HOLIDAY_ID='".$data['HOLIDAY_ID']."'");
+        if ($res->num_rows()>0) {
+          return $res->row_array();
+        }else{
+          return false;
+        }
     }
 
     function selectCalendar(){
