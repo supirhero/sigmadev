@@ -276,6 +276,7 @@ class Home extends CI_Controller {
         //setting for upload libary
         $config['upload_path']		= './asset/user/';
         $config['allowed_types']	= 'jpg|png|gif|jpeg';
+        $config['overwrite'] = TRUE;
         $config['max_size']			= 100000;
         $config['max_width']		= 1024;
         $config['max_height']		= 768;
@@ -302,6 +303,8 @@ class Home extends CI_Controller {
         }
         // jika ada file evidence / berhasil upload
         else {
+            $data['error'] = $this->upload->display_errors();
+
             $updateUser = [
                 'PHONE_NO' => $nohp,
                 'ADDRESS' => $address,
