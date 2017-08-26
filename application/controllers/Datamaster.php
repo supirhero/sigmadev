@@ -13,6 +13,7 @@ class Datamaster extends CI_Controller{
         $this->load->model('M_business');
         $this->load->model('M_mis');
         $this->load->model('M_project_type');
+        error_reporting(E_ALL & ~E_NOTICE);
 
 
         //TOKEN LOGIN CHECKER
@@ -251,13 +252,13 @@ class Datamaster extends CI_Controller{
         /*===============================================================================*/
 
     }
-    public function getData($type,$keyword=null){
+    public function getData($type,$pagenum=10,$page=1,$keyword=null){
         switch ($type) {
             case 'bu':
                 $result[$type]= $this->getbu($keyword);
                 break;
             case 'user':
-                $result[$type]=  $this->getuser($keyword);
+                $result[$type]=  $this->getuser($page,$pagenum,$keyword);
                 break;
             case 'customer':
                 $result[$type]=   $this->getcustomer();
@@ -278,11 +279,13 @@ class Datamaster extends CI_Controller{
         echo json_encode($result);
     }
     public function getbu($keyword=null){
-        $bu=$this->M_business->buListDet($keyword);
+        $bu[""]=$this->M_business->buListDet($keyword);
         return $bu;
     }
-    public function getuser($keyword=null){
-        $user=$this->M_user->userList($keyword);
+    public function getuser($page,$pagenum,$keyword=null){
+        $start = ($page*$pagenum)-$pagenum;
+        $end = ($page*$pagenum);
+        $user=$this->M_user->userList($start,$end,$keyword);
         return $user;
     }
     public function getholiday($keyword=null){
