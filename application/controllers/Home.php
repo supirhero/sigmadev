@@ -270,16 +270,16 @@ class Home extends CI_Controller {
         $this->transformKeys($this->datajson);
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
-
-    //Edit User
     public function edit_user(){
+        $nohp = $this->input->post('no_hp');
         $address = $this->input->post('address');
         //setting for upload libary
         $config['upload_path']		= './asset/user/';
         $config['allowed_types']	= 'jpg|png|gif|jpeg';
         $config['max_size']			= 100000;
         $config['max_width']		= 1024;
-        $config['max_height']		= 768;$this->load->library('upload', $config);
+        $config['max_height']		= 768;
+        $this->load->library('upload', $config);
 
         /*for send verification email
         $project_name=$this->M_baseline->selectProjectName($project);
@@ -288,10 +288,10 @@ class Home extends CI_Controller {
         $this->sendVerificationPMO($project_name,$project,$pm_name,$bu_name,$vp_bu);
         */
         //jika gagal upload/ tidak ada file
-        if (! $this->upload->do_upload('image')){
+        if ($this->upload->do_upload('image')){
             //get id rebaseline history
             $updateUser = [
-                'PHONE_NO' => $this->datajson['userdata']['USER_ID'],
+                'PHONE_NO' => $nohp,
                 'ADDRESS' => $address,
                 'IMAGE' => $this->datajson['userdata']['USER_ID'].".jpg",
             ];
@@ -303,7 +303,7 @@ class Home extends CI_Controller {
         // jika ada file evidence / berhasil upload
         else {
             $updateUser = [
-                'PHONE_NO' => $this->datajson['userdata']['USER_ID'],
+                'PHONE_NO' => $nohp,
                 'ADDRESS' => $address,
             ];
             $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
@@ -315,6 +315,7 @@ class Home extends CI_Controller {
 
         echo json_encode($data);
     }
+
     //bu detail
     public function buDetail(){
         $code = ($this->M_project->getBuBasedCode($_POST['bu_code']))[0]['BU_ID'];
