@@ -292,7 +292,7 @@ order siblings by bu_parent_id";
 
     function getAllBU(){
         $result=array();
-        $sql="select * from P_BU WHERE IS_ACTIVE ='1'";
+        $sql="select * from P_BU WHERE IS_ACTIVE ='1' order by BU_PARENT_CODE";
         $q = $this->db->query($sql);
 
         if($q->num_rows() > 0){
