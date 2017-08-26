@@ -303,7 +303,7 @@ class Home extends CI_Controller {
         }
         // jika ada file evidence / berhasil upload
         else {
-            $datai['error'] = $this->upload->display_errors()."aa";
+            $data['error'] = $this->upload->display_errors()."aa";
 
             $updateUser = [
                 'PHONE_NO' => $nohp,
