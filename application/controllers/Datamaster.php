@@ -61,6 +61,10 @@ class Datamaster extends CI_Controller{
             $this->M_session->update_session($this->datajson['token']);
         }
 
+        if(!isset($this->datajson['userdata']['PROF_ID']))
+        {
+            $this->datajson['userdata']['PROF_ID'] = 7;
+        }
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
