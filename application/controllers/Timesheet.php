@@ -378,11 +378,8 @@ class Timesheet extends CI_Controller {
 
         $project_id   = $_POST['PROJECT_ID'];
         $wp_id = $_POST['WP_ID'];
-
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         //check rebaseline status for task
-
-
 
         if($statusProject == 'On Hold'){
 
@@ -466,8 +463,9 @@ class Timesheet extends CI_Controller {
             $returndata['message'] = "add timesheet succcess ";
         }
         else{
+            $this->output->set_status_header(400);
             $returndata['status'] = "failed";
-            $returndata['message'] = "project status is not in progress";
+            $returndata['message'] = "Status project tidak dalam In Progress atau On Hold";
         }
 
         echo json_encode($returndata);
