@@ -143,8 +143,12 @@ Class M_user extends CI_Model{
         $this->db->where('EMAIL',$email);
         $this->db->delete('VERIFICATION');
     }
-    public function userList($keyword=null){
-      $sql ="select u.*,b.bu_name from users u join p_bu b on u.bu_id=b.bu_id ";
+    public function userList($start=0,$end=20,$keyword=null){
+      $sql ="SELECT * FROM 
+(select u.*,b.bu_name,
+ROW_NUMBER() OVER (ORDER BY b.bu_name) Row_Num
+ from users u 
+join p_bu b on u.bu_id=b.bu_id ";
       if ($keyword!=null) {
         $keyword=strtolower($keyword);
         $sql.=" where ";
@@ -153,6 +157,7 @@ Class M_user extends CI_Model{
         $sql.=" lower(email) like '%".$keyword."%' or";
         $sql.=" lower(bu_name) like '%".$keyword."%'";
       }
+      $sql .=") WHERE Row_Num BETWEEN $start and $end";
       $res=$this->db->query($sql);
       return $res->result_array();
     }
