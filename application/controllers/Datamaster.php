@@ -61,8 +61,10 @@ class Datamaster extends CI_Controller{
             $this->M_session->update_session($this->datajson['token']);
         }
 
+
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
+        /*
         //PRIVILEGE CHECKER
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
