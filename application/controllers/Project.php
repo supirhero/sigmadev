@@ -35,6 +35,7 @@ class Project extends CI_Controller
             echo json_encode($error);
             die();
         }
+
         //if login success
         if(!isset($decoded_user_data[0])){
             //get user data from token
