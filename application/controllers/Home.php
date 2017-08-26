@@ -271,6 +271,50 @@ class Home extends CI_Controller {
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
 
+    //Edit User
+    public function edit_user(){
+        $address = $this->input->post('address');
+        //setting for upload libary
+        $config['upload_path']		= './asset/user/';
+        $config['allowed_types']	= 'jpg|png|gif|jpeg';
+        $config['max_size']			= 100000;
+        $config['max_width']		= 1024;
+        $config['max_height']		= 768;$this->load->library('upload', $config);
+
+        /*for send verification email
+        $project_name=$this->M_baseline->selectProjectName($project);
+        $pm_name=$this->M_baseline->selectProjectPmName($project);
+        $bu_name=$this->M_baseline->selectProjectBUName($project);
+        $this->sendVerificationPMO($project_name,$project,$pm_name,$bu_name,$vp_bu);
+        */
+        //jika gagal upload/ tidak ada file
+        if (! $this->upload->do_upload('image')){
+            //get id rebaseline history
+            $updateUser = [
+                'PHONE_NO' => $this->datajson['userdata']['USER_ID'],
+                'ADDRESS' => $address,
+                'IMAGE' => $this->datajson['userdata']['USER_ID'].".jpg",
+            ];
+            $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
+            $this->db->update('USERS', $updateUser);
+            $data['message'] = 'user updated';
+
+        }
+        // jika ada file evidence / berhasil upload
+        else {
+            $updateUser = [
+                'PHONE_NO' => $this->datajson['userdata']['USER_ID'],
+                'ADDRESS' => $address,
+            ];
+            $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
+            $this->db->update('USERS', $updateUser);
+
+            $data['message'] = 'user updated without img';
+        }
+
+
+        echo json_encode($data);
+    }
     //bu detail
     public function buDetail(){
         $code = ($this->M_project->getBuBasedCode($_POST['bu_code']))[0]['BU_ID'];
