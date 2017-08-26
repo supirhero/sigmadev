@@ -69,6 +69,7 @@ class Datamaster extends CI_Controller{
         /*===============================================================================*/
         //PRIVILEGE CHECKER
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
+        $url_dest = "report/r_overview";
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
                                     join access_url au
@@ -83,6 +84,7 @@ class Datamaster extends CI_Controller{
         $all_user_project_id = $this->db->query("select project_id from resource_pool 
                                                                     where user_id = '".$this->datajson['userdata']['USER_ID']."'
                                                                ")->result_array();
+
         //store list project
         $list_project_id =[];
         foreach ($all_user_project_id as $projecti){
@@ -91,7 +93,7 @@ class Datamaster extends CI_Controller{
         $profile_id = $this->datajson['userdata']['PROF_ID'];
         foreach($privilege as $priv){
             //bypass privilege if user is prouds admin
-            if($profile_id != 7){
+            if($profile_id == 7){
                 //jika akses url ada di dalam db
                 if($priv['ACCESS_URL'] == $url_dest){
                     //jika akses tipe nya business
@@ -253,6 +255,10 @@ class Datamaster extends CI_Controller{
                 }
             }
         }
+        print_r($this->bu_id);
+        print_r($returndata);
+        print_r($project_id_req);
+        die;
         /*===============================================================================*/
 
     }
