@@ -65,17 +65,37 @@ class Iwo extends CI_Controller {
             $offset = 0;
         }
 
+        $usediwo = $this->db->query("select distinct iwo_no from projects")->result_array();
+
          //get iwo
         @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo/');
         $IWO = array();
         $IWO = json_decode($json, true);
 
-        $IWO_VIEW['iwo'] = [];
-        for($i = $offset;$i < $offset+49 ; $i++){
-            array_push($IWO_VIEW['iwo'],$IWO[$i]);
+        $result_iwo1 = [];
+        $result_iwo2 = [];
+
+
+
+        foreach ($usediwo as $ui){
+            $result_iwo2[] = $ui['IWO_NO'];
         }
 
-        echo json_encode($IWO_VIEW);
+        foreach($IWO as $iwo){
+            $result_iwo1[] = $iwo['IWO_NO'];
+        }
+
+
+
+        $result_iwo = array_diff($result_iwo1,$result_iwo2);
+        foreach ($result_iwo as $key => $val)
+        {
+           $hasil['iwo'][]= $IWO[$key];
+        }
+        //echo json_encode($result_iwo);
+
+        echo json_encode($hasil);
+
 
     }
 
