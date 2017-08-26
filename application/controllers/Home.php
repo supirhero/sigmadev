@@ -611,8 +611,6 @@ class Home extends CI_Controller {
         $prof = $this->datajson['userdata']['PROF_ID'];
         $id = $this->datajson['userdata']['USER_ID'];
         $projecttemp = $this->M_project->getUsersProject($id);
-        echo $this->db->last_query();
-        die;
         for($iter = 0 ; $iter < count($projecttemp) ; $iter ++){
             if($projecttemp[$iter]['PROJECT_COMPLETE'] == null){
                 $projecttemp[$iter]['PROJECT_COMPLETE'] = 0;
