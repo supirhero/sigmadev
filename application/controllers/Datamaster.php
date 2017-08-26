@@ -13,6 +13,7 @@ class Datamaster extends CI_Controller{
         $this->load->model('M_business');
         $this->load->model('M_mis');
         $this->load->model('M_project_type');
+        error_reporting(E_ALL & ~E_NOTICE);
 
 
         //TOKEN LOGIN CHECKER
