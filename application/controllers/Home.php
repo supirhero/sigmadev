@@ -274,7 +274,7 @@ class Home extends CI_Controller {
         $nohp = $this->input->post('no_hp');
         $address = $this->input->post('address');
         //setting for upload libary
-        $config['upload_path']		= './asset/user/';
+        $config['upload_path']		= 'asset/user/';
         $config['allowed_types']	= 'jpg|png|gif|jpeg';
         $config['overwrite'] = TRUE;
         $config['max_size']			= 100000;
@@ -303,7 +303,7 @@ class Home extends CI_Controller {
         }
         // jika ada file evidence / berhasil upload
         else {
-            $data['error'] = $this->upload->display_errors()."aa";
+            $data['error'] = $this->upload->display_errors();
 
             $updateUser = [
                 'PHONE_NO' => $nohp,
