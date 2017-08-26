@@ -281,6 +281,8 @@ class Home extends CI_Controller {
         $config['max_width']		= 1024;
         $config['max_height']		= 768;
         $this->load->library('upload', $config);
+        var_dump(is_dir($config['upload_path'])); //return false
+        var_dump(is_writable($config['upload_path']));  //return false
 
         /*for send verification email
         $project_name=$this->M_baseline->selectProjectName($project);
