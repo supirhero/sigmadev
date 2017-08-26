@@ -67,62 +67,63 @@ class Datamaster extends CI_Controller{
     public function getData($type,$keyword=null){
         switch ($type) {
             case 'bu':
-                $this->getbu($keyword);
+                $result[$type]= $this->getbu($keyword);
                 break;
             case 'user':
-                $this->getuser($keyword);
+                $result[$type]=  $this->getuser($keyword);
                 break;
             case 'customer':
-                $this->getcustomer();
+                $result[$type]=   $this->getcustomer();
                 break;
             case 'partner':
-                $this->getpartner();
+                $result[$type]=   $this->getpartner();
                 break;
             case 'holiday':
-                $this->getholiday($keyword);
+                $result[$type]=   $this->getholiday($keyword);
                 break;
             case 'project_type':
-                $this->getproject_type($keyword);
+                $result[$type]=  $this->getproject_type($keyword);
                 break;
             default:
                 # code...
                 break;
         }
+        echo json_encode($result);
     }
     public function getbu($keyword=null){
-        $bu=$this->M_business->buListDet($keyword);
-        echo json_encode($bu);
+        $bu[""]=$this->M_business->buListDet($keyword);
+        return $bu;
     }
     public function getuser($keyword=null){
         $user=$this->M_user->userList($keyword);
-        echo json_encode($user);
+        return $user;
     }
     public function getholiday($keyword=null){
         $holiday=$this->M_holiday->selectHoliday($keyword);
-        echo json_encode($holiday);
+        return $holiday;
     }
     public function getproject_type($keyword=null){
         $data=$this->M_project_type->selectProjectType($keyword);
-        echo json_encode($data);
+        return $data;
     }
     public function getcustomer(){
         $data=$this->M_mis->getcustomerMIS();
-        echo $data;
+        return $data;
     }
     public function getpartner(){
         $data=$this->M_mis->getpartnerMIS();
-        echo $data;
+        return $data;
     }
     public function manage($type,$action){
         switch ($type) {
             case 'bu':
-                $this->bu($action);
+                return   $this->bu($action);
                 break;
             case 'user':
-                $this->user($action);
+                return    $this->user($action);
                 break;
             case 'holiday':
-                $this->holiday($action);
+                return   $this->holiday($action);
                 break;
             default:
                 # code...

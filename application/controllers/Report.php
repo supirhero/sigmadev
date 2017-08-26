@@ -791,7 +791,7 @@ group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
     }
 
     //report monthly overview
-    public function r_month(){
+    public function r_monthly(){
         $tahun = $this->input->post('tahun');
         $month = date("M", mktime(0, 0, 0, $this->input->post('bulan'), 10));
 
