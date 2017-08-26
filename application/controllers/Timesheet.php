@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Timesheet extends CI_Controller {
 
     public $datajson = array();
-
+    public
 
     function __construct()
     {
@@ -375,13 +375,16 @@ class Timesheet extends CI_Controller {
         $data['LONGITUDE'] = $this->input->post("LONGITUDE");
         $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
         $data['WP_ID'] = $this->input->post("WP_ID");
+        $data['SUBMIT_DATE']= date('Y-m-d h:i:s');
 
         $project_id   = $_POST['PROJECT_ID'];
         $wp_id = $_POST['WP_ID'];
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         //check rebaseline status for task
 
-        if($statusProject == 'On Hold'){
+        $statusProject = strtolower($statusProject);
+
+        if($statusProject == 'on hold'){
 
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
             //check member wbs_pool status if it need rebaseline approval
@@ -457,7 +460,7 @@ class Timesheet extends CI_Controller {
             }
 
         }
-        elseif($statusProject == 'In Progress'){
+        elseif($statusProject == 'in progress'){
             $this->M_timesheet->inputTimesheet($data);
             $returndata['status'] = "success";
             $returndata['message'] = "add timesheet succcess ";
