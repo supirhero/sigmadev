@@ -60,7 +60,7 @@ class Task extends CI_Controller
                                     order by al.type asc
                                     ")->result_array();
         //get user project
-        $all_user_project_id = $this->db->query("select project_id from resource_pool 
+        $all_user_project_id = $this->db->query("select project_id from resource_pool
                                                                     where user_id = '".$this->datajson['userdata']['USER_ID']."'
                                                                ")->result_array();
         //store list project
@@ -82,12 +82,12 @@ class Task extends CI_Controller
                         elseif($priv['PRIVILEGE'] == 'only_bu'){
                             switch ($priv['ACCESS_ID']){
                                 case '1':
-                                    $bu_id = $this->db->query(" select p_bu.bu_id 
+                                    $bu_id = $this->db->query(" select p_bu.bu_id
                                                             from (select wp_id,wbs_id from wbs_pool
-                                                            union 
+                                                            union
                                                             select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             join (select wbs_id,project_id from wbs union select wbs_id,project_id from temporary_wbs) wbs
-                                                            on wbs_pool.wbs_id = wbs.wbs_id 
+                                                            on wbs_pool.wbs_id = wbs.wbs_id
                                                             join projects
                                                             on wbs.project_id = projects.project_id
                                                             join p_bu
@@ -104,17 +104,17 @@ class Task extends CI_Controller
                                 case '4' :
                                     break;
                                 case '5' :
-                                    $bu_id = $this->db->query("select p_bu.bu_id from 
+                                    $bu_id = $this->db->query("select p_bu.bu_id from
                                                             (select ts_id,wp_id from timesheet union select ts_id,wp_id from temporary_timesheet) timesheet
-                                                            JOIN 
+                                                            JOIN
                                                             (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             on timesheet.wp_id = wbs_pool.wp_id
-                                                            JOIN 
+                                                            JOIN
                                                             (select project_id,wbs_id from wbs union select project_id,wbs_id from temporary_wbs) wbs
                                                             on wbs_pool.wbs_id = wbs.wbs_id
                                                             JOIN projects
                                                             on wbs.project_id = projects.project_id
-                                                            JOIN p_bu 
+                                                            JOIN p_bu
                                                             on projects.bu_code = p_bu.bu_code
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
                                                             and projects.project_type_id = 'Non Project'
@@ -479,9 +479,9 @@ class Task extends CI_Controller
                                                 join TEMPORARY_WBS_POOL on TEMPORARY_WBS_POOL.RP_ID = RESOURCE_POOL.RP_ID
                                                 WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id in(
                                                   select user_id
-                                                  from temporary_wbs_pool 
-                                                  inner join resource_pool 
-                                                  on temporary_wbs_pool.rp_id=resource_pool.rp_id 
+                                                  from temporary_wbs_pool
+                                                  inner join resource_pool
+                                                  on temporary_wbs_pool.rp_id=resource_pool.rp_id
                                                   where wbs_id='$wbs_id')
                                                 group by RESOURCE_POOL.RP_ID, users.user_name,users.email,action")->result_array();
         echo json_encode($data);
@@ -617,14 +617,14 @@ class Task extends CI_Controller
                 //  $dataexcel[$i-1]['PHASE']= $data['cells'][$i][8];
                 //$dataexcel[$i-1]['EFFORT_DRIVEN']= $data['cells'][$i][9];
                 //$dataexcel[$i-1]['WORK']=trim($data['cells'][$i][5]," hrs");
-                $dur =$this->countDuration(date_format(date_create($data['cells'][$i][6]),"Y/m/d"), date_format(date_create($data['cells'][$i][7]),"Y/m/d"));
+                @$dur =$this->countDuration(date_format(date_create($data['cells'][$i][6]),"Y/m/d"), date_format(date_create($data['cells'][$i][7]),"Y/m/d"));
                 //$dataexcel[$i-1]['DURATION']= floor(trim($data['cells'][$i][5]," days"));
                 $dataexcel[$i-1]['DURATION']= $dur;
                 //$dataexcel[$i-1]['START_DATE']= date('d/m/Y',strtotime($data['cells'][$i][6]));
-                $dataexcel[$i-1]['START_DATE']= date_format(date_create($data['cells'][$i][6]),"d/m/Y");
+                @$dataexcel[$i-1]['START_DATE']= date_format(date_create($data['cells'][$i][6]),"d/m/Y");
                 $dataexcel[$i-1]['START_DATEs']= $data['cells'][$i][6];
                 //$dataexcel[$i-1]['ACTUAL_START_DATE']= $data['cells'][$i][11];
-                $dataexcel[$i-1]['FINISH_DATE']= date_format(date_create($data['cells'][$i][7]),"d/m/Y");
+                @$dataexcel[$i-1]['FINISH_DATE']= date_format(date_create($data['cells'][$i][7]),"d/m/Y");
                 //$dataexcel[$i-1]['FINISH_DATE']= date('d/m/Y',strtotime($data['cells'][$i][7]));
                 $dataexcel[$i-1]['FINISH_DATEs']= $data['cells'][$i][7];
                 //$dataexcel[$i-1]['ACTUAL_FINISH_DATE']= $data['cells'][$i][13];
@@ -648,8 +648,7 @@ class Task extends CI_Controller
                 //$dataexcel[$i-1]['END_DATE']= $data['cells'][$i][31];
             }
 
-            print($data);
-            die;
+
             //echo json_encode($dataexcel);
             $this->M_wbs->tambahwbs($dataexcel);
             //$data['ini']=$dataexcel;
