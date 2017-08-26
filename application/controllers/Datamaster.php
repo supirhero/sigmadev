@@ -91,7 +91,7 @@ class Datamaster extends CI_Controller{
         echo json_encode($result);
     }
     public function getbu($keyword=null){
-        $bu[""]=$this->M_business->buListDet($keyword);
+        $bu=$this->M_business->buListDet($keyword);
         return $bu;
     }
     public function getuser($keyword=null){
