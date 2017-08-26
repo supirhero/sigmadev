@@ -67,6 +67,8 @@ class Home extends CI_Controller {
             $this->M_session->update_session($this->datajson['token']);
         }
 
+        /*FOR PRIVILEGE*/
+        /*===============================================================================*/
         //PRIVILEGE CHECKER
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
@@ -77,7 +79,18 @@ class Home extends CI_Controller {
                                     on
                                     pal.access_id = au.access_id
                                     where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
+                                    order by al.type asc
                                     ")->result_array();
+
+        //get user project
+        $all_user_project_id = $this->db->query("select project_id from resource_pool 
+                                                                    where user_id = '".$this->datajson['userdata']['USER_ID']."'
+                                                               ")->result_array();
+        //store list project
+        $list_project_id =[];
+        foreach ($all_user_project_id as $projecti){
+            array_push($list_project_id,$projecti['PROJECT_ID']);
+        }
 
         foreach($privilege as $priv){
             //jika akses url ada di dalam db
@@ -85,6 +98,7 @@ class Home extends CI_Controller {
                 //jika akses tipe nya business
                 if($priv['TYPE'] == 'BUSINESS'){
                     if($priv['PRIVILEGE'] == 'all_bu'){
+
                     }
                     elseif($priv['PRIVILEGE'] == 'only_bu'){
                         switch ($priv['ACCESS_ID']){
@@ -124,12 +138,42 @@ class Home extends CI_Controller {
                                                             JOIN p_bu 
                                                             on projects.bu_code = p_bu.bu_code
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
+                                                            and projects.project_type_id = 'Non Project'
                                                             ")->row()->BU_ID;
                                 break;
                             case '6' :
-                                $this->bu_id = $this->db->query("select p_bu.bu_alias from p_bu where p_bu.bu_id = '".$this->datajson['userdata']['BU_ID']."'")->BU_ALIAS;
+                                $databu = $this->db->query("select p_bu.bu_id,bu_parent_id from p_bu where p_bu.bu_id = '".$this->datajson['userdata']['BU_ID']."'")->row_array();
+                                if($databu['BU_ID'] == 0){
+                                    $this->bu_id = $this->db->query('select bu_id from p_bu')->result_array();
+                                }
+                                elseif ($databu['BU_PARENT_ID'] == 0){
+                                    $this->bu_id = $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID']."")->result_array();
+                                }
+                                else{
+                                    $this->bu_id[0]['BU_ID'] = $this->datajson['userdata']['BU_ID'];
+                                }
+                                $bu_id = 'masuk';
                                 break;
+                            case '7':
+                                $bu_id = $_POST['BU_ID'];
+                                break;
+                            case '8':
 
+                                break;
+                            case '9':
+                                $projectid = $_POST['project_id'];
+                                $databu = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row_array();
+                                if($databu['BU_ID'] == 0){
+                                    $this->bu_id = $this->db->query('select bu_id from p_bu')->result_array();
+                                }
+                                elseif ($databu['BU_PARENT_ID'] == 0){
+                                    $this->bu_id = $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID']."")->result_array();
+                                }
+                                else{
+                                    $this->bu_id[0]['BU_ID'] = $this->datajson['userdata']['BU_ID'];
+                                }
+                                $bu_id='masuk';
+                                break;
                         }
 
                         if($this->datajson['userdata']['BU_ID'] == $bu_id || $bu_id == 'masuk'){
@@ -145,13 +189,71 @@ class Home extends CI_Controller {
 
                     }
                     else{
-
+                        $returndata['status'] = 'denied';
+                        $returndata['message'] = 'you dont have permission to access this action';
+                        echo json_encode($returndata);
+                        die;
                     }
 
                 }
+                elseif($priv['TYPE'] == 'PROJECT'){
+                    if($priv['PRIVILEGE'] == 'can'){
+                        switch ($priv['ACCESS_ID']){
+                            case '10':
+                                switch ($url_dest){
+                                    case 'task/createtask':
+                                        $project_id_req = $_POST['PROJECT_ID'];
+                                        break;
+                                    case 'task/upload_wbs':
+                                        $project_id_req = $_POST['PROJECT_ID'];
+                                        break;
+                                    case 'task/deletetask':
+                                        $id = $_POST['wbs_id'];
+                                        $project_id_req = $this->M_detail_project->getProjectTask($id);
+
+                                        break;
+                                }
+                                break;
+                            case '11':
+                                $project_id_req = explode(".",$_POST['WBS_ID']);
+                                $project_id_req = $project_id_req[0];
+                                break;
+                            case '12':
+                                $project_id_req = $_POST['project_id'];
+                                break;
+                            case '13':
+                                $project_id_req = $_POST['PROJECT_ID'];
+                                break;
+                            case '14':
+                                $project_id_req = $_POST['project_id'];
+                                break;
+                            case '15':
+                                $project_id_req = $_POST['PROJECT_ID'];
+                                break;
+                            case '16':
+                                $project_id_req = $this->uri->segment(3);
+                                break;
+                        }
+                    }
+                    else{
+
+                    }
+                    if(!in_array($project_id_req,$list_project_id)){
+                        $returndata['status'] = 'denied';
+                        $returndata['message'] = 'you dont have permission to access this action';
+                        echo json_encode($returndata);
+                        die;
+                    }
+                }
+                else{
+                    $returndata['status'] = 'denied';
+                    $returndata['message'] = 'you dont have permission to access this action';
+                    echo json_encode($returndata);
+                    die;
+                }
             }
         }
-
+        /*===============================================================================*/
 
     }
 
