@@ -271,6 +271,57 @@ class Home extends CI_Controller {
         $this->transformKeys($this->datajson);
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
+    public function edit_user(){
+        $nohp = $this->input->post('no_hp');
+        $address = $this->input->post('address');
+        //setting for upload libary
+        $config['upload_path']		= 'asset/user/';
+        $config['allowed_types']	= 'jpg|png|gif|jpeg';
+        $config['overwrite'] = TRUE;
+        $config['max_size']			= 100000;
+        $config['max_width']		= 1024;
+        $config['max_height']		= 768;
+        $this->load->library('upload', $config);
+        var_dump(is_dir($config['upload_path'])); //return false
+        var_dump(is_writable($config['upload_path']));  //return false
+
+        /*for send verification email
+        $project_name=$this->M_baseline->selectProjectName($project);
+        $pm_name=$this->M_baseline->selectProjectPmName($project);
+        $bu_name=$this->M_baseline->selectProjectBUName($project);
+        $this->sendVerificationPMO($project_name,$project,$pm_name,$bu_name,$vp_bu);
+        */
+        //jika gagal upload/ tidak ada file
+        if ($this->upload->do_upload('image')){
+            //get id rebaseline history
+            $updateUser = [
+                'PHONE_NO' => $nohp,
+                'ADDRESS' => $address,
+                'IMAGE' => $this->datajson['userdata']['USER_ID'].".jpg",
+            ];
+            $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
+            $this->db->update('USERS', $updateUser);
+            $data['message'] = 'user updated';
+
+        }
+        // jika ada file evidence / berhasil upload
+        else {
+            $data['config'] = $config;
+            $data['error'] = $this->upload->display_errors();
+
+            $updateUser = [
+                'PHONE_NO' => $nohp,
+                'ADDRESS' => $address,
+            ];
+            $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
+            $this->db->update('USERS', $updateUser);
+
+            $data['message'] = 'user updated without img';
+        }
+
+
+        echo json_encode($data);
+    }
 
     //bu detail
     public function buDetail(){
