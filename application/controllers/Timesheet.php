@@ -472,6 +472,11 @@ class Timesheet extends CI_Controller {
             $returndata['status'] = "success";
             $returndata['message'] = "add timesheet succcess ";
         }
+        elseif ($statusProject == null || $statusProject == ""){
+            $this->output->set_status_header(400);
+            $returndata['status'] = "failed";
+            $returndata['message'] = "Gagal mendapatkan status project";
+        }
         else{
             $this->output->set_status_header(400);
             $returndata['status'] = "failed";
