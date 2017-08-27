@@ -604,7 +604,7 @@ class Home extends CI_Controller {
        //$data['footer']=($this->load->view('v_footer2'));
    }
     public function timesheet($date=null){
-        $user_id = $this->datajson['userdata']['USER_NAME'];
+        $user_id = $this->datajson['userdata']['USER_ID'];
         if($date == NULL)
             $date = date("Y-m-d", strtotime("today"));
       //  $date = date("d M Y", strtotime($date));
@@ -630,15 +630,18 @@ class Home extends CI_Controller {
                 );
             }
             else{
+                $hour = $this->M_timesheet->Timesheet_bydate($user_id,$date);
                 $data["weekdays"][$day[$i]]=array(
                     "holiday"=>false,
-                    "work_hour"=>8
+                    "work_hour"=>$hour
                 );
+                $day[$day[$i]];
             }
         }
 
         $data['holiday']=$holidays;
         //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
+        $data['tampil_Timesheet']=($this->M_timesheet->Timesheet_bydate($user_id,$date));
 
         print_r(json_encode($data));
     }
