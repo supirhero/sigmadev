@@ -8,7 +8,7 @@ class Home extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-        error_reporting(E_ALL & ~E_NOTICE);
+        error_reporting(E_ALL  & ~E_NOTICE);
 
         $this->load->model('M_home');
         $this->load->model('M_project');
@@ -637,7 +637,12 @@ class Home extends CI_Controller {
                 }
                 $hasil['allentry'][$i][0]= $dateObj->format('M');
                 //$dateObj->format('m');
-                $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
+                //test
+                if($hasilAllentry['JML_ENTRY_BULANAN']>0 && $durasi[$i] >0)
+                    $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
+                else
+                    $hasil['allentry'][$i][1]=0;
+
 
                 $i++;
             }
@@ -658,7 +663,10 @@ class Home extends CI_Controller {
                 }
                 //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
                 $hasil['allhour'][$i][0]= $dateObj->format('M');
-                $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
+                if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour[$i] >0)
+                    $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
+                else
+                    $hasil['allhour'][$i][1]=0;
                 $i++;
             }
             $hasil['an']="";
@@ -825,7 +833,7 @@ class Home extends CI_Controller {
             }
             else{
                 $hour = $this->M_timesheet->Timesheet_bydate($user_id,$date);
-                $hour = ($hour <= 0) ? 0 : $hour;
+                $hour = ($hour == NULL) ? 0 : $hour;
 
                 $data["weekdays"][$i]=array(
                     "day"=>$day[$i],

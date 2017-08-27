@@ -536,8 +536,10 @@ class Report extends CI_Controller {
             else{
                 $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
             }
-            array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
-
+            if($hasilAllentry['JML_ENTRY_BULANAN']>0 && $durasi >0)
+                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
+            else
+                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>0]);
         }
 
 
@@ -557,7 +559,10 @@ class Report extends CI_Controller {
                 $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
             }
             //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-            array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+            if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour >0)
+                array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+            else
+                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>0]);
         }
 
         $hasil['total_hours']=$total_hours;
@@ -586,7 +591,10 @@ class Report extends CI_Controller {
             else{
                 $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
             }
-            array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
+            if($hasilAllentry['JML_ENTRY_BULANAN']>0 && $durasi >0)
+                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
+            else
+                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>0]);
 
         }
 
@@ -607,7 +615,11 @@ class Report extends CI_Controller {
                 $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
             }
             //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-            array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+            if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour >0)
+                array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+            else
+                array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>0]);
+
         }
         echo json_encode($hasil);
     }
