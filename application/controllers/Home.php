@@ -665,6 +665,8 @@ class Home extends CI_Controller {
                 $hasil['allhour'][$i][0]= $dateObj->format('M');
                 if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour[$i] >0)
                     $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
+                else
+                    $hasil['allhour'][$i][1]=0;
                 $i++;
             }
             $hasil['an']="";
