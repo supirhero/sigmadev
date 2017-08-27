@@ -272,7 +272,9 @@ class Home extends CI_Controller {
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
     public function userdata(){
-    $this->datajson['userdata']["prof_name"]="Pangeran";
+
+$prof_name = $this->m_user->GetProfile($this->datajson['userdata']["PROF_ID"]);
+    $this->datajson['userdata']["prof_name"]=$prof_name;
         $data["userdata"]=array_change_key_case($this->datajson['userdata'],CASE_LOWER);
         echo json_encode($data);
     }

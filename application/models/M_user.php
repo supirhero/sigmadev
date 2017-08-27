@@ -17,6 +17,14 @@ Class M_user extends CI_Model{
         }
         return $result;
     }
+    function GetProfile($profile_id){
+        //return $this->db->get_where($table,$where);
+        $result=array();
+        $sql="select * from profile where PROF_ID='".$profile_id."'";
+        $q = $this->db->query($sql);
+$result = $q->result_array();
+        return $result["PROF_NAME"];
+    }
 
     function GetOldPass($password){
         $this->db->where("PASSWORD",$password);
