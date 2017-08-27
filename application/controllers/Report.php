@@ -589,7 +589,7 @@ class Report extends CI_Controller {
             if($hasilAllentry['JML_ENTRY_BULANAN']>0 && $durasi >0)
                 array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
             else
-                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>0);
+                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>0]);
 
         }
 
