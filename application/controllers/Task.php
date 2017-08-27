@@ -291,7 +291,9 @@ class Task extends CI_Controller
         $project_id   = $this->input->post("PROJECT_ID");
 
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
-        if($statusProject == 'On Hold'){
+        $statusProject =strtolower($statusProject);
+
+        if($statusProject == 'on hold'){
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
             //wbs id same with project id
             $data['WBS_NAME'] = $this->input->post("WBS_NAME");
@@ -306,7 +308,7 @@ class Task extends CI_Controller
             $status['status'] = 'success';
             $status['message'] = 'Task berhasil di tambah temporary';
         }
-        elseif($statusProject == 'Not Started'){
+        elseif($statusProject == 'not started'){
             //wbs id same with project id
             $data['WBS_NAME'] = $this->input->post("WBS_NAME");
             $data['WBS_ID'] = $project_id;
@@ -342,8 +344,9 @@ class Task extends CI_Controller
             $status['message'] = 'Task berhasil di tambah';
         }
         else{
+            $this->output->set_status_header(400);
             $status['status'] = 'failed';
-            $status['message'] = 'Project sudah on progress';
+            $status['message'] = "Status Project anda $statusProject";
         }
         echo json_encode($status);
     }

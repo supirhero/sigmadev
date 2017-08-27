@@ -64,7 +64,7 @@ class Project extends CI_Controller
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-
+/*
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -477,6 +477,7 @@ class Project extends CI_Controller
             $returndata['message'] = 'success edit project';
         }
         else{
+            $this->output->set_status_header(400);
             $returndata['status']='error';
             $returndata['message'] = 'error edit project';
         }

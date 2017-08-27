@@ -4,7 +4,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Timesheet extends CI_Controller {
 
     public $datajson = array();
-    public
+    public $bu_id;
+    public $project;
 
     function __construct()
     {
@@ -63,7 +64,7 @@ class Timesheet extends CI_Controller {
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-        /*
+/*
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -118,6 +119,7 @@ class Timesheet extends CI_Controller {
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
                                     break;
                                 case '4' :
+
                                     break;
                                 case '5' :
                                     $bu_id = $this->db->query("select p_bu.bu_id from 
@@ -175,8 +177,9 @@ class Timesheet extends CI_Controller {
 
                             }
                             else{
-                                $returndata['status'] = 'denied';
-                                $returndata['message'] = 'you dont have permission to access this action';
+                                $this->output->set_status_header(400);
+                                $returndata['status'] = 'failed';
+                                $returndata['message'] = 'Anda tidak memiliki hak akses untuk mengakses feature ini';
                                 echo json_encode($returndata);
                                 die;
                             }
@@ -378,6 +381,10 @@ class Timesheet extends CI_Controller {
         $data['SUBMIT_DATE']= date('Y-m-d h:i:s');
 
         $project_id   = $_POST['PROJECT_ID'];
+
+        //check bu_id
+
+
         $wp_id = $_POST['WP_ID'];
         $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         //check rebaseline status for task
@@ -468,7 +475,7 @@ class Timesheet extends CI_Controller {
         else{
             $this->output->set_status_header(400);
             $returndata['status'] = "failed";
-            $returndata['message'] = "Status project tidak dalam In Progress atau On Hold";
+            $returndata['message'] = "Status project harus in-progress atau on-hold";
         }
 
         echo json_encode($returndata);
