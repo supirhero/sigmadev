@@ -460,10 +460,40 @@ class Project extends CI_Controller
         $data['project_status'] = ['Not Started','In Progress','On Hold','Completed','Cancelled'];
         $data['project_type'] = [];
         $project_type = $this->db->query('select project_type from p_project_type')->result_array();
+
         foreach ($project_type as $type){
             array_push($data['project_type'],$type['PROJECT_TYPE']);
         }
+        $usediwo = $this->db->query("select distinct iwo_no from projects")->result_array();
 
+        //get iwo
+        @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo/');
+        $IWO = array();
+        $IWO = json_decode($json, true);
+
+        $result_iwo1 = [];
+        $result_iwo2 = [];
+
+
+
+        foreach ($usediwo as $ui){
+            $result_iwo2[] = $ui['IWO_NO'];
+        }
+
+        foreach($IWO as $iwo){
+            $result_iwo1[] = $iwo['IWO_NO'];
+        }
+
+
+
+        $result_iwo = array_diff($result_iwo1,$result_iwo2);
+        foreach ($result_iwo as $key => $val)
+        {
+            $hasil['iwo'][]= $IWO[$key];
+        }
+        //echo json_encode($result_iwo);
+
+        $data["iwolist"]=$hasil['iwo'];
 
         $this->transformKeys($data);
         echo json_encode($data);
