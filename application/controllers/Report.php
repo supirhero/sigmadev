@@ -1099,7 +1099,7 @@ group by project_id) a inner join
             projects c on c.project_id=a.project_id
             inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
             where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
-and type_of_effort in (1,2)
+and type_of_effort in ('1','2')
 and pv!='0' 
 and b.BU_CODE !='PROUDS'
 and b.BU_code !='GTS'
@@ -1111,55 +1111,55 @@ group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
     }
     //report yearly overview
     public function r_yearly($year=false){
-if(!$year)
-{
-    $year=date("Y");
-}
-$listBU=explode(",",$this->input->post('bu_aliases'));
+        if(!$year)
+        {
+            $year=date("Y");
+        }
+        $listBU=explode(",",$this->input->post('bu_aliases'));
         foreach ($listBU as &$value) {
             $list[] = "'".$value."'";
         }
         for($i=1; $i<=12; $i++)
-{
-    $month = date("M", mktime(0, 0, 0, $i, 10));
-    $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-                round(sum(ev)/count(c.project_id),2) as EV,
-                round(sum(pv)/count(c.project_id),2) as PV,
-                round(sum(AC)/count(c.project_id),2) as AC,
-                case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-                case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-             from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-project_id
-from tb_rekap_project
-where  to_char(tanggal,'Mon-YYYY')='$month-$year'
-group by project_id) a inner join
-            projects c on c.project_id=a.project_id
-            inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
-and type_of_effort in (1,2)
-and pv!='0' 
-and b.BU_CODE !='PROUDS'
-and b.BU_code !='GTS'
-and b.BU_code !='NSM' 
-group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
-            order by b.bu_name");
-    $hasil =$query->result();
-    $anu = array("name" => $month);
-    $anuz = array("name" => $month);
+        {
+            $month = date("M", mktime(0, 0, 0, $i, 10));
+            $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+                        round(sum(ev)/count(c.project_id),2) as EV,
+                        round(sum(pv)/count(c.project_id),2) as PV,
+                        round(sum(AC)/count(c.project_id),2) as AC,
+                        case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+                        case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+                     from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
+        case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
+        case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+        project_id
+        from tb_rekap_project
+        where  to_char(tanggal,'Mon-YYYY')='$month-$year'
+        group by project_id) a inner join
+                    projects c on c.project_id=a.project_id
+                    inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+                    where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
+        and type_of_effort in ('1','2')
+        and pv!='0' 
+        and b.BU_CODE !='PROUDS'
+        and b.BU_code !='GTS'
+        and b.BU_code !='NSM' 
+        group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+                    order by b.bu_name");
+            $hasil =$query->result();
+            $anu = array("name" => $month);
+            $anuz = array("name" => $month);
 
-    for($o=0; $o<count($hasil); $o++)
-    {
-        $anu[$hasil[$o]->BU_ALIAS]=$hasil[$o]->CPI;
-        $anuz[$hasil[$o]->BU_ALIAS]=$hasil[$o]->SPI;
-    }
+            for($o=0; $o<count($hasil); $o++)
+            {
+                $anu[$hasil[$o]->BU_ALIAS]=$hasil[$o]->CPI;
+                $anuz[$hasil[$o]->BU_ALIAS]=$hasil[$o]->SPI;
+            }
 
-    $result["r_yearly_cpi"][]=$anu;
-    $result["r_yearly_spi"][]=$anuz;
+            $result["r_yearly_cpi"][]=$anu;
+            $result["r_yearly_spi"][]=$anuz;
 
-    // $result["r_yearly"][]["month_name"] = $month;
-}
+            // $result["r_yearly"][]["month_name"] = $month;
+        }
         echo json_encode($result);
 
     }
