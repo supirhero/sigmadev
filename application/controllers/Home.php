@@ -600,7 +600,7 @@ class Home extends CI_Controller {
        //$data['footer']=($this->load->view('v_footer2'));
    }
     public function timesheet($date=null){
-        $user_id = $this->datajson['userdata']['USER_ID'];
+        $user_id = $this->datajson['userdata']['USER_NAME'];
         if($date == NULL)
             $date = date("Y-m-d", strtotime("today"));
         $date = date("d M Y", strtotime($date));
