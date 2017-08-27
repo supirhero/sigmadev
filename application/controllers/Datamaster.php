@@ -21,6 +21,8 @@ class Datamaster extends CI_Controller{
             $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
 
             $decoded_user_data =$datauser["data"];
+            print_r($decoded_user_data);
+            die;
             //    print_r($decoded_user_data);
             $this->datajson['token'] = $_GET['token'];
 

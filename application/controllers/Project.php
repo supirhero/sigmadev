@@ -591,7 +591,7 @@ SELECT sum(CASE
     RESOURCE_WBS
     ELSE
     1 
-    END*4*duration) as total from wbs WHERE project_id=$project_id");
+    END*8*duration)/2 as total from wbs WHERE project_id=$project_id");
         $total_pv = $query->row()->TOTAL;
 
         $query = $this->db->query("
