@@ -16,7 +16,7 @@ Class M_timesheet extends CI_Model{
           FROM
           (SELECT *
           FROM USER_TIMESHEET_NEW where ts_date= to_date('$date','yyyy-mm-dd')
-          ORDER BY SUBMIT_DATE ASC)
+          ORDER BY SUBMIT_DATE DESC)
           WHERE user_name='".$user_id."'");
         $hasil = $query->result_array();
         //echo $this->db->last_query();
