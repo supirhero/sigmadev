@@ -19,6 +19,7 @@ class Home extends CI_Controller {
         $this->load->model('M_issue');
         $this->load->model('M_Member_Activity');
         $this->load->model('M_data');
+        $this->load->model('M_user');
         $this->load->model('M_session');
 
 
@@ -464,6 +465,12 @@ class Home extends CI_Controller {
         $this->transformKeys($this->datajson);
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
+    public function userdata(){
+
+        $this->datajson['userdata']['prof_name'] = ($this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row())->PROF_NAME;
+        $data["userdata"]=array_change_key_case($this->datajson['userdata'],CASE_LOWER);
+        echo json_encode($data);
+    }
     public function edit_user(){
         $nohp = $this->input->post('no_hp');
         $address = $this->input->post('address');
@@ -479,7 +486,7 @@ class Home extends CI_Controller {
         $config['allowed_types']	= 'jpg|png|gif|jpeg';
         $config['overwrite'] = TRUE;
         $config['max_size']			= 1000000;
-        $config['file_name'] = $this->datajson['userdata']['USER_ID'].$extension;
+        $config['file_name'] = "/asset/user/".$this->datajson['userdata']['USER_ID'].".".$extension;
 
         $this->load->library('upload', $config);
 
@@ -495,16 +502,18 @@ class Home extends CI_Controller {
             $updateUser = [
                 'PHONE_NO' => $nohp,
                 'ADDRESS' => $address,
-                'IMAGE' => $this->datajson['userdata']['USER_ID'].$extension,
+                'IMAGE' =>  "/asset/user/".$this->datajson['userdata']['USER_ID'].".".$extension,
             ];
             $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
             $this->db->update('USERS', $updateUser);
+            $data['status_code'] = '200';
+            $data['status_name'] = 'success';
             $data['message'] = 'user updated';
 
         }
         // jika ada file evidence / berhasil upload
         else {
-            $data['config'] = $config;
+            //$data['config'] = $config;
             $data['error'] = $this->upload->display_errors();
 
             $updateUser = [
@@ -514,6 +523,8 @@ class Home extends CI_Controller {
             $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
             $this->db->update('USERS', $updateUser);
 
+            $data['status_code'] = '200';
+            $data['status_name'] = 'success';
             $data['message'] = 'user updated without img';
         }
 
@@ -789,7 +800,7 @@ class Home extends CI_Controller {
         $user_id = $this->datajson['userdata']['USER_ID'];
         if($date == NULL)
             $date = date("Y-m-d", strtotime("today"));
-        $date = date("d M Y", strtotime($date));
+      //  $date = date("d M Y", strtotime($date));
 
         $data=array();
         $holidays=$this->M_data->get_holidays();
@@ -806,20 +817,28 @@ class Home extends CI_Controller {
         for ($i=0; $i<5; $i++)
         {
             if (in_array($day[$i], $holyday)) {
-                $data["weekdays"][$day[$i]]=array(
+                $data["weekdays"][$i]=array(
+                    "day"=>$day[$i],
                     "holiday"=>true,
                     "work_hour"=>false
                 );
             }
             else{
-                $data["weekdays"][$day[$i]]=array(
+                $hour = $this->M_timesheet->Timesheet_bydate($user_id,$date);
+                $hour = ($hour <= 0) ? 0 : $hour;
+
+                $data["weekdays"][$i]=array(
+                    "day"=>$day[$i],
                     "holiday"=>false,
-                    "work_hour"=>8
+                    "work_hour"=>$hour
                 );
+                $day[$day[$i]];
             }
         }
 
-        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
+       // $data['holiday']=$holidays;
+        //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
+        $data['tampil_Timesheet']=($this->M_timesheet->Timesheet_bydate($user_id,$date));
 
         print_r(json_encode($data));
     }

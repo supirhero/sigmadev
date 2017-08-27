@@ -3,7 +3,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Project extends CI_Controller
 {
     public $datajson = array();
-    public $bu_id ;
 
     function __construct()
     {
@@ -64,7 +63,7 @@ class Project extends CI_Controller
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-/*
+        /*
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -77,7 +76,7 @@ class Project extends CI_Controller
                                     order by al.type asc
                                     ")->result_array();
         //get user project
-        $all_user_project_id = $this->db->query("select project_id from resource_pool 
+        $all_user_project_id = $this->db->query("select project_id from resource_pool
                                                                     where user_id = '".$this->datajson['userdata']['USER_ID']."'
                                                                ")->result_array();
         //store list project
@@ -99,12 +98,12 @@ class Project extends CI_Controller
                         elseif($priv['PRIVILEGE'] == 'only_bu'){
                             switch ($priv['ACCESS_ID']){
                                 case '1':
-                                    $bu_id = $this->db->query(" select p_bu.bu_id 
+                                    $bu_id = $this->db->query(" select p_bu.bu_id
                                                             from (select wp_id,wbs_id from wbs_pool
-                                                            union 
+                                                            union
                                                             select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             join (select wbs_id,project_id from wbs union select wbs_id,project_id from temporary_wbs) wbs
-                                                            on wbs_pool.wbs_id = wbs.wbs_id 
+                                                            on wbs_pool.wbs_id = wbs.wbs_id
                                                             join projects
                                                             on wbs.project_id = projects.project_id
                                                             join p_bu
@@ -121,17 +120,17 @@ class Project extends CI_Controller
                                 case '4' :
                                     break;
                                 case '5' :
-                                    $bu_id = $this->db->query("select p_bu.bu_id from 
+                                    $bu_id = $this->db->query("select p_bu.bu_id from
                                                             (select ts_id,wp_id from timesheet union select ts_id,wp_id from temporary_timesheet) timesheet
-                                                            JOIN 
+                                                            JOIN
                                                             (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             on timesheet.wp_id = wbs_pool.wp_id
-                                                            JOIN 
+                                                            JOIN
                                                             (select project_id,wbs_id from wbs union select project_id,wbs_id from temporary_wbs) wbs
                                                             on wbs_pool.wbs_id = wbs.wbs_id
                                                             JOIN projects
                                                             on wbs.project_id = projects.project_id
-                                                            JOIN p_bu 
+                                                            JOIN p_bu
                                                             on projects.bu_code = p_bu.bu_code
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
                                                             and projects.project_type_id = 'Non Project'
@@ -487,10 +486,40 @@ class Project extends CI_Controller
         $data['project_status'] = ['Not Started','In Progress','On Hold','Completed','Cancelled'];
         $data['project_type'] = [];
         $project_type = $this->db->query('select project_type from p_project_type')->result_array();
+
         foreach ($project_type as $type){
             array_push($data['project_type'],$type['PROJECT_TYPE']);
         }
+        $usediwo = $this->db->query("select distinct iwo_no from projects")->result_array();
 
+        //get iwo
+        @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo/');
+        $IWO = array();
+        $IWO = json_decode($json, true);
+
+        $result_iwo1 = [];
+        $result_iwo2 = [];
+
+
+
+        foreach ($usediwo as $ui){
+            $result_iwo2[] = $ui['IWO_NO'];
+        }
+
+        foreach($IWO as $iwo){
+            $result_iwo1[] = $iwo['IWO_NO'];
+        }
+
+
+
+        $result_iwo = array_diff($result_iwo1,$result_iwo2);
+        foreach ($result_iwo as $key => $val)
+        {
+            $hasil['iwo'][]= $IWO[$key];
+        }
+        //echo json_encode($result_iwo);
+
+        $data["iwolist"]=$hasil['iwo'];
 
         $this->transformKeys($data);
         echo json_encode($data);
@@ -503,7 +532,6 @@ class Project extends CI_Controller
             $returndata['message'] = 'success edit project';
         }
         else{
-            $this->output->set_status_header(400);
             $returndata['status']='error';
             $returndata['message'] = 'error edit project';
         }
