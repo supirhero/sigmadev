@@ -632,7 +632,7 @@ class Home extends CI_Controller {
             }
             else{
                 $hour = $this->M_timesheet->Timesheet_bydate($user_id,$date);
-                $hour = ($hour <= 0) ? 0 : $hour;
+                $hour = ($hour != NULL) ? 0 : $hour;
 
                 $data["weekdays"][$i]=array(
                     "day"=>$day[$i],
