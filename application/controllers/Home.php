@@ -8,7 +8,7 @@ class Home extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-        error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+        error_reporting(E_ALL  & ~E_NOTICE);
 
         $this->load->model('M_home');
         $this->load->model('M_project');
