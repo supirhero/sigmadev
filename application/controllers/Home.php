@@ -637,7 +637,11 @@ class Home extends CI_Controller {
                 }
                 $hasil['allentry'][$i][0]= $dateObj->format('M');
                 //$dateObj->format('m');
-                $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
+                if($hasilAllentry['JML_ENTRY_BULANAN']!=NULL || $hasilAllentry['JML_ENTRY_BULANAN']!=0)
+                    $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
+                else
+                    $hasil['allentry'][$i][1]=0;
+
 
                 $i++;
             }
@@ -825,7 +829,7 @@ class Home extends CI_Controller {
             }
             else{
                 $hour = $this->M_timesheet->Timesheet_bydate($user_id,$date);
-                $hour = ($hour != NULL) ? 0 : $hour;
+                $hour = ($hour == NULL) ? 0 : $hour;
 
                 $data["weekdays"][$i]=array(
                     "day"=>$day[$i],
