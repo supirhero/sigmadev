@@ -271,6 +271,10 @@ class Home extends CI_Controller {
         $this->transformKeys($this->datajson);
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
+    public function userdata(){
+
+        echo json_encode($this->datajson['userdata']);
+    }
     public function edit_user(){
         $nohp = $this->input->post('no_hp');
         $address = $this->input->post('address');
