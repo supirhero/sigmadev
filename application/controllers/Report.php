@@ -610,7 +610,8 @@ class Report extends CI_Controller {
                 $durasihour=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
             }
             //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-            array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+            if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour >0)
+                array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
         }
         echo json_encode($hasil);
     }
