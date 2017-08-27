@@ -15,6 +15,7 @@ Untuk tahap sekarang api yang tersedia :
     * My Assignment
     * Project Activity
     * Business unit
+    * Edit Profile
     
 * REPORT controller
     * Report Overview
@@ -194,6 +195,24 @@ return json data:
 -> bu_id
 -> bu_code
 ```
+
+## EDITUSER
+Detail project overview bisa di capai dengan ke url :
+```
+http://45.77.45.126/dev/home/edit_user/
+```
+Input yang harus di provide :
+```
+-> no_hp        
+-> address      
+-> image      
+```
+return json data:
+```
+-> status
+```
+
+
 ## Project Team Member
 URI yang di gunakan untuk akses API ini :
 ```
