@@ -272,8 +272,9 @@ class Home extends CI_Controller {
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
     public function userdata(){
-
-        echo json_encode(array_change_key_case($this->datajson['userdata'],CASE_LOWER));
+        $data["userdata"]=array_change_key_case($this->datajson['userdata'],CASE_LOWER);
+        array_push($data["userdata"],array("prof_name"=>"Pangeran"));
+        echo json_encode();
     }
     public function edit_user(){
         $nohp = $this->input->post('no_hp');
