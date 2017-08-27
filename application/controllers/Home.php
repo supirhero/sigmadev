@@ -633,7 +633,8 @@ class Home extends CI_Controller {
             }
         }
 
-        $data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
+        $data['holiday']=$holidays;
+        //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
 
         print_r(json_encode($data));
     }
