@@ -19,6 +19,7 @@ class Home extends CI_Controller {
         $this->load->model('M_issue');
         $this->load->model('M_Member_Activity');
         $this->load->model('M_data');
+        $this->load->model('M_user');
         $this->load->model('M_session');
 
 
@@ -273,8 +274,7 @@ class Home extends CI_Controller {
     }
     public function userdata(){
 
-$prof_name = $this->m_user->GetProfile($this->datajson['userdata']["PROF_ID"]);
-    $this->datajson['userdata']["prof_name"]=$prof_name;
+        $this->datajson['userdata']['prof_name'] = ($this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row())->PROF_NAME;
         $data["userdata"]=array_change_key_case($this->datajson['userdata'],CASE_LOWER);
         echo json_encode($data);
     }
