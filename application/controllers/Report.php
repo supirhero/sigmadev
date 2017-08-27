@@ -612,6 +612,9 @@ class Report extends CI_Controller {
             //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
             if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour >0)
                 array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+            else
+                array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>0]);
+
         }
         echo json_encode($hasil);
     }
