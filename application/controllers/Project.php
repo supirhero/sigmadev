@@ -532,8 +532,10 @@ class Project extends CI_Controller
             $returndata['message'] = 'success edit project';
         }
         else{
+            $this->output->set_status_header(400);
             $returndata['status']='error';
             $returndata['message'] = 'error edit project';
+
         }
         echo json_encode($returndata);
     }
