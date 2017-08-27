@@ -521,6 +521,8 @@ class Report extends CI_Controller {
         }
 
 
+        $tahun = $this->input->post('tahun');
+        $user_id=	$this->datajson['userdata']['USER_ID'];
 
         /************************************************/
         /*entry*/
@@ -540,6 +542,7 @@ class Report extends CI_Controller {
                 array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
             else
                 array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>0]);
+
         }
 
 
@@ -562,12 +565,10 @@ class Report extends CI_Controller {
             if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour >0)
                 array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
             else
-                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>0]);
-        }
+                array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>0]);
 
-        $hasil['total_hours']=$total_hours;
-        $this->transformKeys($hasil);
-        echo json_encode($hasil, JSON_NUMERIC_CHECK);
+        }
+        echo json_encode($hasil);
     }
 
     public function myperformances_yearly(){
@@ -621,7 +622,7 @@ class Report extends CI_Controller {
                 array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>0]);
 
         }
-        echo json_encode($hasil);
+
     }
 
     private function countDuration($start_date, $end_date) {
