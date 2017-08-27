@@ -353,8 +353,9 @@ class Project extends CI_Controller
     }
     //get project member
     public function ProjectMember_get(){
-        $id =$this->input->post('BU_ID');
+        $id =$this->input->post('BU_CODE');
         $project_id =$this->input->post('PROJECT_ID');
+
 
         //load available project member from external
         $query = $this->db->query("
@@ -363,8 +364,8 @@ class Project extends CI_Controller
             WHERE USER_TYPE_ID='ext' AND IS_ACTIVE='1' AND NOT EXISTS
             (SELECT USER_ID FROM RESOURCE_POOL WHERE USERS.USER_ID=RESOURCE_POOL.USER_ID AND PROJECT_ID='".$project_id."')");
         $hasil = $query->result_array();
-
         $data['project_member_ext'] = $hasil;
+
         //load available project member from internal
         $bu_id  =   $this->M_detail_project->getBU($id);
         $query = $this->db->query("
@@ -374,9 +375,35 @@ class Project extends CI_Controller
             (SELECT USER_ID FROM RESOURCE_POOL WHERE USERS.USER_ID=RESOURCE_POOL.USER_ID AND PROJECT_ID='".$project_id."')
             ORDER BY USER_NAME ASC");
         $hasil = $query->result_array();
+        $data['project_member_int'] = $hasil;
 
-        $data['project_member'] = $hasil;
-        echo json_encode($data['project_member']);
+        //load availale project member related
+        $bu_code_related = $this->db->query("select related_bu from projects where project_id = '$project_id'")->row()->RELATED_BU;
+        $bu_code_related = explode(',',$bu_code_related);
+        $bu_id_related = [];
+        foreach($bu_code_related as $related){
+            $bu_id_related[] = $this->db->query("select bu_id from p_bu where bu_code = '$related'")->row()->BU_ID;
+        }
+        $teks_bu_related = "";
+        for($iter =0 ; $iter<count($bu_id_related) ; $iter++){
+
+            $teks_bu_related = $teks_bu_related."'".$bu_id_related[$iter]."'";
+            if($iter != count($bu_id_related)-1){
+                $teks_bu_related = $teks_bu_related.",";
+            }
+        }
+
+
+        $query = $this->db->query("
+            SELECT DISTINCT USERS.USER_ID, USERS.BU_ID, USER_TYPE_ID, IS_ACTIVE,USER_NAME,users.EMAIL
+            FROM USERS LEFT JOIN RESOURCE_POOL ON USERS.USER_ID=RESOURCE_POOL.USER_ID
+            WHERE USERS.BU_ID IN ($teks_bu_related) AND USER_TYPE_ID='int' AND IS_ACTIVE='1' AND NOT EXISTS
+            (SELECT USER_ID FROM RESOURCE_POOL WHERE USERS.USER_ID=RESOURCE_POOL.USER_ID AND PROJECT_ID='".$project_id."')
+            ORDER BY USER_NAME ASC");
+        $hasil = $query->result_array();
+
+        $data['project_member_related'] = $hasil;
+        echo json_encode($data);
 
     }
     //action add project member
@@ -405,11 +432,10 @@ class Project extends CI_Controller
     public function ProjectMember_delete(){
         $id = $_POST['MEMBER'];
         //echo $id;
-        foreach ($id as $i){
-            $project_id = $this->M_detail_project->getRPProject($i);
-            //echo $project_id;
-            $this->M_detail_project->deleteRPmember($i);
-        }
+
+        $project_id = $this->M_detail_project->getRPProject($id);
+        //echo $project_id;
+        $this->M_detail_project->deleteRPmember($id);
 
     }
 

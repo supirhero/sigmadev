@@ -225,8 +225,6 @@ class M_project extends CI_Model {
 
 
         if($this->db->query($sql)){
-            echo $this->db->last_query();
-            die;
             return true;
         }
         else{
