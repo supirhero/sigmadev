@@ -637,7 +637,7 @@ class Home extends CI_Controller {
                 }
                 $hasil['allentry'][$i][0]= $dateObj->format('M');
                 //$dateObj->format('m');
-                if($hasilAllentry['JML_ENTRY_BULANAN']!=NULL || $hasilAllentry['JML_ENTRY_BULANAN']!=0 && $durasi[$i] !=0)
+                if($hasilAllentry['JML_ENTRY_BULANAN']>0 && $durasi[$i] >0)
                     $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
                 else
                     $hasil['allentry'][$i][1]=0;
