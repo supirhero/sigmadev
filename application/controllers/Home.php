@@ -313,12 +313,14 @@ class Home extends CI_Controller {
             ];
             $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
             $this->db->update('USERS', $updateUser);
+            $data['status_code'] = '200';
+            $data['status_name'] = 'success';
             $data['message'] = 'user updated';
 
         }
         // jika ada file evidence / berhasil upload
         else {
-            $data['config'] = $config;
+            //$data['config'] = $config;
             $data['error'] = $this->upload->display_errors();
 
             $updateUser = [
@@ -328,6 +330,8 @@ class Home extends CI_Controller {
             $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
             $this->db->update('USERS', $updateUser);
 
+            $data['status_code'] = '200';
+            $data['status_name'] = 'success';
             $data['message'] = 'user updated without img';
         }
 
