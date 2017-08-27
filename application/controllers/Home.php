@@ -663,7 +663,8 @@ class Home extends CI_Controller {
                 }
                 //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
                 $hasil['allhour'][$i][0]= $dateObj->format('M');
-                $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
+                if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour[$i] >0)
+                    $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
                 $i++;
             }
             $hasil['an']="";
