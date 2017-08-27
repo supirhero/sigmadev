@@ -372,6 +372,16 @@ Class M_detail_project extends CI_Model{
                     return $result;
                   }
                 }
+                function getBURelated($id){
+                    $sql = "select related_bu from projects join p_bu 
+                            on p_bu.bu_code=projects.bu 
+                            WHERE BU_CODE='".$id."' or BU_ALIAS='".$id."'";
+                    $q = $this->db->query($sql);
+                    if($q->num_rows() > 0){
+                        $result = $q->row()->BU_ID;
+                        return $result;
+                    }
+                }
                 function getAssignedTeam($project,$wbs){
                   return $this->db->query("SELECT RESOURCE_POOL.*,USERS.USER_NAME FROM RESOURCE_POOL
                     join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
