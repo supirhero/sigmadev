@@ -871,7 +871,7 @@ class Home extends CI_Controller {
         $returnmessage = array();
 
         $config['upload_path']		= 'document_assets/issue/';
-        $config['allowed_types']	= 'zip|doc|docs|docx|xls|pdf|xlsx';
+        $config['allowed_types']	= 'zip|doc|docs|docx|xls|pdf|xlsx|jpg|jpeg|png';
         $config['max_size']			= 5020;
         $config['max_width']		= 1024;
         $config['max_height']		= 768;
