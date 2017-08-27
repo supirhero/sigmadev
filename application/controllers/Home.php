@@ -624,7 +624,8 @@ class Home extends CI_Controller {
         for ($i=0; $i<5; $i++)
         {
             if (in_array($day[$i], $holyday)) {
-                $data["weekdays"][$day[$i]]=array(
+                $data["weekdays"][$i]=array(
+                    "day"=>$day[$i],
                     "holiday"=>true,
                     "work_hour"=>false
                 );
@@ -633,7 +634,8 @@ class Home extends CI_Controller {
                 $hour = $this->M_timesheet->Timesheet_bydate($user_id,$date);
                 $hour = ($hour <= 0) ? 0 : $hour;
 
-                $data["weekdays"][$day[$i]]=array(
+                $data["weekdays"][$i]=array(
+                    "day"=>$day[$i],
                     "holiday"=>false,
                     "work_hour"=>$hour
                 );
