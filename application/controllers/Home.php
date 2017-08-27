@@ -631,6 +631,8 @@ class Home extends CI_Controller {
             }
             else{
                 $hour = $this->M_timesheet->Timesheet_bydate($user_id,$date);
+                $hour = ($hour <= 0) ? 0 : $hour;
+
                 $data["weekdays"][$day[$i]]=array(
                     "holiday"=>false,
                     "work_hour"=>$hour
@@ -639,7 +641,7 @@ class Home extends CI_Controller {
             }
         }
 
-        $data['holiday']=$holidays;
+       // $data['holiday']=$holidays;
         //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
         $data['tampil_Timesheet']=($this->M_timesheet->Timesheet_bydate($user_id,$date));
 
