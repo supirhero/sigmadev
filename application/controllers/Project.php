@@ -548,6 +548,11 @@ class Project extends CI_Controller
         echo json_encode($data);
     }
     public function editProject_action(){
+
+        if(isset($_POST['mobile'])){
+            $_POST = array_change_key_case($_POST,CASE_UPPER);
+        }
+
         $id=$_POST['PROJECT_ID'];
         $confirm = $this->M_project->update($id);
         if($confirm){
