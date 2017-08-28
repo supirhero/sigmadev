@@ -1427,7 +1427,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
   </body>
 
   </html>");
-$this->email->send()
+$this->email->send();
         // if($this->email->send()){
         //     //echo "sent ".$this->email->print_debugger();
         // }
