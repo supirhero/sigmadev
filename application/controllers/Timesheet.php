@@ -631,7 +631,6 @@ class Timesheet extends CI_Controller {
                                                   join wbs_pool b
                                                   on a.wbs_id = b.wbs_id
                                                   where b.wp_id = '$wp_id'
-                                                  and b.rh_id = '$rh_id'
                                                 )
                                                 ")->row()->REBASELINE;
             }

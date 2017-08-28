@@ -1075,7 +1075,13 @@ class Home extends CI_Controller {
 
         $projectid = $this->uri->segment(3);
 
-        $this->datajson['project_issue_list'] = $this->M_home->projectissuelist($projectid);
+        /*$this->datajson['project_issue_list'] = $this->M_home->projectissuelist($projectid);*/
+        $this->db->query("select issue_id,users.user_id as reported_by, 
+                            user_name,date_issue,note,evidence,priority,status 
+                            from manage_issue 
+                            join users on users.user_id = manage_issue.user_id
+                            where project_id = '$projectid'");
+        echo $this->db->last_query();
 
         $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
