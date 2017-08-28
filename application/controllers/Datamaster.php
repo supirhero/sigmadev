@@ -756,6 +756,36 @@ class Datamaster extends CI_Controller{
                             $c['msg_email']='Cannot send email deactivation';
                         }
                         break;
+                    case 'download':
+                        $filename ="Resource External.xls";
+                        header('Content-type: application/ms-excel');
+                        header('Content-Disposition: attachment; filename='.$filename);
+                        echo
+                        "<table class='table table-bordered box-shadow--dp responsive' id=''>
+                        <thead>
+                        <th>User ID</th>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Business Unit</th>
+                        <th>Last Login</th>
+                        <th>Profile</th>
+                        <th>Status</th>
+                        </thead>
+                        <tbody>";
+                        $ambildata = $this->M_user->ExportDatatoExcelExt();
+                        foreach ($ambildata as $frow) {
+                          echo "<tr>";
+                          echo"<td>".$frow->USER_ID."</td>";
+                          echo"<td>".$frow->USER_NAME."</td>";
+                          echo"<td>".$frow->EMAIL."</td>";
+                          echo"<td>".$frow->BU_NAME."</td>";
+                          echo"<td>".$frow->LAST_LOGIN."</td>";
+                          echo"<td>".$frow->PROF_NAME ."</td>";
+                          echo"<td>". $frow->STATUS."</td>";
+                          echo "</tr>";
+                        }
+                        echo "</tbody></table>";
+                        break;
                     default:
                         # code...
                         break;
