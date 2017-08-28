@@ -1164,6 +1164,23 @@ function sendVerificationManual($email,$name,$namevendor){
   }
 
 }
+public function ExportDatatoExcelIn(){
+	$query = $this->db->query("
+	SELECT USER_ID, USER_NAME, EMAIL, LAST_LOGIN, USER_TYPE_ID,B.BU_NAME AS BU_NAME,C.PROF_NAME AS PROF_NAME,
+    CASE A.IS_ACTIVE
+    WHEN 0 THEN 'TIDAK AKTIF'
+    WHEN 1 THEN 'AKTIF'
+    END AS STATUS
+FROM USERS A INNER JOIN P_BU B ON A.BU_ID=B.BU_ID
+INNER JOIN PROFILE C ON A.PROF_ID=C.PROF_ID where USER_TYPE_ID='int'  ");
+
+        if($query->num_rows() > 0){
+            foreach($query->result() as $data){
+                $hasil[] = $data;
+            }
+            return $hasil;
+        }
+	}
 
 }
 ?>
