@@ -371,5 +371,17 @@ class M_project extends CI_Model {
                     where user_id='" . $id . "' or created_by='" . $id . "'
                     ")->result_array();
     }
-
+    public function addprojectmember($project_id,$user){
+      $sql = "insert into RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID ) values ((select nvl(max(RP_ID)+1,1) from RESOURCE_POOL),'".$user."','".$project_id."')";
+      $this->db->query($sql);
+    }
+    public function checkifinproject($project_id,$user){
+      $sql="SELECT * FROM RESOURCE_POOL WHERE PROJECT_ID='".$project_id."' AND USER_ID='".$user."' ";
+      $res=$this->db->query($sql);
+      if ($res->num_rows()>0) {
+        return true;
+      }else{
+        return false;
+      }
+    }
 }
