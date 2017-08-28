@@ -444,6 +444,10 @@ class Project extends CI_Controller
         $this->M_project->addprojectmember($project,$user);
         $c['status']="Success";
         $c['msg']="User berhasil diinvite ke dalam project";
+        //kirim email ke user bersangkutan
+        $email				= $this->M_detail_project->selectemail($user);
+        $project_name = $this->M_detail_project->selectProjectName($project);
+        $this->sendVerificationinviteMember($email,$project_name,$project);
       }
       echo json_encode($c);
     }
@@ -1120,10 +1124,10 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         //$email='dakan@sigma.co.id';
         $this->load->library('email');
         $config['protocol']='smtp';
-        $config['smtp_host']='ssl://smtp.gmail.com';
-        $config['smtp_user']='dummysigma@gmail.com';
-        $config['smtp_pass']='asdasdasdasd';
-        $config['smtp_port']='465';
+        $config['smtp_host']='smtp.sigma.co.id';
+        $config['smtp_user']=SMTP_AUTH_USR;
+        $config['smtp_pass']=SMTP_AUTH_PWD;
+        $config['smtp_port']='587';
         $config['smtp_timeout']='100';
         $config['charset']    = 'utf-8';
         $config['newline']    = "\r\n";
@@ -1423,10 +1427,10 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
   </body>
 
   </html>");
-
-        if($this->email->send()){
-            echo "sent ".$this->email->print_debugger();
-        }
+$this->email->send()
+        // if($this->email->send()){
+        //     //echo "sent ".$this->email->print_debugger();
+        // }
 
     }
     public function availableMember($project_id){
