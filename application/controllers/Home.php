@@ -1187,7 +1187,7 @@ class Home extends CI_Controller {
                 $this->M_issue->insertDetIssue2($data,$id_det);
             }
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
-            $returnmessage['title'] = "both";
+            $returnmessage['title'] = "success";
             $returnmessage['message'] = "berhasil tambah issue, berhasil upload foto";
         }
 
