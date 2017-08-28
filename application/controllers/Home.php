@@ -60,7 +60,7 @@ class Home extends CI_Controller {
 
         if($datauser["data"]["SESSION_EXPIRED"] <= time())
         {
-            $this->output->set_header_status(400);
+            $this->output->set_status_header(400);
             $error['error']="Login error";
             echo json_encode($error);
             die();
