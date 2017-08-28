@@ -1081,7 +1081,6 @@ class Home extends CI_Controller {
                             from manage_issue 
                             join users on users.user_id = manage_issue.user_id
                             where project_id = '$projectid'");
-        echo $this->db->last_query();
 
         $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
