@@ -290,7 +290,7 @@ class Login extends CI_Controller {
         print_r(json_encode($data));
         echo "
             <script>
-                window.location = '/prouds2.telkomsigma.co.id';
+                window.location = 'http://prouds2.telkomsigma.co.id';
             </script>
         ";
         //$this->load->view('v_email_confirm',$data);
