@@ -67,9 +67,9 @@ class Login extends CI_Controller {
                     $result=$this->M_login->loginsso($sso['NIK']);
                 }
                // $token = $this->token->createtoken($result);
-                $token = $this->M_session->insert_session($sso["USER_ID"]);
+                $token = $this->M_session->insert_session($sso["EMP_ID"]);
 
-                redirect('/login/welcome?token='.$token.'&id='.$sso['USER_ID']);
+                redirect('/login/welcome?token='.$token.'&id='.$sso['EMP_ID']);
             }
             //if status 0 maybe it is login extern (VENDOR)
             else {
