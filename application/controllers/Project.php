@@ -428,6 +428,29 @@ class Project extends CI_Controller
         $this->sendVerificationinviteMember($email,$project_name,$project_id);
         echo $this->email()->print_debugger();
     }
+    //created by fa3af
+    //for god sake, please inform me on +62 81230012673 if u dare to change this
+    public function projectmemberadd($project){
+      // prepare data from post
+      $user=$_POST['USER_ID'];
+      // check jika user sudah ada di dalam project atau tidak
+      $check=$this->M_project->checkifinproject($project,$user);
+      if ($check) {
+        //jika true, maka tampilkan pesan error, menandakan user sudah pernah diinvite ke dalam project
+        $c['status']="Error";
+        $c['msg']="User sudah ada di dalam project";
+      }else{
+        //jika false, tambahkan user ke dalam resource_pool
+        $this->M_project->addprojectmember($project,$user);
+        $c['status']="Success";
+        $c['msg']="User berhasil diinvite ke dalam project";
+        //kirim email ke user bersangkutan
+        $email				= $this->M_detail_project->selectemail($user);
+        $project_name = $this->M_detail_project->selectProjectName($project);
+        $this->sendVerificationinviteMember($email,$project_name,$project);
+      }
+      echo json_encode($c);
+    }
     //action delete project member
     public function ProjectMember_delete(){
         $id = $_POST['MEMBER'];
@@ -1101,10 +1124,10 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         //$email='dakan@sigma.co.id';
         $this->load->library('email');
         $config['protocol']='smtp';
-        $config['smtp_host']='ssl://smtp.gmail.com';
-        $config['smtp_user']='dummysigma@gmail.com';
-        $config['smtp_pass']='asdasdasdasd';
-        $config['smtp_port']='465';
+        $config['smtp_host']='smtp.sigma.co.id';
+        $config['smtp_user']=SMTP_AUTH_USR;
+        $config['smtp_pass']=SMTP_AUTH_PWD;
+        $config['smtp_port']='587';
         $config['smtp_timeout']='100';
         $config['charset']    = 'utf-8';
         $config['newline']    = "\r\n";
@@ -1404,10 +1427,10 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
   </body>
 
   </html>");
-
-        if($this->email->send()){
-            echo "sent ".$this->email->print_debugger();
-        }
+$this->email->send()
+        // if($this->email->send()){
+        //     //echo "sent ".$this->email->print_debugger();
+        // }
 
     }
     public function availableMember($project_id){
