@@ -123,21 +123,23 @@ Class M_detail_project extends CI_Model{
     }
     function selectWBS_mobile($id,$rh_id){
         return $this->db->query("select * from (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
-                                          WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                          WBS_ID,WBS_PARENT_ID,PROJECT_ID,PROJECT_STATUS,
                                           WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
                                           DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,rebaseline,
                                           connect_by_isleaf as LEAF,LEVEL from (
-                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
-                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                            select w.WBS_ID,w.WBS_PARENT_ID,p.PROJECT_ID,p.PROJECT_STATUS,
+                                                  w.WBS_NAME,w.WBS_DESC,w.PRIORITY,w.CALCULATION_TYPE,w.START_DATE,w.FINISH_DATE,
                                                   DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'no' as rebaseline
-                                            from wbs
+                                            from wbs w join projects p
+                                            on w.project_id = p.project_id
                                             union
-                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
-                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                            select w.WBS_ID,w.WBS_PARENT_ID,p.PROJECT_ID,p.PROJECT_STATUS,
+                                                  w.WBS_NAME,w.WBS_DESC,w.PRIORITY,w.CALCULATION_TYPE,w.START_DATE,w.FINISH_DATE,
                                                   DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'yes' as rebaseline
-                                             from temporary_wbs
+                                             from temporary_wbs w join projects p
+                                              on w.project_id = p.project_id
                                               where action = 'create'
-                                              and rh_id = '$rh_id'
+                                              and w.rh_id = '$rh_id'
                                           ) connect by  wbs_parent_id = prior wbs_id
                                           start with wbs_id='$id.0'
                                           order siblings by regexp_substr(orde, '^\D*') nulls first,
