@@ -471,6 +471,20 @@ class Task extends CI_Controller
 
         //echo var_dump($workplan);
     }
+    function workplan_view_mobile(){
+        $id_project = $this->uri->segment(3);
+        $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
+        $workplan=$this->M_detail_project->selectWBS_mobile($id_project,$rh_id);
+
+        $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
+
+        $result['workplan'] = $workplan;
+        $result['rebaseline_task'] = $rebaseline;
+        echo json_encode($result);
+
+
+        //echo var_dump($workplan);
+    }
 
 
 

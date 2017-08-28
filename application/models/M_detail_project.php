@@ -121,6 +121,28 @@ Class M_detail_project extends CI_Model{
                                           order siblings by regexp_substr(orde, '^\D*') nulls first,
                                           to_number(regexp_substr(orde, '\d+'))")->result_array();
     }
+    function selectWBS_mobile($id,$rh_id){
+        return $this->db->query("select * from (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
+                                          WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                          WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                          DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,rebaseline,
+                                          connect_by_isleaf as LEAF,LEVEL from (
+                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                                  DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'no' as rebaseline
+                                            from wbs
+                                            union
+                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                                  DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'yes' as rebaseline
+                                             from temporary_wbs
+                                              where action = 'create'
+                                              and rh_id = '$rh_id'
+                                          ) connect by  wbs_parent_id = prior wbs_id
+                                          start with wbs_id='$id.0'
+                                          order siblings by regexp_substr(orde, '^\D*') nulls first,
+                                          to_number(regexp_substr(orde, '\d+'))) where leaf = 1")->result_array();
+    }
     function getAllBU(){
       return $this->db->query("SELECT BU_CODE, BU_ALIAS, BU_NAME FROM P_BU")->result_array();
     }
