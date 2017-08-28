@@ -24,7 +24,7 @@ class M_wbs extends CI_Model {
             $file = array_filter((explode('.',$cars[$i])));
             $array[]=$file;
             if (count($array[$x]) >1 and count($array[$x]) == 2) {
-                echo $array[$x][count($array[$x])-2];
+                $array[$x][count($array[$x])-2];
                 $parent =$array[$x][count($array[$x])-2];
             }
             elseif (count($array[$x]) >=2) {
@@ -35,7 +35,7 @@ class M_wbs extends CI_Model {
                     $h++;
 
                 }
-                echo rtrim($ini, ".");
+               rtrim($ini, ".");
                 $parent = rtrim($ini, ".");
             }
 
@@ -47,7 +47,6 @@ class M_wbs extends CI_Model {
             $afrika[$pro_id.'.'.$id] = $cars[$i];
             $afrikan[$cars[$i]] = $pro_id.'.'.$id;
             if (count($array[$x]) >1 ){
-                //  echo
                 $this->db->set('WBS_PARENT_ID',$afrikan[$parent]);
 
             }

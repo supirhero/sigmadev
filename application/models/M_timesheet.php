@@ -16,12 +16,27 @@ Class M_timesheet extends CI_Model{
           FROM
           (SELECT *
           FROM USER_TIMESHEET_NEW where ts_date= to_date('$date','yyyy-mm-dd')
-          ORDER BY SUBMIT_DATE ASC)
-          WHERE user_id='".$user_id."'");
+          ORDER BY SUBMIT_DATE DESC)
+          WHERE user_name='".$user_id."'");
         $hasil = $query->result_array();
         //echo $this->db->last_query();
         //die;
         return $hasil;
+
+    }
+    function Timesheet_bydate($user_id,$date){
+        //ada perubahan
+
+        //echo "date : $date<br>";
+        $query = $this->db->query("
+          SELECT HOUR_TOTAL FROM TIMESHEET 
+JOIN WBS_POOL ON  WBS_POOL.WP_ID=TIMESHEET.WP_ID
+JOIN RESOURCE_POOL ON  RESOURCE_POOL.RP_ID=WBS_POOL.RP_ID
+where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user_id."'");
+        $hasil = $query->result_array();
+        //echo $this->db->last_query();
+        //die;
+        return $hasil["HOUR_TOTAL"];
 
     }
     function selectTimesheet($user_id){
@@ -325,12 +340,12 @@ GROUP BY TS_DATE")->result_array();
             $WP_ID = $data['WP_ID'];
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
+            $SUBMITDATE = $data['SUBMIT_DATE'];
 
             $this->db->query("INSERT INTO TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE) 
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
-
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'))");
 
         }
         //insert new data with add prefix number at primary key
@@ -459,11 +474,12 @@ GROUP BY TS_DATE")->result_array();
             $WP_ID = $data['WP_ID'];
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
+            $SUBMITDATE = $data['SUBMIT_DATE'];
 
             $this->db->query("INSERT INTO TEMPORARY_TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION,RH_ID) 
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,SUBMIT_DATE,ACTION,RH_ID) 
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create','$rh_id')");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),'create','$rh_id')");
 
 
         }

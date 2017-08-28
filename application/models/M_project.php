@@ -184,6 +184,9 @@ class M_project extends CI_Model {
     }
 
     function update($id) {
+        if(isset($_POST['mobile'])){
+            $_POST = array_change_key_case($_POST,CASE_UPPER);
+        }
         $PROJECT_NAME = $this->input->post('PROJECT_NAME');
         $PM_ID = $this->input->post('PM_ID');
         $IWO_NO = $this->input->post('IWO_NO');
@@ -222,16 +225,17 @@ class M_project extends CI_Model {
                 PROJECT_DESC='".$PROJECT_DESC."',MARGIN='".$MARGIN."',TYPE_OF_EFFORT='".$TYPE_OF_EFFORT."',PRODUCT_TYPE='".$PRODUCT_TYPE."',VISIBILITY='".$VISIBILITY."',CALCULATION_METHOD='".$CALCULATION_METHOD."',TYPE_OF_EXPENSE='".$TYPE_OF_EXPENSE."',PROJECT_OVERHEAD='".$PROJECT_OVERHEAD."',
                 ACTUAL_COST='".$ACTUAL_COST."',COGS='".$COGS."',RELATED_BU='".$RELATED_BU."',ho_operation='$ho_operation' WHERE PROJECT_ID='".$id."'";
 
+        $this->db->query($sql);
 
-
-        if($this->db->query($sql)){
-            echo $this->db->last_query();
-            die;
+        if($this->db->affected_rows() == 1){
             return true;
         }
         else{
             return false;
         }
+
+
+
         //print_r($sql);
 
         //$sql2 = "INSERT INTO RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID,EMAIL) VALUES ('" . $rp_id . "','" . $PM_ID . "','" . $result . "','" . $email. "')";
