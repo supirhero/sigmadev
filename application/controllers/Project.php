@@ -1437,6 +1437,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
       foreach ($userext as $e) {
         array_push($data['data'],$e);
       }
+      $userexist=$this->M_project->getUserInProject($project_id);
+      $data['exist']=$userexist;
       $data['status']='Success';
       $data['project_id']=$project_id;
       echo json_encode($data);
