@@ -622,14 +622,14 @@ class Task extends CI_Controller
         $id = $_POST['wbs_id'];
         $wbs_id = $_POST['wbs_id'];
         $project_id = $this->M_detail_project->getProjectTask($id);
-        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
-        if($statusProject == 'On Hold'){
+        $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
+        if($statusProject == 'on hold'){
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
             $this->M_detail_project->updateProgressDeleteTaskTemp($wbs_id,$rh_id);
             $returndata['status'] = "success";
             $returndata['message'] = "Task temporary deleted success";
         }
-        elseif($statusProject == 'Not Started'){
+        elseif($statusProject == 'not started'){
             //$this->M_detail_project->deleteWBSID($id);
             //$this->M_detail_project->deleteWBSPoolID($id);
             $this->M_detail_project->updateProgressDeleteTask($wbs_id);
@@ -688,14 +688,14 @@ class Task extends CI_Controller
 
         $project_id = explode(".",$_POST['WBS_ID']);
         $project_id = $project_id[0];
-        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+        $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
 
-        if($statusProject == 'On Hold'){
+        if($statusProject == 'on hold'){
             $this->M_detail_project->removeAssignementTemp();
             $data['status'] = 'success';
             $data['message'] = 'Task member berhasil di hapus temporary';
         }
-        elseif($statusProject['Not Started']){
+        elseif($statusProject['not started']){
             $this->M_detail_project->removeAssignement();
 
             //send email
@@ -719,15 +719,15 @@ class Task extends CI_Controller
 
         $project_id = explode(".",$_POST['WBS_ID']);
         $project_id = $project_id[0];
-        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+        $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
 
-        if($statusProject == 'On Hold'){
+        if($statusProject == 'on hold'){
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
             $this->M_detail_project->postAssignmentTemp($rh_id);
             $data['status'] = 'success';
             $data['message'] = 'member di tambah temporary';
         }
-        elseif($statusProject['Not Started']){
+        elseif($statusProject['not started']){
             //assign process
             $this->M_detail_project->postAssignment();
 
