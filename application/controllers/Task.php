@@ -436,6 +436,8 @@ class Task extends CI_Controller
         $id_project = $this->uri->segment(3);
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
         $workplan=$this->M_detail_project->selectWBS($id_project,$rh_id);
+        print_r($workplan);
+        die;
 
         $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
@@ -806,6 +808,10 @@ class Task extends CI_Controller
                 //$dataexcel[$i-1]['IWO_NO']= $data['cells'][$i][3];
                 //$dataexcel[$i-1]['USER_ID']= $data['cells'][$i][2];
                 $dataexcel[$i-1]['WBS_NAME']= $data['cells'][$i][2];
+                /*die;
+                print_r(date_format(date_create($data['cells'][$i][4]),"Y-m-d"));
+                echo "<br>";*/
+                //echo $this->countDuration($data['cells'][$i][4],$data['cells'][$i][5]);
                 //$dataexcel[$i-1]['WBS_DESC']= $data['cells'][$i][];
                 //$dataexcel[$i-1]['PRIORITY']= $data['cells'][$i][5];
                 //  $dataexcel[$i-1]['CALCULATION_TYPE']= $data['cells'][$i][6];
@@ -813,7 +819,8 @@ class Task extends CI_Controller
                 //  $dataexcel[$i-1]['PHASE']= $data['cells'][$i][8];
                 //$dataexcel[$i-1]['EFFORT_DRIVEN']= $data['cells'][$i][9];
                 //$dataexcel[$i-1]['WORK']=trim($data['cells'][$i][5]," hrs");
-                @$dur =$this->countDuration(date_format(date_create($data['cells'][$i][4]),"d/m/Y"), date_format(date_create($data['cells'][$i][5]),"d/m/Y"));
+                @$dur =$this->countDuration(date_format(date_create($data['cells'][$i][4]),"Y-m-d"),date_format(date_create($data['cells'][$i][4]),"Y-m-d"));
+
                 //$dataexcel[$i-1]['DURATION']= floor(trim($data['cells'][$i][5]," days"));
                 $dataexcel[$i-1]['DURATION']= $dur;
                 //$dataexcel[$i-1]['START_DATE']= date('d/m/Y',strtotime($data['cells'][$i][6]));
@@ -1566,8 +1573,10 @@ class Task extends CI_Controller
         $end = new DateTime($end_date);
         $end->modify('+1 day');
         $interval = $end->diff($start);
+        //print_r($interval);
         $days = $interval->days;
         $period = new DatePeriod($start, new DateInterval('P1D'), $end);
+        //print_r($period);
         $holidays = $this->getHolidays();
         foreach ($period as $dt) {
             $curr = $dt->format('D');

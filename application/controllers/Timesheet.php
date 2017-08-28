@@ -685,6 +685,7 @@ class Timesheet extends CI_Controller {
         $project_id = $_POST['project_id'];
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
 
+
         if($confirm_code == 1 || $confirm_code  == 0){
 
             $rebaseline_status = $this->db->query("
@@ -724,6 +725,7 @@ class Timesheet extends CI_Controller {
             echo json_encode($data);
         }
         else{
+            $this->output->set_status_header(400);
             $data['error'] = "confirmation code is incorrect ,choose only 1 for accept and 0 for deny";
             echo json_encode($data);
             die();

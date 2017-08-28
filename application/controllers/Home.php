@@ -1129,11 +1129,11 @@ class Home extends CI_Controller {
                 //$this->sendVerification($USER_ID,$userNamePM,$bu,$USER_VP,$userNameVP,$email_vp,$data,$project_name);
                 //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
             }
-
-
-            $this->M_issue->insertIssue($data);
-            $id_det= $this->M_issue->getMaxDetIssue();
-            $this->M_issue->insertDetIssue3($data,$id_det);
+            else{
+                $this->M_issue->insertIssue($data);
+                $id_det= $this->M_issue->getMaxDetIssue();
+                $this->M_issue->insertDetIssue3($data,$id_det);
+            }
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
             $returnmessage['title'] = "Success";
             $returnmessage['message'] = "berhasil tambah issue ,tetapi gagal upload foto";
@@ -1181,9 +1181,11 @@ class Home extends CI_Controller {
                 //	echo $email_vp;
                 //	echo $data;
             }
-            $this->M_issue->insertIssue2($data);
-            $id_det= $this->M_issue->getMaxDetIssue();
-            $this->M_issue->insertDetIssue2($data,$id_det);
+            else{
+                $this->M_issue->insertIssue2($data);
+                $id_det= $this->M_issue->getMaxDetIssue();
+                $this->M_issue->insertDetIssue2($data,$id_det);
+            }
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
             $returnmessage['title'] = "both";
             $returnmessage['message'] = "berhasil tambah issue, berhasil upload foto";
