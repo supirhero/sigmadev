@@ -712,7 +712,6 @@ class Timesheet extends CI_Controller {
             }
             else{
                 $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
-                echo $this->db->last_query();
                 //if timesheet confirmed ,calculation for workplan complete hours process execute
                 if($confirm_code == 1){
                     $this->M_timesheet->updateProgress($timesheet_id);
