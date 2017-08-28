@@ -26,7 +26,6 @@ class Home extends CI_Controller {
         //TOKEN LOGIN CHECKER
         if(isset($_GET['token'])){
             $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
-
             $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
         //    print_r($decoded_user_data);
             $this->datajson['token'] = $_GET['token'];
@@ -39,6 +38,7 @@ class Home extends CI_Controller {
             $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
         }
         else{
+            print_r($_GET);
             $error['error']="Login First!";
             echo json_encode($error);
             die();
@@ -72,7 +72,7 @@ class Home extends CI_Controller {
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-        //*
+        /*
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
