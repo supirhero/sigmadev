@@ -1028,7 +1028,7 @@ class Home extends CI_Controller {
         $this->datajson['project_team'] = $this->db->query("SELECT users.user_id,users.user_name,users.email,profile.prof_name FROM RESOURCE_POOL
                                                              join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
                                                              join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
-                                                             WHERE PROJECT_ID=".$this->uri->segment(3))->result_array();
+                                                             WHERE PROJECT_ID='".$this->uri->segment(3)."'")->result_array();
         foreach ($this->datajson['project_team'] as $key=>$value){
             $this->transformKeys($this->datajson['project_team'][$key]);
         }
