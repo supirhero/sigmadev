@@ -13,6 +13,9 @@ class Datamaster extends CI_Controller{
         $this->load->model('M_business');
         $this->load->model('M_mis');
         $this->load->model('M_project_type');
+        // $this->load->library('PHPExcel');
+        // $this->load->library('PHPExcel/IOFactory');
+
         error_reporting(E_ALL & ~E_NOTICE);
 
 
@@ -82,7 +85,7 @@ class Datamaster extends CI_Controller{
                                     order by al.type asc
                                     ")->result_array();
         //get user project
-        $all_user_project_id = $this->db->query("select project_id from resource_pool 
+        $all_user_project_id = $this->db->query("select project_id from resource_pool
                                                                     where user_id = '".$this->datajson['userdata']['USER_ID']."'
                                                                ")->result_array();
         //store list project
@@ -105,12 +108,12 @@ class Datamaster extends CI_Controller{
                             switch ($priv['ACCESS_ID']){
                                 //Update Personal Timesheet
                                 case '1':
-                                    $bu_id = $this->db->query(" select p_bu.bu_id 
+                                    $bu_id = $this->db->query(" select p_bu.bu_id
                                                             from (select wp_id,wbs_id from wbs_pool
-                                                            union 
+                                                            union
                                                             select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             join (select wbs_id,project_id from wbs union select wbs_id,project_id from temporary_wbs) wbs
-                                                            on wbs_pool.wbs_id = wbs.wbs_id 
+                                                            on wbs_pool.wbs_id = wbs.wbs_id
                                                             join projects
                                                             on wbs.project_id = projects.project_id
                                                             join p_bu
@@ -256,17 +259,17 @@ class Datamaster extends CI_Controller{
                                     break;
                                 //Approve Timesheet(Non-project) search in this case
                                 case '5' :
-                                    $bu_id = $this->db->query("select p_bu.bu_id from 
+                                    $bu_id = $this->db->query("select p_bu.bu_id from
                                                             (select ts_id,wp_id from timesheet union select ts_id,wp_id from temporary_timesheet) timesheet
-                                                            JOIN 
+                                                            JOIN
                                                             (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             on timesheet.wp_id = wbs_pool.wp_id
-                                                            JOIN 
+                                                            JOIN
                                                             (select project_id,wbs_id from wbs union select project_id,wbs_id from temporary_wbs) wbs
                                                             on wbs_pool.wbs_id = wbs.wbs_id
                                                             JOIN projects
                                                             on wbs.project_id = projects.project_id
-                                                            JOIN p_bu 
+                                                            JOIN p_bu
                                                             on projects.bu_code = p_bu.bu_code
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
                                                             and projects.project_type_id = 'Non Project'
@@ -503,13 +506,13 @@ class Datamaster extends CI_Controller{
         $data=$this->M_mis->getpartnerMIS();
         return $data;
     }
-    public function manage($type,$action){
+    public function manage($type,$action,$other=null){
         switch ($type) {
             case 'bu':
                 return   $this->bu($action);
                 break;
             case 'user':
-                return    $this->user($action);
+                return    $this->user($action,$other);
                 break;
             case 'holiday':
                 return   $this->holiday($action);
@@ -646,7 +649,54 @@ class Datamaster extends CI_Controller{
                                 break;
                         }
                         break;
-
+                    case 'autoactivation':
+                        $user_id=$this->input->post('USER_ID'); //ambil data user_id vendor
+                        $emailv=$this->M_user->getEmail($user_id);
+                        $sup_id=$this->M_user->getSupID($user_id); //ambil data sup_id
+                        $email=$this->M_user->getEmailSupID($sup_id); //ambil data email
+                        $this->M_user->deleteIdentifier($emailv);
+                        $name=$this->M_user->getName($email);
+                        $namevendor=$this->M_user->getNameVendor($emailv);
+                        $this->M_user->statusActive($user_id);
+                        $c['data']=$this->M_user->sendVerificationManual($email,$name,$namevendor);
+                        if ($c['data']) {
+                            $c['status']='Success';
+                            $c['msg_email']='Email info sent';
+                        }else{
+                            $c['status']='Error';
+                            $c['msg_email']='Cannot send email deactivation';
+                        }
+                        break;
+                    case 'download':
+                        $filename ="Resource Internal.xls";
+                        header('Content-type: application/ms-excel');
+                        header('Content-Disposition: attachment; filename='.$filename);
+                        echo
+                        "<table class='table table-bordered box-shadow--dp responsive' id=''>
+                        <thead>
+                        <th>User ID</th>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Business Unit</th>
+                        <th>Last Login</th>
+                        <th>Profile</th>
+                        <th>Status</th>
+                        </thead>
+                        <tbody>";
+                        $ambildata = $this->M_user->ExportDatatoExcelIn();
+                        foreach ($ambildata as $frow) {
+                          echo "<tr>";
+                          echo"<td>".$frow->USER_ID."</td>";
+                          echo"<td>".$frow->USER_NAME."</td>";
+                          echo"<td>".$frow->EMAIL."</td>";
+                          echo"<td>".$frow->BU_NAME."</td>";
+                          echo"<td>".$frow->LAST_LOGIN."</td>";
+                          echo"<td>".$frow->PROF_NAME ."</td>";
+                          echo"<td>". $frow->STATUS."</td>";
+                          echo "</tr>";
+                        }
+                        echo "</tbody></table>";
+                        break;
                     default:
                         # code...
                         break;
@@ -705,6 +755,36 @@ class Datamaster extends CI_Controller{
                             $c['status']='Error';
                             $c['msg_email']='Cannot send email deactivation';
                         }
+                        break;
+                    case 'download':
+                        $filename ="Resource External.xls";
+                        header('Content-type: application/ms-excel');
+                        header('Content-Disposition: attachment; filename='.$filename);
+                        echo
+                        "<table class='table table-bordered box-shadow--dp responsive' id=''>
+                        <thead>
+                        <th>User ID</th>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Business Unit</th>
+                        <th>Last Login</th>
+                        <th>Profile</th>
+                        <th>Status</th>
+                        </thead>
+                        <tbody>";
+                        $ambildata = $this->M_user->ExportDatatoExcelExt();
+                        foreach ($ambildata as $frow) {
+                          echo "<tr>";
+                          echo"<td>".$frow->USER_ID."</td>";
+                          echo"<td>".$frow->USER_NAME."</td>";
+                          echo"<td>".$frow->EMAIL."</td>";
+                          echo"<td>".$frow->BU_NAME."</td>";
+                          echo"<td>".$frow->LAST_LOGIN."</td>";
+                          echo"<td>".$frow->PROF_NAME ."</td>";
+                          echo"<td>". $frow->STATUS."</td>";
+                          echo "</tr>";
+                        }
+                        echo "</tbody></table>";
                         break;
                     default:
                         # code...
