@@ -479,6 +479,7 @@ class Task extends CI_Controller
         $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
         $result['workplan'] = $workplan;
+        $this->transformKeys($result);
         $result['rebaseline_task'] = $rebaseline;
         echo json_encode($result);
 
@@ -1618,6 +1619,26 @@ function dateRange($first, $last, $step = '+1 day', $output_format = 'Y-m-d') {
 
     return $dates;
 }
+    private function transformKeys(&$array)
+    {
+        foreach (array_keys($array) as $key):
+
+            # Working with references here to avoid copying the value,
+            # since you said your data is quite large.
+            $value = &$array[$key];
+            unset($array[$key]);
+            # This is what you actually want to do with your keys:
+            #  - remove exclamation marks at the front
+            #  - camelCase to snake_case
+            $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
+            # Work recursively
+            if (is_array($value)) $this->transformKeys($value);
+            # Store with new key
+            $array[$transformedKey] = $value;
+            # Do not forget to unset references!
+            unset($value);
+        endforeach;
+    }
 
 
 }
