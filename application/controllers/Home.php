@@ -1134,6 +1134,7 @@ class Home extends CI_Controller {
                 $this->M_issue->insertDetIssue3($data,$id_det);
             }
             //redirect('/Detail_Project/view/'.$data['PROJECT_ID'].'#tab6');
+            $returnmessage['error_message']= $this->upload->display_errors();
             $returnmessage['title'] = "Success";
             $returnmessage['message'] = "berhasil tambah issue ,tetapi gagal upload foto";
 
