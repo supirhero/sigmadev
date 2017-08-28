@@ -786,8 +786,6 @@ class Task extends CI_Controller
             $file =  $upload_data['full_path'];
             $this->excel_reader->read($file);
             error_reporting(E_ALL ^ E_NOTICE);
-
-
             // Sheet 1
             $data = $this->excel_reader->sheets[0] ;
 
