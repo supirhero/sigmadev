@@ -558,8 +558,8 @@ class Task extends CI_Controller
 
         $project_id   = $this->input->post("project_id");
 
-        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
-        if($statusProject == 'On Hold'){
+        $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
+        if($statusProject == 'on hold'){
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
             $wbs=$this->input->post("WBS_ID");
             $this->M_detail_project->Edit_WBSTemp(
@@ -575,7 +575,7 @@ class Task extends CI_Controller
             $status['message'] = 'Task berhasil di edit temporary';
 
         }
-        elseif($statusProject == 'Not Started'){
+        elseif($statusProject == 'not started'){
             $wbs=$this->input->post("WBS_ID");
             $this->M_detail_project->Edit_WBS(
                 $_POST["wbs_id"],
