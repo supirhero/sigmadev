@@ -679,7 +679,7 @@ class Timesheet extends CI_Controller {
     //confirmation timesheet(approve or decline)
     function confirmationTimesheet(){
 
-        $approver = $this->datajson['USER_ID'];
+        $approver = $this->datajson['userdata']['USER_ID'];
         $timesheet_id = $_POST['ts_id'];
         $confirm_code = $_POST['confirm'];
         $project_id = $_POST['project_id'];
@@ -706,13 +706,13 @@ class Timesheet extends CI_Controller {
                 echo json_encode($data);
                 die;
             }
-
             if($rebaseline_status == 'yes'){
                 $confirmation = $this->M_timesheet->confirmTimesheetTemp($timesheet_id,$approver,$confirm_code);
                 $data['message'] = 'rebaseline';
             }
             else{
                 $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
+                echo $this->db->last_query();
                 //if timesheet confirmed ,calculation for workplan complete hours process execute
                 if($confirm_code == 1){
                     $this->M_timesheet->updateProgress($timesheet_id);
