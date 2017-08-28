@@ -152,10 +152,10 @@ $result = $q->result_array();
         $this->db->delete('VERIFICATION');
     }
     public function userList($start=0,$end=20,$keyword=null){
-      $sql ="SELECT * FROM 
+      $sql ="SELECT * FROM
 (select u.*,b.bu_name,
 ROW_NUMBER() OVER (ORDER BY b.bu_name) Row_Num
- from users u 
+ from users u
 join p_bu b on u.bu_id=b.bu_id ";
       if ($keyword!=null) {
         $keyword=strtolower($keyword);
@@ -172,10 +172,10 @@ join p_bu b on u.bu_id=b.bu_id ";
     function sendVerification($email,$name){
       $this->load->library('email');
       $config['protocol']='smtp';
-      $config['smtp_host']='ssl://smtp.gmail.com';
-      $config['smtp_user']='dummysigma@gmail.com';
-      $config['smtp_pass']='asdasdasdasd';
-      $config['smtp_port']='465';
+      $config['smtp_host']='smtp.sigma.co.id';
+      $config['smtp_user']=SMTP_AUTH_USR;
+      $config['smtp_pass']=SMTP_AUTH_PWD;
+      $config['smtp_port']='587';
       $config['smtp_timeout']='100';
       $config['charset']    = 'utf-8';
       $config['newline']    = "\r\n";
@@ -506,10 +506,10 @@ join p_bu b on u.bu_id=b.bu_id ";
     function sendDeactivateInfo($email,$name){
   $this->load->library('email');
   $config['protocol']='smtp';
-  $config['smtp_host']='ssl://smtp.gmail.com';
-  $config['smtp_user']='dummysigma@gmail.com';
-  $config['smtp_pass']='asdasdasdasd';
-  $config['smtp_port']='465';
+  $config['smtp_host']='smtp.sigma.co.id';
+  $config['smtp_user']=SMTP_AUTH_USR;
+  $config['smtp_pass']=SMTP_AUTH_PWD;
+  $config['smtp_port']='587';
   $config['smtp_timeout']='100';
   $config['charset']    = 'utf-8';
   $config['newline']    = "\r\n";
@@ -837,10 +837,10 @@ join p_bu b on u.bu_id=b.bu_id ";
 function sendVerificationManual($email,$name,$namevendor){
   $this->load->library('email');
   $config['protocol']='smtp';
-  $config['smtp_host']='ssl://smtp.gmail.com';
-  $config['smtp_user']='dummysigma@gmail.com';
-  $config['smtp_pass']='asdasdasdasd';
-  $config['smtp_port']='465';
+  $config['smtp_host']='smtp.sigma.co.id';
+  $config['smtp_user']=SMTP_AUTH_USR;
+  $config['smtp_pass']=SMTP_AUTH_PWD;
+  $config['smtp_port']='587';
   $config['smtp_timeout']='100';
   $config['charset']    = 'utf-8';
   $config['newline']    = "\r\n";
