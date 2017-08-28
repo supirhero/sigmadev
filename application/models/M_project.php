@@ -81,6 +81,34 @@ class M_project extends CI_Model {
         }
         return $result;
     }
+    public function getUserInProject($project_id){
+      $result = null;
+      $sql = "SELECT USER_NAME, USERS.USER_ID,EMAIL, BU_NAME,USER_TYPE_ID FROM USERS JOIN P_BU ON
+       USERS.BU_ID=P_BU.BU_ID  JOIN RESOURCE_POOL RP on USERS.USER_ID=RP.USER_ID WHERE RP.PROJECT_ID='".$project_id."' AND USERS.IS_ACTIVE='1'  order by USER_NAME";
+      $q = $this->db->query($sql);
+      if ($q->num_rows() > 0) {
+          $result = $q->result_array();
+      }
+      return $result;
+    }
+    function getUser($bu) {
+        $result = null;
+        $sql = "SELECT USER_NAME, USER_ID,EMAIL, BU_NAME,USER_TYPE_ID FROM USERS JOIN P_BU ON USERS.BU_ID=P_BU.BU_ID WHERE USERS.BU_ID='".$bu."' AND USER_TYPE_ID='int' AND USERS.IS_ACTIVE='1'  order by USER_NAME";
+        $q = $this->db->query($sql);
+        if ($q->num_rows() > 0) {
+            $result = $q->result_array();
+        }
+        return $result;
+    }
+    function getUserExt() {
+        $result = null;
+        $sql = "SELECT USER_NAME, USER_ID,EMAIL, BU_NAME,USER_TYPE_ID FROM USERS JOIN P_BU ON USERS.BU_ID=P_BU.BU_ID WHERE USER_TYPE_ID='ext' AND USERS.IS_ACTIVE='1' order by USER_NAME";
+        $q = $this->db->query($sql);
+        if ($q->num_rows() > 0) {
+            $result = $q->result_array();
+        }
+        return $result;
+    }
 
     function getAM($am) {
         $result = null;
@@ -142,7 +170,7 @@ class M_project extends CI_Model {
                 RELATED_BU,
                 CREATED_BY,
                 DATE_CREATED,
-                HO_OPERATION) values 
+                HO_OPERATION) values
                 ('$PROJECT_ID',
                 '". $PROJECT_NAME . "',
                 '" . $PM_ID . "',
@@ -331,7 +359,7 @@ class M_project extends CI_Model {
                FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                     INNER JOIN projects c ON b.project_id = c.project_id
                     INNER JOIN p_bu z on c.bu_code = z.bu_code
-                    WHERE c.bu_code ='$bucode' 
+                    WHERE c.bu_code ='$bucode'
              UNION
              SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
                     b.project_complete, b.project_status, b.project_desc,
@@ -340,7 +368,7 @@ class M_project extends CI_Model {
                INNER JOIN p_bu z on b.bu_code = z.bu_code
                WHERE b.bu_code='$bucode'
                     )
-                    where user_id='" . $id . "' or created_by='" . $id . "' 
+                    where user_id='" . $id . "' or created_by='" . $id . "'
                     ")->result_array();
     }
 

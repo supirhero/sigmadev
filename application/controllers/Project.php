@@ -646,7 +646,7 @@ SELECT sum(CASE
     ) THEN
     RESOURCE_WBS
     ELSE
-    1 
+    1
     END*4*duration) as total from wbs WHERE project_id=$project_id");
         $total_pv = $query->row()->TOTAL;
 
@@ -657,7 +657,7 @@ WITH date_range AS (
     FROM    PROJECTS where project_id='$project_id'
     )
 
-        
+
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
             (select max(t1.pv) ac from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
             (select max(t1.ev) ev from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev
@@ -887,7 +887,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         }
 
         /*===================BATCH WBS POOL==============*/
-        $allTemporaryWbsPool = $this->db->query("select * 
+        $allTemporaryWbsPool = $this->db->query("select *
                                                  from temporary_wbs_pool a join wbs b
                                                  on a.wbs_id = b.wbs_id
                                                  where a.project_id = '$project_id'
@@ -969,7 +969,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 
                 //insert new data
                 if($jumlahts == 0){
-                    $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
+                    $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
 
                     //data for insert
                     $TS_ID = $timesheet['TS_ID'];
@@ -987,9 +987,9 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                     $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
 
 
-                    $this->db->query("INSERT INTO TIMESHEET 
+                    $this->db->query("INSERT INTO TIMESHEET
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,
-                              IS_APPROVED,APPROVAL_DATE,REJECTED_MESSAGE,CONFIRMED_BY) 
+                              IS_APPROVED,APPROVAL_DATE,REJECTED_MESSAGE,CONFIRMED_BY)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE','$SUMBIT_DATE',
                               $IS_APPROVED,'$APPROVAL_DATE','$REJECTED_MESSAGE','$CONFIRMED_BY')");
@@ -1003,7 +1003,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                 //insert new data with add prefix number at primary key
                 elseif($jumlahts == 1){
                     //get timesheet total this day
-                    $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
+                    $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
 
                     //data for insert
                     $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
@@ -1015,8 +1015,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                     $LATITUDE = $data['LATITUDE'];
                     $LONGITUDE = $data['LONGITUDE'];
 
-                    $this->db->query("INSERT INTO TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
+                    $this->db->query("INSERT INTO TIMESHEET
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
 
@@ -1031,14 +1031,14 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                     $this->db->where("TS_DATE = to_date('$tgl','yyyymmdd')");
                     $this->db->like('TS_ID', $data['WP_ID'].'.','after');
 
-                    $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01' 
-                              where TS_DATE = to_date('$tgl','yyyymmdd') 
+                    $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01'
+                              where TS_DATE = to_date('$tgl','yyyymmdd')
                               and TS_ID LIKE '".$data['WP_ID'].".%'";
                     $this->db->query($queryupdate);
 
 
                     //insert query
-                    $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
+                    $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
 
                     //data for insert
                     $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
@@ -1050,8 +1050,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                     $LATITUDE = $data['LATITUDE'];
                     $LONGITUDE = $data['LONGITUDE'];
 
-                    $this->db->query("INSERT INTO TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
+                    $this->db->query("INSERT INTO TIMESHEET
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
                 }
@@ -1409,5 +1409,38 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             echo "sent ".$this->email->print_debugger();
         }
 
+    }
+    public function availableMember($project_id){
+      $project=$this->M_project->getProject($project_id);
+      $bucode=array();
+      $buid=array();
+      $data['data']=array();
+      $bucode[0]=$project['BU_CODE'];
+      $related_bu=explode(',',$project['RELATED_BU']);
+      foreach ($related_bu as $r) {
+        if ($r!=$bucode[0]) {
+          array_push($bucode,$r);
+        }
+      }
+      foreach ($bucode as $bc) {
+        array_push($buid,$this->M_project->getBUID($bc));
+      }
+      foreach ($buid as $bi) {
+        if($bi!=null){
+          $userl=$this->M_project->getUser($bi);
+          foreach ($userl as $u) {
+            array_push($data['data'],$u);
+          }
+        }
+      }
+      $userext=$this->M_project->getUserExt();
+      foreach ($userext as $e) {
+        array_push($data['data'],$e);
+      }
+      $userexist=$this->M_project->getUserInProject($project_id);
+      $data['exist']=$userexist;
+      $data['status']='Success';
+      $data['project_id']=$project_id;
+      echo json_encode($data);
     }
 }
