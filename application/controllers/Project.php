@@ -467,6 +467,13 @@ class Project extends CI_Controller
     public function editProject_view(){
 
         $data['project_setting']=$this->M_project->getProject($this->uri->segment(3));
+        array_walk_recursive($data['project_setting'], function(&$item, $key) {
+            if ($item == null ){
+                $item = 'null';
+            }
+        });
+        print_r($data);
+        die;
         $bu_id=$this->M_project->getProjectID($this->uri->segment(3));
         $data['project_business_unit_detail'] = $this->M_business->getData($bu_id);
         //$data['pm'] = $this->M_project->getPM($bu_id);
@@ -546,9 +553,7 @@ class Project extends CI_Controller
         $data["iwolist"]=$hasil['iwo'];
 
         $this->transformKeys($data);
-        array_walk_recursive($data['project_setting'], function(&$item, $key) {
-            if ($item == 'null') $item = NULL;
-        });
+
         echo json_encode($data);
     }
     public function editProject_action(){
