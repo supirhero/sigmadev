@@ -732,11 +732,11 @@ class Report extends CI_Controller {
     //get list all bu
     public function r_list_bu(){
         $data_bu = $this->M_business->getAllBU();
-        $fixdata = ['directorat'=>[],'company'=>[],'business_unit'=>[]];
+        $fixdata = ['company'=>[],'directorat'=>[],'business_unit'=>[]];
 
 
-        $tree['list_bu'] = $this->buildTree($data_bu);
-        /*
+        //$tree['list_bu'] = $this->buildTree($data_bu);
+
         foreach($data_bu as $data){
 
             if ($data['BU_ID'] == 0){
@@ -748,8 +748,8 @@ class Report extends CI_Controller {
             else{
                 array_push($fixdata['business_unit'],$data);
             }
-        }*/
-        echo json_encode($tree);
+        }
+        echo json_encode($fixdata);
     }
 
     private function buildTree(array $elements, $parentId = null) {
