@@ -513,6 +513,7 @@ class Project extends CI_Controller
         foreach ($project_type as $type){
             array_push($data['project_type'],$type['PROJECT_TYPE']);
         }
+
         $usediwo = $this->db->query("select distinct iwo_no from projects")->result_array();
 
         //get iwo
@@ -545,6 +546,9 @@ class Project extends CI_Controller
         $data["iwolist"]=$hasil['iwo'];
 
         $this->transformKeys($data);
+        array_walk_recursive($data['project_setting'], function(&$item, $key) {
+            if ($item == 'null') $item = NULL;
+        });
         echo json_encode($data);
     }
     public function editProject_action(){

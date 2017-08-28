@@ -788,8 +788,6 @@ class Task extends CI_Controller
             error_reporting(E_ALL ^ E_NOTICE);
             // Sheet 1
             $data = $this->excel_reader->sheets[0] ;
-
-            echo json_encode($data);
             $coba = $data['numRows'];
             $dataexcel = Array();
             for ($i = 1; $i <= $data['numRows']; $i++) {
