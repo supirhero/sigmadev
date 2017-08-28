@@ -60,7 +60,8 @@ class Home extends CI_Controller {
 
         if($datauser["data"]["SESSION_EXPIRED"] <= time())
         {
-            $error['error']="session is expired";
+            $this->output->set_header_status(400);
+            $error['error']="Login error";
             echo json_encode($error);
             die();
         }
@@ -71,7 +72,7 @@ class Home extends CI_Controller {
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-        /*
+
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -379,8 +380,6 @@ class Home extends CI_Controller {
                                 echo json_encode($returndata);
                                 die;
                             }
-
-
                         }
                         else{
                             $this->output->set_status_header(403);

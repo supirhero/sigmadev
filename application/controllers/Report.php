@@ -735,7 +735,7 @@ class Report extends CI_Controller {
         $fixdata = ['directorat'=>[],'company'=>[],'business_unit'=>[]];
 
 
-        $tree = $this->buildTree($data_bu);
+        $tree['list_bu'] = $this->buildTree($data_bu);
         /*
         foreach($data_bu as $data){
 
