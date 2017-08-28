@@ -73,7 +73,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
-$tnsname = "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 10.210.20.38 )(PORT = 1521))
+$tnsname = "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 180.250.19.221 )(PORT = 1521))
                 (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = XE)))";
 $db['default'] = array(
     'dsn'	=> '',

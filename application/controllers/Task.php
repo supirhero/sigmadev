@@ -436,8 +436,6 @@ class Task extends CI_Controller
         $id_project = $this->uri->segment(3);
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
         $workplan=$this->M_detail_project->selectWBS($id_project,$rh_id);
-        print_r($workplan);
-        die;
 
         $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
@@ -792,6 +790,8 @@ class Task extends CI_Controller
 
             // Sheet 1
             $data = $this->excel_reader->sheets[0] ;
+
+            echo json_encode($data);
             $coba = $data['numRows'];
             $dataexcel = Array();
             for ($i = 1; $i <= $data['numRows']; $i++) {
