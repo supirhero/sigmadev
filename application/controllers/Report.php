@@ -623,6 +623,8 @@ class Report extends CI_Controller {
 
         }
 
+        echo json_encode($hasil);
+
     }
 
     private function countDuration($start_date, $end_date) {
