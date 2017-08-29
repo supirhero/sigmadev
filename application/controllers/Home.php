@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Home extends CI_Controller {
 
     public $datajson = array();
+    public $allowedBU = [];
 
 
     public function __construct()
@@ -69,10 +70,11 @@ class Home extends CI_Controller {
             $this->M_session->update_session($this->datajson['token']);
         }
 
+        //newest
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-        /*
+
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -105,6 +107,26 @@ class Home extends CI_Controller {
 
                         }
                         elseif($priv['PRIVILEGE'] == 'only_bu'){
+                            //fetching busines unit
+                            $user_bu = $this->datajson['userdata']['BU_ID'];
+                            $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->BU_PARENT_ID;
+                            $directorat_bu = [];
+                            //if company
+                            if($user_bu == 0){
+                                $access = 'masuk';
+                            }
+                            //if directorat
+                            elseif ($user_bu_parent == 0){
+                                $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = '$user_bu'")->result_array();
+                                foreach ($bu_id_all as $buid){
+                                    $directorat_bu[] = $buid['BU_ID'];
+                                }
+                            }
+                            //if bu
+                            else{
+                                $directorat_bu[] = $this->datajson['userdata']['BU_ID'];
+                            }
+
                             switch ($priv['ACCESS_ID']){
                                 //Update Personal Timesheet
                                 case '1':
@@ -126,62 +148,10 @@ class Home extends CI_Controller {
                                 case '2':
                                     //get bu id from bu code
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
-                                    $bu_parent_id = $this->db->query("select bu_parent_id from p_bu where bu_id = '$bu_id'")->BU_PARENT_ID;
-                                    //get user data
-                                    $databu = $this->datajson['userdata'];
-                                    //if company
-                                    if($databu['BU_ID'] == 0){
-                                        $bu_id = 'masuk';
-                                    }
-                                    //if directorat
-                                    elseif ($bu_parent_id == 0){
-                                        $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID'].")")->result_array();
-                                        $bu_id_all_array = [];
-                                        foreach ($bu_id_all as $buid){
-                                            $bu_id_all_array[] = $buid['BU_ID'];
-                                        }
-
-                                        if(array_search($bu_id,$bu_id_all_array) != false){
-                                            $bu_id = 'masuk';
-                                        }
-                                        else{
-                                            $bu_id = 'gagal';
-                                        }
-                                    }
-                                    //if bu
-                                    else{
-
-                                    }
                                     break;
                                 //Create Project
                                 case '3':
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
-                                    $bu_parent_id = $this->db->query("select bu_parent_id from p_bu where bu_id = '$bu_id'")->BU_PARENT_ID;
-                                    //get user data
-                                    $databu = $this->datajson['userdata'];
-                                    //if company
-                                    if($databu['BU_ID'] == 0){
-                                        $bu_id = 'masuk';
-                                    }
-                                    //if directorat
-                                    elseif ($bu_parent_id == 0){
-                                        $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID'].")")->result_array();
-                                        $bu_id_all_array = [];
-                                        foreach ($bu_id_all as $buid){
-                                            $bu_id_all_array[] = $buid['BU_ID'];
-                                        }
-
-                                        if(array_search($bu_id,$bu_id_all_array) != false){
-                                            $bu_id = 'masuk';
-                                        }
-                                        else{
-                                            $bu_id = 'gagal';
-                                        }
-                                    }
-                                    //if bu
-                                    else{
-
-                                    }
                                     break;
                                 //Access All Project In Business Unit
                                 case '4' :
@@ -229,33 +199,6 @@ class Home extends CI_Controller {
                                         $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
                                     }
 
-                                    $bu_parent_id = $this->db->query("select bu_parent_id from p_bu where bu_id = '$bu_id'")->BU_PARENT_ID;
-                                    //get user data
-                                    $databu = $this->datajson['userdata'];
-                                    //if company
-                                    if($databu['BU_ID'] == 0){
-                                        $bu_id = 'masuk';
-                                    }
-                                    //if directorat
-                                    elseif ($bu_parent_id == 0){
-                                        $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID'].")")->result_array();
-                                        $bu_id_all_array = [];
-                                        foreach ($bu_id_all as $buid){
-                                            $bu_id_all_array[] = $buid['BU_ID'];
-                                        }
-
-                                        if(array_search($bu_id,$bu_id_all_array) != false){
-                                            $bu_id = 'masuk';
-                                        }
-                                        else{
-                                            $bu_id = 'gagal';
-                                        }
-                                    }
-                                    //if bu
-                                    else{
-
-                                    }
-
                                     break;
                                 //Approve Timesheet(Non-project) search in this case
                                 case '5' :
@@ -274,61 +217,10 @@ class Home extends CI_Controller {
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
                                                             and projects.project_type_id = 'Non Project'
                                                             ")->row()->BU_ID;
-                                    $bu_parent_id = $this->db->query("select bu_parent_id from p_bu where bu_id = '$bu_id'")->BU_PARENT_ID;
-                                    //get user data
-                                    $databu = $this->datajson['userdata'];
-                                    //if company
-                                    if($databu['BU_ID'] == 0){
-                                        $bu_id = 'masuk';
-                                    }
-                                    //if directorat
-                                    elseif ($bu_parent_id == 0){
-                                        $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID'].")")->result_array();
-                                        $bu_id_all_array = [];
-                                        foreach ($bu_id_all as $buid){
-                                            $bu_id_all_array[] = $buid['BU_ID'];
-                                        }
-
-                                        if(array_search($bu_id,$bu_id_all_array) != false){
-                                            $bu_id = 'masuk';
-                                        }
-                                        else{
-                                            $bu_id = 'gagal';
-                                        }
-                                    }
-                                    //if bu
-                                    else{
-
-                                    }
                                     break;
                                 //See Report Overview
                                 case '6' :
-                                    $bu_id = $this->datajson['userdata']['BU_ID'];
-                                    $bu_parent_id = $this->db->query("select bu_parent_id from p_bu where bu_id = '$bu_id'")->BU_PARENT_ID;
-                                    //get user data
-                                    $databu = $this->datajson['userdata'];
-                                    //if company
-                                    if($databu['BU_ID'] == 0){
-
-                                        $bu_id_fetch = $this->db-query("select bu_id from p_bu")->result_array();
-                                        foreach ($bu_id_fetch as $fetch){
-                                            $this->bu_id[] = $fetch['BU_ID'];
-                                        }
-                                        $bu_id = "masuk";
-                                    }
-                                    //if directorat
-                                    elseif ($bu_parent_id == 0){
-                                        $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID'].")")->result_array();
-                                        foreach ($bu_id_all as $buid){
-                                            $this->bu_id[] = $buid['BU_ID'];
-                                        }
-                                        $bu_id = 'masuk';
-                                    }
-                                    //if bu
-                                    else{
-                                        $this->bu_id[] = $this->datajson['userdata']['BU_ID'];
-                                        $bu_id = 'masuk';
-                                    }
+                                    /* LIMIT REPORT OVERVIEW BY ADD IN CLAUSE TO QUERY */
                                     break;
                                 //See Resource Report
                                 case '7':
@@ -342,36 +234,10 @@ class Home extends CI_Controller {
                                 case '9':
                                     $projectid = $_POST['project_id'];
                                     $bu_id = $this->db->query("select bu_id from projects where project_id = '$projectid'")->row()->BU_ID;
-                                    $databu = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row_array();
-                                    if($databu['BU_ID'] == 0){
-                                        $bu_id = "masuk";
-                                    }
-                                    elseif ($databu['BU_PARENT_ID'] == 0){
-                                        $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = ".$databu['BU_ID'].")")->result_array();
-                                        $bu_id_all_array = [];
-                                        foreach ($bu_id_all as $buid){
-                                            $bu_id_all_array[] = $buid['BU_ID'];
-                                        }
-
-                                        if(array_search($bu_id,$bu_id_all_array) != false){
-                                            $bu_id = 'masuk';
-                                        }
-                                        else{
-                                            $bu_id = 'gagal';
-                                        }
-                                    }
-                                    else{
-                                        if($this->datajson['userdata']['BU_ID'] == $bu_id){
-                                            $bu_id  = 'masuk';
-                                        }
-                                        else{
-                                            $bu_id = 'gagal';
-                                        }
-                                    }
                                     break;
                             }
-                            if($this->datajson['userdata']['BU_ID'] == $bu_id || $bu_id == 'masuk'){
-
+                            if(array_search($this->datajson['userdata']['BU_ID'],$directorat_bu) || $bu_id == 'masuk'){
+                                $this->allowedBU = $directorat_bu;
                             }
                             else{
                                 $this->output->set_status_header(403);
@@ -393,6 +259,7 @@ class Home extends CI_Controller {
                     elseif($priv['TYPE'] == 'PROJECT'){
                         if($priv['PRIVILEGE'] == 'can'){
                             switch ($priv['ACCESS_ID']){
+                                //Upload, create, edit, and delete workplan
                                 case '10':
                                     switch ($url_dest){
                                         case 'task/createtask':
@@ -408,31 +275,45 @@ class Home extends CI_Controller {
                                             break;
                                     }
                                     break;
+                                //Assign Task
                                 case '11':
                                     $project_id_req = explode(".",$_POST['WBS_ID']);
                                     $project_id_req = $project_id_req[0];
                                     break;
+                                //Baseline - Rebaseline project
                                 case '12':
                                     $project_id_req = $_POST['project_id'];
                                     break;
+                                //Update progress manually
                                 case '13':
                                     $project_id_req = $_POST['PROJECT_ID'];
                                     break;
+                                //Approve timesheet
                                 case '14':
                                     $project_id_req = $_POST['project_id'];
                                     break;
+                                //Edit Project
                                 case '15':
                                     $project_id_req = $_POST['PROJECT_ID'];
                                     break;
+                                //See Project Report
                                 case '16':
                                     $project_id_req = $this->uri->segment(3);
+                                    break;
+                                //Download Report
+                                case '17':
                                     break;
                             }
                         }
                         else{
-
+                            $this->output->set_status_header(403);
+                            $returndata['status'] = 'denied';
+                            $returndata['message'] = 'you dont have permission to access this action';
+                            echo json_encode($returndata);
+                            die;
                         }
                         if(!in_array($project_id_req,$list_project_id)){
+                            $this->output->set_status_header(403);
                             $returndata['status'] = 'denied';
                             $returndata['message'] = 'you dont have permission to access this action';
                             echo json_encode($returndata);

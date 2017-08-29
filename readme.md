@@ -466,6 +466,38 @@ Json Return data :
     ->total_project_value
 ```
 
+## Advance Search Project
+URI :
+```
+http://45.77.45.126/dev/report/report_filter
+```
+Input yang harus di provide :
+```
+->value <= checkbox (1 (< 5m) , 2 (1M sd 5m) , 3 (> 5m) )
+->status <= checkbox (1 == 'Not Started' , 2 == 'In Progress' , 3 == 'On Hold', 4 == 'Completed', 5 == 'In Planning', 6 == 'Cancelled')
+->schedule <= checkbox (1 == 'Schedule Overrun', 2 == 'On Schedule' , 3 == 'Ahead Schedule')
+->budget <= checkbox (1 == 'Over Budget', 2 == 'On Budget', 3 == 'Ahead Budget')
+```
+Json Return :
+```
+->project[]
+    ->
+    ->
+```
+## Download Avance Search Project Result
+URI :
+```
+http://45.77.45.126/dev/report/report_filter_download
+```
+Input yang harus di provide :
+```
+->value <= checkbox (1 (< 5m) , 2 (1M sd 5m) , 3 (> 5m) )
+->status <= checkbox (1 == 'Not Started' , 2 == 'In Progress' , 3 == 'On Hold', 4 == 'Completed', 5 == 'In Planning', 6 == 'Cancelled')
+->schedule <= checkbox (1 == 'Schedule Overrun', 2 == 'On Schedule' , 3 == 'Ahead Schedule')
+->budget <= checkbox (1 == 'Over Budget', 2 == 'On Budget', 3 == 'Ahead Budget')
+```
+Return = File Excel
+
 # Project Controller
 ## Add Project View Data
 API ini akan collect data yang berguna untuk mengisi data yang di perlukan form untuk submit project baru. 

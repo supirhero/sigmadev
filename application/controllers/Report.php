@@ -1273,76 +1273,170 @@ class Report extends CI_Controller {
 
 }
 
-public function exportexcel_project()
-{
-    $query ="select a.* from v_find_project a";
-    $cond=" where 1=1";
-            //if(isset($this->input->post("bu"))){
-            //  $cond=." and BU_ID='$this->input->post('bu')' ";
-            //}
-    $y=$this->input->get("year");
-    $bu=$this->input->get("bu_id");
-    $month=$this->input->get("month");
-    $pm=$this->input->get("pm");
-    $pv=$this->input->get("project_value");
-    $ss=$this->input->get("schedule_status");
-    $bs=$this->input->get("budget_status");
-    $ps=$this->input->get("project_status");
-    $tp=$this->input->get("type_of_effort");
-    if(isset($y)&&$y!='all'){
-        $cond.=" and TO_CHAR(a.date_created,'YYYY')='".$y."' ";
-    }
-            //if(isset($cat)&&$cat!='all'){
-            //$cond.=" and cat='".$this->input->post("cat")."' ";
-            //}
-    if(isset($tp)&&$tp!='all'){
-        $cond.=" and TYPE_OF_EFFORT='".$type_of_effort."' ";
-    }
-    if(isset($ss)&&$ss!='all'){
-        $cond.=" and SCHEDULE_status='".$schedule_status."' ";
-    }
-    if(isset($ps)&&$ps!='all'){
-        $cond.=" and project_status='".$project_status."' ";
-    }
-    if(isset($bs)&&$bs!='all'){
-        $cond.=" and Budget_status='".$budget_status."' ";
-    }
-    if(isset($pm)&&$pm!='all'){
-        $cond.=" and PM_ID='".$pm."' ";
-    }
-    if(isset($bu)&&$bu!='all'){
-        $cond.=" and bu_id='".$bu."' ";
-    }
-    if(isset($month)&&$month!='all'){
-        if (strlen($month)<1){
-            $month='0'.$month;
+    public function report_filter(){
+        $query ="select project_name,project_status,project_complete as percent,amount,
+                 customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
+                 where 1=1 ";
+        if(!empty($this->input->post('value'))){
+            foreach ($this->input->post('value') as $value){
+                switch ($value){
+                    case '1':
+                        $query .= " or amount < 1000000000";
+                        break;
+                    case '2':
+                        $query .= " or amount between 1000000000 and 5000000000";
+                        break;
+                    case '3':
+                        $query .= "or amount > 5000000000";
+                        break;
+                }
+            }
         }
-        $cond.=" and TO_CHAR(SCHEDULE_START,'MM')='".$month."' ";
+        if(!empty($this->input->post('status'))){
+            foreach ($this->input->post('status') as $value){
+                switch ($value){
+                    case '1':
+                        $query .= " or project_status = 'Not Started'";
+                        break;
+                    case '2':
+                        $query .= " or project_status = 'In Progress'";
+                        break;
+                    case '3':
+                        $query .= " or project_status = 'On Hold'";
+                        break;
+                    case '4':
+                        $query .= " or project_status = 'Completed'";
+                        break;
+                    case '5':
+                        $query .= " or project_status = 'In Planning'";
+                        break;
+                    case '6':
+                        $query .= " or project_status = 'Cancelled'";
+                        break;
+                }
+            }
+        }
+        if(!empty($this->input->post('schedule'))){
+            foreach ($this->input->post('schedule') as $value){
+                switch ($value){
+                    case '1':
+                        $query .= " or schedule_status = 'Schedule Overrun'";
+                        break;
+                    case '2':
+                        $query .= " or schedule_status = 'On Schedule'";
+                        break;
+                    case '3':
+                        $query .= " or project_status = 'Ahead Schedule'";
+                        break;
+
+                }
+            }
+        }
+        if(!empty($this->input->post('budget'))){
+            foreach ($this->input->post('budget') as $value){
+                switch ($value){
+                    case '1':
+                        $query .= " or schedule_status = 'Over Budget'";
+                        break;
+                    case '2':
+                        $query .= " or schedule_status = 'On Budget'";
+                        break;
+                    case '3':
+                        $query .= " or project_status = 'Ahead Budget'";
+                        break;
+
+                }
+            }
+        }
+
+        $result['project'] = $this->db->query($query)->result_array();
+        echo json_encode($result);
     }
-    if(isset($pv)&&$pv!='all'){
-        if($pv=='1'){
 
-            $cond.=" and amount <=100000000'".$pv."' ";
+    public function report_filter_download(){
+
+        $query ="select project_name,project_status,project_complete as percent,amount,
+                 customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
+                 where 1=1 ";
+        if(!empty($this->input->post('value'))){
+            foreach ($this->input->post('value') as $value){
+                switch ($value){
+                    case '1':
+                        $query .= " or amount < 1000000000";
+                        break;
+                    case '2':
+                        $query .= " or amount between 1000000000 and 5000000000";
+                        break;
+                    case '3':
+                        $query .= "or amount > 5000000000";
+                        break;
+                }
+            }
         }
-        elseif($pv=='2') {
-                    # code...
-            $cond.=" and amount between 1000000000 and 5000000000'".$pv."' ";
+        if(!empty($this->input->post('status'))){
+            foreach ($this->input->post('status') as $value){
+                switch ($value){
+                    case '1':
+                        $query .= " or project_status = 'Not Started'";
+                        break;
+                    case '2':
+                        $query .= " or project_status = 'In Progress'";
+                        break;
+                    case '3':
+                        $query .= " or project_status = 'On Hold'";
+                        break;
+                    case '4':
+                        $query .= " or project_status = 'Completed'";
+                        break;
+                    case '5':
+                        $query .= " or project_status = 'In Planning'";
+                        break;
+                    case '6':
+                        $query .= " or project_status = 'Cancelled'";
+                        break;
+                }
+            }
         }
-        elseif ($pv=='3') {
-            $cond.=" and amount >5000000000'".$pv."' ";
+        if(!empty($this->input->post('schedule'))){
+            foreach ($this->input->post('schedule') as $value){
+                switch ($value){
+                    case '1':
+                        $query .= " or schedule_status = 'Schedule Overrun'";
+                        break;
+                    case '2':
+                        $query .= " or schedule_status = 'On Schedule'";
+                        break;
+                    case '3':
+                        $query .= " or project_status = 'Ahead Schedule'";
+                        break;
 
+                }
+            }
+        }
+        if(!empty($this->input->post('budget'))){
+            foreach ($this->input->post('budget') as $value){
+                switch ($value){
+                    case '1':
+                        $query .= " or schedule_status = 'Over Budget'";
+                        break;
+                    case '2':
+                        $query .= " or schedule_status = 'On Budget'";
+                        break;
+                    case '3':
+                        $query .= " or project_status = 'Ahead Budget'";
+                        break;
+
+                }
+            }
         }
 
-
-    }
-
-            //echo $query.$cond;
-    $p =$this->db->query($query.$cond)->result_array();
-    //echo ($query.$cond);
-    $filename ="document_name.xls";
-    header('Content-type: application/ms-excel');
-    header('Content-Disposition: attachment; filename='.$filename);
-    echo "<table class='table table-stripped'>
+        //echo $query.$cond;
+        $p =$this->db->query($query)->result_array();
+        //echo ($query.$cond);
+        $filename ="report_project.xls";
+        header('Content-type: application/ms-excel');
+        header('Content-Disposition: attachment; filename='.$filename);
+        echo "<table class='table table-stripped'>
     <thead>
 
         <tr>
@@ -1369,17 +1463,12 @@ public function exportexcel_project()
     <tbody>";
         foreach ($p as $project) {
             echo "<tr>";
-            echo "<td>".$project['BU_ALIAS']."</td>";
-            echo "<td>".$project['IWO_NO']."</td>";
-            echo "<td>".$project['DATE_CREATED']."</td>";
             echo "<td>".$project['PROJECT_NAME']."</td>";
-            echo "<td>".$project['CUR_ID']." ".$project['AMOUNT']."</td>";
+            echo "<td>".$project['AMOUNT']."</td>";
             echo "<td>".$project['CUSTOMER_NAME']."</td>";
             echo "<td>".$project['PROJECT_STATUS']."</td>";
-            echo "<td>".$project['PROJECT_COMPLETE']." </td>";
+            echo "<td>".$project['PERCENT']." </td>";
             echo "<td>".$project['PM']."</td>";
-            echo "<td>".$project['TYPE_OF_EFFORT']."</td>";
-            echo "<td>".$project['RESOURCES']."</td>";
             echo "<td>".$project['PV']."</td>";
             echo "<td>".$project['EV']."</td>";
             echo "<td>".$project['AC']."</td>";

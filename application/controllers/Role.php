@@ -2,106 +2,109 @@
 //
 class Role extends CI_Controller
 {
+
+    public $datajson = array();
+
     function __construct()
     {
         parent::__construct();
         $this->load->model('M_role');
+        $this->load->model('M_session');
+
+        //TOKEN LOGIN CHECKER
+        if(isset($_GET['token'])){
+            $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
+            $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
+            //    print_r($decoded_user_data);
+            $this->datajson['token'] = $_GET['token'];
+
+        }
+        elseif(isset($_SERVER['HTTP_TOKEN'])){
+            $datauser["data"] = $this->M_session->GetDataUser($_SERVER['HTTP_TOKEN']);
+
+            $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
+            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
+        }
+        else{
+            print_r($_GET);
+            $error['error']="Login First!";
+            echo json_encode($error);
+            die();
+        }
+        //if login success
+        if(!isset($decoded_user_data[0])){
+            //get user data from token
+
+            //for login bypass ,this algorithm is not used
+            //$this->datajson['userdata'] = (array)$decoded_user_data['data'];
+            //this code below for login bypass
+            $this->datajson['userdata'] = $decoded_user_data;
+        }
+        //if login fail
+        else {
+            echo $decoded_user_data[0];
+            die();
+        }
+
+        if($datauser["data"]["SESSION_EXPIRED"] <= time())
+        {
+            $this->output->set_status_header(400);
+            $error['error']="Login error";
+            echo json_encode($error);
+            die();
+        }
+        else{
+            $this->M_session->update_session($this->datajson['token']);
+        }
     }
 
-    function insert(){
-        $data = [
-            [
-                "ACCESS_ID"=>1,
-                "ACCESS_NAME"=>"Update Personal Timesheet",
-                "TYPE"=>"BUSINESS"
-            ],
-            [
-                "ACCESS_ID"=>2,
-                "ACCESS_NAME"=>"Access Business Unit Overview",
-                "TYPE"=>"BUSINESS",
-            ],
-            [
-                "ACCESS_ID"=>3,
-                "ACCESS_NAME"=>"Create Project",
-                "TYPE"=>"BUSINESS",
-            ],
-            [
-                "ACCESS_ID"=>4,
-                "ACCESS_NAME"=>"Access All Project In Business Unit",
-                "TYPE"=>"BUSINESS",
-            ],
-            [
-                "ACCESS_ID"=>5,
-                "ACCESS_NAME"=>"Approve Timesheet(Non-project)",
-                "TYPE"=>"BUSINESS",
-            ],
-            [
-                "ACCESS_ID"=>6,
-                "ACCESS_NAME"=>"See Report Overview",
-                "TYPE"=>"BUSINESS",
-            ],
-            [
-                "ACCESS_ID"=>7,
-                "ACCESS_NAME"=>"See Resource Report",
-                "TYPE"=>"BUSINESS"
-            ],
-            [
-                "ACCESS_ID"=>8,
-                "ACCESS_NAME"=>"Download Report",
-                "TYPE"=>"BUSINESS"
-            ],
-            [
-                "ACCESS_ID"=>9,
-                "ACCESS_NAME"=>"Approve/Deny Rebaseline",
-                "TYPE"=>"BUSINESS"
-            ]
-        ];
-        $dataurl= [
-            [
-                "ACCESS_ID" => 1,
-                "ACCESS_URL"=>"timesheet/addtimesheet"
-            ],
-            [
-                "ACCESS_ID" =>1 ,
-                "ACCESS_URL"=>"timesheet/view"
-            ],
-            [
-                "ACCESS_ID"=>2,
-                "ACCESS_URL"=>"home/budetail"
-            ],
-            [
-                "ACCESS_ID"=>3,
-                "ACCESS_URL"=>"project/addproject_view"
-            ],
-            [
-                "ACCESS_ID"=>3,
-                "ACCESS_URL"=>"project/addproject_acion"
-            ],
-            [
-                "ACCESS_ID"=>4,
-                "ACCESS_URL"=>'accept'
-            ],
-            [
-                "ACCESS_ID"=>5,
-                "ACCESS_URL"=>"timesheet/confirmationtimesheet"
-            ],
-            [
-                "ACCESS_ID"=>7,
-                "ACCESS_URL"=>"report/r_people"
-            ],
-            [
-                "ACCESS_ID"=>9,
-                "ACCESS_URL"=>"project/accept_rebaseline"
-            ],
-            [
-                "ACCESS_ID"=>9,
-                "ACCESS_URL"=>"project/deny_rebaseline"
-            ]
-        ];/*
-        foreach($dataurl as $d){
+    function getProfile(){
+        $data['profile'] = $this->db->query("select * from profile")->result_array();
 
-            $this->db->insert('ACCESS_URL',$d);
-        }*/
+        echo json_encode($data);
+    }
+
+    function editProfile_view(){
+        $prof_id = $this->input->post('profile_id');
+        $data['profile_setting'] = $this->db->query("select * from profile where prof_id = '$prof_id'")->result_array();
+        $data['profile_privilege'] = $this->db->query("select al.access_name,al.type,pac.privilege
+                                                        from profile join profile_access_list pac
+                                                        on profile.prof_id = pac.profile_id
+                                                        join access_list al
+                                                        on al.access_id=pac.access_id
+                                                        where profile.prof_id = '".$this->datajson['userdata']['PROF_ID']."'")->result_array();
+        echo json_encode($data);
+    }
+
+    function editProfile_action(){
+        $prof_id = $this->input->post('profile_id');
+        $prof_name = $this->input->post('role_name');
+        $prof_desc = $this->input->post('role_desc');
+
+        $role1 = $this->input->post('role_1');
+        $role2 = $this->input->post('role_2');
+        $role3 = $this->input->post('role_3');
+        $role4 = $this->input->post('role_4');
+        $role5 = $this->input->post('role_5');
+        $role6 = $this->input->post('role_6');
+        $role7 = $this->input->post('role_7');
+        $role8 = $this->input->post('role_8');
+        $role9 = $this->input->post('role_9');
+        $role10 = $this->input->post('role_10');
+        $role11 = $this->input->post('role_11');
+        $role12 = $this->input->post('role_12');
+        $role13 = $this->input->post('role_13');
+        $role14 = $this->input->post('role_14');
+        $role15 = $this->input->post('role_15');
+        $role16 = $this->input->post('role_16');
+
+        $this->db->query("update profile set prof_name = '$prof_name',prof_desc = '$prof_desc' where prof_id = '$prof_id'");
+        if($this->db->affected_rows() == 1){
+            $data['change_profile'] = 'success';
+        }
+        $change = [
+
+        ];
 
     }
 }
