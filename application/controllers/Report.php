@@ -769,7 +769,7 @@ class Report extends CI_Controller {
     }
 
     //https://marvelapp.com/hj9eb56/screen/29382899
-    public function r_directoratbu(){
+    public function r_bu(){
         $bu = $_POST['bu'];
         $tahun = $_POST['tahun'];
         $data =array();
@@ -916,151 +916,117 @@ class Report extends CI_Controller {
 }
 
     //resource per bu
-public function r_util_bu(){
+    public function r_util_bu(){
 
-    $tahun = $this->input->post('tahun');
-        // $tahun = '2016';
-        //  $bu = 37;
-    $bu = $this->input->post('bu_id');
+        $tahun = $this->input->post('tahun');
+            // $tahun = '2016';
+            //  $bu = 37;
+        $bu = $this->input->post('bu_id');
 
-    $y=(int)date("Y");
-        // $m=(int)date("m");
-        //echo print_r ($thn);
+        $y=(int)date("Y");
+            // $m=(int)date("m");
+            //echo print_r ($thn);
 
 
-    $count_user=$this->M_report->getCountUser($bu);
-        //echo print_r($tahun);
+        $count_user=$this->M_report->getCountUser($bu);
+            //echo print_r($tahun);
 
-    if (($tahun==$y)){
+        if (($tahun==$y)){
 
-        $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
+            $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
+        }
+        else{
+
+            $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
+
+        }
+
+
+            //Utilization text
+        if ($res['jml_util']<80)
+        {
+            $res['status_utilization']='Under';
+        }
+        elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
+            $res['status_utilization']='Optimal';
+        }
+        else {
+            $res['status_utilization']='Over';
+        }
+
+        $allhour=$this->M_report->getAllHourBU($bu,$tahun);
+        $res['allhour']=[];
+        $i=1;
+        foreach ($allhour as $hus) {
+            $res['allhour'][$i][0]= $hus['BULAN'];
+            $res['allhour'][$i][1]=$hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun));
+            $i++;
+        }
+
+            //   json_encode($res,JSON_NUMERIC_CHECK);
+            //$i=1;
+            /*  $data['res'][0]=array('Month','Entry');
+
+            foreach ($res as $r) {
+
+
+
+            //  $hasil['res'][$i][0]=  $dateObj->format('M');
+            $data['res'][$i][0]=  $r['JML_ENTRY_BULANAN'];
+            $data['res'][$i][1]=  $r['BULAN'];
+
+            $i++;
+
+
+        }*/
+        echo json_encode($res,JSON_NUMERIC_CHECK);
     }
-    else{
 
-        $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
-
+    function getdurationmonth($month,$tahun){
+        switch ($month) {
+            case '01':
+            $dur=$this->countDuration($tahun."/1/1", $tahun."/1/31");
+            break;
+            case '02':
+            $dur=$this->countDuration($tahun."/2/1", $tahun."/2/28");
+            break;
+            case '03':
+            $dur=$this->countDuration($tahun."/3/1", $tahun."/3/31");
+            break;
+            case '04':
+            $dur=$this->countDuration($tahun."/4/1", $tahun."/4/30");
+            break;
+            case '05':
+            $dur=$this->countDuration($tahun."/5/1", $tahun."/5/31");
+            break;
+            case '06':
+            $dur=$this->countDuration($tahun."/6/1", $tahun."/6/30");
+            break;
+            case '07':
+            $dur=$this->countDuration($tahun."/7/1", $tahun."/7/31");
+            break;
+            case '08':
+            $dur=$this->countDuration($tahun."/8/1", $tahun."/8/31");
+            break;
+            case '09':
+            $dur=$this->countDuration($tahun."/9/1", $tahun."/9/30");
+            break;
+            case '10':
+            $dur=$this->countDuration($tahun."/10/1", $tahun."/10/31");
+            break;
+            case '11':
+            $dur=$this->countDuration($tahun."/11/1", $tahun."/11/30");
+            break;
+            case '12':
+            $dur=$this->countDuration($tahun."/12/1", $tahun."/12/31");
+            break;
+        }
+        return $dur;
     }
+        //report overview
+    public function r_overview(){
 
-
-        //Utilization text
-    if ($res['jml_util']<80)
-    {
-        $res['status_utilization']='Under';
-    }
-    elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
-        $res['status_utilization']='Optimal';
-    }
-    else {
-        $res['status_utilization']='Over';
-    }
-
-    $allhour=$this->M_report->getAllHourBU($bu,$tahun);
-    $res['allhour']=[];
-    $i=1;
-    foreach ($allhour as $hus) {
-        $res['allhour'][$i][0]= $hus['BULAN'];
-        $res['allhour'][$i][1]=$hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun));
-        $i++;
-    }
-
-        //   json_encode($res,JSON_NUMERIC_CHECK);
-        //$i=1;
-        /*  $data['res'][0]=array('Month','Entry');
-
-        foreach ($res as $r) {
-
-
-
-        //  $hasil['res'][$i][0]=  $dateObj->format('M');
-        $data['res'][$i][0]=  $r['JML_ENTRY_BULANAN'];
-        $data['res'][$i][1]=  $r['BULAN'];
-
-        $i++;
-
-
-    }*/
-    echo json_encode($res,JSON_NUMERIC_CHECK);
-}
-
-function getdurationmonth($month,$tahun){
-    switch ($month) {
-        case '01':
-        $dur=$this->countDuration($tahun."/1/1", $tahun."/1/31");
-        break;
-        case '02':
-        $dur=$this->countDuration($tahun."/2/1", $tahun."/2/28");
-        break;
-        case '03':
-        $dur=$this->countDuration($tahun."/3/1", $tahun."/3/31");
-        break;
-        case '04':
-        $dur=$this->countDuration($tahun."/4/1", $tahun."/4/30");
-        break;
-        case '05':
-        $dur=$this->countDuration($tahun."/5/1", $tahun."/5/31");
-        break;
-        case '06':
-        $dur=$this->countDuration($tahun."/6/1", $tahun."/6/30");
-        break;
-        case '07':
-        $dur=$this->countDuration($tahun."/7/1", $tahun."/7/31");
-        break;
-        case '08':
-        $dur=$this->countDuration($tahun."/8/1", $tahun."/8/31");
-        break;
-        case '09':
-        $dur=$this->countDuration($tahun."/9/1", $tahun."/9/30");
-        break;
-        case '10':
-        $dur=$this->countDuration($tahun."/10/1", $tahun."/10/31");
-        break;
-        case '11':
-        $dur=$this->countDuration($tahun."/11/1", $tahun."/11/30");
-        break;
-        case '12':
-        $dur=$this->countDuration($tahun."/12/1", $tahun."/12/31");
-        break;
-    }
-    return $dur;
-}
-    //report overview
-public function r_overview(){
-
-    $date=date("M-Y");
-    $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-        round(sum(ev)/count(c.project_id),2) as EV,
-        round(sum(pv)/count(c.project_id),2) as PV,
-        round(sum(AC)/count(c.project_id),2) as AC,
-        case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-        case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-        from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-        case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-        case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-        project_id
-        from tb_rekap_project
-        where  to_char(tanggal,'Mon-YYYY')='$date'
-        group by project_id) a inner join
-        projects c on c.project_id=a.project_id
-        inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-        where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
-        and type_of_effort in (1,2)
-        and pv!='0' 
-        and b.BU_CODE !='PROUDS'
-        and b.BU_code !='GTS'
-        and b.BU_code !='NSM' 
-        group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
-        order by b.bu_name");
-    $result["r_monthly"] = $query->result();
-    $year=date("Y");
-
-    $listBU=explode(",",$this->input->post('bu_aliases'));
-    foreach ($listBU as &$value) {
-        $list[] = "'".$value."'";
-    }
-    $listBU = implode(",",$list);
-    for($i=1; $i<=12; $i++)
-    {
-        $month = date("M", mktime(0, 0, 0, $i, 10));
+        $date=date("M-Y");
         $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
             round(sum(ev)/count(c.project_id),2) as EV,
             round(sum(pv)/count(c.project_id),2) as PV,
@@ -1072,7 +1038,7 @@ public function r_overview(){
             case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
             project_id
             from tb_rekap_project
-            where  to_char(tanggal,'Mon-YYYY')='$month-$year'
+            where  to_char(tanggal,'Mon-YYYY')='$date'
             group by project_id) a inner join
             projects c on c.project_id=a.project_id
             inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
@@ -1082,48 +1048,82 @@ public function r_overview(){
             and b.BU_CODE !='PROUDS'
             and b.BU_code !='GTS'
             and b.BU_code !='NSM' 
-            and b.BU_alias in ($listBU)
             group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
-        $result["r_yearly"][$i] = $query->result();
-        $result["r_yearly"][$i]["month_name"] = $month;
+        $result["r_monthly"] = $query->result();
+        $year=date("Y");
+
+        $listBU=explode(",",$this->input->post('bu_aliases'));
+        foreach ($listBU as &$value) {
+            $list[] = "'".$value."'";
+        }
+        $listBU = implode(",",$list);
+        for($i=1; $i<=12; $i++)
+        {
+            $month = date("M", mktime(0, 0, 0, $i, 10));
+            $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+                round(sum(ev)/count(c.project_id),2) as EV,
+                round(sum(pv)/count(c.project_id),2) as PV,
+                round(sum(AC)/count(c.project_id),2) as AC,
+                case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+                case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+                from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
+                case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
+                case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+                project_id
+                from tb_rekap_project
+                where  to_char(tanggal,'Mon-YYYY')='$month-$year'
+                group by project_id) a inner join
+                projects c on c.project_id=a.project_id
+                inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+                where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
+                and type_of_effort in (1,2)
+                and pv!='0' 
+                and b.BU_CODE !='PROUDS'
+                and b.BU_code !='GTS'
+                and b.BU_code !='NSM' 
+                and b.BU_alias in ($listBU)
+                group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+                order by b.bu_name");
+            $result["r_yearly"][$i] = $query->result();
+            $result["r_yearly"][$i]["month_name"] = $month;
+        }
+        echo json_encode($result);
     }
-    echo json_encode($result);
-}
 
-    //report monthly overview
-public function r_month(){
-    $tahun = $this->input->post('tahun');
-    $month = date("M", mktime(0, 0, 0, $this->input->post('bulan'), 10));
+        //report monthly overview
+    public function r_month(){
+        $tahun = $this->input->post('tahun');
+        $month = date("M", mktime(0, 0, 0, $this->input->post('bulan'), 10));
 
-    $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-        round(sum(ev)/count(c.project_id),2) as EV,
-        round(sum(pv)/count(c.project_id),2) as PV,
-        round(sum(AC)/count(c.project_id),2) as AC,
-        case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-        case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-        from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-        case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-        case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-        project_id
-        from tb_rekap_project
-        where  to_char(tanggal,'Mon-YYYY')='$month-$tahun'
-        group by project_id) a inner join
-        projects c on c.project_id=a.project_id
-        inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-        where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
-        and type_of_effort in ('1','2')
-        and pv!='0' 
-        and b.BU_CODE !='PROUDS'
-        and b.BU_code !='GTS'
-        and b.BU_code !='NSM' 
-        group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
-        order by b.bu_name");
-    $result["r_monthly"] = $query->result();
-    echo json_encode($result);
-}
-    //report yearly overview
-public function r_yearly($year=false){
+        $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+            round(sum(ev)/count(c.project_id),2) as EV,
+            round(sum(pv)/count(c.project_id),2) as PV,
+            round(sum(AC)/count(c.project_id),2) as AC,
+            case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+            case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+            from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
+            case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
+            case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+            project_id
+            from tb_rekap_project
+            where  to_char(tanggal,'Mon-YYYY')='$month-$tahun'
+            group by project_id) a inner join
+            projects c on c.project_id=a.project_id
+            inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
+            and type_of_effort in ('1','2')
+            and pv!='0' 
+            and b.BU_CODE !='PROUDS'
+            and b.BU_code !='GTS'
+            and b.BU_code !='NSM' 
+            group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+            order by b.bu_name");
+        $result["r_monthly"] = $query->result();
+        echo json_encode($result);
+    }
+        //report yearly overview
+    public function r_yearly($year=false){
     if(!$year)
     {
         $year=date("Y");
