@@ -104,14 +104,18 @@ class Role extends CI_Controller
         }
         $i = 0;
         foreach($role as $priv){
-            $change = [
-                "PRIVILEGE"=>$priv
-            ];
-            $this->db->where('PROFILE_ID',$prof_id);
-            $this->db->where('ACCESS_ID',$i);
-            $this->db->update('PROFILE_ACCESS_LIST',$change);
+            if($role[$i] != null || $role[$i] != ""){
+                $change = [
+                    "PRIVILEGE"=>$priv
+                ];
+                $this->db->where('PROFILE_ID',$prof_id);
+                $this->db->where('ACCESS_ID',$i+1);
+                $this->db->update('PROFILE_ACCESS_LIST',$change);
+            }
             $i++;
         }
+        echo $this->db->last_query();
+
 
     }
 }
