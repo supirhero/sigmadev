@@ -1234,6 +1234,16 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             START WITH WBS_ID='".$id."' ORDER SIBLINGS BY WBS_PARENT_ID")->result();
     }
 
+    private function checkTSData($wp,$date){
+        $id=$wp.".".date_format(date_create($date),'Ymd');
+        $query=$this->db->query("select HOUR_TOTAL as HOURS from TIMESHEET where TS_ID='".$id."'");
+        if($query->num_rows() > 0){
+            return $query->row()->HOURS;
+        }else{
+            return 'a';
+        }
+    }
+
     private function sendVerificationinviteMember($email,$project_name,$project_id){
 
         //$email='dakan@sigma.co.id';
