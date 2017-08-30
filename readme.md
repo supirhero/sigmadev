@@ -1111,6 +1111,21 @@ URI untuk mengakses API ini :
  -> status
  -> msg
  -> data
-
  ```
+ 
+ 
+##  Manage User list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/manage/user/{type}/{action}
+ type : int, ext
+ action : emailactivation, autoactivation,download
+ ```
+ example Return Json :
+ ```
+ -> status
+ -> msg_email
+ -> data
+ ```
+ 
 
