@@ -1296,6 +1296,7 @@ class Report extends CI_Controller {
         $query ="select project_name,project_status,project_complete as percent,amount,
                  customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
                  where 1=1 ";
+
         if(!empty($this->input->post('value'))){
             foreach ($this->input->post('value') as $value){
                 switch ($value){

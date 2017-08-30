@@ -25,7 +25,7 @@ class Home extends CI_Controller {
         if(isset($_GET['token'])){
             $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
             $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
-        //    print_r($decoded_user_data);
+            //    print_r($decoded_user_data);
             $this->datajson['token'] = $_GET['token'];
 
         }
@@ -119,12 +119,12 @@ class Home extends CI_Controller {
                             switch ($priv['ACCESS_ID']){
                                 //Update Personal Timesheet
                                 case '1':
-                                    $bu_id = $this->db->query(" select p_bu.bu_id 
+                                    $bu_id = $this->db->query(" select p_bu.bu_id
                                                             from (select wp_id,wbs_id from wbs_pool
-                                                            union 
+                                                            union
                                                             select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             join (select wbs_id,project_id from wbs union select wbs_id,project_id from temporary_wbs) wbs
-                                                            on wbs_pool.wbs_id = wbs.wbs_id 
+                                                            on wbs_pool.wbs_id = wbs.wbs_id
                                                             join projects
                                                             on wbs.project_id = projects.project_id
                                                             join p_bu
@@ -192,17 +192,17 @@ class Home extends CI_Controller {
                                     break;
                                 //Approve Timesheet(Non-project) search in this case
                                 case '5' :
-                                    $bu_id = $this->db->query("select p_bu.bu_id from 
+                                    $bu_id = $this->db->query("select p_bu.bu_id from
                                                             (select ts_id,wp_id from timesheet union select ts_id,wp_id from temporary_timesheet) timesheet
-                                                            JOIN 
+                                                            JOIN
                                                             (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             on timesheet.wp_id = wbs_pool.wp_id
-                                                            JOIN 
+                                                            JOIN
                                                             (select project_id,wbs_id from wbs union select project_id,wbs_id from temporary_wbs) wbs
                                                             on wbs_pool.wbs_id = wbs.wbs_id
                                                             JOIN projects
                                                             on wbs.project_id = projects.project_id
-                                                            JOIN p_bu 
+                                                            JOIN p_bu
                                                             on projects.bu_code = p_bu.bu_code
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
                                                             and projects.project_type_id = 'Non Project'
@@ -440,137 +440,137 @@ class Home extends CI_Controller {
     /*FOR DATATIMESHEET THIS MONTH*/
     private function datatimesheet(){
 
-            //parameter
-            $tanggalnow = getdate();
-            $_POST['bulan'] = $tanggalnow['mon'];
-            $_POST['tahun'] = $tanggalnow['year'];
-            $user_id=$this->datajson['userdata']['USER_ID'];
-            if (strlen($this->input->post('bulan'))=='2'){
-                $bulan = $this->input->post('bulan');
-            }else {
-                $bulan = '0'.$this->input->post('bulan');
-            }
-            $hasil['bulan']=$bulan;
-            $tahun = $this->input->post('tahun');
-            $y=(int)date("Y");
-            $m=(int)date("m");
-            // get Util data
-            $total_hours=$this->M_home->getTotalHour($user_id,$bulan,$tahun);
-            // get Entry Data
-            $entry=$this->M_home->getEntry($user_id,$bulan,$tahun);
+        //parameter
+        $tanggalnow = getdate();
+        $_POST['bulan'] = $tanggalnow['mon'];
+        $_POST['tahun'] = $tanggalnow['year'];
+        $user_id=$this->datajson['userdata']['USER_ID'];
+        if (strlen($this->input->post('bulan'))=='2'){
+            $bulan = $this->input->post('bulan');
+        }else {
+            $bulan = '0'.$this->input->post('bulan');
+        }
+        $hasil['bulan']=$bulan;
+        $tahun = $this->input->post('tahun');
+        $y=(int)date("Y");
+        $m=(int)date("m");
+        // get Util data
+        $total_hours=$this->M_home->getTotalHour($user_id,$bulan,$tahun);
+        // get Entry Data
+        $entry=$this->M_home->getEntry($user_id,$bulan,$tahun);
 
-            //echo json_encode($entry);
-            $a_date = "2009-11-23";
-            $o=11;
-            //if( (!isset($entry))&&(!isset($total_hours)) ){
-            //$entry=0;$total_hours=0;
-            //}
-            //  if (($entry)&&($total_hours)){
-            //  $entry=0;$total_hours=0;
-            //  }
-            //echo date("d-m-Y", strtotime('1-'.$o.'-2016'))."<br />";
-            //echo "hu".date("t", strtotime($a_date))."hh";
-            //echo $entry;
-            //echo $this->countDuration('2016/11/1', '2016/11/30') /$entry*100;
+        //echo json_encode($entry);
+        $a_date = "2009-11-23";
+        $o=11;
+        //if( (!isset($entry))&&(!isset($total_hours)) ){
+        //$entry=0;$total_hours=0;
+        //}
+        //  if (($entry)&&($total_hours)){
+        //  $entry=0;$total_hours=0;
+        //  }
+        //echo date("d-m-Y", strtotime('1-'.$o.'-2016'))."<br />";
+        //echo "hu".date("t", strtotime($a_date))."hh";
+        //echo $entry;
+        //echo $this->countDuration('2016/11/1', '2016/11/30') /$entry*100;
 
-            //Entry calculation
-            //$hasil['e']=$entry;
-            //$hasil['t']=$total_hours;
-            if (($bulan==$m)&& ($tahun==$y) ){
-                $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
+        //Entry calculation
+        //$hasil['e']=$entry;
+        //$hasil['t']=$total_hours;
+        if (($bulan==$m)&& ($tahun==$y) ){
+            $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
+        }
+        else{
+            $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
+        }
+        //Utilization calculation
+        if (($bulan==$m)&& ($tahun==$y) ){
+            $hasil['utilization']=$total_hours/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
+            $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8);
+        }
+        else{
+            $hasil['utilization']=$total_hours/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
+            $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8);
+
+        }
+        //Utilization text
+        if ($hasil['utilization'] < 80)
+        {
+            $hasil['status_utilization']='Under';
+        }
+        elseif (($hasil['utilization']>=80) && ($hasil['utilization']<=100)   ){
+            $hasil['status_utilization']='Optimal';
+        }
+        else {
+            $hasil['status_utilization']='Over';
+        }
+        // Entry text
+        if ($hasil['entry']<100)
+        {
+            $hasil['status']='Under';
+        }
+        elseif ($hasil['entry']==100) {
+            $hasil['status']='Complete';
+        }
+        else {
+            $hasil['status']='Over';
+        }
+
+        $allentry=$this->M_home->getAllEntry($user_id,$tahun);
+        //$hasil['JML_ENTRY_BULANAN']=$allentry;
+        $hasil['allentry'][0]=array('Month', 'Entry');
+        $i=1;
+        foreach ($allentry as $hasilAllentry) {
+            $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
+            // March
+            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
+
+                $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
             }
             else{
-                $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
+                $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
             }
-            //Utilization calculation
-            if (($bulan==$m)&& ($tahun==$y) ){
-                $hasil['utilization']=$total_hours/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
-                $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8);
+            $hasil['allentry'][$i][0]= $dateObj->format('M');
+            //$dateObj->format('m');
+            //test
+            if($hasilAllentry['JML_ENTRY_BULANAN']>0 && $durasi[$i] >0)
+                $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
+            else
+                $hasil['allentry'][$i][1]=0;
+
+
+            $i++;
+        }
+
+        $allhour=$this->M_home->getAllHour($user_id,$tahun);
+        $hasil['allhour'][0]=array('Month', 'Hour');
+        $i=1;
+        foreach ($allhour as $hasilAllhour) {
+
+            $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
+            // March
+            if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
+
+                $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
             }
             else{
-                $hasil['utilization']=$total_hours/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
-                $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8);
-
+                $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
             }
-            //Utilization text
-            if ($hasil['utilization'] < 80)
-            {
-                $hasil['status_utilization']='Under';
-            }
-            elseif (($hasil['utilization']>=80) && ($hasil['utilization']<=100)   ){
-                $hasil['status_utilization']='Optimal';
-            }
-            else {
-                $hasil['status_utilization']='Over';
-            }
-            // Entry text
-            if ($hasil['entry']<100)
-            {
-                $hasil['status']='Under';
-            }
-            elseif ($hasil['entry']==100) {
-                $hasil['status']='Complete';
-            }
-            else {
-                $hasil['status']='Over';
-            }
+            //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
+            $hasil['allhour'][$i][0]= $dateObj->format('M');
+            if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour[$i] >0)
+                $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
+            else
+                $hasil['allhour'][$i][1]=0;
+            $i++;
+        }
+        $hasil['an']="";
+        $hasil['bulan']=$bulan;
+        $hasil['tahun']=$tahun;
+        $hasil['a']=$entry;
+        $hasil['total_hours']=$total_hours;
+        $hasil['b']= $this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun));
 
-            $allentry=$this->M_home->getAllEntry($user_id,$tahun);
-            //$hasil['JML_ENTRY_BULANAN']=$allentry;
-            $hasil['allentry'][0]=array('Month', 'Entry');
-            $i=1;
-            foreach ($allentry as $hasilAllentry) {
-                $dateObj   = DateTime::createFromFormat('!m', $hasilAllentry['MONTH_VALUE']);
-                // March
-                if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
-                    $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d")));
-                }
-                else{
-                    $durasi[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
-                }
-                $hasil['allentry'][$i][0]= $dateObj->format('M');
-                //$dateObj->format('m');
-                //test
-                if($hasilAllentry['JML_ENTRY_BULANAN']>0 && $durasi[$i] >0)
-                    $hasil['allentry'][$i][1]=$hasilAllentry['JML_ENTRY_BULANAN']/$durasi[$i]*100;
-                else
-                    $hasil['allentry'][$i][1]=0;
-
-
-                $i++;
-            }
-
-            $allhour=$this->M_home->getAllHour($user_id,$tahun);
-            $hasil['allhour'][0]=array('Month', 'Hour');
-            $i=1;
-            foreach ($allhour as $hasilAllhour) {
-
-                $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
-                // March
-                if (($dateObj->format('m')==$m)&& ($tahun==$y) ){
-
-                    $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", date("Y/m/d"))*8);
-                }
-                else{
-                    $durasihour[$i]=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun))*8);
-                }
-                //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
-                $hasil['allhour'][$i][0]= $dateObj->format('M');
-                if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour[$i] >0)
-                    $hasil['allhour'][$i][1]=($hasilAllhour['JML_JAM_BULANAN']/$durasihour[$i])*100;
-                else
-                    $hasil['allhour'][$i][1]=0;
-                $i++;
-            }
-            $hasil['an']="";
-            $hasil['bulan']=$bulan;
-            $hasil['tahun']=$tahun;
-            $hasil['a']=$entry;
-            $hasil['total_hours']=$total_hours;
-            $hasil['b']= $this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun));
-
-            $this->datajson['datatimesheet'] = $hasil;
+        $this->datajson['datatimesheet'] = $hasil;
 
 
 
@@ -682,27 +682,27 @@ class Home extends CI_Controller {
 
     /*For  Timesheet*/
     public function timesheet_old()
-   {
-       //$data=array();
-       //$data['holidays']=$this->M_data->get_holidays();
-       //$data['holidays']=json_decode($data['holidays'],true);
-       //$data['header']=($this->load->view('v_header'));
-       //$data['float_button']=($this->load->view('v_floating_button'));
-       //$data['nav']=($this->load->view('v_nav1'));
-       //$data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
-       //$data['assignment']=($this->M_home->assignmentView($user_id));
-       //$data['pr_list']=$this->M_home->assignmentProject($user_id);
-       //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
-       //$data['task_user']=($this->M_home->assignmentView($user_id));
+    {
+        //$data=array();
+        //$data['holidays']=$this->M_data->get_holidays();
+        //$data['holidays']=json_decode($data['holidays'],true);
+        //$data['header']=($this->load->view('v_header'));
+        //$data['float_button']=($this->load->view('v_floating_button'));
+        //$data['nav']=($this->load->view('v_nav1'));
+        //$data['project'] = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$user_id."'");
+        //$data['assignment']=($this->M_home->assignmentView($user_id));
+        //$data['pr_list']=$this->M_home->assignmentProject($user_id);
+        //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+        //$data['task_user']=($this->M_home->assignmentView($user_id));
 
-       //$this->load->view('v_home_timesheet', $data);
-       //$data['footer']=($this->load->view('v_footer2'));
-   }
+        //$this->load->view('v_home_timesheet', $data);
+        //$data['footer']=($this->load->view('v_footer2'));
+    }
     public function timesheet($date=null){
         $user_id = $this->datajson['userdata']['USER_ID'];
         if($date == NULL)
             $date = date("Y-m-d", strtotime("today"));
-      //  $date = date("d M Y", strtotime($date));
+        //  $date = date("d M Y", strtotime($date));
 
         $data=array();
         $holidays=$this->M_data->get_holidays();
@@ -738,7 +738,7 @@ class Home extends CI_Controller {
             }
         }
 
-       // $data['holiday']=$holidays;
+        // $data['holiday']=$holidays;
         //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
         $data['tampil_Timesheet']=($this->M_timesheet->Timesheet_bydate($user_id,$date));
 
@@ -757,7 +757,7 @@ class Home extends CI_Controller {
         if(insertTimesheet($data))
         {
             $returnmessage['title'] = "Success";
-        $returnmessage['message'] = "berhasil tambah timesheet";
+            $returnmessage['message'] = "berhasil tambah timesheet";
         }else
         {
             $returnmessage['title'] = "Fail";
@@ -803,22 +803,22 @@ class Home extends CI_Controller {
         $projecttempfix=[];
 
         $bu_name = [];
-       foreach ($projecttemp as $data){
-           array_push($bu_name,$data['BU_NAME']);
-       }
-       $bu_name = array_unique($bu_name);
+        foreach ($projecttemp as $data){
+            array_push($bu_name,$data['BU_NAME']);
+        }
+        $bu_name = array_unique($bu_name);
         //search bu code
         $bu_with_code = $this->M_project->searchBuCode($bu_name);
         foreach ($bu_with_code as $data){
-           $index_array = count($projecttempfix);
-           $projecttempfix[$index_array]['BU_NAME'] = $data['bu_name'];
-           $projecttempfix[$index_array]['BU_CODE'] = $data['bu_code'];
-           $projecttempfix[$index_array]['PROJECT_LIST']= [];
-           for($i = 0 ; $i < count($projecttemp) ; $i++){
+            $index_array = count($projecttempfix);
+            $projecttempfix[$index_array]['BU_NAME'] = $data['bu_name'];
+            $projecttempfix[$index_array]['BU_CODE'] = $data['bu_code'];
+            $projecttempfix[$index_array]['PROJECT_LIST']= [];
+            for($i = 0 ; $i < count($projecttemp) ; $i++){
                 if($projecttemp[$i]['BU_NAME'] == $data['bu_name']){
                     array_push($projecttempfix[$index_array]['PROJECT_LIST'],$projecttemp[$i]);
                 }
-           }
+            }
         }
 
         $this->datajson['project'] = $projecttempfix;
@@ -1619,5 +1619,4 @@ class Home extends CI_Controller {
 
 
 }
-
 

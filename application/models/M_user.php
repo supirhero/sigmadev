@@ -183,7 +183,7 @@ join p_bu b on u.bu_id=b.bu_id ";
         $sql.=" lower(email) like '%".$keyword."%' or";
         $sql.=" lower(bu_name) like '%".$keyword."%'";
       }
-      $res=$this->db->query($sql);
+      $res=$this->db->query($sql.")");
       return $res->result_array();
     }
     function sendVerification($email,$name){
