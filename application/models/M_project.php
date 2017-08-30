@@ -368,7 +368,6 @@ class M_project extends CI_Model {
                INNER JOIN p_bu z on b.bu_code = z.bu_code
                WHERE b.bu_code='$bucode'
                     )
-                    where user_id='" . $id . "' or created_by='" . $id . "'
                     ")->result_array();
     }
     public function addprojectmember($project_id,$user){

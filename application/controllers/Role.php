@@ -85,6 +85,7 @@ class Role extends CI_Controller
         $role[13] = $this->input->post('role_14');
         $role[14] = $this->input->post('role_15');
         $role[15] = $this->input->post('role_16');
+        $role[16] = $this->input->post('role_17');
 
         $insert_profile = [
             'PROF_ID'=>$prof_id,
