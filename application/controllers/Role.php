@@ -64,6 +64,56 @@ class Role extends CI_Controller
         echo json_encode($data);
     }
 
+    function createProfile(){
+        $prof_id = $this->db->query("select nvl(max(prof_id)+1,0) as id from profile")->row()->ID;
+        $prof_name = $this->input->post('role_name');
+        $prof_desc = $this->input->post('role_desc');
+
+        $role[0] = $this->input->post('role_1');
+        $role[1] = $this->input->post('role_2');
+        $role[2] = $this->input->post('role_3');
+        $role[3] = $this->input->post('role_4');
+        $role[4] = $this->input->post('role_5');
+        $role[5] = $this->input->post('role_6');
+        $role[6] = $this->input->post('role_7');
+        $role[7] = $this->input->post('role_8');
+        $role[8] = $this->input->post('role_9');
+        $role[9] = $this->input->post('role_10');
+        $role[10] = $this->input->post('role_11');
+        $role[11] = $this->input->post('role_12');
+        $role[12] = $this->input->post('role_13');
+        $role[13] = $this->input->post('role_14');
+        $role[14] = $this->input->post('role_15');
+        $role[15] = $this->input->post('role_16');
+
+        $insert_profile = [
+            'PROF_ID'=>$prof_id,
+            'PROF_NAME'=>$prof_name,
+            'PROF_DESC'=>$prof_desc
+        ];
+        $this->db->insert('PROFILE',$insert_profile);
+        if($this->db->affected_rows() == 1){
+            $data['create_profile'] = 'success';
+            $i = 0;
+            foreach($role as $priv){
+                if($role[$i] != null || $role[$i] != ""){
+                    $add = [
+                        'PRIVILEGE'=>$priv,
+                        'PROFILE_ID'=>$prof_id,
+                        'ACCESS_ID'=>$i+1
+                    ];
+                    $this->db->insert('PROFILE_ACCESS_LIST',$add);
+                }
+                $i++;
+            }
+
+        }
+
+        $data['status']= 'success';
+        echo json_encode($data);
+
+    }
+
     function editProfile_view(){
         $prof_id = $this->input->post('profile_id');
         $data['profile_setting'] = $this->db->query("select * from profile where prof_id = '$prof_id'")->result_array();
