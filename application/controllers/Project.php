@@ -1016,8 +1016,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         $allTemporaryWbsPool = $this->db->query("select *
                                                  from temporary_wbs_pool a join wbs b
                                                  on a.wbs_id = b.wbs_id
-                                                 where a.project_id = '$project_id'
-                                                 and b.rh_id = '$rh_id'")->result_array();
+                                                 where b.project_id = '$project_id'
+                                                 and a.rh_id = '$rh_id'")->result_array();
         if(count($allTemporaryWbsPool) != 0){
             foreach ($allTemporaryWbsPool as $wbsPool){
                 /*ADD MEMBER TO TASK*/
@@ -1220,6 +1220,18 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             # Do not forget to unset references!
             unset($value);
         endforeach;
+    }
+    private function getSelectedWBS($id){
+        return $this->M_detail_project->getWBSselected($id);
+    }
+    private function getAllParent($id){
+        return $this->M_detail_project->getAllParentWBS($id);
+    }
+
+    private function getAllParentWBS($id){
+        return $this->db->query("SELECT CONNECT_BY_ISLEAF AS LEAF, WBS.*, LEVEL
+            FROM WBS where WBS_ID NOT IN ('".$id."') CONNECT BY  WBS_ID=PRIOR WBS_PARENT_ID
+            START WITH WBS_ID='".$id."' ORDER SIBLINGS BY WBS_PARENT_ID")->result();
     }
 
     private function sendVerificationinviteMember($email,$project_name,$project_id){

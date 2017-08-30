@@ -616,7 +616,7 @@ else{
             }
             else{
                 $confirmation = $this->M_timesheet->confirmTimesheet($timesheet_id,$approver,$confirm_code);
-                //if timesheet confirmed ,calculation for workplan complete hours process execute
+                //if timesheet confirmed ,calculation for workplan complete hours process execute\
                 if($confirm_code == 1){
                     $this->M_timesheet->updateProgress($timesheet_id);
                 }
