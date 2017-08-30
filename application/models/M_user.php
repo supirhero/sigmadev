@@ -169,6 +169,23 @@ join p_bu b on u.bu_id=b.bu_id ";
       $res=$this->db->query($sql);
       return $res->result_array();
     }
+    public function user_List($keyword=null){
+      $sql ="SELECT * FROM
+(select u.*,b.bu_name,
+ROW_NUMBER() OVER (ORDER BY b.bu_name) Row_Num
+ from users u
+join p_bu b on u.bu_id=b.bu_id ";
+      if ($keyword!=null) {
+        $keyword=strtolower($keyword);
+        $sql.=" where ";
+        $sql.=" lower(user_name) like '%".$keyword."%' or";
+        $sql.=" lower(user_id) like '%".$keyword."%' or";
+        $sql.=" lower(email) like '%".$keyword."%' or";
+        $sql.=" lower(bu_name) like '%".$keyword."%'";
+      }
+      $res=$this->db->query($sql);
+      return $res->result_array();
+    }
     function sendVerification($email,$name){
       $this->load->library('email');
       $config['protocol']='smtp';
