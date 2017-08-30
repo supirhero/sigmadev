@@ -1084,6 +1084,20 @@ URI untuk mengakses API ini :
    ->  "HOLIDAY_END": "01-JUN-17",
    ->  "COLOR": null
  ```
+ 
+ 
+## Accept project_type list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/getData/project_type
+ ```
+ example Return Json :
+ ```
+            "ID": "1",
+            "PROJECT_TYPE": "Project",
+            "TYPE_EFFORT": "Project"
+ ```
+ 
 ## Deny Rebaseline
 URI untuk mengakses API ini :
 ```
