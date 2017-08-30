@@ -1121,10 +1121,38 @@ URI untuk mengakses API ini :
  type : int, ext
  action : emailactivation, autoactivation,download
  ```
+  input yang harus di provide :
+```
+-> USER_ID 
+-> STAT ( status 1 atau 0, untuk emailactivation saja) 
+```
  example Return Json :
  ```
  -> status
  -> msg_email
+ -> data
+ ```
+ 
+ 
+ 
+##  Manage holiday list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/manage/holiday/{action}
+ action : add, update, delete
+ ```
+ input yang harus di provide :
+```
+-> HOLIDAY_ID (untuk edit/delete)
+-> HOLIDAY (nama holiday)
+-> HOLIDAY_START
+-> HOLIDAY_END
+-> COLOR
+```
+ example Return Json :
+ ```
+ -> status
+ -> msg
  -> data
  ```
  
