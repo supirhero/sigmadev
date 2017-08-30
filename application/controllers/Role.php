@@ -171,4 +171,30 @@ class Role extends CI_Controller
 
 
     }
+
+    function userAccess_view(){
+        $user_access['user_list'] = $this->db->query("select u.user_id , u.user_name,u.email,p.prof_name
+                            from users u 
+                            join profile p
+                            on u.PROF_ID = p.PROF_ID")->result_array();
+
+        $user_access['profile_list'] = $this->db->query("select prof_id,prof_name from profile");
+
+        echo json_encode($user_access);
+    }
+
+    function userAccess_edit(){
+        $user_id = $this->input->post('user_id');
+        $prof_id = $this->input->post('prof_id');
+
+        $this->db->query("update users set prof_id = '$prof_id' where user_id = '$user_id'");
+
+        if($this->db->affected_rows() == 1){
+            echo json_encode(['status'=>'success']);
+        }
+        else{
+            $this->output->set_status_header(500);
+            echo json_encode(['status'=>'failed']);
+        }
+    }
 }

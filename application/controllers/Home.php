@@ -71,7 +71,7 @@ class Home extends CI_Controller {
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-        /*
+
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -256,30 +256,6 @@ class Home extends CI_Controller {
 
                     }
                     elseif($priv['TYPE'] == 'PROJECT'){
-                        //fetching busines unit
-                        $user_bu = $this->datajson['userdata']['BU_ID'];
-                        $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
-
-                        $directorat_bu = [];
-                        //if company
-                        if($user_bu == 0){
-                            $access = 'masuk';
-                        }
-                        //if directorat
-                        elseif ($user_bu_parent == 0){
-                            $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = '$user_bu'")->result_array();
-                            $project_list = [];
-                            foreach ($bu_id_all as $buid){
-                                $directorat_bu[] = $buid['BU_ID'];
-                            }
-                            foreach ($directorat_bu as $bu){
-
-                            }
-                        }
-                        //if bu
-                        else{
-                            $directorat_bu[]  = $this->datajson['userdata']['BU_ID'];
-                        }
                         if($priv['PRIVILEGE'] == 'can'){
                             switch ($priv['ACCESS_ID']){
                                 //Upload, create, edit, and delete workplan
