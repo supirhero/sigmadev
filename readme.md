@@ -1050,24 +1050,24 @@ URI untuk mengakses API ini :
  ```
  example Return Json :
  ```
-->  "USER_ID": "B2008031710",
-->  "PROF_ID": "6",
-->  "BU_ID": "11",
-->  "SUP_ID": "S200810080",
-->  "USER_TYPE_ID": "int",
-->  "USER_NAME": "TETRA NIKELISANTY",
-->  "EMAIL": "tetra.nikelisanty@sigma.co.id",
-->  "PHONE_NO": null,
-->  "IS_ACTIVE": "1",
-->  "LAST_LOGIN": "16-MAR-17 12.00.00.000000 AM",
-->  "PASSWORD": "7bb7cd553807cd52e28f018de82361e4",
-->  "ADDRESS": null,
-->  "IS_SHIFT": null,
-->  "IMAGE": null,
-->  "POSITION": "Head of Section",
-->  "EMP_CAT": "PERMANENT",
-->  "BU_NAME": "Banking Solution Delivery",
-->  "ROW_NUM": "1"
+   ->  "USER_ID": "B2008031710",
+   ->  "PROF_ID": "6",
+   ->  "BU_ID": "11",
+   ->  "SUP_ID": "S200810080",
+   ->  "USER_TYPE_ID": "int",
+   ->  "USER_NAME": "TETRA NIKELISANTY",
+   ->  "EMAIL": "tetra.nikelisanty@sigma.co.id",
+   ->  "PHONE_NO": null,
+   ->  "IS_ACTIVE": "1",
+   ->  "LAST_LOGIN": "16-MAR-17 12.00.00.000000 AM",
+   ->  "PASSWORD": "7bb7cd553807cd52e28f018de82361e4",
+   ->  "ADDRESS": null,
+   ->  "IS_SHIFT": null,
+   ->  "IMAGE": null,
+   ->  "POSITION": "Head of Section",
+   ->  "EMP_CAT": "PERMANENT",
+   ->  "BU_NAME": "Banking Solution Delivery",
+   ->  "ROW_NUM": "1"
  
  
  ```
