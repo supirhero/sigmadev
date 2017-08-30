@@ -366,6 +366,7 @@ class Task extends CI_Controller
         $result['workplan'] = $result[$id_project.'.0'];
         $result['rebaseline_task'] = $rebaseline;
         unset($result[$id_project.'.0']);
+        $result['project_status'] = $this->db->query("select project_status from projects where project_id = '$id_project'")->row()->PROJECT_STATUS;
         echo json_encode($result);
 
 
