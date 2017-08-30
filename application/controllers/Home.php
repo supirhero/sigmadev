@@ -365,7 +365,7 @@ class Home extends CI_Controller {
         $config['upload_path']		= 'asset/user/';
         $config['allowed_types']	= 'jpg|png|gif|jpeg';
         $config['overwrite'] = TRUE;
-        $config['max_size']			= 1000000;
+        $config['max_size']			= 3000000;
         $config['file_name'] = $this->datajson['userdata']['USER_ID'].".".$extension;
 
         $this->load->library('upload', $config);
@@ -382,7 +382,7 @@ class Home extends CI_Controller {
             $updateUser = [
                 'PHONE_NO' => $nohp,
                 'ADDRESS' => $address,
-                'IMAGE' =>  "/asset/user/".$this->datajson['userdata']['USER_ID'].".".$extension,
+                'IMAGE' =>  "/asset/user/".$this->datajson['userdata']['USER_ID'].".".$extension."?".time(),
             ];
             $this->db->where('USER_ID', $this->datajson['userdata']['USER_ID']);
             $this->db->update('USERS', $updateUser);
