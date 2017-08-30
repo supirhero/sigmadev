@@ -114,7 +114,9 @@ class Role extends CI_Controller
             }
             $i++;
         }
-        echo $this->db->last_query();
+
+        $data['status']= 'success';
+        echo json_encode($data);
 
 
     }
