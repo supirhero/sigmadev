@@ -460,7 +460,7 @@ class Datamaster extends CI_Controller{
                 $result[$type]= $this->getbu($keyword);
                 break;
             case 'user':
-                $result[$type]=  $this->getuser($page,$pagenum,$keyword);
+                $result[$type]=  $this->getuser($keyword,$page,$pagenum);
                 break;
             case 'customer':
                 $result[$type]=   $this->getcustomer();
@@ -484,10 +484,10 @@ class Datamaster extends CI_Controller{
         $bu=$this->M_business->buListDet($keyword);
         return $bu;
     }
-    public function getuser($page,$pagenum,$keyword=null){
+    public function getuser($keyword=null,$page=1,$pagenum=10){
         $start = ($page*$pagenum)-$pagenum;
         $end = ($page*$pagenum);
-        $user=$this->M_user->userList($start,$end,$keyword);
+        $user=$this->M_user->user_List($keyword);
         return $user;
     }
     public function getholiday($keyword=null){
