@@ -60,6 +60,9 @@ Untuk tahap sekarang api yang tersedia :
     * Accept Rebaseline
     * Deny Rebaseline
     
+* MasterData Controller
+    * Accept Rebaseline
+    * Deny Rebaseline
     
     
 ## LOGIN CONTROLLER
@@ -1016,3 +1019,141 @@ URI untuk mengakses API ini :
  ```
  -> status
  ```
+
+ 
+# DATAMASTER 
+## BU list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/getData/bu
+ ```
+ example Return Json :
+ ```
+ -> "BU_ID": "7",
+ -> "BU_ALIAS": "ITPS",
+ -> "BU_NAME": "IT & Property Business Solution",
+ -> "BU_PARENT_CODE": null,
+ -> "BU_LEVEL": null,
+ -> "BU_CODE": "MSS",
+ -> "BU_PARENT_ID": "1",
+ -> "BU_HEAD": "L200910270",
+ ->  "BU_DESC": null,
+ ->  "IS_ACTIVE": "1",
+ ->  "LEVEL": "3",
+ ->  "BU_HEAD_NAME": "MUHAMAD DETA SEPTIANTO"
+ 
+```
+
+##  user list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/getData/user
+ ```
+ example Return Json :
+ ```
+   ->  "USER_ID": "B2008031710",
+   ->  "PROF_ID": "6",
+   ->  "BU_ID": "11",
+   ->  "SUP_ID": "S200810080",
+   ->  "USER_TYPE_ID": "int",
+   ->  "USER_NAME": "TETRA NIKELISANTY",
+   ->  "EMAIL": "tetra.nikelisanty@sigma.co.id",
+   ->  "PHONE_NO": null,
+   ->  "IS_ACTIVE": "1",
+   ->  "LAST_LOGIN": "16-MAR-17 12.00.00.000000 AM",
+   ->  "PASSWORD": "7bb7cd553807cd52e28f018de82361e4",
+   ->  "ADDRESS": null,
+   ->  "IS_SHIFT": null,
+   ->  "IMAGE": null,
+   ->  "POSITION": "Head of Section",
+   ->  "EMP_CAT": "PERMANENT",
+   ->  "BU_NAME": "Banking Solution Delivery",
+   ->  "ROW_NUM": "1"
+ ```
+ 
+##  holiday list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/getData/holiday
+ ```
+ example Return Json :
+ ```
+   ->  "HOLIDAY_ID": "700036",
+   ->  "HOLIDAY": "Hari Lahir Pancasila",
+   ->  "HOLIDAY_START": "01-JUN-17",
+   ->  "HOLIDAY_END": "01-JUN-17",
+   ->  "COLOR": null
+ ```
+ 
+ 
+##  project_type list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/getData/project_type
+ ```
+ example Return Json :
+ ```
+            "ID": "1",
+            "PROJECT_TYPE": "Project",
+            "TYPE_EFFORT": "Project"
+ ```
+ 
+ 
+ 
+##  Manage BU list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/manage/bu/{action}
+ action : add, update,changelevel,toggleactive
+ ```
+ example Return Json :
+ ```
+ -> status
+ -> msg
+ -> data
+ ```
+ 
+ 
+##  Manage User list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/manage/user/{type}/{action}
+ type : int, ext
+ action : emailactivation, autoactivation,download
+ ```
+  input yang harus di provide :
+```
+-> USER_ID 
+-> STAT ( status 1 atau 0, untuk emailactivation saja) 
+```
+ example Return Json :
+ ```
+ -> status
+ -> msg_email
+ -> data
+ ```
+ 
+ 
+ 
+##  Manage holiday list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/manage/holiday/{action}
+ action : add, update, delete
+ ```
+ input yang harus di provide :
+```
+-> HOLIDAY_ID (untuk edit/delete)
+-> HOLIDAY (nama holiday)
+-> HOLIDAY_START
+-> HOLIDAY_END
+-> COLOR
+```
+ example Return Json :
+ ```
+ -> status
+ -> msg
+ -> data
+ ```
+ 
+

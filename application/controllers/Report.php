@@ -776,7 +776,7 @@ class Report extends CI_Controller {
     }
 
     //https://marvelapp.com/hj9eb56/screen/29382899
-    public function r_directoratbu_test(){
+    public function r_directoratbu(){
         $bu = $_POST['bu'];
         $tahun = $_POST['tahun'];
         $data =array();

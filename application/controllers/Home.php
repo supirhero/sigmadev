@@ -4,8 +4,6 @@ class Home extends CI_Controller {
 
     public $datajson = array();
     public $allowedBU = [];
-
-
     public function __construct()
     {
         parent::__construct();
@@ -22,7 +20,6 @@ class Home extends CI_Controller {
         $this->load->model('M_data');
         $this->load->model('M_user');
         $this->load->model('M_session');
-
 
         //TOKEN LOGIN CHECKER
         if(isset($_GET['token'])){
@@ -74,7 +71,7 @@ class Home extends CI_Controller {
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-        /*
+
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -109,7 +106,8 @@ class Home extends CI_Controller {
                         elseif($priv['PRIVILEGE'] == 'only_bu'){
                             //fetching busines unit
                             $user_bu = $this->datajson['userdata']['BU_ID'];
-                            $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->BU_PARENT_ID;
+                            $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
+
                             $directorat_bu = [];
                             //if company
                             if($user_bu == 0){
@@ -124,7 +122,7 @@ class Home extends CI_Controller {
                             }
                             //if bu
                             else{
-                                $directorat_bu[] = $this->datajson['userdata']['BU_ID'];
+                                $directorat_bu[]  = $this->datajson['userdata']['BU_ID'];
                             }
 
                             switch ($priv['ACCESS_ID']){
@@ -148,6 +146,7 @@ class Home extends CI_Controller {
                                 case '2':
                                     //get bu id from bu code
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
+                                    $this->datajson['userdata']['BU_ID'] = $bu_id;
                                     break;
                                 //Create Project
                                 case '3':
@@ -236,7 +235,7 @@ class Home extends CI_Controller {
                                     $bu_id = $this->db->query("select bu_id from projects where project_id = '$projectid'")->row()->BU_ID;
                                     break;
                             }
-                            if(array_search($this->datajson['userdata']['BU_ID'],$directorat_bu) || $bu_id == 'masuk'){
+                            if(array_search($bu_id,$directorat_bu) || $bu_id == 'masuk'){
                                 $this->allowedBU = $directorat_bu;
                             }
                             else{
