@@ -462,6 +462,10 @@ class Task extends CI_Controller
         }
 
 
+        //for null data tolerance
+        if($data == null){
+            $data = [];
+        }
         $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
         $result['workplan'] = $result[$id_project.'.0'];
         $result['rebaseline_task'] = $rebaseline;
