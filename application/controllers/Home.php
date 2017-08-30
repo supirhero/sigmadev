@@ -860,7 +860,7 @@ class Home extends CI_Controller {
 //echo($data['AllProject']);
 //$iwo=$this->M_detail_project->getProjectIWO($id);
         */
-        $data['project_detail']=$this->M_detail_project->getProjectDetail($id);
+        $data['project_detail']=$this->db->query("select iwo_no as iwo, project_name,bu_name as bu_owner, project_desc as description from projects join p_bu on projects.bu_code = p_bu.bu_code where project_id = '$id'")->row_array();
         /*$data['tampil_DETAIL']=$this->M_detail_project->selectWBS($this->uri->segment(3));
         $data['business_unit_name']=$this->M_invite->getAllBUName();
         //$self_bu=$this->session->userdata('BU_ID');
@@ -899,10 +899,7 @@ class Home extends CI_Controller {
         */
         //$data['WBS']=$wbs;
         //Project Detail
-        $this->datajson['project_detail'] = $data;
-        $this->datajson['overview']['IWO'] = $this->datajson["project_detail"]["project_detail"]["IWO_NO"];
-        $this->datajson['overview']['BU_OWNER']=$this->datajson["project_detail"]["project_detail"]["BU_NAME"];
-        $this->datajson['overview']['DESCRIPTION']=$this->datajson["project_detail"]["project_detail"]["PROJECT_DESC"];
+        $this->datajson['overview']= $data['project_detail'];
 
         //Project Workplan Status
         $this->datajson['project_workplan_status']['project_status'] = $this->datajson["project_detail"]["project_detail"]["PROJECT_STATUS"];

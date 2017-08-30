@@ -109,8 +109,6 @@ where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user
         $wbs=$this->db->query("SELECT WBS_ID from WBS_POOL WHERE WP_ID='".$wp."'")->row()->WBS_ID;
         $work=$this->db->query("select sum(hour_total) as WORK_H, wbs_id from user_timesheet where wbs_id='$wbs'  group by wbs_id")->row()->WORK_H;
         $wc=$this->db->query("select work_complete from wbs where wbs_id='$wbs'")->row()->WORK_COMPLETE;
-        echo $work*100/$wc;
-        die;
         if($work*100/$wc>100){
             $this->db->query("update wbs set work='$work', progress_wbs=100 where wbs_id='$wbs'");
         }else{
@@ -443,11 +441,11 @@ GROUP BY TS_DATE")->result_array();
                   set IS_APPROVED = $confirm_code, CONFIRMED_BY = '$approver' , APPROVAL_DATE = to_date('$date','yyyy-mm-dd')
                   where TS_ID = '$timesheet_id'";
         $exec = $this->db->query($query);
-        if($exec){
-            return 'success';
+        if($this->db->affected_rows() == 1){
+            return true;
         }
         else{
-            return 'failed';
+            return false;
         }
     }
 
