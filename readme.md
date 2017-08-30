@@ -60,6 +60,9 @@ Untuk tahap sekarang api yang tersedia :
     * Accept Rebaseline
     * Deny Rebaseline
     
+* MasterData Controller
+    * Accept Rebaseline
+    * Deny Rebaseline
     
     
 ## LOGIN CONTROLLER
@@ -1002,6 +1005,65 @@ URI untuk mengakses API ini :
  Return Json :
  ```
  -> status
+ ```
+## Deny Rebaseline
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/project/deny_rebaseline
+ ```
+ Input yang harus di provide :
+ ```
+ ->project_id
+ ```
+ Return Json :
+ ```
+ -> status
+ ```
+
+ 
+# DATAMASTER 
+## Accept BU list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/getData/bu
+ ```
+ example Return Json :
+ ```
+ -> "BU_ID": "7",
+ -> "BU_ALIAS": "ITPS",
+ -> "BU_NAME": "IT & Property Business Solution",
+ -> "BU_PARENT_CODE": null,
+ -> "BU_LEVEL": null,
+ -> "BU_CODE": "MSS",
+ -> "BU_PARENT_ID": "1",
+ -> "BU_HEAD": "L200910270",
+ ->  "BU_DESC": null,
+ ->  "IS_ACTIVE": "1",
+ ->  "LEVEL": "3",
+ ->  "BU_HEAD_NAME": "MUHAMAD DETA SEPTIANTO"
+ 
+
+## Accept user list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/getData/user
+ ```
+ example Return Json :
+ ```
+ -> "BU_ID": "7",
+ -> "BU_ALIAS": "ITPS",
+ -> "BU_NAME": "IT & Property Business Solution",
+ -> "BU_PARENT_CODE": null,
+ -> "BU_LEVEL": null,
+ -> "BU_CODE": "MSS",
+ -> "BU_PARENT_ID": "1",
+ -> "BU_HEAD": "L200910270",
+ ->  "BU_DESC": null,
+ ->  "IS_ACTIVE": "1",
+ ->  "LEVEL": "3",
+ ->  "BU_HEAD_NAME": "MUHAMAD DETA SEPTIANTO"
+ 
+ 
  ```
 ## Deny Rebaseline
 URI untuk mengakses API ini :
