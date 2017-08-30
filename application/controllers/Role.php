@@ -403,7 +403,7 @@ class Role extends CI_Controller
                                                         on profile.prof_id = pac.profile_id
                                                         join access_list al
                                                         on al.access_id=pac.access_id
-                                                        where profile.prof_id = '".$this->datajson['userdata']['PROF_ID']."'")->result_array();
+                                                        where profile.prof_id = '".$prof_id."'")->result_array();
         echo json_encode($data);
     }
 
