@@ -1295,81 +1295,150 @@ class Report extends CI_Controller {
     public function report_filter(){
         $query ="select project_name,project_status,project_complete as percent,amount,
                  customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
-                 where 1=1 ";
+                 ";
+        $i = 0;
+        if(!empty($this->input->post('value')) || !empty($this->input->post('status')) || !empty($this->input->post('schedule')) || !empty($this->input->post('budget'))){
+            $query .= 'where ';
+        }
 
         if(!empty($this->input->post('value'))){
             foreach ($this->input->post('value') as $value){
-                switch ($value){
-                    case '1':
-                        $query .= " or amount < 1000000000";
-                        break;
-                    case '2':
-                        $query .= " or amount between 1000000000 and 5000000000";
-                        break;
-                    case '3':
-                        $query .= "or amount > 5000000000";
-                        break;
+                if($i == 0){
+                    switch ($value){
+                        case '1':
+                            $query .= " amount < 1000000000";
+                            break;
+                        case '2':
+                            $query .= " amount between 1000000000 and 5000000000";
+                            break;
+                        case '3':
+                            $query .= " amount > 5000000000";
+                            break;
+                    }
+                    $i = 1;
                 }
+                else{
+                    switch ($value){
+                        case '1':
+                            $query .= " or amount < 1000000000";
+                            break;
+                        case '2':
+                            $query .= " or amount between 1000000000 and 5000000000";
+                            break;
+                        case '3':
+                            $query .= " or amount > 5000000000";
+                            break;
+                    }
+                }
+
             }
         }
         if(!empty($this->input->post('status'))){
             foreach ($this->input->post('status') as $value){
-                switch ($value){
-                    case '1':
-                        $query .= " or project_status = 'Not Started'";
-                        break;
-                    case '2':
-                        $query .= " or project_status = 'In Progress'";
-                        break;
-                    case '3':
-                        $query .= " or project_status = 'On Hold'";
-                        break;
-                    case '4':
-                        $query .= " or project_status = 'Completed'";
-                        break;
-                    case '5':
-                        $query .= " or project_status = 'In Planning'";
-                        break;
-                    case '6':
-                        $query .= " or project_status = 'Cancelled'";
-                        break;
+                if($i == 0){
+                    switch ($value){
+                        case '1':
+                            $query .= " project_status = 'Not Started'";
+                            break;
+                        case '2':
+                            $query .= " project_status = 'In Progress'";
+                            break;
+                        case '3':
+                            $query .= " project_status = 'On Hold'";
+                            break;
+                        case '4':
+                            $query .= " project_status = 'Completed'";
+                            break;
+                        case '5':
+                            $query .= " project_status = 'In Planning'";
+                            break;
+                        case '6':
+                            $query .= " project_status = 'Cancelled'";
+                            break;
+                    }
+                    $i = 1;
+                }
+                else{
+                    switch ($value){
+                        case '1':
+                            $query .= " or project_status = 'Not Started'";
+                            break;
+                        case '2':
+                            $query .= " or project_status = 'In Progress'";
+                            break;
+                        case '3':
+                            $query .= " or project_status = 'On Hold'";
+                            break;
+                        case '4':
+                            $query .= " or project_status = 'Completed'";
+                            break;
+                        case '5':
+                            $query .= " or project_status = 'In Planning'";
+                            break;
+                        case '6':
+                            $query .= " or project_status = 'Cancelled'";
+                            break;
+                    }
                 }
             }
         }
         if(!empty($this->input->post('schedule'))){
             foreach ($this->input->post('schedule') as $value){
-                switch ($value){
-                    case '1':
-                        $query .= " or schedule_status = 'Schedule Overrun'";
-                        break;
-                    case '2':
-                        $query .= " or schedule_status = 'On Schedule'";
-                        break;
-                    case '3':
-                        $query .= " or project_status = 'Ahead Schedule'";
-                        break;
+                if($i == 0){
+                    switch ($value){
+                        case '1':
+                            $query .= " schedule_status = 'Schedule Overrun'";
+                            break;
+                        case '2':
+                            $query .= " schedule_status = 'On Schedule'";
+                            break;
+                        case '3':
+                            $query .= " schedule_status = 'Ahead Schedule'";
+                            break;
 
+                    }
+                    $i = 1;
                 }
+                else{
+                    switch ($value){
+                        case '1':
+                            $query .= " or schedule_status = 'Schedule Overrun'";
+                            break;
+                        case '2':
+                            $query .= " or schedule_status = 'On Schedule'";
+                            break;
+                        case '3':
+                            $query .= " or schedule_status = 'Ahead Schedule'";
+                            break;
+
+                    }
+                }
+
             }
         }
         if(!empty($this->input->post('budget'))){
             foreach ($this->input->post('budget') as $value){
-                switch ($value){
-                    case '1':
-                        $query .= " or schedule_status = 'Over Budget'";
-                        break;
-                    case '2':
-                        $query .= " or schedule_status = 'On Budget'";
-                        break;
-                    case '3':
-                        $query .= " or project_status = 'Ahead Budget'";
-                        break;
+                if($i == 0){
+                    switch ($value){
+                        case '1':
+                            $query .= " schedule_status = 'Over Budget'";
+                            break;
+                        case '2':
+                            $query .= " schedule_status = 'On Budget'";
+                            break;
+                        case '3':
+                            $query .= " project_status = 'Ahead Budget'";
+                            break;
 
+                    }
                 }
+
             }
         }
 
         $result['project'] = $this->db->query($query)->result_array();
+        echo $this->db->last_query();
+        die;
         echo json_encode($result);
     }
 
