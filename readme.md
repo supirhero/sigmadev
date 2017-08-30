@@ -1022,7 +1022,7 @@ URI untuk mengakses API ini :
 
  
 # DATAMASTER 
-## Accept BU list
+## BU list
 URI untuk mengakses API ini :
 ```
  http://45.77.45.126/dev/datamaster/getData/bu
@@ -1044,7 +1044,7 @@ URI untuk mengakses API ini :
  
 ```
 
-## Accept user list
+##  user list
 URI untuk mengakses API ini :
 ```
  http://45.77.45.126/dev/datamaster/getData/user
@@ -1071,7 +1071,7 @@ URI untuk mengakses API ini :
    ->  "ROW_NUM": "1"
  ```
  
-## Accept holiday list
+##  holiday list
 URI untuk mengakses API ini :
 ```
  http://45.77.45.126/dev/datamaster/getData/holiday
@@ -1086,7 +1086,7 @@ URI untuk mengakses API ini :
  ```
  
  
-## Accept project_type list
+##  project_type list
 URI untuk mengakses API ini :
 ```
  http://45.77.45.126/dev/datamaster/getData/project_type
@@ -1098,16 +1098,19 @@ URI untuk mengakses API ini :
             "TYPE_EFFORT": "Project"
  ```
  
-## Deny Rebaseline
+ 
+ 
+##  Manage BU list
 URI untuk mengakses API ini :
 ```
- http://45.77.45.126/dev/project/deny_rebaseline
+ http://45.77.45.126/dev/datamaster/manage/bu/{action}
+ action : add, update,changelevel,toggleactive
  ```
- Input yang harus di provide :
- ```
- ->project_id
- ```
- Return Json :
+ example Return Json :
  ```
  -> status
+ -> msg
+ -> data
+
  ```
+
