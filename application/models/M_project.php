@@ -288,21 +288,22 @@ class M_project extends CI_Model {
 
     function getUsersProject($id) {
         return $this->db->query("SELECT   distinct project_id, project_name,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
-            project_status, project_desc, created_by
+            project_status, project_desc, created_by,date_created
        FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                     c.project_complete, c.project_status, c.project_desc,
-                    c.created_by
+                    c.created_by,c.date_created
                FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                     INNER JOIN projects c ON b.project_id = c.project_id
                     INNER JOIN p_bu z on c.bu_code = z.bu_code
              UNION
              SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
                     b.project_complete, b.project_status, b.project_desc,
-                    b.created_by
+                    b.created_by,b.date_created
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
                INNER JOIN p_bu z on b.bu_code = z.bu_code
                     )
-                    where user_id='" . $id . "' or created_by='" . $id . "'")->result_array();
+                    where user_id='" . $id . "' or created_by='" . $id . "' 
+                    order by date_created desc")->result_array();
     }
 
     function getWBS($project) {
