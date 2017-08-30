@@ -81,30 +81,37 @@ class Role extends CI_Controller
         $prof_name = $this->input->post('role_name');
         $prof_desc = $this->input->post('role_desc');
 
-        $role1 = $this->input->post('role_1');
-        $role2 = $this->input->post('role_2');
-        $role3 = $this->input->post('role_3');
-        $role4 = $this->input->post('role_4');
-        $role5 = $this->input->post('role_5');
-        $role6 = $this->input->post('role_6');
-        $role7 = $this->input->post('role_7');
-        $role8 = $this->input->post('role_8');
-        $role9 = $this->input->post('role_9');
-        $role10 = $this->input->post('role_10');
-        $role11 = $this->input->post('role_11');
-        $role12 = $this->input->post('role_12');
-        $role13 = $this->input->post('role_13');
-        $role14 = $this->input->post('role_14');
-        $role15 = $this->input->post('role_15');
-        $role16 = $this->input->post('role_16');
+        $role[0] = $this->input->post('role_1');
+        $role[1] = $this->input->post('role_2');
+        $role[2] = $this->input->post('role_3');
+        $role[3] = $this->input->post('role_4');
+        $role[4] = $this->input->post('role_5');
+        $role[5] = $this->input->post('role_6');
+        $role[6] = $this->input->post('role_7');
+        $role[7] = $this->input->post('role_8');
+        $role[8] = $this->input->post('role_9');
+        $role[9] = $this->input->post('role_10');
+        $role[10] = $this->input->post('role_11');
+        $role[11] = $this->input->post('role_12');
+        $role[12] = $this->input->post('role_13');
+        $role[13] = $this->input->post('role_14');
+        $role[14] = $this->input->post('role_15');
+        $role[15] = $this->input->post('role_16');
 
         $this->db->query("update profile set prof_name = '$prof_name',prof_desc = '$prof_desc' where prof_id = '$prof_id'");
         if($this->db->affected_rows() == 1){
             $data['change_profile'] = 'success';
         }
-        $change = [
-
-        ];
+        $i = 0;
+        foreach($role as $priv){
+            $change = [
+                "PRIVILEGE"=>$priv
+            ];
+            $this->db->where('PROFILE_ID',$prof_id);
+            $this->db->where('ACCESS_ID',$i);
+            $this->db->update('PROFILE_ACCESS_LIST',$change);
+            $i++;
+        }
 
     }
 }
