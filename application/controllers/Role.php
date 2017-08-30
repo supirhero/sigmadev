@@ -164,6 +164,9 @@ class Role extends CI_Controller
                 $this->db->update('PROFILE_ACCESS_LIST',$change);
             }
             $i++;
+            if($this->db->affected_rows() == 1){
+                $data['profile_privilege'] = 'success';
+            }
         }
 
         $data['status']= 'success';
