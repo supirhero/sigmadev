@@ -1437,8 +1437,6 @@ class Report extends CI_Controller {
         }
 
         $result['project'] = $this->db->query($query)->result_array();
-        echo $this->db->last_query();
-        die;
         echo json_encode($result);
     }
 
