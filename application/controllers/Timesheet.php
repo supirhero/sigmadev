@@ -569,14 +569,16 @@ class Timesheet extends CI_Controller {
         $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
         $data['WP_ID'] = $this->input->post("WP_ID");
         $data['SUBMIT_DATE']= date('Y-m-d H:i:s');
-
         $project_id   = $_POST['PROJECT_ID'];
 
         //check bu_id
 
 
         $wp_id = $_POST['WP_ID'];
-        $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+        if($data['WP_ID'] != "" && $project_id != "")
+        {
+
+            $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         //check rebaseline status for task
 
         $statusProject = strtolower($statusProject);
@@ -672,6 +674,13 @@ class Timesheet extends CI_Controller {
             $returndata['message'] = "Status project harus in-progress atau on-hold";
         }
 
+        }
+else{
+
+    $this->output->set_status_header(400);
+    $returndata['status'] = "failed";
+    $returndata['message'] = "Project ID/WP ID tidak boleh kosong";
+}
         echo json_encode($returndata);
     }
 
