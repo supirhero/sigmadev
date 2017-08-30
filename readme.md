@@ -1042,6 +1042,7 @@ URI untuk mengakses API ini :
  ->  "LEVEL": "3",
  ->  "BU_HEAD_NAME": "MUHAMAD DETA SEPTIANTO"
  
+```
 
 ## Accept user list
 URI untuk mengakses API ini :
