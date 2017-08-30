@@ -1069,8 +1069,20 @@ URI untuk mengakses API ini :
    ->  "EMP_CAT": "PERMANENT",
    ->  "BU_NAME": "Banking Solution Delivery",
    ->  "ROW_NUM": "1"
+ ```
  
- 
+## Accept holiday list
+URI untuk mengakses API ini :
+```
+ http://45.77.45.126/dev/datamaster/getData/holiday
+ ```
+ example Return Json :
+ ```
+   ->  "HOLIDAY_ID": "700036",
+   ->  "HOLIDAY": "Hari Lahir Pancasila",
+   ->  "HOLIDAY_START": "01-JUN-17",
+   ->  "HOLIDAY_END": "01-JUN-17",
+   ->  "COLOR": null
  ```
 ## Deny Rebaseline
 URI untuk mengakses API ini :
