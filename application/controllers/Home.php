@@ -83,15 +83,6 @@ class Home extends CI_Controller {
                                     where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
                                     order by al.type asc
                                     ")->result_array();
-        //get user project
-        $all_user_project_id = $this->db->query("select project_id from resource_pool 
-                                                                    where user_id = '".$this->datajson['userdata']['USER_ID']."'
-                                                               ")->result_array();
-        //store list project
-        $list_project_id =[];
-        foreach ($all_user_project_id as $projecti){
-            array_push($list_project_id,$projecti['PROJECT_ID']);
-        }
         $profile_id = $this->datajson['userdata']['PROF_ID'];
         foreach($privilege as $priv){
             //bypass privilege if user is prouds admin
@@ -255,8 +246,32 @@ class Home extends CI_Controller {
                         }
 
                     }
+                    //jika akses tipe nya project
                     elseif($priv['TYPE'] == 'PROJECT'){
+                        //fetching granted project list
+                        $granted_project = $this->db->query("SELECT   distinct project_id
+                                                           FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
+                                                                        c.project_complete, c.project_status, c.project_desc,
+                                                                        c.created_by
+                                                                   FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
+                                                                        INNER JOIN projects c ON b.project_id = c.project_id
+                                                                        INNER JOIN p_bu z on c.bu_code = z.bu_code
+                                                                 UNION
+                                                                 SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
+                                                                        b.project_complete, b.project_status, b.project_desc,
+                                                                        b.created_by
+                                                                   FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
+                                                                   INNER JOIN p_bu z on b.bu_code = z.bu_code
+                                                                        )
+                                                                        where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
+                        $granted_project_list = [];
+                        //rearrange project list so it can readable to array search
+                        foreach ($granted_project as $gp){
+                            $granted_project_list[] = $gp['PROJECT_ID'];
+                        }
+
                         if($priv['PRIVILEGE'] == 'can'){
+                            //get project id
                             switch ($priv['ACCESS_ID']){
                                 //Upload, create, edit, and delete workplan
                                 case '10':
@@ -311,7 +326,7 @@ class Home extends CI_Controller {
                             echo json_encode($returndata);
                             die;
                         }
-                        if(!in_array($project_id_req,$list_project_id)){
+                        if(!in_array($project_id_req,$granted_project_list)){
                             $this->output->set_status_header(403);
                             $returndata['status'] = 'denied';
                             $returndata['message'] = 'you dont have permission to access this action';
