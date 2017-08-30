@@ -79,7 +79,7 @@ class Report extends CI_Controller {
                                     order by al.type asc
                                     ")->result_array();
         //get user project
-        $all_user_project_id = $this->db->query("select project_id from resource_pool 
+        $all_user_project_id = $this->db->query("select project_id from resource_pool
                                                                     where user_id = '".$this->datajson['userdata']['USER_ID']."'
                                                                ")->result_array();
         //store list project
@@ -102,12 +102,12 @@ class Report extends CI_Controller {
                             switch ($priv['ACCESS_ID']){
                                 //Update Personal Timesheet
                                 case '1':
-                                    $bu_id = $this->db->query(" select p_bu.bu_id 
+                                    $bu_id = $this->db->query(" select p_bu.bu_id
                                                             from (select wp_id,wbs_id from wbs_pool
-                                                            union 
+                                                            union
                                                             select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             join (select wbs_id,project_id from wbs union select wbs_id,project_id from temporary_wbs) wbs
-                                                            on wbs_pool.wbs_id = wbs.wbs_id 
+                                                            on wbs_pool.wbs_id = wbs.wbs_id
                                                             join projects
                                                             on wbs.project_id = projects.project_id
                                                             join p_bu
@@ -253,17 +253,17 @@ class Report extends CI_Controller {
                                     break;
                                 //Approve Timesheet(Non-project) search in this case
                                 case '5' :
-                                    $bu_id = $this->db->query("select p_bu.bu_id from 
+                                    $bu_id = $this->db->query("select p_bu.bu_id from
                                                             (select ts_id,wp_id from timesheet union select ts_id,wp_id from temporary_timesheet) timesheet
-                                                            JOIN 
+                                                            JOIN
                                                             (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
                                                             on timesheet.wp_id = wbs_pool.wp_id
-                                                            JOIN 
+                                                            JOIN
                                                             (select project_id,wbs_id from wbs union select project_id,wbs_id from temporary_wbs) wbs
                                                             on wbs_pool.wbs_id = wbs.wbs_id
                                                             JOIN projects
                                                             on wbs.project_id = projects.project_id
-                                                            JOIN p_bu 
+                                                            JOIN p_bu
                                                             on projects.bu_code = p_bu.bu_code
                                                             where timesheet.ts_id = '".$_POST['ts_id']."'
                                                             and projects.project_type_id = 'Non Project'
@@ -972,37 +972,87 @@ class Report extends CI_Controller {
         //echo print_r ($thn);
 
 
-        $count_user=$this->M_report->getCountUser($bu);
-        //echo print_r($tahun);
+        $c=$this->M_report->getbu($bu);
+        if ($c['BU_PARENT_ID']=='0') {
+          $count_user=0;
+          $child=$this->M_report->getbuchild($bu);
+          $res['jml_entry']=0;
+          $count=count($child);
+          foreach ($child as $ch) {
+            $count_user=$this->M_report->getCountUser($ch['BU_ID']);
+            if ($count_user==0) {
+              $count=$count-1;
+            }else{
+              if (($tahun==$y)){
+                  $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2));
+              }else{
+                  $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2));
+              }
+            }
+          }
+          $res['jml_entry']=$res['jml_entry']/$count;
+          if ($res['jml_entry']<100)
+          {
+              $res['status']='Under';
+          }
+          elseif ($res['jml_entry']==100) {
+              $res['status']='Complete';
+          }
+          else {
+              $res['status']='Over';
+          }
+          $res['allentry']=[];
+          foreach ($child as $chs) {
+            $allentry=$this->M_report->gettahunanbu($chs['BU_ID'],$tahun);
+            $i=1;
+            foreach ($allentry as $has) {
+                $count_user=$this->M_report->getCountUser($chs['BU_ID']);
+                if ($count_user>0) {
+                  $res['allentry'][$i][0]= $has['BULAN'];
+                  $res['allentry'][$i][1]=$res['allentry'][$i][1]+($has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun)));
+                
+                  $i++;
+                }
 
-        if (($tahun==$y)){
-            $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
-        }
-        else{
-            $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
+            }
 
-        }
-        // Entry text
-        if ($res['jml_entry']<100)
-        {
-            $res['status']='Under';
-        }
-        elseif ($res['jml_entry']==100) {
-            $res['status']='Complete';
-        }
-        else {
-            $res['status']='Over';
-        }
+          }
+          for ($v=1; $v<=12 ; $v++) {
+            $res['allentry'][$v][1]=$res['allentry'][$v][1]/$count;
+          }
+        }else{
+          $count_user=$this->M_report->getCountUser($bu);
+          //echo print_r($tahun);
+
+          if (($tahun==$y)){
+              $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
+          }
+          else{
+              $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
+
+          }
+          // Entry text
+          if ($res['jml_entry']<100)
+          {
+              $res['status']='Under';
+          }
+          elseif ($res['jml_entry']==100) {
+              $res['status']='Complete';
+          }
+          else {
+              $res['status']='Over';
+          }
 
 
-        $allentry=$this->M_report->gettahunanbu($bu,$tahun);
-        $res['allentry']=[];
-        $i=1;
-        foreach ($allentry as $has) {
+          $allentry=$this->M_report->gettahunanbu($bu,$tahun);
+          $res['allentry']=[];
+          $i=1;
+          foreach ($allentry as $has) {
 
-            $res['allentry'][$i][0]= $has['BULAN'];
-            $res['allentry'][$i][1]=$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun));
-            $i++;
+              $res['allentry'][$i][0]= $has['BULAN'];
+              $res['allentry'][$i][1]=$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun));
+              $i++;
+          }
         }
 
         //   json_encode($res,JSON_NUMERIC_CHECK);
@@ -1155,12 +1205,12 @@ class Report extends CI_Controller {
             group by project_id) a inner join
             projects c on c.project_id=a.project_id
             inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
+            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
             and type_of_effort in (1,2)
-            and pv!='0' 
+            and pv!='0'
             and b.BU_CODE !='PROUDS'
             and b.BU_code !='GTS'
-            and b.BU_code !='NSM' 
+            and b.BU_code !='NSM'
             group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
         $result["r_monthly"] = $query->result();
@@ -1189,12 +1239,12 @@ class Report extends CI_Controller {
                 group by project_id) a inner join
                 projects c on c.project_id=a.project_id
                 inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-                where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
+                where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
                 and type_of_effort in (1,2)
-                and pv!='0' 
+                and pv!='0'
                 and b.BU_CODE !='PROUDS'
                 and b.BU_code !='GTS'
-                and b.BU_code !='NSM' 
+                and b.BU_code !='NSM'
                 and b.BU_alias in ($listBU)
                 group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
                 order by b.bu_name");
@@ -1224,12 +1274,12 @@ class Report extends CI_Controller {
             group by project_id) a inner join
             projects c on c.project_id=a.project_id
             inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
+            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
             and type_of_effort in ('1','2')
-            and pv!='0' 
+            and pv!='0'
             and b.BU_CODE !='PROUDS'
             and b.BU_code !='GTS'
-            and b.BU_code !='NSM' 
+            and b.BU_code !='NSM'
             group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
         $result["r_monthly"] = $query->result();
@@ -1263,12 +1313,12 @@ class Report extends CI_Controller {
             group by project_id) a inner join
             projects c on c.project_id=a.project_id
             inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project' 
+            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
             and type_of_effort in ('1','2')
-            and pv!='0' 
+            and pv!='0'
             and b.BU_CODE !='PROUDS'
             and b.BU_code !='GTS'
-            and b.BU_code !='NSM' 
+            and b.BU_code !='NSM'
             group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
         $hasil =$query->result();
