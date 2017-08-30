@@ -74,7 +74,7 @@ class Home extends CI_Controller {
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-    /*
+        /*
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -220,7 +220,7 @@ class Home extends CI_Controller {
                                     break;
                                 //See Report Overview
                                 case '6' :
-                                    /* LIMIT REPORT OVERVIEW BY ADD IN CLAUSE TO QUERY */
+                                    //LIMIT REPORT OVERVIEW BY ADD IN CLAUSE TO QUERY
                                     break;
                                 //See Resource Report
                                 case '7':
