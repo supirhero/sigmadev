@@ -654,7 +654,7 @@ class Task extends CI_Controller
             $data['status'] = 'success';
             $data['message'] = 'member di tambah temporary';
         }
-        elseif($statusProject['not started']){
+        elseif($statusProject == 'not started'){
             //assign process
             $this->M_detail_project->postAssignment();
 
