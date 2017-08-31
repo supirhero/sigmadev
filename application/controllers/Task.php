@@ -524,8 +524,19 @@ class Task extends CI_Controller
             $status['message'] = 'Task berhasil di edit';
         }
         else{
-            $status['status']= 'failed';
-            $status['message'] = 'Project sudah on progress';
+            $name = $this->input->post('wbs_name');
+            $wbs_id = $this->input->post('wbs_id');
+            $this->db->query("update wbs set wbs_name = '$name' where wbs_id = '$wbs_id'");
+            if($this->db->affected_rows() == 1){
+                $status['status']= 'Succes';
+                $status['message'] = 'Task Name Updated';
+            }
+            else{
+                $this->output->set_status_header(500);
+                $status['status']= 'failed';
+                $status['message'] = 'Task name not updated';
+            }
+
         }
         echo json_encode($status);
 
