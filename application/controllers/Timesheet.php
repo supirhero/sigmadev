@@ -473,8 +473,6 @@ class Timesheet extends CI_Controller {
         $wp_id = $_POST['WP_ID'];
         if($data['WP_ID'] != "" && $project_id != "")
         {
-            echo "masuk";
-            die;
             $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
         //check rebaseline status for task
 
