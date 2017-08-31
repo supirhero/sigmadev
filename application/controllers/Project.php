@@ -1080,7 +1080,6 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                                                   where c.project_id = '$project_id'
                                                   and a.rh_id = '$rh_id'
                                                   ")->result_array();
-
         if(count($allTemporayTimesheet) != 0){
             foreach ($allTemporayTimesheet as $timesheet){
 
@@ -1132,19 +1131,30 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                     $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
 
                     //data for insert
-                    $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
-                    $SUBJECT = $data['SUBJECT'];
-                    $MESSAGE = $data['MESSAGE'];
-                    $HOUR_TOTAL = $data['WORK_HOUR'];
+                    $TS_ID = $timesheet['TS_ID'];
+                    $SUBJECT = $timesheet['SUBJECT'];
+                    $MESSAGE = $timesheet['MESSAGE'];
+                    $HOUR_TOTAL = $timesheet['HOUR_TOTAL'];
                     $TS_DATE = "to_date('$tgl','yyyymmdd')";
-                    $WP_ID = $data['WP_ID'];
-                    $LATITUDE = $data['LATITUDE'];
-                    $LONGITUDE = $data['LONGITUDE'];
+                    $WP_ID = $timesheet['WP_ID'];
+                    $LATITUDE = $timesheet['LATITUDE'];
+                    $LONGITUDE = $timesheet['LONGITUDE'];
+                    $SUMBIT_DATE =$timesheet['SUBMIT_DATE'];
+                    $IS_APPROVED = $timesheet['IS_APPROVED'];
+                    $APPROVAL_DATE = $timesheet['APPROVAL_DATE'];
+                    $REJECTED_MESSAGE = $timesheet['REJECTED_MESSAGE'];
+                    $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
 
                     $this->db->query("INSERT INTO TIMESHEET
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE)
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,
+                              IS_APPROVED,APPROVAL_DATE,REJECTED_MESSAGE,CONFIRMED_BY)
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE','$SUMBIT_DATE',
+                              $IS_APPROVED,'$APPROVAL_DATE','$REJECTED_MESSAGE','$CONFIRMED_BY')");
+
+                    if($timesheet['IS_APPROVED'] == 1){
+                        $this->M_timesheet->updateProgress($timesheet['TS_ID']);
+                    }
 
 
                 }
@@ -1162,27 +1172,38 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                               and TS_ID LIKE '".$data['WP_ID'].".%'";
                     $this->db->query($queryupdate);
 
-
-                    //insert query
-                    $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
-
                     //data for insert
-                    $TS_ID = $data['WP_ID'].".$tgl.".str_pad(($getCountTimesheet+1),2,"0",STR_PAD_LEFT);
-                    $SUBJECT = $data['SUBJECT'];
-                    $MESSAGE = $data['MESSAGE'];
-                    $HOUR_TOTAL = $data['WORK_HOUR'];
+                    $TS_ID = $timesheet['TS_ID'];
+                    $SUBJECT = $timesheet['SUBJECT'];
+                    $MESSAGE = $timesheet['MESSAGE'];
+                    $HOUR_TOTAL = $timesheet['HOUR_TOTAL'];
                     $TS_DATE = "to_date('$tgl','yyyymmdd')";
-                    $WP_ID = $data['WP_ID'];
-                    $LATITUDE = $data['LATITUDE'];
-                    $LONGITUDE = $data['LONGITUDE'];
+                    $WP_ID = $timesheet['WP_ID'];
+                    $LATITUDE = $timesheet['LATITUDE'];
+                    $LONGITUDE = $timesheet['LONGITUDE'];
+                    $SUMBIT_DATE =$timesheet['SUBMIT_DATE'];
+                    $IS_APPROVED = $timesheet['IS_APPROVED'];
+                    $APPROVAL_DATE = $timesheet['APPROVAL_DATE'];
+                    $REJECTED_MESSAGE = $timesheet['REJECTED_MESSAGE'];
+                    $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
 
                     $this->db->query("INSERT INTO TIMESHEET
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE)
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,
+                              IS_APPROVED,APPROVAL_DATE,REJECTED_MESSAGE,CONFIRMED_BY)
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE','$SUMBIT_DATE',
+                              $IS_APPROVED,'$APPROVAL_DATE','$REJECTED_MESSAGE','$CONFIRMED_BY')");
+
+                    if($timesheet['IS_APPROVED'] == 1){
+                        $this->M_timesheet->updateProgress($timesheet['TS_ID']);
+                    }
                 }
             }
         }
+
+        /*===================CHANGE PROJECT STATUS=============*/
+        $this->db->query("update projects set project_status = 'In Progress',rh_id = null where project_id = '$project_id'");
+
 
         $return['status'] = 'success';
         echo json_encode($return);
