@@ -791,8 +791,7 @@ class Report extends CI_Controller {
     }
 
     //https://marvelapp.com/hj9eb56/screen/29382902
-    public function r_people(){
-        $bu_id = $_POST['BU_ID'];
+    public function r_people(){        $bu_id = $_POST['BU_ID'];
         $bulan = $_POST['BULAN'];
         $tahun = $_POST['TAHUN'];
         $y=(int)date("Y");
@@ -1412,6 +1411,16 @@ class Report extends CI_Controller {
 
 
     public function report_filter_download(){
+
+        $this->load->library('excel');
+
+        $this->excel->setActiveSheetIndex(0);
+        //name the worksheet
+        $this->excel->getActiveSheet()->setTitle('Report Project');
+        //set cell A1 content with some text
+        $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
+
+
         $query ="select project_name,project_status,project_complete as percent,amount,
                  customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
                  ";
@@ -1527,53 +1536,27 @@ class Report extends CI_Controller {
 
         //echo $query.$cond;
         $p =$this->db->query($query)->result_array();
-        //echo ($query.$cond);
-        $filename ="report_project.xls";
-        header('Content-type: application/ms-excel');
-        header('Content-Disposition: attachment; filename='.$filename);
-        echo "<table class='table table-stripped'>
-    <thead>
 
-        <tr>
-            <td>BU</td>
-            <td>IWO</td>
-            <td>Create Date</td>
-            <td>Project Name</td>
-            <td>Project Amount</td>
-            <td>Customer Name</td>
-            <td>Project Status</td>
-            <td>Progress %</td>
-            <td>PM</td>
-            <td>TYPE OF EFFORT</td>
-            <td>Resources</td>
-            <td>PV</td>
-            <td>EV</td>
-            <td>AC</td>
-            <td>SPI</td>
-            <td>CPI</td>
-            <td>Schedule Status</td>
-            <td>Budget Status</td>
-        </tr>
-    </thead>
-    <tbody>";
-        foreach ($p as $project) {
-            echo "<tr>";
-            echo "<td>".$project['PROJECT_NAME']."</td>";
-            echo "<td>".$project['AMOUNT']."</td>";
-            echo "<td>".$project['CUSTOMER_NAME']."</td>";
-            echo "<td>".$project['PROJECT_STATUS']."</td>";
-            echo "<td>".$project['PERCENT']." </td>";
-            echo "<td>".$project['PM']."</td>";
-            echo "<td>".$project['PV']."</td>";
-            echo "<td>".$project['EV']."</td>";
-            echo "<td>".$project['AC']."</td>";
-            echo "<td>".$project['SPI']."</td>";
-            echo "<td>".$project['CPI']."</td>";
-            echo "<td>".$project['SCHEDULE_STATUS']."</td>";
-            echo "<td>".$project['BUDGET_STATUS']."</td>";
-            echo "</tr>";
-        }
-        echo "</tbody></table>";
+        // read data to active sheet
+        $this->excel->getActiveSheet()->fromArray($p);
+
+        $filename='Project Report.xls'; //save our workbook as this file name
+
+        header('Content-Type: application/vnd.ms-excel'); //mime type
+
+        header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
+
+        header('Cache-Control: max-age=0'); //no cache
+
+        //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
+        //if you want to save it as .XLSX Excel 2007 format
+
+        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
+
+        //force user to download the Excel file without writing it to server's HD
+        $objWriter->save('php://output');
+
+
     }
 
 
