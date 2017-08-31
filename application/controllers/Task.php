@@ -341,9 +341,6 @@ class Task extends CI_Controller
             }
         }
 
-        print_r($workplan);
-        die;
-
         $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
         //$created_array = $this->buildTree($workplan);
