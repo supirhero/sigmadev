@@ -384,6 +384,14 @@ class Task extends CI_Controller
         $id_project = $this->uri->segment(3);
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
         $workplan=$this->M_detail_project->selectWBS_mobile($id_project,$rh_id);
+        foreach ($workplan as &$wp){
+            if($wp['WORK_PERCENT_COMPLETE'] == null){
+                $wp['WORK_PERCENT_COMPLETE'] = 0;
+            }
+            if($wp['WORK'] == null){
+                $wp['WORK'] = 0;
+            }
+        }
 
         $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
