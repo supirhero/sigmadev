@@ -3,10 +3,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Home extends CI_Controller {
 
     public $datajson = array();
-    public $allowedBU = [];
     public function __construct()
     {
         parent::__construct();
+        $this->datajson['privilege'] = ['master_data_access'=>false,
+                                        'manage_role_access'=>false,
+                                        'create_edit_delete_task_updatepercent'=>false,
+                                        'req_rebaseline'=>false,
+                                        'acc_deny_rebaseline'=> false,
+                                        'assign_project_member'=>false,
+                                        'project_report'=>true,
+                                        'project_activities'=>false,
+                                        'acc_deny_timesheet'=>false,
+                                        'report_overview'=>false];
         error_reporting(E_ALL  & ~E_NOTICE);
 
         $this->load->model('M_home');
@@ -71,7 +80,7 @@ class Home extends CI_Controller {
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-        /*
+
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -100,6 +109,8 @@ class Home extends CI_Controller {
                             $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
 
                             $directorat_bu = [];
+                            //for if tolerant array_search
+                            $directorat_bu[] = null;
                             //if company
                             if($user_bu == 0){
                                 $access = 'masuk';
@@ -115,7 +126,6 @@ class Home extends CI_Controller {
                             else{
                                 $directorat_bu[]  = $this->datajson['userdata']['BU_ID'];
                             }
-
                             switch ($priv['ACCESS_ID']){
                                 //Update Personal Timesheet
                                 case '1':
@@ -137,7 +147,6 @@ class Home extends CI_Controller {
                                 case '2':
                                     //get bu id from bu code
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
-                                    $this->datajson['userdata']['BU_ID'] = $bu_id;
                                     break;
                                 //Create Project
                                 case '3':
@@ -145,50 +154,8 @@ class Home extends CI_Controller {
                                     break;
                                 //Access All Project In Business Unit
                                 case '4' :
-                                    if($url_dest == 'project/projectmember_add'){
-                                        $projectid = $_POST['project_id'];
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'project/projectmember_delete'){
-                                        $id = $_POST['MEMBER'];
-                                        $project_id = $this->M_detail_project->getRPProject($id);
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif($url_dest == 'project/editproject_action'){
-                                        $id=$_POST['PROJECT_ID'];
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'project/gantt' || $url_dest == 'project/spi' || $url_dest == 'project/cpi' || $url_dest == 'project/s_curve' || $url_dest == 'baseline'){
-                                        $projectid = $this->uri->segment(3);
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'project/rebaseline' || $url_dest == 'project/accept_rebaseline' || $url_dest == 'project/deny_rebaseline'){
-                                        $id = $this->input->post("project_id");
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/createtask'){
-                                        $project_id   = $this->input->post("PROJECT_ID");
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/edittask_action'){
-                                        $project_id   = $this->input->post("project_id");
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/deletetask'){
-                                        $id = $_POST['wbs_id'];
-                                        $project_id = $this->M_detail_project->getProjectTask($id);
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/assigntaskmemberproject' || $url_dest == 'removetaskmemberproject'){
-                                        $project_id = explode(".",$_POST['WBS_ID']);
-                                        $project_id = $project_id[0];
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/upload_wbs'){
-                                        $project_id = $this->input->post('project_id');
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-
+                                    $projectid = $this->uri->segment(3);
+                                    $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row()->BU_ID;
                                     break;
                                 //Approve Timesheet(Non-project) search in this case
                                 case '5' :
@@ -226,10 +193,7 @@ class Home extends CI_Controller {
                                     $bu_id = $this->db->query("select bu_id from projects where project_id = '$projectid'")->row()->BU_ID;
                                     break;
                             }
-                            if(array_search($bu_id,$directorat_bu) || $bu_id == 'masuk'){
-                                $this->allowedBU = $directorat_bu;
-                            }
-                            else{
+                            if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
                                 $this->output->set_status_header(403);
                                 $returndata['status'] = 'failed';
                                 $returndata['message'] = 'Anda tidak bisa mengakses feature yang ada di business unit ini';
@@ -265,6 +229,8 @@ class Home extends CI_Controller {
                                                                         )
                                                                         where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
                         $granted_project_list = [];
+                        $granted_project_list[] = null;
+
                         //rearrange project list so it can readable to array search
                         foreach ($granted_project as $gp){
                             $granted_project_list[] = $gp['PROJECT_ID'];
@@ -343,6 +309,20 @@ class Home extends CI_Controller {
                     }
                 }
             }
+        }
+
+        if($this->datajson['userdata']['PROF_ID'] == 7){
+            $this->datajson['privilege']['master_data_access'] = true;
+            $this->datajson['privilege']['manage_role_access'] = true;
+            $this->datajson['privilege']['report_overview'] = true;
+        }
+        if($this->datajson['userdata']['PROF_ID'] == 5){
+            $this->datajson['privilege']['create_edit_delete_task_updatepercent']=true;
+            $this->datajson['privilege']['req_rebaseline']=true;
+            $this->datajson['privilege']['create_edit_delete_task_updatepercent']=true;
+            $this->datajson['privilege']['assign_project_member']=true;
+            $this->datajson['privilege']['project_activities']=true;
+            $this->datajson['privilege']['acc_deny_timesheet']=true;
         }
         /*===============================================================================*/
 
