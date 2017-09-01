@@ -1249,6 +1249,12 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         return $this->M_detail_project->getAllParentWBS($id);
     }
 
+    private function getAllChildWBS($wbs){
+        return $this->db->query("SELECT CONNECT_BY_ISLEAF AS LEAF, WBS.*, LEVEL
+                      FROM WBS where WBS_ID NOT IN ('$wbs') and CONNECT_BY_ISLEAF=1  CONNECT BY  WBS_PARENT_ID= PRIOR WBS_ID
+                      START WITH WBS_ID='$wbs' ORDER SIBLINGS BY WBS_PARENT_ID ")->result();
+    }
+
     private function getAllParentWBS($id){
         return $this->db->query("SELECT CONNECT_BY_ISLEAF AS LEAF, WBS.*, LEVEL
             FROM WBS where WBS_ID NOT IN ('".$id."') CONNECT BY  WBS_ID=PRIOR WBS_PARENT_ID
