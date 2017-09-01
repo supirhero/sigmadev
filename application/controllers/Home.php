@@ -359,6 +359,7 @@ class Home extends CI_Controller {
         $this->transformKeys($this->datajson);
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
+
     public function userdata(){
 
         $this->datajson['userdata']['prof_name'] = ($this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row())->PROF_NAME;
