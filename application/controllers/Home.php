@@ -494,11 +494,11 @@ class Home extends CI_Controller {
         //Utilization calculation
         if (($bulan==$m)&& ($tahun==$y) ){
             $hasil['utilization']=$total_hours/($countdurationtoday*8) *100;
-            $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8);
+            $hasil['c']= ($countdurationtoday*8);
         }
         else{
             $hasil['utilization']=$total_hours/($countdurationlastday*8) *100;
-            $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8);
+            $hasil['c']= ($countdurationlastday*8);
 
         }
         //Utilization text
