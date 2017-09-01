@@ -3,9 +3,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Home extends CI_Controller {
 
     public $datajson = array();
+    public $privilege = array();
     public function __construct()
     {
         parent::__construct();
+        $this->datajson['privilege'] = ['master_data_access'=>false,
+                                        'manage_role_access'=>false,
+                                        'create_edit_delete_task_updatepercent'=>false,
+                                        'req_rebaseline'=>false,
+                                        'acc_deny_rebaseline'=> false,
+                                        'assign_project_member'=>false,
+                                        'project_report'=>true,
+                                        'project_activities'=>false,
+                                        'acc_deny_timesheet'=>false,
+                                        'report_overview'=>false,];
         error_reporting(E_ALL  & ~E_NOTICE);
 
         $this->load->model('M_home');
@@ -299,6 +310,20 @@ class Home extends CI_Controller {
                     }
                 }
             }
+        }
+
+        if($this->datajson['userdata']['PROF_ID'] == 7){
+            $this->datajson['privilege']['master_data_access'] = true;
+            $this->datajson['privilege']['manage_role_access'] = true;
+            $this->datajson['privilege']['report_overview'] = true;
+        }
+        if($this->datajson['userdata']['PROF_ID'] == 5){
+            $this->datajson['privilege']['create_edit_delete_task_updatepercent']=true;
+            $this->datajson['privilege']['req_rebaseline']=true;
+            $this->datajson['privilege']['create_edit_delete_task_updatepercent']=true;
+            $this->datajson['privilege']['assign_project_member']=true;
+            $this->datajson['privilege']['project_activities']=true;
+            $this->datajson['privilege']['acc_deny_timesheet']=true;
         }
         /*===============================================================================*/
 
