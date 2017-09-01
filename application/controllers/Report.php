@@ -416,9 +416,9 @@ class Report extends CI_Controller {
                 $durasi=($this->countDuration($tahun."/".$dateObj->format('m')."/1", $this->last_day($dateObj->format('m'),$tahun)));
             }
             if($hasilAllentry['JML_ENTRY_BULANAN']>0 && $durasi >0)
-                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
+                array_push($hasil['allentry'],['label'=>substr($hasilAllentry['MONTH_DISPLAY'],0,3),'value'=>$hasilAllentry['JML_ENTRY_BULANAN']/$durasi*100]);
             else
-                array_push($hasil['allentry'],['label'=>$hasilAllentry['MONTH_DISPLAY'],'value'=>0]);
+                array_push($hasil['allentry'],['label'=>substr($hasilAllentry['MONTH_DISPLAY'],0,3),'value'=>0]);
 
         }
 
@@ -427,6 +427,7 @@ class Report extends CI_Controller {
         /*utilization*/
         $hasil['allhour']=[];
         $allhour=$this->M_home->getAllHour($user_id,$tahun);
+
         foreach ($allhour as $hasilAllhour) {
 
             $dateObj   = DateTime::createFromFormat('!m', $hasilAllhour['MONTH_VALUE']);
@@ -440,9 +441,9 @@ class Report extends CI_Controller {
             }
             //$hasil['anjay'][$i] = $this->last_day($dateObj->format('m'),$tahun);
             if($hasilAllhour['JML_JAM_BULANAN']>0 && $durasihour >0)
-                array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
+                array_push($hasil['allhour'],['label'=>substr($hasilAllhour['MONTH_DISPLAY'],0,3),'value'=>$hasilAllhour['JML_JAM_BULANAN']/$durasihour*100]);
             else
-                array_push($hasil['allhour'],['label'=>$hasilAllhour['MONTH_DISPLAY'],'value'=>0]);
+                array_push($hasil['allhour'],['label'=>substr($hasilAllhour['MONTH_DISPLAY'],0,3),'value'=>0]);
 
         }
         echo json_encode($hasil);
