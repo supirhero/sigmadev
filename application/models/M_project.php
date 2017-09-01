@@ -286,26 +286,43 @@ class M_project extends CI_Model {
         return $this->db->query("select count(*) as C from PROJECTS where IWO_NO like '%" . $IWO . "%'")->row()->C;
     }
 
-    function getUsersProject($id) {
-        return $this->db->query("SELECT   distinct project_id, project_name,iwo_no,project_type,type_effort,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
-            project_status, project_desc, created_by,date_created
-       FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
-                    c.project_complete, c.project_status, c.project_desc,
-                    c.created_by,c.date_created, c.iwo_no,d.project_type,d.category as type_effort
-               FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
-                    INNER JOIN projects c ON b.project_id = c.project_id
-                    INNER JOIN p_bu z on c.bu_code = z.bu_code
-                    INNER JOIN p_project_category d on c.TYPE_OF_EFFORT=d.ID
-             UNION
-             SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
-                    b.project_complete, b.project_status, b.project_desc,
-                    b.created_by,b.date_created,b.iwo_no,d.project_type,d.category as type_effort
-               FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
-               INNER JOIN p_bu z on b.bu_code = z.bu_code
-               INNER JOIN p_project_category d on b.TYPE_OF_EFFORT=d.ID
-                    )
-                    where user_id='".$id."' or created_by='".$id."'
-                    order by date_created desc")->result_array();
+    function getUsersProject($id,$keyword=null,$status=null,$type=null,$effort=null) {
+      $sql="SELECT   distinct project_id, project_name,iwo_no,project_type,type_effort,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
+          project_status, project_desc, created_by,date_created
+     FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
+                  c.project_complete, c.project_status, c.project_desc,
+                  c.created_by,c.date_created, c.iwo_no,d.project_type,d.category as type_effort
+             FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
+                  INNER JOIN projects c ON b.project_id = c.project_id
+                  INNER JOIN p_bu z on c.bu_code = z.bu_code
+                  INNER JOIN p_project_category d on c.TYPE_OF_EFFORT=d.ID
+           UNION
+           SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
+                  b.project_complete, b.project_status, b.project_desc,
+                  b.created_by,b.date_created,b.iwo_no,d.project_type,d.category as type_effort
+             FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
+             INNER JOIN p_bu z on b.bu_code = z.bu_code
+             INNER JOIN p_project_category d on b.TYPE_OF_EFFORT=d.ID
+                  )
+                  where 1=1 and (user_id='".$id."' or created_by='".$id."') ";
+                  if ($keyword!=null) {
+                    $keyword=strtolower($keyword);
+                    $sql.=" and (lower(project_name) like '%".$keyword."%' or lower(iwo_no) like '%".$keyword."%') ";
+                  }
+                  if ($status!=null) {
+                    $status=strtolower($status);
+                    $sql.=" and lower(project_status) like '%".$status."%' ";
+                  }
+                  if ($type!=null) {
+                    $type=strtolower($type);
+                    $sql.=" and lower(project_type) like '%".$type."%' ";
+                  }
+                  if ($effort!=null) {
+                    $effort=strtolower($effort);
+                    $sql.=" and lower(effort_type) like '%".$effort."%' ";
+                  }
+          $sql.=" order by date_created desc";
+        return $this->db->query($sql)->result_array();
     }
 
     function getWBS($project) {
@@ -353,25 +370,42 @@ class M_project extends CI_Model {
         return $result;
     }
 
-    function getUsersProjectBasedBU($id,$bucode) {
-        return $this->db->query("SELECT   distinct project_id, project_name,IWO_NO, PROJECT_TYPE,bu_code,bu_id, category as effort_type,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
+    function getUsersProjectBasedBU($id,$bucode,$keyword=null,$status=null,$type=null,$effort=null) {
+        $sql="SELECT   distinct project_id, project_name,IWO_NO, PROJECT_TYPE,bu_code,bu_id, effort_type,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
             project_status, project_desc, created_by
        FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,z.bu_id,
                     c.project_complete, c.project_status, c.project_desc,
-                    c.created_by, iwo_NO, pc.project_type, category
+                    c.created_by, iwo_NO, pc.project_type, category as effort_type
                FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                     INNER JOIN projects c ON b.project_id = c.project_id
                     INNER JOIN p_bu z on c.bu_code = z.bu_code
                     INNER JOIN p_project_category pc on c.type_of_effort=pc.id
-                    WHERE c.bu_code ='$bucode'
+                    WHERE c.bu_code='".$bucode."'
              UNION
              SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,z.bu_id,
                     b.project_complete, b.project_status, b.project_desc,
-                    b.created_by,iwo_NO, pc.project_type, category
+                    b.created_by,iwo_NO, pc.project_type, category as effort_type
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
                INNER JOIN p_bu z on b.bu_code = z.bu_code
                     INNER JOIN p_project_category pc on b.type_of_effort=pc.id
-               WHERE b.bu_code='$bucode')")->result_array();
+               WHERE b.bu_code='".$bucode."') where 1=1 ";
+               if ($keyword!=null) {
+                 $keyword=strtolower($keyword);
+                 $sql.=" and (lower(project_name) like '%".$keyword."%' or lower(iwo_no) like '%".$keyword."%') ";
+               }
+               if ($status!=null) {
+                 $status=strtolower($status);
+                 $sql.=" and lower(project_status) like '%".$status."%' ";
+               }
+               if ($type!=null) {
+                 $type=strtolower($type);
+                 $sql.=" and lower(project_type) like '%".$type."%' ";
+               }
+               if ($effort!=null) {
+                 $effort=strtolower($effort);
+                 $sql.=" and lower(effort_type) like '%".$effort."%' ";
+               }
+        return $this->db->query($sql)->result_array();
     }
     public function addprojectmember($project_id,$user){
       $sql = "insert into RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID ) values ((select nvl(max(RP_ID)+1,1) from RESOURCE_POOL),'".$user."','".$project_id."')";
