@@ -659,31 +659,33 @@ class Task extends CI_Controller
 
     //Assign task to project member
     public function assignTaskMemberProject(){
-
         $project_id = explode(".",$_POST['WBS_ID']);
         $project_id = $project_id[0];
         $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
-
         if($statusProject == 'on hold'){
-            $this->M_detail_project->removeAssignementTemp();
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+            $this->M_detail_project->postAssignmentTemp($rh_id);
             $data['status'] = 'success';
-            $data['message'] = 'Task member berhasil di hapus temporary';
+            $data['message'] = 'member di tambah temporary';
         }
-        elseif($statusProject == 'not started' || $statusProject == 'in progress' ){
-            $this->M_detail_project->removeAssignement();
+        elseif($statusProject == 'not started'){
+            //assign process
+            $this->M_detail_project->postAssignment();
             //send email
+            $wbs=$this->input->post('WBS_ID');
             $email=$this->input->post('EMAIL');
             $user_name=$this->input->post('NAME');
             $wbs_name=$this->input->post('WBS_NAME');
-            //$this->sendVerificationremoveMember($email,$user_name,$wbs_name);
+            $projectid = $this->M_detail_project->getProject_Id($wbs);
+            //$this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);$data['status'] = 'success';
             $data['status'] = 'success';
-            $data['message'] = 'Task member berhasil di hapus';
+            $data['message'] = 'member di tambah';
         }
         else{
-            $this->output->set_status_header(400);
             $data['status'] = 'failed';
-            $data['message'] = 'Project status harus On Hold, Not Started, dan In Progress untuk assign task member';
+            $data['message'] = 'Project status masih on progress';
         }
+        //return
         echo json_encode($data);
 
     }
