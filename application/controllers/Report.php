@@ -1234,9 +1234,11 @@ class Report extends CI_Controller {
             order by b.bu_name");
         $result["r_monthly"] = $query->result();
         $known = array();
-        $filtered = array_filter($result["r_monthly"], function ($val) use (&$known) {
-            $unique = !in_array($val->BU_ALIAS, $known);
+        $knownz = array();
+        $filtered = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
+            $unique = !in_array($val->BU_ALIAS, $knownz);
             $known[] = $val;
+            $knownz[] = $val->BU_ALIAS;
             return $unique;
         });
         echo json_encode($filtered);
