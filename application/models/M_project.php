@@ -302,7 +302,7 @@ class M_project extends CI_Model {
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
                INNER JOIN p_bu z on b.bu_code = z.bu_code
                     )
-                    where user_id='" . $id . "' or created_by='" . $id . "' 
+                    where user_id='" . $id . "' or created_by='" . $id . "'
                     order by date_created desc")->result_array();
     }
 
@@ -352,24 +352,24 @@ class M_project extends CI_Model {
     }
 
     function getUsersProjectBasedBU($id,$bucode) {
-        return $this->db->query("SELECT   distinct project_id, project_name,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
+        return $this->db->query("SELECT   distinct project_id, project_name,IWO_NO, PROJECT_TYPE, category as effort_type,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
             project_status, project_desc, created_by
        FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                     c.project_complete, c.project_status, c.project_desc,
-                    c.created_by
+                    c.created_by, iwo_NO, pc.project_type, category
                FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                     INNER JOIN projects c ON b.project_id = c.project_id
                     INNER JOIN p_bu z on c.bu_code = z.bu_code
+                    INNER JOIN p_project_category pc on c.type_of_effort=pc.category
                     WHERE c.bu_code ='$bucode'
              UNION
              SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
                     b.project_complete, b.project_status, b.project_desc,
-                    b.created_by
+                    b.created_by,iwo_NO, pc.project_type, category
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
                INNER JOIN p_bu z on b.bu_code = z.bu_code
-               WHERE b.bu_code='$bucode'
-                    )
-                    ")->result_array();
+                    INNER JOIN p_project_category pc on b.type_of_effort=pc.category
+               WHERE b.bu_code='$bucode')")->result_array();
     }
     public function addprojectmember($project_id,$user){
       $sql = "insert into RESOURCE_POOL (RP_ID,USER_ID,PROJECT_ID ) values ((select nvl(max(RP_ID)+1,1) from RESOURCE_POOL),'".$user."','".$project_id."')";
