@@ -1233,7 +1233,15 @@ class Report extends CI_Controller {
             group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
         $result["r_monthly"] = $query->result();
-        echo json_encode($result);
+        $known = array();
+        $knownz = array();
+        $filtered = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
+            $unique = !in_array($val->BU_ALIAS, $knownz);
+            $known[] = $val;
+            $knownz[] = $val->BU_ALIAS;
+            return $unique;
+        });
+        echo json_encode($filtered);
     }
         //report yearly overview
     public function r_yearly($year=false){
