@@ -3,7 +3,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Home extends CI_Controller {
 
     public $datajson = array();
-    public $allowedBU = [];
     public function __construct()
     {
         parent::__construct();
@@ -100,6 +99,8 @@ class Home extends CI_Controller {
                             $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
 
                             $directorat_bu = [];
+                            //for if tolerant array_search
+                            $directorat_bu[] = null;
                             //if company
                             if($user_bu == 0){
                                 $access = 'masuk';
@@ -115,7 +116,6 @@ class Home extends CI_Controller {
                             else{
                                 $directorat_bu[]  = $this->datajson['userdata']['BU_ID'];
                             }
-
                             switch ($priv['ACCESS_ID']){
                                 //Update Personal Timesheet
                                 case '1':
@@ -183,10 +183,7 @@ class Home extends CI_Controller {
                                     $bu_id = $this->db->query("select bu_id from projects where project_id = '$projectid'")->row()->BU_ID;
                                     break;
                             }
-                            if(array_search($bu_id,$directorat_bu) || $bu_id == 'masuk'){
-                                $this->allowedBU = $directorat_bu;
-                            }
-                            else{
+                            if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
                                 $this->output->set_status_header(403);
                                 $returndata['status'] = 'failed';
                                 $returndata['message'] = 'Anda tidak bisa mengakses feature yang ada di business unit ini';
@@ -222,6 +219,8 @@ class Home extends CI_Controller {
                                                                         )
                                                                         where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
                         $granted_project_list = [];
+                        $granted_project_list[] = null;
+
                         //rearrange project list so it can readable to array search
                         foreach ($granted_project as $gp){
                             $granted_project_list[] = $gp['PROJECT_ID'];
