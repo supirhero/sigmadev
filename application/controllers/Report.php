@@ -1232,8 +1232,14 @@ class Report extends CI_Controller {
             and b.BU_code !='NSM'
             group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by b.bu_name");
-        $result["r_monthly"] = array_unique($query->result());
-        echo json_encode($result);
+        $result["r_monthly"] = $query->result();
+        $known = array();
+        $filtered = array_filter($result["r_monthly"], function ($val) use (&$known) {
+            $unique = !in_array($val->BU_ALIAS, $known);
+            $known[] = $val;
+            return $unique;
+        });
+        echo json_encode($filtered);
     }
         //report yearly overview
     public function r_yearly($year=false){
