@@ -481,21 +481,23 @@ class Home extends CI_Controller {
             $entry = 1;
         }
         $countduration = $this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"));
-        $countduration = ($countduration > 0) ? $countduration : 1;
+        $countdurationtoday = ($countduration > 0) ? $countduration : 1;
+        $countdurationlastday = $this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun));
+        $countdurationlastday = ($countdurationlastday > 0) ? $countdurationlastday : 1;
 
         if (($bulan==$m)&& ($tahun==$y) ){
-            $hasil['entry']=$entry/$countduration *100;
+            $hasil['entry']=$entry/$countdurationtoday *100;
         }
         else{
-            $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
+            $hasil['entry']=$entry/$countdurationlastday *100;
         }
         //Utilization calculation
         if (($bulan==$m)&& ($tahun==$y) ){
-            $hasil['utilization']=$total_hours/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
+            $hasil['utilization']=$total_hours/($countdurationtoday*8) *100;
             $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8);
         }
         else{
-            $hasil['utilization']=$total_hours/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
+            $hasil['utilization']=$total_hours/($countdurationlastday*8) *100;
             $hasil['c']= ($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8);
 
         }
