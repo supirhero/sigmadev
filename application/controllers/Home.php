@@ -71,7 +71,7 @@ class Home extends CI_Controller {
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-        /*
+
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -137,7 +137,6 @@ class Home extends CI_Controller {
                                 case '2':
                                     //get bu id from bu code
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
-                                    $this->datajson['userdata']['BU_ID'] = $bu_id;
                                     break;
                                 //Create Project
                                 case '3':
@@ -145,50 +144,8 @@ class Home extends CI_Controller {
                                     break;
                                 //Access All Project In Business Unit
                                 case '4' :
-                                    if($url_dest == 'project/projectmember_add'){
-                                        $projectid = $_POST['project_id'];
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'project/projectmember_delete'){
-                                        $id = $_POST['MEMBER'];
-                                        $project_id = $this->M_detail_project->getRPProject($id);
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif($url_dest == 'project/editproject_action'){
-                                        $id=$_POST['PROJECT_ID'];
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'project/gantt' || $url_dest == 'project/spi' || $url_dest == 'project/cpi' || $url_dest == 'project/s_curve' || $url_dest == 'baseline'){
-                                        $projectid = $this->uri->segment(3);
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'project/rebaseline' || $url_dest == 'project/accept_rebaseline' || $url_dest == 'project/deny_rebaseline'){
-                                        $id = $this->input->post("project_id");
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/createtask'){
-                                        $project_id   = $this->input->post("PROJECT_ID");
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/edittask_action'){
-                                        $project_id   = $this->input->post("project_id");
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/deletetask'){
-                                        $id = $_POST['wbs_id'];
-                                        $project_id = $this->M_detail_project->getProjectTask($id);
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/assigntaskmemberproject' || $url_dest == 'removetaskmemberproject'){
-                                        $project_id = explode(".",$_POST['WBS_ID']);
-                                        $project_id = $project_id[0];
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-                                    elseif ($url_dest == 'task/upload_wbs'){
-                                        $project_id = $this->input->post('project_id');
-                                        $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$project_id'")->row()->BU_ID;
-                                    }
-
+                                    $projectid = $this->uri->segment(3);
+                                    $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row()->BU_ID;
                                     break;
                                 //Approve Timesheet(Non-project) search in this case
                                 case '5' :

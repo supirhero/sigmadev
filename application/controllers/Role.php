@@ -339,7 +339,7 @@ class Role extends CI_Controller
     }
 
     function getProfile(){
-        $data['profile'] = $this->db->query("select * from profile")->result_array();
+        $data['profile'] = $this->db->query("select * from profile order by prof_id asc")->result_array();
 
         echo json_encode($data);
     }
