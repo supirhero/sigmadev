@@ -308,7 +308,7 @@ class Home extends CI_Controller {
     /*For Overview Home*/
     public function index(){
         $bagian_unit = $this->datajson['userdata']['BU_ID'];
-        $this->datajson['userdata']['PROFILE_NAME'] = ($this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row())->PROF_NAME;
+        $this->datajson['userdata']['PROFILE_NAME'] = $this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row()->PROF_NAME;
         $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
         //$this->datajson['bussines_unit'] = $query->BU_NAME;
         $this->project();
@@ -319,7 +319,7 @@ class Home extends CI_Controller {
 
     public function userdata(){
 
-        $this->datajson['userdata']['prof_name'] = ($this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row())->PROF_NAME;
+        $this->datajson['userdata']['prof_name'] = $this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row()->PROF_NAME;
         $data["userdata"]=array_change_key_case($this->datajson['userdata'],CASE_LOWER);
         echo json_encode($data);
     }
@@ -386,7 +386,7 @@ class Home extends CI_Controller {
 
     //bu detail
     public function buDetail(){
-        $code = ($this->M_project->getBuBasedCode($_POST['bu_code']))[0]['BU_ID'];
+        $code = $this->M_project->getBuBasedCode($_POST['bu_code'])[0]['BU_ID'];
         $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code']);
         $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code'")->result_array();
         $data['bu_id'] = $code;
@@ -434,10 +434,7 @@ class Home extends CI_Controller {
         //Entry calculation
         //$hasil['e']=$entry;
         //$hasil['t']=$total_hours;
-        if($entry<=0)
-        {
-            $entry = 1;
-        }
+
         $countduration = $this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"));
         $countdurationtoday = ($countduration > 0) ? $countduration : 1;
         $countdurationlastday = $this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun));
@@ -918,7 +915,7 @@ class Home extends CI_Controller {
     public function projectdoc(){
         $projectid = $this->uri->segment(3);
 
-        $this->datajson['project_doc_list'] = $this->db->query("select a.*,b.user_name from project_doc a 
+        $this->datajson['project_doc_list'] = $this->db->query("select a.*,b.user_name from project_doc a
                                                                 join users b
                                                                 on a.upload_by = b.user_id where project_id = $projectid")->result_array();
         foreach ($this->datajson['project_doc_list'] as $key=>$value){
@@ -935,9 +932,9 @@ class Home extends CI_Controller {
         $projectid = $this->uri->segment(3);
 
         /*$this->datajson['project_issue_list'] = $this->M_home->projectissuelist($projectid);*/
-        $this->datajson['project_issue_list'] = $this->db->query("select issue_id,users.user_id as reported_by, 
-                            user_name,date_issue,note,evidence,priority,status 
-                            from manage_issue 
+        $this->datajson['project_issue_list'] = $this->db->query("select issue_id,users.user_id as reported_by,
+                            user_name,date_issue,note,evidence,priority,status
+                            from manage_issue
                             join users on users.user_id = manage_issue.user_id
                             where project_id = '$projectid'")->result_array();
 
@@ -1583,4 +1580,3 @@ class Home extends CI_Controller {
 
 
 }
-
