@@ -480,8 +480,11 @@ class Home extends CI_Controller {
         {
             $entry = 1;
         }
+        $countduration = $this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"));
+        $countduration = ($countduration > 0) ? $countduration : 1;
+
         if (($bulan==$m)&& ($tahun==$y) ){
-            $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
+            $hasil['entry']=$entry/$countduration *100;
         }
         else{
             $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
