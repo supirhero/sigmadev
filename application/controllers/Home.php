@@ -3,7 +3,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Home extends CI_Controller {
 
     public $datajson = array();
-    public $privilege = array();
     public function __construct()
     {
         parent::__construct();
@@ -16,7 +15,7 @@ class Home extends CI_Controller {
                                         'project_report'=>true,
                                         'project_activities'=>false,
                                         'acc_deny_timesheet'=>false,
-                                        'report_overview'=>false,];
+                                        'report_overview'=>false];
         error_reporting(E_ALL  & ~E_NOTICE);
 
         $this->load->model('M_home');
