@@ -476,6 +476,10 @@ class Home extends CI_Controller {
         //Entry calculation
         //$hasil['e']=$entry;
         //$hasil['t']=$total_hours;
+        if($entry<=0)
+        {
+            $entry = 1;
+        }
         if (($bulan==$m)&& ($tahun==$y) ){
             $hasil['entry']=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
         }
