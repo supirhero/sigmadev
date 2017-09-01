@@ -9,7 +9,7 @@ Class M_home extends CI_Model{
     }
 
     function assignmentView($user_id){
-        $query = $this->db->query(" SELECT a.USER_ID, c.USER_NAME, f.bu_name ,a.RP_ID, a.PROJECT_ID, b.PROJECT_NAME, d.WP_ID, d.WBS_ID, e.WBS_NAME, e.START_DATE, e.FINISH_DATE
+        $query = $this->db->query(" SELECT a.USER_ID, c.USER_NAME, f.bu_name ,a.RP_ID, a.PROJECT_ID,b.project_complete as project_percent,b.project_status, b.PROJECT_NAME, d.WP_ID, d.WBS_ID, e.WBS_NAME, e.START_DATE, e.FINISH_DATE
                                     FROM RESOURCE_POOL a LEFT JOIN PROJECTS b
                                     ON a.PROJECT_ID=b.PROJECT_ID LEFT JOIN USERS c
                                     ON a.USER_ID=c.USER_ID LEFT JOIN WBS_POOL d
@@ -18,6 +18,13 @@ Class M_home extends CI_Model{
                                     on b.bu_code = f.bu_code
                                     where a.user_id='".$user_id."'");
         $hasil = $query->result_array();
+        foreach($hasil as &$hasilRef){
+            foreach($hasilRef as &$hasilRefRef){
+                if($hasilRefRef == null){
+                    $hasilRefRef = 'Not Set';
+                }
+            }
+        }
 
         //reserve variable
         $array_fix = [];
