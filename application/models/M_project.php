@@ -362,7 +362,7 @@ class M_project extends CI_Model {
                FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                     INNER JOIN projects c ON b.project_id = c.project_id
                     INNER JOIN p_bu z on c.bu_code = z.bu_code
-                    INNER JOIN p_project_category pc on c.type_of_effort=pc.category
+                    INNER JOIN p_project_category pc on c.type_of_effort=pc.id
                     WHERE c.bu_code ='$bucode'
              UNION
              SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
@@ -370,7 +370,7 @@ class M_project extends CI_Model {
                     b.created_by,iwo_NO, pc.project_type, category
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
                INNER JOIN p_bu z on b.bu_code = z.bu_code
-                    INNER JOIN p_project_category pc on b.type_of_effort=pc.category
+                    INNER JOIN p_project_category pc on b.type_of_effort=pc.id
                WHERE b.bu_code='$bucode')")->result_array();
     }
     public function addprojectmember($project_id,$user){
