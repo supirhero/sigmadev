@@ -785,10 +785,28 @@ class Home extends CI_Controller {
     }
 
     /*FOR PROJECT LIST*/
-    private function project(){
+    private function project($type="normal"){
         $prof = $this->datajson['userdata']['PROF_ID'];
         $id = $this->datajson['userdata']['USER_ID'];
-        $projecttemp = $this->M_project->getUsersProject($id);
+      switch ($type) {
+        case "normal":
+          // no filter no search
+          $projecttemp = $this->M_project->getUsersProject($id);
+          break;
+        case "filter":
+          // filter
+          isset($_POST['STATUS'])?$status=$_POST['STATUS']:$status=null;
+          isset($_POST['PROJECT_TYPE'])?$type=$_POST['PROJECT_TYPE']:$type=null;
+          isset($_POST['EFFORT_TYPE'])?$effort=$_POST['EFFORT_TYPE']:$effort=null;
+          $projecttemp = $this->M_project->getUsersProject($id,null,$status,$type,$effort);
+          break;
+        case "search":
+          // search
+          isset($_POST['KEYWORD'])?$keyword=$_POST['KEYWORD']:$keyword=null;
+          $projecttemp = $this->M_project->getUsersProject($id,$keyword);
+          break;
+      }
+
         for($iter = 0 ; $iter < count($projecttemp) ; $iter ++){
             if($projecttemp[$iter]['PROJECT_COMPLETE'] == null){
                 $projecttemp[$iter]['PROJECT_COMPLETE'] = 0;
@@ -1620,6 +1638,29 @@ class Home extends CI_Controller {
         //  echo $r;
 
     }
-
+    public function searchhome(){
+        $bagian_unit = $this->datajson['userdata']['BU_ID'];
+        $this->datajson['userdata']['PROFILE_NAME'] = $this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row()->PROF_NAME;
+        $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
+        //$this->datajson['bussines_unit'] = $query->BU_NAME;
+        //required data POST :
+        // KEYWORD -> untuk iwo_no dan nama
+        $this->project("search");
+        $this->transformKeys($this->datajson);
+        echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
+    }
+    public function filterhome(){
+        $bagian_unit = $this->datajson['userdata']['BU_ID'];
+        $this->datajson['userdata']['PROFILE_NAME'] = $this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row()->PROF_NAME;
+        $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
+        //$this->datajson['bussines_unit'] = $query->BU_NAME;
+        //required data POST :
+        // STATUS -> status project
+        // PROJECT_TYPE -> project / non project
+        // EFFORT_TYPE -> project/cr/manage operation/dll
+        $this->project("filter");
+        $this->transformKeys($this->datajson);
+        echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
+    }
 
 }
