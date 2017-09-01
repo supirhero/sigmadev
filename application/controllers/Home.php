@@ -410,14 +410,19 @@ class Home extends CI_Controller {
     //bu detail
     public function buDetail(){
         $code = $this->M_project->getBuBasedCode($_POST['bu_code'])[0]['BU_ID'];
-        $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code']);
+        // check untuk filter/search
+        isset($_POST['KEYWORD'])?$keyword=$_POST['KEYWORD']:$keyword=null;
+        isset($_POST['STATUS'])?$status=$_POST['STATUS']:$status=null;
+        isset($_POST['PROJECT_TYPE'])?$type=$_POST['PROJECT_TYPE']:$type=null;
+        isset($_POST['EFFORT_TYPE'])?$effort=$_POST['EFFORT_TYPE']:$effort=null;
+        // end check
+        $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code'],$keyword,$status,$type,$effort);
         $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code'")->result_array();
         $data['bu_id'] = $code;
         $data['bu_code'] = $_POST['bu_code'];
 
         echo json_encode($data);
     }
-
     /*FOR DATATIMESHEET THIS MONTH*/
     private function datatimesheet(){
 
