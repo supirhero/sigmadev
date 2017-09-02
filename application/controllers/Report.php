@@ -1231,9 +1231,10 @@ class Report extends CI_Controller {
         $result["r_monthly"] = $query->result();
         $known = array();
         $knownz = array();
-        $filtered = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
+        $filtered["r_monthly"] = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
             $unique = !in_array($val->BU_ALIAS, $knownz);
-            $known[] = $val;
+            array_push($known,$val);
+
             $knownz[] = $val->BU_ALIAS;
             return $unique;
         });
@@ -1243,7 +1244,7 @@ class Report extends CI_Controller {
             $object->$key = $value;
         }
         $filteredz["r_monthly"] = array($object);
-        echo json_encode($filteredz);
+        echo json_encode($filtered);
     }
         //report yearly overview
     public function r_yearly($year=false){
