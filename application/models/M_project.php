@@ -286,8 +286,10 @@ class M_project extends CI_Model {
         return $this->db->query("select count(*) as C from PROJECTS where IWO_NO like '%" . $IWO . "%'")->row()->C;
     }
 
-    function getUsersProject($id,$keyword=null,$status=null,$type=null,$effort=null) {
-      $sql="SELECT   distinct project_id, project_name,iwo_no,project_type,type_effort,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
+    function getUsersProject($id,$page=1,$keyword=null,$status=null,$type=null,$effort=null) {
+        $start = $page-1;
+        $end = $page*5;
+      $sql="select * from (SELECT   distinct project_id, project_name,iwo_no,project_type,type_effort,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
           project_status, project_desc, created_by,date_created
      FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                   c.project_complete, c.project_status, c.project_desc,
@@ -321,7 +323,8 @@ class M_project extends CI_Model {
                     $effort=strtolower($effort);
                     $sql.=" and lower(effort_type) like '%".$effort."%' ";
                   }
-          $sql.=" order by date_created desc";
+          $sql.=" order by date_created desc)";
+          $sql.=" where ROWNUM > $start and ROWNUM <= $end";
         return $this->db->query($sql)->result_array();
     }
 

@@ -791,22 +791,24 @@ $data["error_upload"] = $this->upload->display_errors();
     private function project($type="normal"){
         $prof = $this->datajson['userdata']['PROF_ID'];
         $id = $this->datajson['userdata']['USER_ID'];
-      switch ($type) {
+        isset($_POST['page'])?$page=$_POST['PAGE']:$page=1;
+
+        switch ($type) {
         case "normal":
           // no filter no search
-          $projecttemp = $this->M_project->getUsersProject($id);
+          $projecttemp = $this->M_project->getUsersProject($id,$page);
           break;
         case "filter":
           // filter
           isset($_POST['STATUS'])?$status=$_POST['STATUS']:$status=null;
           isset($_POST['PROJECT_TYPE'])?$type=$_POST['PROJECT_TYPE']:$type=null;
           isset($_POST['EFFORT_TYPE'])?$effort=$_POST['EFFORT_TYPE']:$effort=null;
-          $projecttemp = $this->M_project->getUsersProject($id,null,$status,$type,$effort);
+          $projecttemp = $this->M_project->getUsersProject($id,$page,null,$status,$type,$effort);
           break;
         case "search":
           // search
           isset($_POST['KEYWORD'])?$keyword=$_POST['KEYWORD']:$keyword=null;
-          $projecttemp = $this->M_project->getUsersProject($id,$keyword);
+          $projecttemp = $this->M_project->getUsersProject($id,$page,$keyword);
           break;
       }
 
