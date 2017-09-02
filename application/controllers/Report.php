@@ -950,7 +950,6 @@ class Report extends CI_Controller {
 
 
     }*/
-        $res['allentry']=array($res['allentry']);
 
         $result["r_entry_bu"] = $res;
 
@@ -1084,7 +1083,7 @@ class Report extends CI_Controller {
 
 
         }*/
-        $res['allentry']=array($res['allentry']);
+        $res['allhour']=array($res['allhour']);
 
         $result["r_util_bu"] = $res;
 
