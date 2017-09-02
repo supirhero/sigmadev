@@ -324,7 +324,7 @@ class M_project extends CI_Model {
                     $sql.=" and lower(effort_type) like '%".$effort."%' ";
                   }
           $sql.=" order by date_created desc)";
-          $sql.=" where ROWNUM > $start and ROWNUM <= $end";
+        //  $sql.=" where ROWNUM > $start and ROWNUM <= $end";
         return $this->db->query($sql)->result_array();
     }
 
