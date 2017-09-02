@@ -367,7 +367,7 @@ class M_project extends CI_Model {
              UNION
              SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,z.bu_id,
                     b.project_complete, b.project_status, b.project_desc,
-                    b.created_by,iwo_NO, pc.project_type, category as effort_type
+                    b.created_by,iwo_NO, pc.project_type
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
                INNER JOIN p_bu z on b.bu_code = z.bu_code
                     INNER JOIN p_project_category pc on b.type_of_effort=pc.id
