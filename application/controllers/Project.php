@@ -1623,8 +1623,9 @@ $this->email->send();
     $c['history']=$this->gethistoryall($project);
     echo json_encode($c,JSON_NUMERIC_CHECK);
   }
-  public function gethistorydetail($cap_id){
-
+  public function gethistorydetail($wbs_id){
+    $c['data']=$this->M_project->gethistorydetail($wbs_id);
+    echo json_encode($c);
   }
   public function gethistoryall($project){
     //$dathistory[0][0]='Task';
