@@ -765,7 +765,7 @@ SELECT sum(CASE
                                                   WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
                                                   DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'no' as rebaseline
                                             from wbs) connect by  wbs_parent_id = prior wbs_id
-                                          start with wbs_id='$project_id'
+                                          start with wbs_id='$project_id"."."."0'
                                           order siblings by regexp_substr(orde, '^\D*') nulls first,
                                           to_number(regexp_substr(orde, '\d+')))");
         $total_pv = $query->row()->TOTAL;
