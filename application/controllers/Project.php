@@ -151,7 +151,7 @@ class Project extends CI_Controller
                                 //Access All Project In Business Unit
                                 case '4' :
                                     $projectid = $this->uri->segment(3);
-                                    $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row()->BU_ID;
+                                    $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on (a.bu_code = b.bu_code or a.bu_code=b.bu_alias) where project_id = '$projectid'")->row()->BU_ID;
                                     break;
                                 //Approve Timesheet(Non-project) search in this case
                                 case '5' :
