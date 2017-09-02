@@ -1308,110 +1308,66 @@ class Report extends CI_Controller {
         $status = $this->input->post('status');
         $schedule = $this->input->post('schedule');
         $budget = $this->input->post('budget');
-        if(!empty($this->input->post('value')) || !empty($this->input->post('status')) || !empty($this->input->post('schedule')) || !empty($this->input->post('budget'))){
-            $query .= 'where ';
-        }
 
-        if(!empty($this->input->post('value'))){
-            if($i == 0){
-                if($value[0] == 1){
-                    $query .= " amount < 1000000000";
-                }if($value[1] == 1){
-                    $query .= " amount between 1000000000 and 5000000000";
-                }if($value[2] == 1){
-                    $query .= " amount > 5000000000";
-                }
-                $i = 1;
-            }
-            else{
-                if($value[0] == 1){
-                    $query .= " or amount < 1000000000";
-                }if($value[1] == 1){
-                    $query .= " or amount between 1000000000 and 5000000000";
-                }if($value[2] == 1){
-                    $query .= " or amount > 5000000000";
-                }
-            }
-        }
-        if(!empty($this->input->post('status'))){
-            if($i == 0){
-                if($status[0] == 1) {
-                    $query .= " project_status = 'Not Started'";
-                }if($status[1] == 1) {
-                    $query .= " project_status = 'In Progress'";
-                }if($status[2] == 1) {
-                    $query .= " project_status = 'On Hold'";
-                }if($status[3] == 1) {
-                    $query .= " project_status = 'Completed'";
-                }if($status[4] == 1) {
-                    $query .= " project_status = 'In Planning'";
-                }if ($status[5] == 1) {
-                    $query .= " project_status = 'Cancelled'";
-                }
-                $i = 1;
-            }
-            else{
-                if($status[0] == 1) {
-                    $query .= " or project_status = 'Not Started'";
-                }if($status[1] == 1) {
-                    $query .= " or project_status = 'In Progress'";
-                }if($status[2] == 1) {
-                    $query .= " or project_status = 'On Hold'";
-                }if($status[3] == 1) {
-                    $query .= " or project_status = 'Completed'";
-                }if($status[4] == 1) {
-                    $query .= " or project_status = 'In Planning'";
-                }if ($status[5] == 1) {
-                    $query .= " or project_status = 'Cancelled'";
-                }
-            }
-        }
-        if(!empty($this->input->post('schedule'))){
+        if(!empty($value)){
+            $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
+            for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    if($schedule[0] == 1){
-                        $query .= " schedule_status = 'Schedule Overrun'";
-                    }if($schedule[0] == 1){
-                        $query .= " schedule_status = 'On Schedule'";
-                    }if($schedule[0] == 1){
-                        $query .= " schedule_status = 'Ahead Schedule'";
-                    }
-                    $i = 1;
+                    $query .= " where ";
+                    $i++;
                 }
-                else{
-                    if($schedule[0] == 1){
-                        $query .= " or schedule_status = 'Schedule Overrun'";
-                    }if($schedule[0] == 1){
-                        $query .= " or schedule_status = 'On Schedule'";
-                    }if($schedule[0] == 1){
-                        $query .= " or schedule_status = 'Ahead Schedule'";
-                    }
+                elseif($value[$a] == 1){
+                    $query .= " or ";
+                }
+                if($value[$a] == 1){
+                    $query .= " amount '".$valueVal[$a]."'";
+                }
+            }
+        }if(!empty($status)){
+            $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
+            for($a = 0 ; $a < count($valueVal);$a++){
+                if($i == 0){
+                    $query .= " where ";
+                    $i++;
+                }
+                elseif($status[$a] == 1){
+                    $query .= " or ";
+                }
+                if($status[$a] == 1){
+                    $query .= " project_status =  '".$valueVal[$a]."'";
+                }
+            }
+        }if(!empty($schedule)){
+            $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
+            for($a = 0 ; $a < count($valueVal);$a++){
+                if($i == 0){
+                    $query .= " where ";
+                    $i++;
+                }
+                elseif($schedule[$a] == 1){
+                    $query .= " or ";
+                }
+                if($schedule[$a] == 1){
+                    $query .= " schedule_status = '".$valueVal[$a]."'";
+                }
+            }
+        }if(!empty($budget)){
+            $valueVal = ["Over Budget","On Budget","Ahead Budget"];
+            for($a = 0 ; $a < count($valueVal);$a++){
+                if($i == 0){
+                    $query .= " where ";
+                    $i++;
+                }
+                elseif($budget[$a] == 1){
+                    $query .= " or ";
+                }
+                if($budget[$a] == 1){
+                    $query .= " budget_status = '".$valueVal[$a]."'";
                 }
 
             }
-
-        if(!empty($this->input->post('budget'))){
-                if($i == 0){
-                    if($budget[0] == 1){
-                        $query .= " schedule_status = 'Over Budget'";
-                    }if($budget[0] == 1){
-                        $query .= " schedule_status = 'On Budget'";
-                    }if($budget[0] == 1){
-                        $query .= " project_status = 'Ahead Budget'";
-                    }
-                    $i = 1;
-                }
-                else{
-                    if($budget[0] == 1){
-                        $query .= " or schedule_status = 'Over Budget'";
-                    }if($budget[0] == 1){
-                        $query .= " or schedule_status = 'On Budget'";
-                    }if($budget[0] == 1){
-                        $query .= " or project_status = 'Ahead Budget'";
-                    }
-                }
-
-
         }
+
 
         $result['project'] = $this->db->query($query)->result_array();
         echo json_encode($result);
@@ -1438,109 +1394,64 @@ class Report extends CI_Controller {
         $status = $this->input->post('status');
         $schedule = $this->input->post('schedule');
         $budget = $this->input->post('budget');
-        if(!empty($this->input->post('value')) || !empty($this->input->post('status')) || !empty($this->input->post('schedule')) || !empty($this->input->post('budget'))){
-            $query .= 'where ';
-        }
 
-        if(!empty($this->input->post('value'))){
-            if($i == 0){
-                if($value[0] == 1){
-                    $query .= " amount < 1000000000";
-                }if($value[1] == 1){
-                    $query .= " amount between 1000000000 and 5000000000";
-                }if($value[2] == 1){
-                    $query .= " amount > 5000000000";
+        if(!empty($value)){
+            $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
+            for($a = 0 ; $a < count($valueVal);$a++){
+                if($i == 0){
+                    $query .= " where ";
+                    $i++;
                 }
-                $i = 1;
-            }
-            else{
-                if($value[0] == 1){
-                    $query .= " or amount < 1000000000";
-                }if($value[1] == 1){
-                    $query .= " or amount between 1000000000 and 5000000000";
-                }if($value[2] == 1){
-                    $query .= " or amount > 5000000000";
+                elseif($value[$a] == 1){
+                    $query .= " or ";
+                }
+                if($value[$a] == 1){
+                    $query .= " amount '".$valueVal[$a]."'";
                 }
             }
-        }
-        if(!empty($this->input->post('status'))){
-            if($i == 0){
-                if($status[0] == 1) {
-                    $query .= " project_status = 'Not Started'";
-                }if($status[1] == 1) {
-                    $query .= " project_status = 'In Progress'";
-                }if($status[2] == 1) {
-                    $query .= " project_status = 'On Hold'";
-                }if($status[3] == 1) {
-                    $query .= " project_status = 'Completed'";
-                }if($status[4] == 1) {
-                    $query .= " project_status = 'In Planning'";
-                }if ($status[5] == 1) {
-                    $query .= " project_status = 'Cancelled'";
+        }if(!empty($status)){
+            $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
+            for($a = 0 ; $a < count($valueVal);$a++){
+                if($i == 0){
+                    $query .= " where ";
+                    $i++;
                 }
-                $i = 1;
-            }
-            else{
-                if($status[0] == 1) {
-                    $query .= " or project_status = 'Not Started'";
-                }if($status[1] == 1) {
-                    $query .= " or project_status = 'In Progress'";
-                }if($status[2] == 1) {
-                    $query .= " or project_status = 'On Hold'";
-                }if($status[3] == 1) {
-                    $query .= " or project_status = 'Completed'";
-                }if($status[4] == 1) {
-                    $query .= " or project_status = 'In Planning'";
-                }if ($status[5] == 1) {
-                    $query .= " or project_status = 'Cancelled'";
+                elseif($status[$a] == 1){
+                    $query .= " or ";
+                }
+                if($status[$a] == 1){
+                    $query .= " project_status =  '".$valueVal[$a]."'";
                 }
             }
-        }
-        if(!empty($this->input->post('schedule'))){
-            if($i == 0){
-                if($schedule[0] == 1){
-                    $query .= " schedule_status = 'Schedule Overrun'";
-                }if($schedule[0] == 1){
-                    $query .= " schedule_status = 'On Schedule'";
-                }if($schedule[0] == 1){
-                    $query .= " schedule_status = 'Ahead Schedule'";
+        }if(!empty($schedule)){
+            $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
+            for($a = 0 ; $a < count($valueVal);$a++){
+                if($i == 0){
+                    $query .= " where ";
+                    $i++;
                 }
-                $i = 1;
-            }
-            else{
-                if($schedule[0] == 1){
-                    $query .= " or schedule_status = 'Schedule Overrun'";
-                }if($schedule[0] == 1){
-                    $query .= " or schedule_status = 'On Schedule'";
-                }if($schedule[0] == 1){
-                    $query .= " or schedule_status = 'Ahead Schedule'";
+                elseif($schedule[$a] == 1){
+                    $query .= " or ";
+                }
+                if($schedule[$a] == 1){
+                    $query .= " schedule_status = '".$valueVal[$a]."'";
                 }
             }
+        }if(!empty($budget)){
+            $valueVal = ["Over Budget","On Budget","Ahead Budget"];
+            for($a = 0 ; $a < count($valueVal);$a++){
+                if($i == 0){
+                    $query .= " where ";
+                    $i++;
+                }
+                elseif($budget[$a] == 1){
+                    $query .= " or ";
+                }
+                if($budget[$a] == 1){
+                    $query .= " budget_status = '".$valueVal[$a]."'";
+                }
 
-        }
-
-        if(!empty($this->input->post('budget'))){
-            if($i == 0){
-                if($budget[0] == 1){
-                    $query .= " schedule_status = 'Over Budget'";
-                }if($budget[0] == 1){
-                    $query .= " schedule_status = 'On Budget'";
-                }if($budget[0] == 1){
-                    $query .= " project_status = 'Ahead Budget'";
-                }
-                $i = 1;
             }
-            else{
-                if($budget[0] == 1){
-                    $query .= " or schedule_status = 'Over Budget'";
-                }if($budget[0] == 1){
-                    $query .= " or schedule_status = 'On Budget'";
-                }if($budget[0] == 1){
-                    $query .= " or project_status = 'Ahead Budget'";
-                }
-            }
-
-
         }
 
         //echo $query.$cond;
