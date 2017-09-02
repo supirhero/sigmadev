@@ -1233,10 +1233,9 @@ class Report extends CI_Controller {
         $knownz = array();
         $filtered = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
             $unique = !in_array($val->BU_ALIAS, $knownz);
-            array_push($known,$val);
-
+            $known[] = $val;
             $knownz[] = $val->BU_ALIAS;
-            return $known;
+            return $unique;
         });
         $object = new stdClass();
         foreach ($filtered as $key => $value)
