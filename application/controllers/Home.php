@@ -384,6 +384,8 @@ class Home extends CI_Controller {
             $data['status_code'] = '200';
             $data['status_name'] = 'success';
             $data['message'] = 'user updated';
+            $data['image_error'] = "0";//kegedean filesize
+
 
         }
         // jika ada file evidence / berhasil upload
