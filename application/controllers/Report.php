@@ -660,24 +660,24 @@ class Report extends CI_Controller {
         $data =array();
         $c=$this->M_report->getbu($bu);
         if ($c['BU_PARENT_ID']=='0') {
-            $data['project']['completed'] =0;
-            $data['project']['in_progress']=0;
-            $data['project']['not_started']=0;
-            $data['project']['jumlah']=0;
+            $data['project_dir']['completed'] =0;
+            $data['project_dir']['in_progress']=0;
+            $data['project_dir']['not_started']=0;
+            $data['project_dir']['jumlah']=0;
             $data['finance']['total_project_value']=0;
             $child=$this->M_report->getbuchild($bu);
             foreach ($child as $ch) {
-                $data['project']['completed'] =$data['project']['completed']+$this->M_report->Portofolio_completed_Project($ch['BU_ID'],$tahun);
-                $data['project']['in_progress']=$data['project']['in_progress']+$this->M_report->Portofolio_Active_Project($ch['BU_ID'],$tahun);
-                $data['project']['not_started']=$data['project']['not_started']+$this->M_report->Portofolio_notstarted_Project($ch['BU_ID'],$tahun);
-                $data['project']['jumlah']=$data['project']['jumlah']+$this->M_report->Portofolio_Total_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['completed'] =$data['project']['completed']+$this->M_report->Portofolio_completed_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['in_progress']=$data['project']['in_progress']+$this->M_report->Portofolio_Active_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['not_started']=$data['project']['not_started']+$this->M_report->Portofolio_notstarted_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['jumlah']=$data['project']['jumlah']+$this->M_report->Portofolio_Total_Project($ch['BU_ID'],$tahun);
                 $data['finance']['total_project_value']=$data['project']['total_project_value']+$this->M_report->Portofolio_Total_Project_Value($ch['BU_ID'],$tahun);
             }
         }else{
-            $data['project']['completed'] = $this->M_report->Portofolio_completed_Project($bu,$tahun);
-            $data['project']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
-            $data['project']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
-            $data['project']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
+            $data['project_dir']['completed'] = $this->M_report->Portofolio_completed_Project($bu,$tahun);
+            $data['project_dir']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
+            $data['project_dir']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
+            $data['project_dir']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
             $data['finance']['total_project_value'] = $this->M_report->Portofolio_Total_Project_Value($bu,$tahun);
         }
         print_r(json_encode($data));
