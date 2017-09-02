@@ -352,8 +352,22 @@ class Timesheet extends CI_Controller {
             $_POST = array_change_key_case($_POST,CASE_UPPER);
         }
         $id=$this->input->post("PROJECT_ID");
+        $rh_id = $this->db->query("select rh_id from projects where project_id = '$id'")->row()->RH_ID;
+
         $user_id = $this->datajson['userdata']['USER_ID'];
-        $query = $this->db->query("SELECT WP_ID,PROJECT_ID,WBS_NAME,TASK_MEMBER_REBASELINE,TASK_REBASELINE FROM CARI_TASK_NEW WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
+        $query = $this->db->query("SELECT WP_ID,PROJECT_ID,WBS_NAME,TASK_MEMBER_REBASELINE,TASK_REBASELINE 
+                                  FROM
+                                  (SELECT a.USER_ID, a.USER_NAME, b.RP_ID, c.PROJECT_ID, c.PROJECT_NAME, d.WP_ID, e.wbs_name, c.PROJECT_STATUS,d.rebaseline as task_member_rebaseline,e.rebaseline as task_rebaseline
+                                    FROM
+                                    USERS a INNER JOIN
+                                    RESOURCE_POOL b ON a.USER_ID=b.USER_ID 
+                                    INNER JOIN
+                                    PROJECTS c ON b.PROJECT_ID=c.PROJECT_ID 
+                                    inner JOIN
+                                    (select wbs_id,rp_id,wp_id,'no' as rebaseline from wbs_pool union select wbs_id,rp_id,wp_id,'yes' as rebaseline from temporary_wbs_pool where rh_id = '$rh_id') d ON d.rp_id=b.rp_id
+                                    inner JOIN
+                                    (select wbs_id,wbs_name,'no' as rebaseline from wbs union select wbs_id,wbs_name,'yes' as rebaseline from temporary_wbs where rh_id = '$rh_id') e ON d.wbs_id=e.wbs_id)
+                                  WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
         //$query = $this->db->query("SELECT * FROM CARI_TASK WHERE PROJECT_ID='900418' and USER_ID='S201506017'");
 
         $hasil['task'] = $query->result_array();
