@@ -287,7 +287,7 @@ class M_project extends CI_Model {
     }
 
     function getUsersProject($id,$keyword=null,$status=null,$type=null,$effort=null) {
-      $sql="SELECT   distinct project_id, project_name,iwo_no,project_type,type_effort,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
+      $sql="SELECT   distinct project_id, project_name,iwo_no,project_type,type_effort,bu_name, bu_code,to_char(111) as project_complete,
           project_status, project_desc, created_by,date_created
      FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                   c.project_complete, c.project_status, c.project_desc,
@@ -304,7 +304,7 @@ class M_project extends CI_Model {
              INNER JOIN p_bu z on b.bu_code = z.bu_code
              INNER JOIN p_project_category d on b.TYPE_OF_EFFORT=1
                   )
-                  user_id='".$id."' or created_by='".$id."' ";
+                  where 1=1 and (user_id='".$id."' or created_by='".$id."') ";
                   if ($keyword!=null) {
                     $keyword=strtolower($keyword);
                     $sql.=" and (lower(project_name) like '%".$keyword."%' or lower(iwo_no) like '%".$keyword."%') ";
