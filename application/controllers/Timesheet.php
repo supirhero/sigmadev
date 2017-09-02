@@ -661,27 +661,27 @@ else{
                 if($checkmember == 'yes'){
                     $this->M_timesheet->editTimesheetTemp($data,$rh_id);
                     $returndata['status'] = "success";
-                    $returndata['message'] = "add timesheet temporary succcess ";
+                    $returndata['message'] = "edit timesheet temporary succcess ";
                 }
                 //insert timesheet to temporary timesheet if member not need rebaseline but task need rebaseline approval
                 elseif ($checktask == 'yes'){
                     $this->M_timesheet->editTimesheetTemp($data,$rh_id);
 
                     $returndata['status'] = "success";
-                    $returndata['message'] = "add timesheet temporary succcess ";
+                    $returndata['message'] = "edit timesheet temporary succcess ";
                 }
                 //insert timesheet to original timesheet table because his member status and task status not need rebaseline approval
                 else{
                     $this->M_timesheet->editTimesheet($data);
                     $returndata['status'] = "success";
-                    $returndata['message'] = "add timesheet succcess ";
+                    $returndata['message'] = "edit timesheet succcess ";
                 }
 
             }
             elseif($statusProject == 'in progress'){
                 $this->M_timesheet->editTimesheet($data);
                 $returndata['status'] = "success";
-                $returndata['message'] = "add timesheet succcess ";
+                $returndata['message'] = "edit timesheet succcess ";
             }
             elseif ($statusProject == null || $statusProject == ""){
                 $this->output->set_status_header(400);
