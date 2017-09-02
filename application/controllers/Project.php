@@ -1612,4 +1612,63 @@ $this->email->send();
       $data['project_id']=$project_id;
       echo json_encode($data);
     }
+    // history, buat ambil history update progress task yg dilakukan PM
+  // created by faishol
+  public function history($project){
+    $c=array();
+    $c['project']=$project;
+    // summary untuk latest update
+    $c['summary']=$this->M_detail_project->getHistory($project);
+    //history untuk history semua task
+    $c['history']=$this->gethistoryall($project);
+    echo json_encode($c,JSON_NUMERIC_CHECK);
+  }
+  public function gethistorydetail($cap_id){
+
+  }
+  public function gethistoryall($project){
+    //$dathistory[0][0]='Task';
+  $wbs_name=$this->db->query ("SELECT
+    WBS.WBS_NAME,
+    CAPTURE_WBS.WBS_ID
+    FROM
+    CAPTURE_WBS
+    INNER JOIN WBS ON WBS.WBS_ID = CAPTURE_WBS.WBS_ID
+    where CAPTURE_WBS.PROJECT_ID='".$project."'")->result_array();
+    $x=1;
+    $max = $this->db->query("select MAX(COUNT(DETAIL_CAP_ID))
+    as maxs from detail_capture where
+    project_id='".$project."' GROUP BY wbs_ID")->row()->MAXS;
+    foreach ($wbs_name as $wbs_name) {
+      $dathistory[$x][0]=$wbs_name['WBS_NAME'];
+      $a=1;
+      $c=0;
+      $b=$max;
+      $res=$this->db->query ("select work_percent_complete
+      from Detail_capture where wbs_id='".$wbs_name['WBS_ID']."' order by detail_cap_id")->result_array();
+      //$purel =array(20, 40, 60, 80);
+      for ($i=0; $i < $max ; $i++) {
+        //$dathistory[0][$a]='';
+        if ($max ==count($res)){
+          $dathistory[$x][$a]=$res[$i]['WORK_PERCENT_COMPLETE'];
+        }else {
+          if ($i <count($res)) {
+            $dathistory[$x][$a]=$res[$c]['WORK_PERCENT_COMPLETE'];
+            $c++;
+          }
+          else {
+            $dathistory[$x][$a]=0;
+          }
+        }
+
+
+        $b--;
+        $a++;
+
+      }
+      //echo json_encode($res)."<br />";
+      $x++;
+    }
+    return $dathistory;
+  }
 }
