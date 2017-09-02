@@ -1217,7 +1217,7 @@ class Report extends CI_Controller {
         $result["r_monthly"] = $query->result();
         $known = array();
         $knownz = array();
-        $filtered = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
+        $filtered["r_monthly"] = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
             $unique = !in_array($val->BU_ALIAS, $knownz);
             $known[] = $val;
             $knownz[] = $val->BU_ALIAS;
