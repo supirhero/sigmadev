@@ -900,6 +900,7 @@ class Report extends CI_Controller {
         }else{
           $count_user=$this->M_report->getCountUser($bu);
           //echo print_r($tahun);
+            $count_user = ($count_user > 0) ? $count_user : 1;
 
           if (($tahun==$y)){
               $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
