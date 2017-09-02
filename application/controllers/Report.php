@@ -1084,7 +1084,7 @@ class Report extends CI_Controller {
 
 
         }*/
-        $res['allhour']=array($res['allhour']);
+        $res['allhour']=$res['allhour'];
 
         $result["r_util_bu"] = $res;
 
