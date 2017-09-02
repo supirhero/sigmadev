@@ -951,7 +951,7 @@ class Report extends CI_Controller {
 
     }*/
 
-        $result["r_entry_bu"] = array($res);
+        $result["r_entry_bu"] = $res;
 
     echo json_encode($result,JSON_NUMERIC_CHECK);
 
@@ -1086,7 +1086,7 @@ class Report extends CI_Controller {
         }*/
         $res['allhour']=array($res['allhour']);
 
-        $result["r_util_bu"] = array($res);
+        $result["r_util_bu"] = $res;
 
         echo json_encode($result,JSON_NUMERIC_CHECK);
     }
