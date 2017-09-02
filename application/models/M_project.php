@@ -304,7 +304,7 @@ class M_project extends CI_Model {
              INNER JOIN p_bu z on b.bu_code = z.bu_code
              INNER JOIN p_project_category d on b.TYPE_OF_EFFORT=1
                   )
-                  where 1=1 and (user_id='".$id."' or created_by='".$id."') ";
+                (user_id='".$id."' or created_by='".$id."') ";
                   if ($keyword!=null) {
                     $keyword=strtolower($keyword);
                     $sql.=" and (lower(project_name) like '%".$keyword."%' or lower(iwo_no) like '%".$keyword."%') ";
