@@ -1155,7 +1155,7 @@ class Home extends CI_Controller {
         $config['mailtype'] = 'html';
         $config['validation'] = TRUE;
         $this->email->initialize($config);
-        $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
+        $this->email->from('salma.ulhaq@sigma.co.id', 'Project & Resources Development System');
         //  $this->email->to($email_vp);
         $this->email->cc('pmo@sigma.co.id');
         //$this->email->bcc('pmo@sigma.co.id');
