@@ -25,7 +25,7 @@ Class M_detail_project extends CI_Model{
 
     }
     function getHistory($project){
-      return $this->db->query("select a.*,b.wbs_name,c.user_name from capture_wbs a inner join wbs b on a.wbs_id=b.wbs_id inner join users c on a.user_id=c.user_id where a.project_id='$project' order by DATE_CAP")->result();
+      return $this->db->query("select a.*,b.wbs_name,c.user_name as last_update_by from capture_wbs a inner join wbs b on a.wbs_id=b.wbs_id inner join users c on a.user_id=c.user_id where a.project_id='$project' order by DATE_CAP")->result();
     }
     function endsWith($haystack, $needle)  {
       $length = strlen($needle);
@@ -202,16 +202,16 @@ Class M_detail_project extends CI_Model{
         join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
         join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
         WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(
-          select user_id 
-          from wbs_pool 
-          inner join resource_pool 
-          on wbs_pool.rp_id=resource_pool.rp_id 
+          select user_id
+          from wbs_pool
+          inner join resource_pool
+          on wbs_pool.rp_id=resource_pool.rp_id
           where wbs_id='$wbs_id'
-          UNION 
-          select user_id 
-          from temporary_wbs_pool 
-          inner join resource_pool 
-          on temporary_wbs_pool.rp_id=resource_pool.rp_id 
+          UNION
+          select user_id
+          from temporary_wbs_pool
+          inner join resource_pool
+          on temporary_wbs_pool.rp_id=resource_pool.rp_id
           where wbs_id='$wbs_id')
         group by RESOURCE_POOL.RP_ID, users.user_name,users.email
         ")->result();
@@ -223,7 +223,7 @@ Class M_detail_project extends CI_Model{
           WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
           (select user_id from wbs_pool inner join resource_pool on wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
           group by RESOURCE_POOL.RP_ID, users.user_name,users.email
-          UNION 
+          UNION
           SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline FROM RESOURCE_POOL
           join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
           join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
@@ -397,8 +397,8 @@ Class M_detail_project extends CI_Model{
                   }
                 }
                 function getBURelated($id){
-                    $sql = "select related_bu from projects join p_bu 
-                            on p_bu.bu_code=projects.bu 
+                    $sql = "select related_bu from projects join p_bu
+                            on p_bu.bu_code=projects.bu
                             WHERE BU_CODE='".$id."' or BU_ALIAS='".$id."'";
                     $q = $this->db->query($sql);
                     if($q->num_rows() > 0){
@@ -855,9 +855,9 @@ Class M_detail_project extends CI_Model{
 
     public function insertWBSTemp($data, $project_id,$rh_id){
 
-        $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from 
+        $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from
                                 (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from wbs
-                                UNION 
+                                UNION
                                 SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from temporary_wbs where rh_id = '$rh_id') where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
         $sql = "INSERT INTO TEMPORARY_WBS
             (
@@ -925,7 +925,7 @@ Class M_detail_project extends CI_Model{
 
         $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
                                 select WP_ID from WBS_POOL
-                                UNION 
+                                UNION
                                 select WP_ID from TEMPORARY_WBS_POOL)")->row()->NEW_ID;
         $this->db->set('RP_ID', $member);
         $this->db->set('WP_ID', $id);
@@ -945,7 +945,11 @@ Class M_detail_project extends CI_Model{
                     where rh_id = '$id' and action != 'create'";
         return $this->db->query($query)->result_array();
     }
+    public function gethistorydetail($cap_id){
+      return $this->db->query("select date_cap as updated_on, wbs_name, dc.work_percent_complete as percentage, user_name as update_by from detail_capture dc
+join users us on dc.user_id=us.user_id
+join wbs w on w.wbs_id=dc.wbs_id
+where cap_id='".$cap_id."' ORDER BY DETAIL_CAP_ID")->result_array();
+    }
 
 }
-
-
