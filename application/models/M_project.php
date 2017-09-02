@@ -317,10 +317,6 @@ class M_project extends CI_Model {
                     $type=strtolower($type);
                     $sql.=" and lower(project_type) like '%".$type."%' ";
                   }
-                  if ($effort!=null) {
-                    $effort=strtolower($effort);
-                    $sql.=" and lower(effort_type) like '%".$effort."%' ";
-                  }
           $sql.=" order by date_created desc";
         return $this->db->query($sql)->result_array();
     }
