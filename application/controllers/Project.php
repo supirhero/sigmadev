@@ -756,7 +756,18 @@ SELECT sum(CASE
     RESOURCE_WBS
     ELSE
     1
-    END*4*duration) as total from wbs WHERE project_id=$project_id");
+    END*4*duration) as total from (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
+                                          WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                          WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                          DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,rebaseline,
+                                          connect_by_isleaf as LEAF,LEVEL from (
+                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                                  DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'no' as rebaseline
+                                            from wbs) connect by  wbs_parent_id = prior wbs_id
+                                          start with wbs_id='$project_id'
+                                          order siblings by regexp_substr(orde, '^\D*') nulls first,
+                                          to_number(regexp_substr(orde, '\d+')))");
         $total_pv = $query->row()->TOTAL;
 
         $query = $this->db->query("
