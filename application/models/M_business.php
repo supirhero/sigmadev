@@ -75,6 +75,14 @@ select distinct tahun from tb_project_bu where bu_id='".$bu_id."' order by tahun
     function ChangeMemberBU($user_id,$bu_id){
         $sql="UPDATE USERS SET BU_ID='".$bu_id."' WHERE USER_ID='".$user_id."'";
         $q = $this->db->query($sql);
+        $sql2="SELECT USER_ID, USER_NAME, BU.BU_ID,BU_NAME, EMAIL FROM USERS US JOIN P_BU BU ON US.BU_ID=BU.BU_ID WHERE USER_ID='".$user_id."' ";
+        $res=$this->db->query($sql2);
+        if ($res->num_rows()>0) {
+          $data=$res->result_array();
+        }else {
+          $data=false;
+        }
+        return $data;
     }
 
     function getEmail($user_id){
