@@ -295,14 +295,14 @@ class M_project extends CI_Model {
              FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                   INNER JOIN projects c ON b.project_id = c.project_id
                   INNER JOIN p_bu z on c.bu_code = z.bu_code
-                  INNER JOIN p_project_category d on c.TYPE_OF_EFFORT=d.ID
+                  INNER JOIN p_project_category d on 1=1
            UNION
            SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
                   b.project_complete, b.project_status, b.project_desc,
                   b.created_by,b.date_created,b.iwo_no,d.project_type,d.category as type_effort
              FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
              INNER JOIN p_bu z on b.bu_code = z.bu_code
-             INNER JOIN p_project_category d on b.TYPE_OF_EFFORT=d.ID
+             INNER JOIN p_project_category d on 1=1
                   )
                   where 1=1 and (user_id='".$id."' or created_by='".$id."') ";
                   if ($keyword!=null) {
