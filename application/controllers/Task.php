@@ -389,7 +389,12 @@ class Task extends CI_Controller
 
     //Create Task
     function createTask_view($project_id){
-        $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline from (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs union select wbs_id,wbs_name,project_id,wbs_parent_id,'yes' as rebaseline from temporary_wbs) where PROJECT_ID='".$project_id."' connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id.".0' order siblings by wbs_parent_id")->result_array();
+        $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+        $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline 
+                                        from (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs 
+                                              union
+                                             select wbs_id,wbs_name,project_id,wbs_parent_id,'yes' as rebaseline from temporary_wbs where rh_id = '$rh_id') 
+                                        where PROJECT_ID='".$project_id."' connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id.".0' order siblings by wbs_parent_id")->result_array();
         echo json_encode($data);
     }
     function createTask(){
