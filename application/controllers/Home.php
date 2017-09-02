@@ -394,7 +394,7 @@ class Home extends CI_Controller {
             if(strpos(
                 $this->upload->display_errors(),"Maximum"
             )){
-                $data['image_error'] = "1";//kegedean filesize
+                $data['image_error'] = "0";//kegedean filesize
             }
             elseif(strpos(
                 $this->upload->display_errors(),"extension"
@@ -404,7 +404,7 @@ class Home extends CI_Controller {
 
             }
             else{
-                $data['image_error'] = "0";//kegedean filesize
+                $data['image_error'] = "1";//kegedean filesize
 
             }
 
