@@ -303,7 +303,7 @@ class M_project extends CI_Model {
              FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
              INNER JOIN p_bu z on b.bu_code = z.bu_code
              INNER JOIN p_project_category d on b.TYPE_OF_EFFORT=d.ID
-                  )) ";
+                  ) ";
 
           $sql.=" order by date_created desc";
         return $this->db->query($sql)->result_array();
