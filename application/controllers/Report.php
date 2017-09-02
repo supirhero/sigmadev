@@ -979,6 +979,7 @@ class Report extends CI_Controller {
             $count_user=$this->M_report->getCountUser($ch['BU_ID']);
             if ($count_user==0) {
               $count=$count-1;
+                $count_user=1;
             }else{
               if (($tahun==$y)){
                   $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2));
