@@ -291,7 +291,7 @@ class M_project extends CI_Model {
           project_status, project_desc, created_by,date_created
      FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                   c.project_complete, c.project_status, c.project_desc,
-                  c.created_by,c.date_created, c.iwo_no,d.project_type,d.category as type_effort
+                  c.created_by,c.date_created, c.iwo_no,d.project_type
              FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                   INNER JOIN projects c ON b.project_id = c.project_id
                   INNER JOIN p_bu z on c.bu_code = z.bu_code
@@ -299,9 +299,10 @@ class M_project extends CI_Model {
            UNION
            SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
                   b.project_complete, b.project_status, b.project_desc,
-                  b.created_by,b.date_created,b.iwo_no,d.project_type,d.category as type_effort
+                  b.created_by,b.date_created,b.iwo_no
              FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
              INNER JOIN p_bu z on b.bu_code = z.bu_code
+             INNER JOIN p_project_category d on b.TYPE_OF_EFFORT=d.ID
                   ) ";
 
           $sql.=" order by date_created desc";
@@ -358,7 +359,7 @@ class M_project extends CI_Model {
             project_status, project_desc, created_by
        FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,z.bu_id,
                     c.project_complete, c.project_status, c.project_desc,
-                    c.created_by, iwo_NO, pc.project_type
+                    c.created_by, iwo_NO, pc.project_type, category as effort_type
                FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                     INNER JOIN projects c ON b.project_id = c.project_id
                     INNER JOIN p_bu z on c.bu_code = z.bu_code
@@ -367,7 +368,7 @@ class M_project extends CI_Model {
              UNION
              SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,z.bu_id,
                     b.project_complete, b.project_status, b.project_desc,
-                    b.created_by,iwo_NO, pc.project_type
+                    b.created_by,iwo_NO, pc.project_type, category as effort_type
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
                INNER JOIN p_bu z on b.bu_code = z.bu_code
                     INNER JOIN p_project_category pc on b.type_of_effort=pc.id
