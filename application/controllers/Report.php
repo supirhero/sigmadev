@@ -422,7 +422,7 @@ class Report extends CI_Controller {
 
         }
 
-        $hasil['allentry']=array($hasil['allentry']);
+
         /************************************************/
         /*utilization*/
         $hasil['allhour']=[];
@@ -893,6 +893,7 @@ class Report extends CI_Controller {
 
             }
 
+
           }
           for ($v=1; $v<=12 ; $v++) {
             $res['allentry'][$v][1]=$res['allentry'][$v][1]/$count;
@@ -949,8 +950,10 @@ class Report extends CI_Controller {
 
 
     }*/
+        $res['allentry']=array($res['allentry']);
 
         $result["r_entry_bu"] = $res;
+
     echo json_encode($result,JSON_NUMERIC_CHECK);
 
 
@@ -1081,6 +1084,8 @@ class Report extends CI_Controller {
 
 
         }*/
+        $res['allentry']=array($res['allentry']);
+
         $result["r_util_bu"] = $res;
 
         echo json_encode($result,JSON_NUMERIC_CHECK);
