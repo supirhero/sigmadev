@@ -1217,12 +1217,18 @@ class Report extends CI_Controller {
         $result["r_monthly"] = $query->result();
         $known = array();
         $knownz = array();
-        $filtered["r_monthly"] = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
+        $filtered = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
             $unique = !in_array($val->BU_ALIAS, $knownz);
             $known[] = $val;
             $knownz[] = $val->BU_ALIAS;
             return $unique;
         });
+        $object = new stdClass();
+        foreach ($filtered as $key => $value)
+        {
+            $object->$key = $value;
+        }
+        $filtered["r_monthly"] = $object;
         echo json_encode($filtered);
     }
         //report yearly overview
