@@ -885,9 +885,9 @@ class Report extends CI_Controller {
             foreach ($allentry as $has) {
                 $count_user=$this->M_report->getCountUser($chs['BU_ID']);
                 if ($count_user>0) {
-                  $res['allentry'][$i][0]= $has['BULAN'];
-                  $res['allentry'][$i][1]=$res['allentry'][$i][1]+($has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun)));
+                    $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
 
+                    array_push($res['allentry'],['label'=>$monthName,'value'=>$res['allentry'][$i][1]+($has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun)))]);
                   $i++;
                 }
 
@@ -927,9 +927,9 @@ class Report extends CI_Controller {
           $res['allentry']=[];
           $i=1;
           foreach ($allentry as $has) {
+              $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
+              array_push($res['allentry'],['label'=>$monthName,'value'=>$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun))]);
 
-              $res['allentry'][$i][0]= $has['BULAN'];
-              $res['allentry'][$i][1]=$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun));
               $i++;
           }
         }
@@ -1015,7 +1015,7 @@ class Report extends CI_Controller {
             foreach ($allhour as $hus) {
                 $count_user=$this->M_report->getCountUser($chs['BU_ID']);
                 if ($count_user>0) {
-                    $monthName = date('F', mktime(0, 0, 0, $i, 10)); // March
+                    $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
                     array_push($res['allhour'],['label'=>$monthName,'value'=>($hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun)))]);
 
                   $i++;
