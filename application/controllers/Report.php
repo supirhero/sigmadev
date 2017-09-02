@@ -422,7 +422,7 @@ class Report extends CI_Controller {
 
         }
 
-
+        $hasil['allentry']=array($hasil['allentry']);
         /************************************************/
         /*utilization*/
         $hasil['allhour']=[];
