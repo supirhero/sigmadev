@@ -949,7 +949,9 @@ class Report extends CI_Controller {
 
 
     }*/
-    echo json_encode($res,JSON_NUMERIC_CHECK);
+
+        $result["r_entry_bu"] = $res;
+    echo json_encode($result,JSON_NUMERIC_CHECK);
 
 
 
@@ -1075,7 +1077,9 @@ class Report extends CI_Controller {
 
 
         }*/
-        echo json_encode($res,JSON_NUMERIC_CHECK);
+        $result["r_util_bu"] = $res;
+
+        echo json_encode($result,JSON_NUMERIC_CHECK);
     }
 
     function getdurationmonth($month,$tahun){
