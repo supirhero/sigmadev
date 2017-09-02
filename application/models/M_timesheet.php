@@ -63,7 +63,7 @@ where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user
   FROM
   (SELECT *
   FROM USER_TIMESHEET
-  ORDER BY ts_date DESC)
+  ORDER BY SUBMIT_DATE DESC)
   WHERE user_id='".$user_id."'")->result();
     }
 
