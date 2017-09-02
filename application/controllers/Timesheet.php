@@ -672,14 +672,14 @@ else{
                 }
                 //insert timesheet to original timesheet table because his member status and task status not need rebaseline approval
                 else{
-                    $this->M_timesheet->inputTimesheet($data);
+                    $this->M_timesheet->editTimesheet($data);
                     $returndata['status'] = "success";
                     $returndata['message'] = "add timesheet succcess ";
                 }
 
             }
             elseif($statusProject == 'in progress'){
-                $this->M_timesheet->inputTimesheet($data);
+                $this->M_timesheet->editTimesheet($data);
                 $returndata['status'] = "success";
                 $returndata['message'] = "add timesheet succcess ";
             }
