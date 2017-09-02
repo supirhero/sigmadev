@@ -48,7 +48,7 @@ where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user
                                   FROM
                                   (SELECT *
                                   FROM USER_TIMESHEET_NEW
-                                  ORDER BY SUBMIT_DATE ASC)
+                                  ORDER BY SUBMIT_DATE DESC)
                                   WHERE user_id='".$user_id."'
                                   and ts_date between to_date('$past','yyyy-mm-dd') and to_date('$now','yyyy-mm-dd')");
         $hasil = $query->result_array();
