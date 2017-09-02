@@ -406,7 +406,7 @@ class Home extends CI_Controller {
 
             }
 
-
+$data["error_upload"] = $this->upload->display_errors();
             $updateUser = [
                 'PHONE_NO' => $nohp,
                 'ADDRESS' => $address,
