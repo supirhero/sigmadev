@@ -1689,7 +1689,7 @@ $data["error_upload"] = $this->upload->display_errors();
 
           echo json_encode($c);
         }
-        function sendVerificationManual($email,$name,$bu_name){
+    function sendVerificationManual($email,$name,$bu_name){
         $this->load->library('email');
         $config['protocol']='smtp';
         $config['smtp_host']='smtp.sigma.co.id';
@@ -1709,7 +1709,7 @@ $data["error_upload"] = $this->upload->display_errors();
         $this->email->attach($logo);
         $this->email->attach($css);
         $cid_logo = $this->email->attachment_cid($logo);
-        $this->email->subject('Verification PROUD Account');
+        $this->email->subject('[PROUDS] Business Unit Invitation');
         $this->email->message("<!DOCTYPE html>
         <html>
         <head>
