@@ -1236,7 +1236,7 @@ class Report extends CI_Controller {
             array_push($known,$val);
 
             $knownz[] = $val->BU_ALIAS;
-            return $unique;
+            return $known;
         });
         $object = new stdClass();
         foreach ($filtered as $key => $value)
