@@ -886,7 +886,7 @@ class Report extends CI_Controller {
                 $count_user=$this->M_report->getCountUser($chs['BU_ID']);
                 if ($count_user>0) {
                     $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
-
+                    if($i<=12)
                     array_push($res['allentry'],['label'=>$monthName,'value'=>$res['allentry'][$i][1]+($has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun)))]);
                   $i++;
                 }
