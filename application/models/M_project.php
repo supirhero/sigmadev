@@ -291,7 +291,7 @@ class M_project extends CI_Model {
           project_status, project_desc, created_by,date_created
      FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                   c.project_complete, c.project_status, c.project_desc,
-                  c.created_by,c.date_created, c.iwo_no,d.project_type
+                  c.created_by,c.date_created, c.iwo_no
              FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                   INNER JOIN projects c ON b.project_id = c.project_id
                   INNER JOIN p_bu z on c.bu_code = z.bu_code
