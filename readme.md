@@ -469,6 +469,30 @@ Json Return data :
     ->total_project_value
 ```
 
+
+
+## Entry Directorat / BU
+```
+http://45.77.45.126/dev/report/r_entry_bu
+```
+Input yang harus di provide :
+```
+->bu_id (ID Bussiness unit)
+->tahun (tahun report untuk bussiness unit)
+```
+
+
+## Utility Directorat / BU
+```
+http://45.77.45.126/dev/report/r_util_bu
+```
+Input yang harus di provide :
+```
+->bu_id (ID Bussiness unit)
+->tahun (tahun report untuk bussiness unit)
+```
+
+
 ## Advance Search Project
 URI :
 ```
