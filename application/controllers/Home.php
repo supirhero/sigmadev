@@ -384,7 +384,7 @@ class Home extends CI_Controller {
             $data['status_code'] = '200';
             $data['status_name'] = 'success';
             $data['message'] = 'user updated';
-            $data['image_error'] = "0";//kegedean filesize
+            $data['image_error'] = "1";//kegedean filesize
 
 
         }
