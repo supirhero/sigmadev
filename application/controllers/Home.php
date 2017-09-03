@@ -110,19 +110,19 @@ class Home extends CI_Controller {
         if($user_privilege[8]['PRIVILEGE'] == 'all_bu' || $user_privilege[8]['PRIVILEGE'] == 'only_bu'){
             $this->datajson['privilege']['edit_project']=true;
         }
-        if($user_privilege[9]['PRIVILEGE'] == 'all_bu' || $user_privilege[9]['PRIVILEGE'] == 'only_bu'){
+        if($user_privilege[9]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['timesheet_approval']=true;
         }
-        if($user_privilege[10]['PRIVILEGE'] == 'all_bu' || $user_privilege[10]['PRIVILEGE'] == 'only_bu'){
+        if($user_privilege[10]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['creat_edit_upload_percent_member_task']=true;
         }
-        if($user_privilege[11]['PRIVILEGE'] == 'all_bu' || $user_privilege[11]['PRIVILEGE'] == 'only_bu'){
+        if($user_privilege[11]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['project_member']=true;
         }
-        if($user_privilege[12]['PRIVILEGE'] == 'all_bu' || $user_privilege[12]['PRIVILEGE'] == 'only_bu'){
+        if($user_privilege[12]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['upload_doc']=true;
         }
-        if($user_privilege[13]['PRIVILEGE'] == 'all_bu' || $user_privilege[13]['PRIVILEGE'] == 'only_bu'){
+        if($user_privilege[13]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['upload_issue']=true;
         }
 
