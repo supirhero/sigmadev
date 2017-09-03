@@ -8,14 +8,19 @@ class Home extends CI_Controller {
         parent::__construct();
         $this->datajson['privilege'] = ['master_data_access'=>false,
                                         'manage_role_access'=>false,
-                                        'create_edit_delete_task_updatepercent'=>false,
-                                        'req_rebaseline'=>false,
-                                        'acc_deny_rebaseline'=> false,
-                                        'assign_project_member'=>false,
-                                        'project_report'=>true,
-                                        'project_activities'=>false,
-                                        'acc_deny_timesheet'=>false,
-                                        'report_overview'=>false];
+                                        'bu_access' => false,
+                                        'bu_invite_member'=>false,
+                                        'report_overview'=>false,
+                                        'report_bu_directorat'=>false,
+                                        'report_bu_teammember'=>false,
+                                        'report_find_project'=>false,
+                                        'edit_project'=>false,
+                                        'timesheet_approval'=>false,
+                                        'creat_edit_upload_percent_member_task'=>false,
+                                        'project_member'=>false,
+                                        'upload_doc_and_issue'=>false,
+                                        'upload_issue'=>false,
+                                        ];
         error_reporting(E_ALL  & ~E_NOTICE);
 
         $this->load->model('M_home');
@@ -76,11 +81,12 @@ class Home extends CI_Controller {
             $this->M_session->update_session($this->datajson['token']);
         }
 
+
+
         //newest
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
-
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
                                     from access_list al
@@ -94,14 +100,13 @@ class Home extends CI_Controller {
                                     ")->result_array();
         $profile_id = $this->datajson['userdata']['PROF_ID'];
         foreach($privilege as $priv){
-            //bypass privilege if user is prouds admin
-            if($profile_id != 7){
-                //jika akses url ada di dalam db
-                if($priv['ACCESS_URL'] == $url_dest){
+            $will_die = 0;
+            //jika akses url ada di dalam db
+            if($priv['ACCESS_URL'] == $url_dest){
                     //jika akses tipe nya business
                     if($priv['TYPE'] == 'BUSINESS'){
                         if($priv['PRIVILEGE'] == 'all_bu'){
-
+                            $will_die = 0;
                         }
                         elseif($priv['PRIVILEGE'] == 'only_bu'){
                             //fetching busines unit
@@ -127,86 +132,41 @@ class Home extends CI_Controller {
                                 $directorat_bu[]  = $this->datajson['userdata']['BU_ID'];
                             }
                             switch ($priv['ACCESS_ID']){
-                                //Update Personal Timesheet
                                 case '1':
-                                    $bu_id = $this->db->query(" select p_bu.bu_id
-                                                            from (select wp_id,wbs_id from wbs_pool
-                                                            union
-                                                            select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
-                                                            join (select wbs_id,project_id from wbs union select wbs_id,project_id from temporary_wbs) wbs
-                                                            on wbs_pool.wbs_id = wbs.wbs_id
-                                                            join projects
-                                                            on wbs.project_id = projects.project_id
-                                                            join p_bu
-                                                            on projects.bu_code = p_bu.bu_code
-                                                            where wbs_pool.wp_id = '".$_POST['WP_ID']."'
-                                                            ")->row()->BU_ID;
-
+                                    if($this->datajson['userdata']['PROF_ID'] == 7){
+                                        $bu_id = 'masuk';
+                                    }
+                                    else{
+                                        $bu_id = 'cant';
+                                    }
                                     break;
-                                //Access Business Unit Overview
                                 case '2':
-                                    //get bu id from bu code
-                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
-                                    break;
-                                //Create Project
-                                case '3':
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
                                     break;
-                                //Access All Project In Business Unit
-                                case '4' :
-                                    $projectid = $this->uri->segment(3);
-                                    $bu_id = $this->db->query("select b.bu_id,b.bu_parent_id from projects a join p_bu b on a.bu_id = b.bu_id where project_id = '$projectid'")->row()->BU_ID;
+                                case '3':
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
                                     break;
-                                //Approve Timesheet(Non-project) search in this case
-                                case '5' :
-                                    $bu_id = $this->db->query("select p_bu.bu_id from
-                                                            (select ts_id,wp_id from timesheet union select ts_id,wp_id from temporary_timesheet) timesheet
-                                                            JOIN
-                                                            (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool) wbs_pool
-                                                            on timesheet.wp_id = wbs_pool.wp_id
-                                                            JOIN
-                                                            (select project_id,wbs_id from wbs union select project_id,wbs_id from temporary_wbs) wbs
-                                                            on wbs_pool.wbs_id = wbs.wbs_id
-                                                            JOIN projects
-                                                            on wbs.project_id = projects.project_id
-                                                            JOIN p_bu
-                                                            on projects.bu_code = p_bu.bu_code
-                                                            where timesheet.ts_id = '".$_POST['ts_id']."'
-                                                            and projects.project_type_id = 'Non Project'
-                                                            ")->row()->BU_ID;
+                                case '6':
+                                    $bu_id = $_POST['bu'];
                                     break;
-                                //See Report Overview
-                                case '6' :
-                                    //LIMIT REPORT OVERVIEW BY ADD IN CLAUSE TO QUERY
-                                    break;
-                                //See Resource Report
                                 case '7':
                                     $bu_id = $_POST['BU_ID'];
                                     break;
-                                //Download Report
-                                case '8':
-
-                                    break;
-                                //Approve or deny rebaseline (search in this case)
-                                case '9':
-                                    $projectid = $_POST['project_id'];
-                                    $bu_id = $this->db->query("select bu_id from projects where project_id = '$projectid'")->row()->BU_ID;
+                                case '8' :
+                                    if($this->datajson['userdata']['PROF_ID'] == 3 || $this->datajson['userdata']['PROF_ID'] == 7 ){
+                                        $bu_id = 'masuk';
+                                    }
                                     break;
                             }
                             if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
-                                $this->output->set_status_header(403);
-                                $returndata['status'] = 'failed';
-                                $returndata['message'] = 'Anda tidak bisa mengakses feature yang ada di business unit ini';
-                                echo json_encode($returndata);
-                                die;
+                                $will_die = 1;
+                            }
+                            else{
+                                $will_die = 0;
                             }
                         }
                         else{
-                            $this->output->set_status_header(403);
-                            $returndata['status'] = 'failed';
-                            $returndata['message'] = 'Anda tidak bisa mengakses feature yang ada di business unit ini';
-                            echo json_encode($returndata);
-                            die;
+                            $will_die = 1;
                         }
 
                     }
@@ -239,90 +199,72 @@ class Home extends CI_Controller {
                         if($priv['PRIVILEGE'] == 'can'){
                             //get project id
                             switch ($priv['ACCESS_ID']){
-                                //Upload, create, edit, and delete workplan
+                                case '9':
+                                    $project_id_req = $_POST['PROJECT_ID'];
+                                    break;
                                 case '10':
+                                    $project_id_req = $_POST['project_id'];
+                                    break;
+                                case '11':
                                     switch ($url_dest){
-                                        case 'task/createtask':
-                                            $project_id_req = $_POST['PROJECT_ID'];
-                                            break;
                                         case 'task/upload_wbs':
-                                            $project_id_req = $_POST['PROJECT_ID'];
+                                            $project_id_req = $_POST['project_id'];
+                                            break;
+                                        case 'task/assigntaskmemberproject':
+                                            $project_id = explode(".",$_POST['WBS_ID']);
+                                            $project_id_req = $project_id[0];
+                                            break;
+                                        case 'task/removetaskmemberproject':
+                                            $project_id = explode(".",$_POST['WBS_ID']);
+                                            $project_id_req = $project_id[0];
+                                            break;
+                                        case 'task/createtask':
+                                            $project_id_req   = $this->input->post("PROJECT_ID");
+                                            break;
+                                        case 'task/edittaskpercent':
+                                            $project_id_req=$this->input->post("PROJECT_ID");
+                                            break;
+                                        case 'task/edittask_action':
+                                            $project_id_req= $this->input->post("project_id");
                                             break;
                                         case 'task/deletetask':
                                             $id = $_POST['wbs_id'];
                                             $project_id_req = $this->M_detail_project->getProjectTask($id);
-
                                             break;
                                     }
                                     break;
-                                //Assign Task
-                                case '11':
-                                    $project_id_req = explode(".",$_POST['WBS_ID']);
-                                    $project_id_req = $project_id_req[0];
-                                    break;
-                                //Baseline - Rebaseline project
                                 case '12':
-                                    $project_id_req = $_POST['project_id'];
+                                    $id = $_POST['MEMBER'];
+                                    $project_id_req = $this->M_detail_project->getRPProject($id);
                                     break;
-                                //Update progress manually
                                 case '13':
-                                    $project_id_req = $_POST['PROJECT_ID'];
-                                    break;
-                                //Approve timesheet
-                                case '14':
-                                    $project_id_req = $_POST['project_id'];
-                                    break;
-                                //Edit Project
-                                case '15':
-                                    $project_id_req = $_POST['PROJECT_ID'];
-                                    break;
-                                //See Project Report
-                                case '16':
                                     $project_id_req = $this->uri->segment(3);
                                     break;
-                                //Download Report
-                                case '17':
+                                case '14':
+                                    $project_id_req =$this->input->post("PROJECT_ID");
                                     break;
+                            }
+
+                            if(!in_array($project_id_req,$granted_project_list)){
+                                $will_die = 1;
                             }
                         }
                         else{
-                            $this->output->set_status_header(403);
-                            $returndata['status'] = 'denied';
-                            $returndata['message'] = 'you dont have permission to access this action';
-                            echo json_encode($returndata);
-                            die;
-                        }
-                        if(!in_array($project_id_req,$granted_project_list)){
-                            $this->output->set_status_header(403);
-                            $returndata['status'] = 'denied';
-                            $returndata['message'] = 'you dont have permission to access this action';
-                            echo json_encode($returndata);
-                            die;
+                            $will_die = 1;
                         }
                     }
                     else{
+                        $will_die = 1;
+                    }
+
+                    if($will_die ==1){
                         $this->output->set_status_header(403);
-                        $returndata['status'] = 'denied';
-                        $returndata['message'] = 'you dont have permission to access this action';
+                        $returndata['status'] = 'failed';
+                        $returndata['message'] = 'Anda tidak bisa mengakses feature yang ada di business unit ini';
                         echo json_encode($returndata);
                         die;
                     }
                 }
-            }
-        }
-
-        if($this->datajson['userdata']['PROF_ID'] == 7){
-            $this->datajson['privilege']['master_data_access'] = true;
-            $this->datajson['privilege']['manage_role_access'] = true;
-            $this->datajson['privilege']['report_overview'] = true;
-        }
-        if($this->datajson['userdata']['PROF_ID'] == 5){
-            $this->datajson['privilege']['create_edit_delete_task_updatepercent']=true;
-            $this->datajson['privilege']['req_rebaseline']=true;
-            $this->datajson['privilege']['create_edit_delete_task_updatepercent']=true;
-            $this->datajson['privilege']['assign_project_member']=true;
-            $this->datajson['privilege']['project_activities']=true;
-            $this->datajson['privilege']['acc_deny_timesheet']=true;
         }
         /*===============================================================================*/
 
@@ -480,8 +422,9 @@ $data["error_upload"] = $this->upload->display_errors();
         //Entry calculation
         //$hasil['e']=$entry;
         //$hasil['t']=$total_hours;
-
+        //get date duration from begining of month
         $countduration = $this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"));
+
         $countdurationtoday = ($countduration > 0) ? $countduration : 1;
         $countdurationlastday = $this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun));
         $countdurationlastday = ($countdurationlastday > 0) ? $countdurationlastday : 1;

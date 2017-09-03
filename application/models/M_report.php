@@ -50,6 +50,7 @@ function getTotalHour ($user_id,$bulan,$tahun){
     WHERE
     user_id = '".$user_id."'
     AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
+    AND IS_APPROVED = 1
     AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
     GROUP BY user_id,TO_CHAR (TS_DATE, 'mm')
     UNION ALL
@@ -66,7 +67,7 @@ function getTotalHour ($user_id,$bulan,$tahun){
     ")->row()->JML_JAM_BULANAN;
     }
 
-
+//filter is approved
  function getEntry($user_id,$bulan,$tahun)
     {
        return $this->db->query("SELECT
@@ -77,6 +78,7 @@ function getTotalHour ($user_id,$bulan,$tahun){
         WHERE
         user_id = '".$user_id."'
         AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
+        AND IS_APPROVED = 1
         AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
         GROUP BY
         user_id, TO_CHAR (TS_DATE, 'mm')
