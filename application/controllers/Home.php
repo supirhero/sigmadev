@@ -678,8 +678,8 @@ $data["error_upload"] = $this->upload->display_errors();
         {
             $year= $this->input->post('tahun');
         }
-        $year = isset($this->input->post('tahun'))?$this->input->post('tahun'):date('Y', strtotime('today'));
-        $bulan = isset($this->input->post('bulan'))?$this->input->post('bulan'):date('m', strtotime('today'));
+        $year = $this->input->post('tahun')!= ""?$this->input->post('tahun'):date('Y', strtotime('today'));
+        $bulan = $this->input->post('bulan')!= ""?$this->input->post('bulan'):date('m', strtotime('today'));
         $month = date("M", mktime(0, 0, 0, $bulan, 10));
         $data['activity_Timesheet']=($this->M_timesheet->selectTimesheet_bymonth($user_id,$month,$year));
         //$data['task_user']=($this->M_home->assignmentView($user_id));
