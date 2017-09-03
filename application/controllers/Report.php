@@ -607,7 +607,10 @@ class Report extends CI_Controller {
                 $data['project_dir']['not_started']=$data['project_dir']['not_started']+$this->M_report->Portofolio_notstarted_Project($ch['BU_ID'],$tahun);
                 $data['project_dir']['jumlah']=$data['project_dir']['jumlah']+$this->M_report->Portofolio_Total_Project($ch['BU_ID'],$tahun);
                 $data['finance']['total_project_value']=$data['finance']['total_project_value']+$this->M_report->Portofolio_Total_Project_Value($ch['BU_ID'],$tahun);
+
             }
+            $data['finance']['total_project_value'] =  money_format('%.2n', $data['finance']['total_project_value']);
+
         }
         //if business unit
         else{
@@ -616,7 +619,7 @@ class Report extends CI_Controller {
             $data['project_dir']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
             $data['project_dir']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
             $data['project_dir']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
-            $data['finance']['total_project_value'] = $this->M_report->Portofolio_Total_Project_Value($bu,$tahun);
+            $data['finance']['total_project_value'] =  money_format('%.2n', $this->M_report->Portofolio_Total_Project_Value($bu,$tahun));
         }
         print_r(json_encode($data));
     }
