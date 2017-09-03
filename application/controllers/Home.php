@@ -990,6 +990,25 @@ $data["error_upload"] = $this->upload->display_errors();
         $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
     }
+    /*For Project Doc*/
+    public function deleteprojectdoc(){
+        //echo $project_id;
+        if(isset($_POST['doc_id']) || isset($_POST['DOC_ID']))
+        {
+
+            $this->M_detail_project->deleteDoc($_POST['doc_id']);
+            $result["status"] = "success";
+        }
+        else{
+            $this->output->set_status_header(402);
+            $result["status"] = "failed";
+            $result["message"] = "Doc ID can not be empty";
+        }
+
+
+        $this->transformKeys($this->datajson);
+        print_r(json_encode($this->datajson));
+    }
 
     /*Issue Manajement*/
     public function projectissue(){
