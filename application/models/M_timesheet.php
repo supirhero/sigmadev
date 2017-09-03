@@ -38,7 +38,7 @@ Class M_timesheet extends CI_Model{
                                   FROM USER_TIMESHEET_NEW
                                   ORDER BY SUBMIT_DATE DESC)
                                   WHERE user_id='".$user_id."'
-                                  and where  to_char(ts_date,'Mon-YYYY')='$month-$year'");
+                                  and  to_char(ts_date,'Mon-YYYY')='$month-$year'");
         $hasil = $query->result_array();
         return $hasil;
 
