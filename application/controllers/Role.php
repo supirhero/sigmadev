@@ -313,7 +313,7 @@ class Role extends CI_Controller
 
     function editProfile_view(){
         $prof_id = $this->input->post('profile_id');
-        $data['profile_setting'] = $this->db->query("select * from profile where prof_id = '$prof_id'")->result_array();
+        $data['profile_setting'] = $this->db->query("select * from profile where prof_id = '$prof_id' order by access_id asc")->result_array();
         $data['profile_privilege'] = $this->db->query("select al.access_name,al.type,pac.privilege
                                                         from profile join profile_access_list pac
                                                         on profile.prof_id = pac.profile_id
