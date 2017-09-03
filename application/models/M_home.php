@@ -35,7 +35,7 @@ Class M_home extends CI_Model{
 
         //get bu name and project name
         foreach ($hasil as $data){
-            array_push($bu_temp,array($data['BU_NAME'],$data['BU_CODE']));
+            array_push($bu_temp,$data['BU_NAME']);
             array_push($project_temp,$data['PROJECT_NAME']);
         }
 
@@ -61,7 +61,6 @@ Class M_home extends CI_Model{
                     if(count($penampung) == 0){
                         $penampung['project_name']=$data;
                         $penampung['bu_name'] = $hasil[$i]['BU_NAME'];
-                        $penampung['project_id'] = $hasil[$i]['project_id'];
                         $penampung['assignment_list'] = [$hasil[$i]];
                     }
                     else{
