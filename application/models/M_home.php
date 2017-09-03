@@ -61,6 +61,8 @@ Class M_home extends CI_Model{
                     if(count($penampung) == 0){
                         $penampung['project_name']=$data;
                         $penampung['bu_name'] = $hasil[$i]['BU_NAME'];
+                        $penampung['bu_code'] = $hasil[$i]['BU_CODE'];
+                        $penampung['project_id'] = $hasil[$i]['PROJECT_ID'];
                         $penampung['assignment_list'] = [$hasil[$i]];
                     }
                     else{
@@ -79,6 +81,7 @@ Class M_home extends CI_Model{
                 if($data == $data2['bu_name']){
                     if(count($penampung) == 0){
                         $penampung['bu_name'] = $data;
+                        $penampung['bu_code'] = $data2["bu_code"];
                         $penampung['project_detail'] = [];
                         array_push($penampung['project_detail'],$data2);
                     }
