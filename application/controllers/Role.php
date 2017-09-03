@@ -371,29 +371,22 @@ class Role extends CI_Controller
 
     }
 
-    function editRule_action(){
+    function editRole_action(){
         $user_id = $this->input->post('user_id');
-        $assigned_profile = $this->post('assigned_prof_id');
+        $assigned_profile = $this->input->post('assigned_prof_id');
 
-        if($this->datajson['userdata']['PROF_ID'] == 7){
-
-            $this->db->query("update users set prof_id = '$assigned_profile' where user_id = '$user_id'");
-
-            if($this->db->affected_rows() == 1){
+        $this->db->query("aupdate users set prof_id = '$assigned_profile' where user_id = '$user_id'");
+        if($this->db->affected_rows() == 1){
                 $data['status'] = 'success';
                 $data['message'] = 'success ganti profile';
             }
-            else{
+        else{
                 $this->output->set_status_header(500);
                 $data['status'] = 'error';
                 $data['message'] = 'Something wrong with server';
             }
-        }
-        else{
-            $this->output->set_status_header(403);
-            die;
-        }
 
+        echo json_encode($data);
     }
 
     function userAccess_view(){
