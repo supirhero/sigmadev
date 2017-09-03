@@ -465,7 +465,7 @@ class Project extends CI_Controller
 
         $project_id = $this->M_detail_project->getRPProject($id);
         //echo $project_id;
-        if(isset($_POST['MEMBER']))
+        if(isset($_POST['MEMBER']) || isset($_POST['member']))
         {
 
             $this->M_detail_project->deleteRPmember($id);
