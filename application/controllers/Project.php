@@ -465,7 +465,7 @@ class Project extends CI_Controller
 
         $project_id = $this->M_detail_project->getRPProject($id);
         //echo $project_id;
-        if($id > 1)
+        if($id != "")
         {
 
             $this->M_detail_project->deleteRPmember($id);
