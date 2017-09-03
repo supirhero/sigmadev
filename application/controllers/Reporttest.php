@@ -318,7 +318,8 @@ class Reporttest extends CI_Controller {
         $data['project']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
         $data['project']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
         $data['project']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
-        $data['finance']['total_project_value'] = $this->M_report->Portofolio_Total_Project_Value($bu,$tahun);
+        setlocale(LC_MONETARY, 'it_IT');
+        $data['finance']['total_project_value'] =  money_format('%.2n', $this->M_report->Portofolio_Total_Project_Value($bu,$tahun));
         print_r(json_encode($data));
     }
 

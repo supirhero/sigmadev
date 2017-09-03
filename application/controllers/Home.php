@@ -84,9 +84,9 @@ class Home extends CI_Controller {
 
         /*================================================================================*/
         /* FOR PRIVILEGE INTEGRATION */
-        $user_privilege = $this->db->query("select a.access_name,b.access_id,b.privilege 
-                                            from access_list a join profile_access_list b 
-                                            on a.access_id = b.access_id 
+        $user_privilege = $this->db->query("select a.access_name,b.access_id,b.privilege
+                                            from access_list a join profile_access_list b
+                                            on a.access_id = b.access_id
                                             where b.profile_id = '".$this->datajson['userdata']['PROF_ID']."'")->result_array();
         if($user_privilege[0]['PRIVILEGE'] == 'all_bu'){
             $this->datajson['privilege']['master_data_access']=true;
@@ -428,6 +428,7 @@ $data["error_upload"] = $this->upload->display_errors();
         // end check
         $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code'],$keyword,$status,$type,$effort);
         $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code'")->result_array();
+        $data['nonmember'] = $this->db->query("select user_id, user_name from users where bu_id != '$code'")->result_array();
         $data['bu_id'] = $code;
         $data['bu_code'] = $_POST['bu_code'];
 
@@ -665,6 +666,7 @@ $data["error_upload"] = $this->upload->display_errors();
 
     /*For Activities*/
     public function myactivities(){
+
         $user_id = $this->datajson['userdata']['USER_ID'];
         $data=array();
 
@@ -673,7 +675,11 @@ $data["error_upload"] = $this->upload->display_errors();
         //$data['nav']=($this->load->view('v_nav1'));
         //$data['assignment']=($this->M_home->assignmentView($user_id));
         //$data['pr_list']=$this->M_home->assignmentProject($user_id);
-        $data['activity_Timesheet']=($this->M_timesheet->selectTimesheet($user_id));
+
+        $year = $this->input->post('tahun')!= ""?$this->input->post('tahun'):date('Y');
+        $bulan = $this->input->post('bulan')!= ""?$this->input->post('bulan'):date('m');
+        $month = date("M", mktime(0, 0, 0, $bulan, 10));
+        $data['activity_Timesheet']=($this->M_timesheet->selectTimesheet_bymonth($user_id,$month,$year));
         //$data['task_user']=($this->M_home->assignmentView($user_id));
 
         //$this->load->view('v_home_activity', $data);
@@ -940,7 +946,7 @@ $data["error_upload"] = $this->upload->display_errors();
         $this->datajson['project_performance_index']['spi'] = $this->datajson['project_detail']['spi'];
 
         //Project Team
-        $this->datajson['project_team'] = $this->db->query("SELECT users.user_id,users.user_name,users.email,profile.prof_name FROM RESOURCE_POOL
+        $this->datajson['project_team'] = $this->db->query("SELECT users.user_id,users.user_name,users.email,profile.prof_name,RESOURCE_POOL.RP_ID FROM RESOURCE_POOL
                                                              join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
                                                              join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
                                                              WHERE PROJECT_ID='".$this->uri->segment(3)."'")->result_array();
@@ -984,6 +990,24 @@ $data["error_upload"] = $this->upload->display_errors();
 
         $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));
+    }
+    /*For Project Doc*/
+    public function deleteprojectdoc(){
+        //echo $project_id;
+        if(isset($_POST['doc_id']) || isset($_POST['DOC_ID']))
+        {
+
+            $this->M_detail_project->deleteDoc($_POST['doc_id']);
+            $result["status"] = "success";
+        }
+        else{
+            $this->output->set_status_header(402);
+            $result["status"] = "failed";
+            $result["message"] = "Doc ID can not be empty";
+        }
+
+
+        print_r(json_encode($result));
     }
 
     /*Issue Manajement*/
@@ -1171,7 +1195,7 @@ $data["error_upload"] = $this->upload->display_errors();
         $this->email->initialize($config);
         $this->email->from('salma.ulhaq@sigma.co.id', 'Project & Resources Development System');
         //  $this->email->to($email_vp);
-        $this->email->cc('dyaskur@sigma.co.id');
+        $this->email->cc('salma.ulhaq@sigma.co.id');
         //$this->email->bcc('pmo@sigma.co.id');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";

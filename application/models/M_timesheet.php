@@ -24,6 +24,25 @@ Class M_timesheet extends CI_Model{
         return $hasil;
 
     }
+
+    function selectTimesheet_bymonth($user_id,$month,$year){
+        //ada perubahan
+
+        //ada perubahan
+        $now = date('Y-m-d');
+        $past = date('Y-m-d', strtotime('this month'));
+        $query = $this->db->query("
+                                  SELECT *
+                                  FROM
+                                  (SELECT *
+                                  FROM USER_TIMESHEET_NEW
+                                  ORDER BY SUBMIT_DATE DESC)
+                                  WHERE user_id='".$user_id."'
+                                  and  to_char(ts_date,'Mon-YYYY')='$month-$year'");
+        $hasil = $query->result_array();
+        return $hasil;
+
+    }
     function Timesheet_bydate($user_id,$date){
         //ada perubahan
 
@@ -431,8 +450,8 @@ GROUP BY TS_DATE")->result_array();
 
 
 
-        $this->db->query("update timesheet
-                             set TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE ='$TS_DATE', WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS') 
+         $this->db->query("update timesheet
+                             set IS_APPROVED = -1,TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE =$TS_DATE, WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS') 
                            where TS_ID = '$TS_ID'");
     }
 
@@ -598,7 +617,7 @@ GROUP BY TS_DATE")->result_array();
             $SUBMITDATE = $data['SUBMIT_DATE'];
 
             $this->db->query("UPDATE TEMPORARY_TIMESHEET 
-                             set TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE ='$TS_DATE', WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS') 
+                             set IS_APPROVED = -1,TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE =$TS_DATE, WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS') 
                            where TS_ID = '$TS_ID'");
 
     }

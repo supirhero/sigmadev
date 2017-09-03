@@ -239,6 +239,17 @@ Return data json object yang di terima :
 -> userdata
 -> project_doc_list <= berisi array informasi setiap doc untuk project ybs
 ```
+
+### View Docs and Files list
+URI yang di gunakan untuk akses API ini :
+```
+http://45.77.45.126/dev/home/delprojectdoc
+```
+Return data json object yang di terima :
+```
+-> doc_id
+```
+
 ### Upload Project Doc/Files
 URI yang di gunakan :
 ```
@@ -325,6 +336,29 @@ Input yang harus di provide :
 -> SUBJECT
 -> MESSAGE
 -> HOUR_TOTAL
+```
+
+Return data json object yang di terima :
+```
+ -> title 
+ -> message
+ ```
+ 
+ 
+ 
+### Add new timesheet
+URI yang digunakan 
+```
+http://45.77.45.126/dev/home/edittimesheet
+```
+
+Input yang harus di provide :
+```
+-> TS_ID
+-> TS_DATE
+-> SUBJECT
+-> MESSAGE
+-> HOUR
 ```
 
 Return data json object yang di terima :

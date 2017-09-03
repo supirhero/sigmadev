@@ -262,6 +262,7 @@ class Timesheet extends CI_Controller {
 
         //select project based on user
         $date = $this->input->post('date');
+        $date = ($date!="")?$date:date("Y-m-d");
 
         $userid = $this->datajson['userdata']['USER_ID'];
         $project = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$userid."'")->result_array();
@@ -527,11 +528,15 @@ else{
         $data['SUBMIT_DATE']= date('Y-m-d H:i:s');
         $project_id   = $_POST['PROJECT_ID'];
 
-        //check bu_id
-
-
         $wp_id = $_POST['WP_ID'];
-        if($data['WP_ID'] != "" && $project_id != "")
+        //check bu_id
+        if($data['TS_ID'] == ""){
+
+            $this->output->set_status_header(400);
+            $returndata['status'] = "failed";
+            $returndata['message'] = "TS ID tidak boleh kosong";
+        }
+else if($data['WP_ID'] != "" && $project_id != "")
         {
             $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
             //check rebaseline status for task
@@ -596,27 +601,27 @@ else{
                 if($checkmember == 'yes'){
                     $this->M_timesheet->editTimesheetTemp($data,$rh_id);
                     $returndata['status'] = "success";
-                    $returndata['message'] = "edit timesheet temporary succcess ";
+                    $returndata['message'] = "edit timesheet temporary success ";
                 }
                 //insert timesheet to temporary timesheet if member not need rebaseline but task need rebaseline approval
                 elseif ($checktask == 'yes'){
                     $this->M_timesheet->editTimesheetTemp($data,$rh_id);
 
                     $returndata['status'] = "success";
-                    $returndata['message'] = "edit timesheet temporary succcess ";
+                    $returndata['message'] = "edit timesheet temporary success ";
                 }
                 //insert timesheet to original timesheet table because his member status and task status not need rebaseline approval
                 else{
                     $this->M_timesheet->editTimesheet($data);
                     $returndata['status'] = "success";
-                    $returndata['message'] = "edit timesheet succcess ";
+                    $returndata['message'] = "edit timesheet success ";
                 }
 
             }
             elseif($statusProject == 'in progress'){
                 $this->M_timesheet->editTimesheet($data);
                 $returndata['status'] = "success";
-                $returndata['message'] = "edit timesheet succcess ";
+                $returndata['message'] = "edit timesheet success ";
             }
             elseif ($statusProject == null || $statusProject == ""){
                 $this->output->set_status_header(400);

@@ -380,7 +380,14 @@ Class M_detail_project extends CI_Model{
 
 
                 public function deleteRPmember($id){
+                    $sql = "delete from resource_pool where rp_id=$id";
+                    $q = $this->db->query($sql);
                   $this->db->delete('RESOURCE_POOL', array('RP_ID' => $id));
+                }
+                public function deleteDoc($id){
+                    $sql = "delete from project_doc where doc_id=$id";
+                    $q = $this->db->query($sql);
+                  $this->db->delete('project_doc', array('doc_id' => $id));
                 }
 
                 function editWBS($data){

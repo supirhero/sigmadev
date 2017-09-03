@@ -460,13 +460,44 @@ class Project extends CI_Controller
     }
     //action delete project member
     public function ProjectMember_delete(){
-        $id = $_POST['MEMBER'];
+        $id = $_POST['member']?$_POST['member']:$_POST['MEMBER'];
         //echo $id;
 
         $project_id = $this->M_detail_project->getRPProject($id);
         //echo $project_id;
-        $this->M_detail_project->deleteRPmember($id);
+        if(isset($_POST['MEMBER']) || isset($_POST['member']))
+        {
+            $this->load->library('email');
+            $config['protocol']='smtp';
+            $config['smtp_host']='smtp.sigma.co.id';
+            $config['smtp_user']=SMTP_AUTH_USR;
+            $config['smtp_pass']=SMTP_AUTH_PWD;
+            $config['smtp_port']='587';
+            $config['smtp_timeout']='100';
+            $config['charset']    = 'utf-8';
+            $config['newline']    = "\r\n";
+            $config['validation'] = TRUE;
+            $this->email->initialize($config);
+            $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
+            $this->email->to('salma.ulhaq@sigma.co.id');
+            $logo=base_url()."asset/image/logo_new_sigma1.png";
+            $css=base_url()."asset/css/confirm.css";
+            $this->email->attach($logo);
+            $this->email->attach($css);
+            $cid_logo = $this->email->attachment_cid($logo);
+            $this->email->subject('[PROUDS] Project Kicked Off');
+            $this->email->message("You kicked off from this project");
 
+            $this->email->send();
+            $this->M_detail_project->deleteRPmember($id);
+            $result["status"] = "success";
+        }
+        else{
+            $this->output->set_status_header(402);
+            $result["status"] = "failed";
+            $result["message"] = "Member can not be empty";
+        }
+echo json_encode($result);
     }
 
 
