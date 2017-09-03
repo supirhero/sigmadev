@@ -1250,33 +1250,73 @@ class Report extends CI_Controller {
         $status = $this->input->post('status');
         $schedule = $this->input->post('schedule');
         $budget = $this->input->post('budget');
+        $cross = 0;
 
         if(!empty($value)){
             $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
             for($a = 0 ; $a < count($valueVal);$a++){
+
+                $havevalue = 0;
                 if($i == 0){
                     $query .= " where ";
                     $i++;
                 }
-                elseif($value[$a] == 1){
-                    $query .= " or ";
-                }
+
                 if($value[$a] == 1){
-                    $query .= " amount '".$valueVal[$a]."'";
+                    $query .= " amount ".$valueVal[$a];
+                }
+                //search index
+                for($j = $a; $j < count($valueVal)-1;$j++){
+                    if($value[$j+1] == 1){
+                        $havevalue = 1;
+                    }
+                }
+
+
+                if(($value[$a] == 1 && $havevalue == 1 ) || $cross == 1){
+                    $query .= " or ";
+                    $havevalue = 0;
+                    $cross = 0;
+                }
+                if($a == count($valueVal)-1){
+                    $cross = 1;
                 }
             }
-        }if(!empty($status)){
+
+        }
+        if(!empty($status)){
             $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
             for($a = 0 ; $a < count($valueVal);$a++){
+
+                $havevalue = 0;
+
+                if(($status[$a] == 1 && $havevalue == 1)|| $cross == 1 ){
+                    $query .= " or ";
+                    $havevalue = 0;
+                    $cross = 0;
+                }
+
                 if($i == 0){
                     $query .= " where ";
                     $i++;
                 }
-                elseif($status[$a] == 1){
-                    $query .= " or ";
-                }
+
+
                 if($status[$a] == 1){
                     $query .= " project_status =  '".$valueVal[$a]."'";
+                }
+
+                //search index
+                for($j = $a; $j < count($valueVal)-1;$j++){
+                    if($status[$j+1] == 1){
+                        $havevalue = 1;
+                    }
+                }
+
+
+
+                if($a == count($valueVal)-1){
+                    $cross = 1;
                 }
             }
         }if(!empty($schedule)){
@@ -1312,6 +1352,8 @@ class Report extends CI_Controller {
 
 
         $result['project'] = $this->db->query($query)->result_array();
+        echo $this->db->last_query();
+        die;
         echo json_encode($result);
     }
 

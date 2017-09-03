@@ -948,6 +948,7 @@ $data["error_upload"] = $this->upload->display_errors();
             $this->transformKeys($this->datajson['project_team'][$key]);
         }
         unset($this->datajson["project_detail"]);
+        unset($this->datajson["userdata"]);
 
         $this->transformKeys($this->datajson);
         print_r(json_encode($this->datajson));

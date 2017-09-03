@@ -44,7 +44,7 @@ where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user
         $now = date('Y-m-d');
         $past = date('Y-m-d', strtotime('-6 days'));
         $query = $this->db->query("
-                                  SELECT *
+                                  SELECT DISTINCT ts_id,wp,date_id,wbs_id,rp_id,user_id,user_name,project_id,project_name,wbs_name,subject,message,hour_total,ts_date,bulan,month,tahun,longitude,latitude,submit_date,is_approved,task_member_rebaseline,task_rebaseline,timesheet_rebaseline
                                   FROM
                                   (SELECT *
                                   FROM USER_TIMESHEET_NEW
@@ -52,6 +52,9 @@ where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user
                                   WHERE user_id='".$user_id."'
                                   and ts_date between to_date('$past','yyyy-mm-dd') and to_date('$now','yyyy-mm-dd')");
         $hasil = $query->result_array();
+
+        echo $this->db->last_query();
+        die;
         return $hasil;
 
     }
