@@ -80,6 +80,25 @@ class M_wbs extends CI_Model {
             //$this->db->set('END_DATE',$dataarray[$i]['END_DATE']);
             $this->db->insert('WBS');
 
+            //get all wbs data from new wbs
+            $selWBS=$this->M_detail_project->getWBSselected($b);
+            $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
+
+            $dateStartWBS= new DateTime($selWBS->START_DATE);
+            $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+            foreach ($allParent as $ap) {
+                $dateStartParent=new DateTime($ap->START_DATE);
+                $dateEndParent=new DateTime($ap->FINISH_DATE);
+                if ($dateStartWBS<$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
+                }
+                if ($dateEndWBS>$dateStartParent) {
+                    $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
+                }
+                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+            }
+
+
         }
         //return json_encode($number[count($number)-1]);
     }

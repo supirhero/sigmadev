@@ -1699,10 +1699,11 @@ $data["error_upload"] = $this->upload->display_errors();
             $bu_name = $this->M_business->getBUName($bu_id);
             $this->sendVerificationManual($email,$name,$bu_name);
             $c['status']="Success";
-            $c['msg']="User berhasil diinvite";
+            $c['message']="User berhasil diinvite";
           }else{
+            $this->output->set_status_header(500);
             $c['status']="Error";
-            $c['msg']="User gagal diinvite";
+            $c['message']="User gagal diinvite";
           }
 
           echo json_encode($c);
