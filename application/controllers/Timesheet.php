@@ -508,6 +508,136 @@ else{
 }
         echo json_encode($returndata);
     }
+    function editTimesheet(){
+
+        if(isset($_POST['mobile'])){
+            $_POST = array_change_key_case($_POST,CASE_UPPER);
+        }
+
+        $userid=$this->datajson['userdata']['USER_ID'];
+        $data['TS_ID'] = $this->input->post("TS_ID");
+        $data['WORK_HOUR'] = $this->input->post("HOUR");
+        $data['DATE'] = $this->input->post("TS_DATE");
+        $data['SUBJECT'] = $this->input->post("TS_SUBJECT");
+        $data['MESSAGE'] = $this->input->post("TS_MESSAGE");
+        $data['LATITUDE'] = $this->input->post("LATITUDE");
+        $data['LONGITUDE'] = $this->input->post("LONGITUDE");
+        $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
+        $data['WP_ID'] = $this->input->post("WP_ID");
+        $data['SUBMIT_DATE']= date('Y-m-d H:i:s');
+        $project_id   = $_POST['PROJECT_ID'];
+
+        //check bu_id
+
+
+        $wp_id = $_POST['WP_ID'];
+        if($data['WP_ID'] != "" && $project_id != "")
+        {
+            $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+            //check rebaseline status for task
+
+            $statusProject = strtolower($statusProject);
+
+            if($statusProject == 'on hold'){
+
+                $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+                //check member wbs_pool status if it need rebaseline approval
+                $checkmember = $this->db->query("
+                                        select 'yes' as rebaseline
+                                        from temporary_wbs_pool
+                                        where wp_id = '".$_POST['WP_ID']."'
+                                        and rh_id = '$rh_id'
+                                        union
+                                        select 'no' as rebaseline 
+                                        from wbs_pool
+                                        where wp_id = '".$_POST['WP_ID']."'")->row()->REBASELINE;
+
+                //check task status if it need rebaseline approval
+                if($checkmember == 'yes'){
+                    $checktask = $this->db->query("
+                                                select rebaseline from (
+                                                  select 'yes' as rebaseline 
+                                                  from temporary_wbs
+                                                  join temporary_wbs_pool
+                                                  on temporary_wbs.wbs_id = temporary_wbs_pool.wbs_id
+                                                  where temporary_wbs_pool.wp_id = '$wp_id'
+                                                  and temporary_wbs.rh_id = '$rh_id'
+                                                  and temporary_wbs_pool.rh_id = '$rh_id'
+                                                  UNION 
+                                                  select 'no' as rebaseline 
+                                                  from wbs a
+                                                  join temporary_wbs_pool b
+                                                  on a.wbs_id = b.wbs_id
+                                                  where b.wp_id = '$wp_id'
+                                                  and b.rh_id = '$rh_id'
+                                                )
+                                                ")->row()->REBASELINE;
+                }
+                elseif($checkmember == 'no'){
+                    $checktask = $this->db->query("
+                                                select rebaseline from (
+                                                  select 'yes' as rebaseline 
+                                                  from temporary_wbs a
+                                                  join wbs_pool b
+                                                  on a.wbs_id = b.wbs_id
+                                                  where b.wp_id = '$wp_id'
+                                                  and a.rh_id = '$rh_id'
+                                                  UNION 
+                                                  select 'no' as rebaseline 
+                                                  from wbs a
+                                                  join wbs_pool b
+                                                  on a.wbs_id = b.wbs_id
+                                                  where b.wp_id = '$wp_id'
+                                                )
+                                                ")->row()->REBASELINE;
+                }
+
+                //insert timesheet to temporary timesheet if member task need rebaseline approval
+                if($checkmember == 'yes'){
+                    $this->M_timesheet->editTimesheetTemp($data,$rh_id);
+                    $returndata['status'] = "success";
+                    $returndata['message'] = "edit timesheet temporary succcess ";
+                }
+                //insert timesheet to temporary timesheet if member not need rebaseline but task need rebaseline approval
+                elseif ($checktask == 'yes'){
+                    $this->M_timesheet->editTimesheetTemp($data,$rh_id);
+
+                    $returndata['status'] = "success";
+                    $returndata['message'] = "edit timesheet temporary succcess ";
+                }
+                //insert timesheet to original timesheet table because his member status and task status not need rebaseline approval
+                else{
+                    $this->M_timesheet->editTimesheet($data);
+                    $returndata['status'] = "success";
+                    $returndata['message'] = "edit timesheet succcess ";
+                }
+
+            }
+            elseif($statusProject == 'in progress'){
+                $this->M_timesheet->editTimesheet($data);
+                $returndata['status'] = "success";
+                $returndata['message'] = "edit timesheet succcess ";
+            }
+            elseif ($statusProject == null || $statusProject == ""){
+                $this->output->set_status_header(400);
+                $returndata['status'] = "failed";
+                $returndata['message'] = "Gagal mendapatkan status project";
+            }
+            else{
+                $this->output->set_status_header(400);
+                $returndata['status'] = "failed";
+                $returndata['message'] = "Status project harus in-progress atau on-hold";
+            }
+
+        }
+        else{
+
+            $this->output->set_status_header(400);
+            $returndata['status'] = "failed";
+            $returndata['message'] = "Project ID/WP ID tidak boleh kosong";
+        }
+        echo json_encode($returndata);
+    }
 
     //confirmation timesheet(approve or decline)
     function confirmationTimesheet(){

@@ -48,7 +48,7 @@ where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user
                                   FROM
                                   (SELECT *
                                   FROM USER_TIMESHEET_NEW
-                                  ORDER BY SUBMIT_DATE ASC)
+                                  ORDER BY SUBMIT_DATE DESC)
                                   WHERE user_id='".$user_id."'
                                   and ts_date between to_date('$past','yyyy-mm-dd') and to_date('$now','yyyy-mm-dd')");
         $hasil = $query->result_array();
@@ -63,7 +63,7 @@ where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user
   FROM
   (SELECT *
   FROM USER_TIMESHEET
-  ORDER BY ts_date DESC)
+  ORDER BY SUBMIT_DATE DESC)
   WHERE user_id='".$user_id."'")->result();
     }
 
@@ -405,6 +405,33 @@ GROUP BY TS_DATE")->result_array();
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
         }
     }
+    function editTimesheet($data){
+
+        //change date input for readable to sql
+        $tgl=date_format(date_create($data['DATE']),'Ymd');
+
+        //check timesheet data for this date ,
+        //0 = no data
+        //-1 = have an old data (Only one data)
+        //1 = have a new data
+
+            //data for insert
+            $TS_ID = $data['TS_ID'];
+            $SUBJECT = $data['SUBJECT'];
+            $MESSAGE = $data['MESSAGE'];
+            $HOUR_TOTAL = $data['WORK_HOUR'];
+            $TS_DATE = "to_date('$tgl','yyyymmdd')";
+            $WP_ID = $data['WP_ID'];
+            $LATITUDE = $data['LATITUDE'];
+            $LONGITUDE = $data['LONGITUDE'];
+            $SUBMITDATE = $data['SUBMIT_DATE'];
+
+
+        $this->db->query("UPDATE TEMPORARY_TIMESHEET 
+                             set TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE ='$TS_DATE', WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS') 
+                           where TS_ID = '$TS_ID'
+                             ");
+    }
 
     function checkTSData($wp,$date){
         //for update old data from this date
@@ -546,6 +573,34 @@ GROUP BY TS_DATE")->result_array();
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create','$rh_id')");
         }
     }
+    function editTimesheetTemp($data,$rh_id){
+
+        //change date input for readable to sql
+        $tgl=date_format(date_create($data['DATE']),'Ymd');
+
+        //check timesheet data for this date ,
+        //0 = no data
+        //-1 = have an old data (Only one data)
+        //1 = have a new data
+
+            //data for insert
+            $TS_ID = $data['TS_ID'];
+            $SUBJECT = $data['SUBJECT'];
+            $MESSAGE = $data['MESSAGE'];
+            $HOUR_TOTAL = $data['WORK_HOUR'];
+            $TS_DATE = "to_date('$tgl','yyyymmdd')";
+            $WP_ID = $data['WP_ID'];
+            $LATITUDE = $data['LATITUDE'];
+            $LONGITUDE = $data['LONGITUDE'];
+            $SUBMITDATE = $data['SUBMIT_DATE'];
+
+            $this->db->query("UPDATE TEMPORARY_TIMESHEET 
+                             set TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE ='$TS_DATE', WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',IS_VALID=1,SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),ACTION = 'edit',RH_ID='$rh_id' 
+                           where TS_ID = '$TS_ID'
+                             ");
+
+    }
+
     function confirmTimesheetTemp($timesheet_id,$approver,$confirm_code){
         $date = date('Y-m-d');
         $query = "update temporary_timesheet 
