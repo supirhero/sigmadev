@@ -325,10 +325,10 @@ class Task extends CI_Controller
     //Create Task
     function createTask_view($project_id){
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
-        $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline 
-                                        from (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs 
+        $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline
+                                        from (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs
                                               union
-                                             select wbs_id,wbs_name,project_id,wbs_parent_id,'yes' as rebaseline from temporary_wbs where rh_id = '$rh_id') 
+                                             select wbs_id,wbs_name,project_id,wbs_parent_id,'yes' as rebaseline from temporary_wbs where rh_id = '$rh_id')
                                         where PROJECT_ID='".$project_id."' connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id.".0' order siblings by wbs_parent_id")->result_array();
         echo json_encode($data);
     }
@@ -651,7 +651,7 @@ class Task extends CI_Controller
             for ($i = 1; $i <= $data['numRows']; $i++) {
                 if($data['cells'][$i][1] == '')
                     break;
-                
+
                 $cars = $data['cells'][$i][1];
                 $array[]=$data['cells'][$i][1];
                 $dataexcel[$i-1]['anjay']=$array;
@@ -680,8 +680,8 @@ class Task extends CI_Controller
         //$dataexcel[$i-1]['FINISH_DATE']= date('d/m/Y',strtotime($data['cells'][$i][7]));
                 $dataexcel[$i-1]['FINISH_DATEs']= $data['cells'][$i][7];
         //$dataexcel[$i-1]['ACTUAL_FINISH_DATE']= $data['cells'][$i][13];
-                
-                
+
+
         //$dataexcel[$i-1]['MILESTONE']= $data['cells'][$i][16];
         //$dataexcel[$i-1]['WORK_COMPLETE']= $data['cells'][$i][7];
         //    $dataexcel[$i-1]['WORK_PERCENT_COMPLETE']= $data['cells'][$i][18];
@@ -1078,7 +1078,7 @@ if($this->email->send()){
               <meta name='viewport' content='width=device-width' />
               <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
               <title>Remove Member</title>
-    
+
               <style>
                   /* -------------------------------------
                   GLOBAL
@@ -1088,7 +1088,7 @@ if($this->email->send()){
                   padding:0;
               }
       * { font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; }
-    
+
               img {
                 max-width: 100%;
             }
@@ -1102,13 +1102,13 @@ if($this->email->send()){
                 width: 100%!important;
                 height: 100%;
             }
-    
-    
+
+
             /* -------------------------------------
             ELEMENTS
             ------------------------------------- */
             a { color: #2BA6CB;}
-    
+
             .btn {
                 text-decoration:none;
                 color:#FFF;
@@ -1122,7 +1122,7 @@ if($this->email->send()){
                 border-radius: 5px;
                 box-shadow: 3px 3px 3px 1px #EBEBEB;
             }
-    
+
             p.callout {
                 padding:15px;
                 text-align:center;
@@ -1133,7 +1133,7 @@ if($this->email->send()){
                 font-weight:bold;
                 color: #2BA6CB;
             }
-    
+
             .column table { width:100%;}
             .column {
                 width: 300px;
@@ -1156,22 +1156,22 @@ if($this->email->send()){
                 border:0;
                 border-collapse:collapse;
             }
-    
+
             /* -------------------------------------
             HEADER
             ------------------------------------- */
             table.head-wrap { width: 100%;}
-    
+
             .header.container table td.logo { padding: 15px; }
             .header.container table td.label { padding: 15px; padding-left:0px;}
-    
-    
+
+
             /* -------------------------------------
             BODY
             ------------------------------------- */
             table.body-wrap { width: 100%;}
-    
-    
+
+
             /* -------------------------------------
             FOOTER
             ------------------------------------- */
@@ -1181,10 +1181,10 @@ if($this->email->send()){
             .footer-wrap .container td.content p {
                 font-size:10px;
                 font-weight: bold;
-    
+
             }
-    
-    
+
+
             /* -------------------------------------
             TYPOGRAPHY
             ------------------------------------- */
@@ -1192,16 +1192,16 @@ if($this->email->send()){
                 font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 1.1; margin-bottom:15px; color:#000;
             }
             h1 small, h2 small, h3 small, h4 small, h5 small, h6 small { font-size: 60%; color: #6f6f6f; line-height: 0; text-transform: none; }
-    
+
             h1 { font-weight:200; font-size: 44px;}
             h2 { font-weight:200; font-size: 37px;}
             h3 { font-weight:500; font-size: 27px;}
             h4 { font-weight:500; font-size: 23px;}
             h5 { font-weight:900; font-size: 17px;}
             h6 { font-weight:900; font-size: 14px; text-transform: uppercase; color:#444;}
-    
+
             .collapse { margin:0!important;}
-    
+
             p, ul {
                 margin-bottom: 10px;
                 font-weight: normal;
@@ -1210,24 +1210,24 @@ if($this->email->send()){
             }
             p.lead { font-size:17px; }
             p.last { margin-bottom:0px;}
-    
+
             ul li {
                 margin-left:5px;
                 list-style-position: inside;
             }
-    
+
             hr {
                 border: 0;
                 height: 0;
                 border-top: 1px dotted rgba(0, 0, 0, 0.1);
                 border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
             }
-    
-    
+
+
             /* -------------------------------------
             Shopify
             ------------------------------------- */
-    
+
             .products {
                 width:100%;
                 height:40px;padding
@@ -1242,13 +1242,13 @@ if($this->email->send()){
             .products span {
                 font-size:17px;
             }
-    
-    
+
+
             /* ---------------------------------------------------
             RESPONSIVENESS
             Nuke it from orbit. It's the only way to be sure.
             ------------------------------------------------------ */
-    
+
             /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
             .container {
                 display:block!important;
@@ -1256,7 +1256,7 @@ if($this->email->send()){
                 margin:0 auto!important; /* makes it centered */
                 clear:both!important;
             }
-    
+
             /* This should also be a block element, so that it will fill 100% of the .container */
             .content {
                 padding: 15px 15px 0 15px;
@@ -1264,51 +1264,51 @@ if($this->email->send()){
                 margin:0 auto;
                 display:block;
             }
-    
+
             /* Let's make sure tables in the content area are 100% wide */
             .content table { width: 100%; }
-    
+
             /* Be sure to place a .clear element after each set of columns, just to be safe */
             .clear { display: block; clear: both; }
-    
-    
+
+
             /* -------------------------------------------
             PHONE
             For clients that support media queries.
             Nothing fancy.
             -------------------------------------------- */
             @media only screen and (max-width: 600px) {
-    
+
                 a[class='btn'] { display:block!important; margin-bottom:10px!important; background-image:none!important; margin-right:0!important;}
-    
+
                 div[class='column'] { width: auto!important; float:none!important;}
-    
+
                 table.social div[class='column'] {
                   width:auto!important;
               }
-    
+
           }
-    
+
       </style>
     </head>
-    
+
     <body bgcolor='#FFFFFF'>\
       <table class='head-wrap' bgcolor='#FFFFFF'>
           <tr>
               <td></td>
               <td class='header container'>
-    
+
                   <div class='content'>
                       <table bgcolor='#FFFFFF'>
                           <tr>
                               <td>
-    
+
                               </td>
-    
+
                           </tr>
                       </table>
                   </div>
-    
+
               </td>
               <td></td>
           </tr>
@@ -1317,7 +1317,7 @@ if($this->email->send()){
           <tr>
               <td></td>
               <td class='container' bgcolor='#FFFFFF'>
-    
+
                   <div class='content'>
                       <table>
                           <tr>
@@ -1337,41 +1337,41 @@ if($this->email->send()){
                                       <p style='text-align: left'>Having Trouble ? Contact us at <a href='mailto:prouds.support@sigma.co.id?Subject=Need%20help' target='_top'>prouds.support@sigma.co.id</a></p>
                                   </td>
                               </tr>
-    
+
                           </table>
                       </div>
-    
+
                   </td>
-    
+
               </tr>
           </table>
           <!-- /BODY -->
-    
+
           <!-- FOOTER -->
           <table class='footer-wrap' bgcolor='#FFFFFF'>
               <tr>
                   <td></td>
                   <td class='container'>
-    
+
                       <!-- content -->
                       <div class='content' style='margin-top: -15px'>
                           <table>
                               <tr>
                                   <br/>
-    
+
                               </br/>
                           </tr>
                       </table>
                   </div>
                   <!-- /content -->
-    
+
               </td>
               <td></td>
           </tr>
       </table>
-    
+
     </body>
-    
+
     </html>");
 
     if($this->email->send()){
@@ -1481,6 +1481,14 @@ if($this->email->send()){
             # Do not forget to unset references!
             unset($value);
         endforeach;
+    }
+    public function getCurrentProgresTask(){
+      $c['WBS_ID']=$_POST['wbs_id'];
+      $sql="SELECT * FROM WBS WHERE WBS_ID='".$_POST['wbs_id']."' ";
+      $data=$this->db->query($sql)->row_array();
+      $c['PROJECT_ID']=$data['PROJECT_ID'];
+      $c['WORK_PERCENT_COMPLETE']=$data['WORK_PERCENT_COMPLETE'];
+      echo json_encode($c, JSON_NUMERIC_CHECK);
     }
 
 
