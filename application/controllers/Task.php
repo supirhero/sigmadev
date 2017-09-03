@@ -248,6 +248,32 @@ class Task extends CI_Controller
         $id_project = $this->uri->segment(3);
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
         $workplan=$this->M_detail_project->selectWBS($id_project,$rh_id);
+        $workplan_wp = [];
+        $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
+        $rebaseline_wp = [];
+        $findIndex = [];
+
+        foreach($workplan as &$wp){
+            $workplan_wp[] = $wp['WBS_ID'];
+            $wp['status']='none';
+        }
+
+        foreach ($rebaseline as $rwp){
+            $rebaseline_wp[] = $rwp['WBS_ID'];
+        }
+
+        foreach ($rebaseline_wp as $r){
+            $findIndex[] = array_search($r,$workplan_wp);
+        }
+
+        foreach ($findIndex as $index){
+            $index_rebaseline = array_search($workplan[$index]['WBS_ID'],$rebaseline_wp);
+            if($index_rebaseline == null){
+                $index = 0;
+            }
+            $workplan[$index]['status'] =  $rebaseline[$index_rebaseline]['ACTION'];
+        }
+
         foreach ($workplan as &$wp){
             if($wp['WORK_PERCENT_COMPLETE'] == null){
                 $wp['WORK_PERCENT_COMPLETE'] = 0;
@@ -256,8 +282,6 @@ class Task extends CI_Controller
                 $wp['WORK'] = 0;
             }
         }
-
-        $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
         //$created_array = $this->buildTree($workplan);
 
