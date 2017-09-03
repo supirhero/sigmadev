@@ -9,15 +9,15 @@ class Report extends CI_Controller {
     {
         parent::__construct();
         $this->datajson['privilege'] = ['master_data_access'=>false,
-        'manage_role_access'=>false,
-        'create_edit_delete_task_updatepercent'=>false,
-        'req_rebaseline'=>false,
-        'acc_deny_rebaseline'=> false,
-        'assign_project_member'=>false,
-        'project_report'=>true,
-        'project_activities'=>false,
-        'acc_deny_timesheet'=>false,
-        'report_overview'=>false];
+            'manage_role_access'=>false,
+            'create_edit_delete_task_updatepercent'=>false,
+            'req_rebaseline'=>false,
+            'acc_deny_rebaseline'=> false,
+            'assign_project_member'=>false,
+            'project_report'=>true,
+            'project_activities'=>false,
+            'acc_deny_timesheet'=>false,
+            'report_overview'=>false];
         error_reporting(E_ALL & ~E_NOTICE);
         $this->load->model('M_home');
      //   $this->load->model('M_timesheet');
@@ -77,15 +77,15 @@ class Report extends CI_Controller {
         //PRIVILEGE CHECKER
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
-            from access_list al
-            join access_url au
-            on al.access_id = au.access_id
-            join profile_access_list pal
-            on
-            pal.access_id = au.access_id
-            where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
-            order by al.type asc
-            ")->result_array();
+                                    from access_list al
+                                    join access_url au
+                                    on al.access_id = au.access_id
+                                    join profile_access_list pal
+                                    on
+                                    pal.access_id = au.access_id
+                                    where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
+                                    order by al.type asc
+                                    ")->result_array();
         $profile_id = $this->datajson['userdata']['PROF_ID'];
         foreach($privilege as $priv){
             $will_die = 0;
@@ -121,30 +121,30 @@ class Report extends CI_Controller {
                         }
                         switch ($priv['ACCESS_ID']){
                             case '1':
-                            if($this->datajson['userdata']['PROF_ID'] == 7){
-                                $bu_id = 'masuk';
-                            }
-                            else{
-                                $bu_id = 'cant';
-                            }
-                            break;
+                                if($this->datajson['userdata']['PROF_ID'] == 7){
+                                    $bu_id = 'masuk';
+                                }
+                                else{
+                                    $bu_id = 'cant';
+                                }
+                                break;
                             case '2':
-                            $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
-                            break;
+                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                break;
                             case '3':
-                            $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
-                            break;
+                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
+                                break;
                             case '6':
-                            $bu_id = $_POST['bu'];
-                            break;
+                                $bu_id = $_POST['bu'];
+                                break;
                             case '7':
-                            $bu_id = $_POST['BU_ID'];
-                            break;
+                                $bu_id = $_POST['BU_ID'];
+                                break;
                             case '8' :
-                            if($this->datajson['userdata']['PROF_ID'] == 3 || $this->datajson['userdata']['PROF_ID'] == 7 ){
-                                $bu_id = 'masuk';
-                            }
-                            break;
+                                if($this->datajson['userdata']['PROF_ID'] == 3 || $this->datajson['userdata']['PROF_ID'] == 7 ){
+                                    $bu_id = 'masuk';
+                                }
+                                break;
                         }
                         if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
                             $will_die = 1;
@@ -162,20 +162,20 @@ class Report extends CI_Controller {
                 elseif($priv['TYPE'] == 'PROJECT'){
                     //fetching granted project list
                     $granted_project = $this->db->query("SELECT   distinct project_id
-                     FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
-                     c.project_complete, c.project_status, c.project_desc,
-                     c.created_by
-                     FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
-                     INNER JOIN projects c ON b.project_id = c.project_id
-                     INNER JOIN p_bu z on c.bu_code = z.bu_code
-                     UNION
-                     SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
-                     b.project_complete, b.project_status, b.project_desc,
-                     b.created_by
-                     FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
-                     INNER JOIN p_bu z on b.bu_code = z.bu_code
-                     )
-                     where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
+                                                           FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
+                                                                        c.project_complete, c.project_status, c.project_desc,
+                                                                        c.created_by
+                                                                   FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
+                                                                        INNER JOIN projects c ON b.project_id = c.project_id
+                                                                        INNER JOIN p_bu z on c.bu_code = z.bu_code
+                                                                 UNION
+                                                                 SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
+                                                                        b.project_complete, b.project_status, b.project_desc,
+                                                                        b.created_by
+                                                                   FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
+                                                                   INNER JOIN p_bu z on b.bu_code = z.bu_code
+                                                                        )
+                                                                        where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
                     $granted_project_list = [];
                     $granted_project_list[] = null;
 
@@ -188,49 +188,49 @@ class Report extends CI_Controller {
                         //get project id
                         switch ($priv['ACCESS_ID']){
                             case '9':
-                            $project_id_req = $_POST['PROJECT_ID'];
-                            break;
+                                $project_id_req = $_POST['PROJECT_ID'];
+                                break;
                             case '10':
-                            $project_id_req = $_POST['project_id'];
-                            break;
-                            case '11':
-                            switch ($url_dest){
-                                case 'task/upload_wbs':
                                 $project_id_req = $_POST['project_id'];
                                 break;
-                                case 'task/assigntaskmemberproject':
-                                $project_id = explode(".",$_POST['WBS_ID']);
-                                $project_id_req = $project_id[0];
+                            case '11':
+                                switch ($url_dest){
+                                    case 'task/upload_wbs':
+                                        $project_id_req = $_POST['project_id'];
+                                        break;
+                                    case 'task/assigntaskmemberproject':
+                                        $project_id = explode(".",$_POST['WBS_ID']);
+                                        $project_id_req = $project_id[0];
+                                        break;
+                                    case 'task/removetaskmemberproject':
+                                        $project_id = explode(".",$_POST['WBS_ID']);
+                                        $project_id_req = $project_id[0];
+                                        break;
+                                    case 'task/createtask':
+                                        $project_id_req   = $this->input->post("PROJECT_ID");
+                                        break;
+                                    case 'task/edittaskpercent':
+                                        $project_id_req=$this->input->post("PROJECT_ID");
+                                        break;
+                                    case 'task/edittask_action':
+                                        $project_id_req= $this->input->post("project_id");
+                                        break;
+                                    case 'task/deletetask':
+                                        $id = $_POST['wbs_id'];
+                                        $project_id_req = $this->M_detail_project->getProjectTask($id);
+                                        break;
+                                }
                                 break;
-                                case 'task/removetaskmemberproject':
-                                $project_id = explode(".",$_POST['WBS_ID']);
-                                $project_id_req = $project_id[0];
-                                break;
-                                case 'task/createtask':
-                                $project_id_req   = $this->input->post("PROJECT_ID");
-                                break;
-                                case 'task/edittaskpercent':
-                                $project_id_req=$this->input->post("PROJECT_ID");
-                                break;
-                                case 'task/edittask_action':
-                                $project_id_req= $this->input->post("project_id");
-                                break;
-                                case 'task/deletetask':
-                                $id = $_POST['wbs_id'];
-                                $project_id_req = $this->M_detail_project->getProjectTask($id);
-                                break;
-                            }
-                            break;
                             case '12':
-                            $id = $_POST['MEMBER'];
-                            $project_id_req = $this->M_detail_project->getRPProject($id);
-                            break;
+                                $id = $_POST['MEMBER'];
+                                $project_id_req = $this->M_detail_project->getRPProject($id);
+                                break;
                             case '13':
-                            $project_id_req = $this->uri->segment(3);
-                            break;
+                                $project_id_req = $this->uri->segment(3);
+                                break;
                             case '14':
-                            $project_id_req =$this->input->post("PROJECT_ID");
-                            break;
+                                $project_id_req =$this->input->post("PROJECT_ID");
+                                break;
                         }
 
                         if(!in_array($project_id_req,$granted_project_list)){
@@ -594,7 +594,6 @@ class Report extends CI_Controller {
         $c=$this->M_report->getbu($bu);
         //if directorat
         if ($c['BU_PARENT_ID']=='0') {
-            $data['type']='directorate';
             $data['project_dir']['completed'] =0;
             $data['project_dir']['in_progress']=0;
             $data['project_dir']['not_started']=0;
@@ -602,95 +601,91 @@ class Report extends CI_Controller {
             $data['finance']['total_project_value']=0;
             $child=$this->M_report->getbuchild($bu);
             foreach ($child as $ch) {
-                $data['project_dir']['completed'] =$data['project_dir']['completed']+$this->M_report->Portofolio_completed_Project($ch['BU_ID'],$tahun);
-                $data['project_dir']['in_progress']=$data['project_dir']['in_progress']+$this->M_report->Portofolio_Active_Project($ch['BU_ID'],$tahun);
-                $data['project_dir']['not_started']=$data['project_dir']['not_started']+$this->M_report->Portofolio_notstarted_Project($ch['BU_ID'],$tahun);
-                $data['project_dir']['jumlah']=$data['project_dir']['jumlah']+$this->M_report->Portofolio_Total_Project($ch['BU_ID'],$tahun);
-                $data['finance']['total_project_value']=$data['finance']['total_project_value']+$this->M_report->Portofolio_Total_Project_Value($ch['BU_ID'],$tahun);
-
+                $data['project_dir']['completed'] =$data['project']['completed']+$this->M_report->Portofolio_completed_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['in_progress']=$data['project']['in_progress']+$this->M_report->Portofolio_Active_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['not_started']=$data['project']['not_started']+$this->M_report->Portofolio_notstarted_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['jumlah']=$data['project']['jumlah']+$this->M_report->Portofolio_Total_Project($ch['BU_ID'],$tahun);
+                $data['finance']['total_project_value']=$data['project']['total_project_value']+$this->M_report->Portofolio_Total_Project_Value($ch['BU_ID'],$tahun);
             }
-            $data['finance']['total_project_value'] =  number_format($data['finance']['total_project_value'], 2, ',', '.');
-
         }
         //if business unit
         else{
-          $data['type']='business_unit';
-          $data['project_dir']['completed'] = $this->M_report->Portofolio_completed_Project($bu,$tahun);
-          $data['project_dir']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
-          $data['project_dir']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
-          $data['project_dir']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
-          $data['finance']['total_project_value'] =  number_format($this->M_report->Portofolio_Total_Project_Value($bu,$tahun), 2, ',', '.');
-      }
-      print_r(json_encode($data));
-  }
+            $data['project_dir']['completed'] = $this->M_report->Portofolio_completed_Project($bu,$tahun);
+            $data['project_dir']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
+            $data['project_dir']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
+            $data['project_dir']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
+            $data['finance']['total_project_value'] = $this->M_report->Portofolio_Total_Project_Value($bu,$tahun);
+        }
+        print_r(json_encode($data));
+    }
 
-  public function chart_directoratbu(){
+    public function chart_directoratbu(){
 
-    $tahun = $this->input->post('thn');
+        $tahun = $this->input->post('thn');
         // $tahun = '2016';
         //  $bu = 37;
-    $bu = $this->input->post('bu_id');
+        $bu = $this->input->post('bu_id');
 
-    $y=(int)date("Y");
+        $y=(int)date("Y");
         // $m=(int)date("m");
         //echo print_r ($thn);
 
 
-    $count_user=$this->M_report->getCountUser($bu);
+        $count_user=$this->M_report->getCountUser($bu);
         //echo print_r($tahun);
 
-    if (($tahun==$y)){
-        $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
-        $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
-    }
-    else{
-        $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
-        $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
+        if (($tahun==$y)){
+            $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
+            $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
+        }
+        else{
+            $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
+            $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
 
-    }
+        }
 
 
         //Utilization text
-    if ($res['jml_util']<80)
-    {
-        $res['status_utilization']='Under';
-    }
-    elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
-        $res['status_utilization']='Optimal';
-    }
-    else {
-        $res['status_utilization']='Over';
-    }
+        if ($res['jml_util']<80)
+        {
+            $res['status_utilization']='Under';
+        }
+        elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
+            $res['status_utilization']='Optimal';
+        }
+        else {
+            $res['status_utilization']='Over';
+        }
         // Entry text
-    if ($res['jml_entry']<100)
-    {
-        $res['status']='Under';
-    }
-    elseif ($res['jml_entry']==100) {
-        $res['status']='Complete';
-    }
-    else {
-        $res['status']='Over';
-    }
+        if ($res['jml_entry']<100)
+        {
+            $res['status']='Under';
+        }
+        elseif ($res['jml_entry']==100) {
+            $res['status']='Complete';
+        }
+        else {
+            $res['status']='Over';
+        }
 
 
-    $allentry=$this->M_report->gettahunanbu($bu,$tahun);
-    $res['allentry'] = [];
-    $i=1;
-    foreach ($allentry as $has) {
+        $allentry=$this->M_report->gettahunanbu($bu,$tahun);
+        $res['allentry'] = [];
+        $i=1;
+        foreach ($allentry as $has) {
 
-        array_push($res['allentry'],[$has['BULAN'],$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun))]);
-        $i++;
-    }
+            array_push($res['allentry'],[$has['BULAN'],$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun))]);
+            $i++;
+        }
 
-    $allhour=$this->M_report->getAllHourBU($bu,$tahun);
-    $res['allhour']= [];
-    $i=1;
-    foreach ($allhour as $hus) {
-        $res['allhour'][$i]['bulan']= $hus['BULAN'];
-        $res['allhour'][$i]['utilization']=$hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($has['BULAN'],$tahun));
-        $i++;
-    }
+        $allhour=$this->M_report->getAllHourBU($bu,$tahun);
+        $res['allhour']= [];
+        $i=1;
+        foreach ($allhour as $hus) {
+            $res['allhour'][$i]['bulan']= $hus['BULAN'];
+            $res['allhour'][$i]['utilization']=$hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($has['BULAN'],$tahun));
+            $i++;
+        }
 
         //   json_encode($res,JSON_NUMERIC_CHECK);
         //$i=1;
@@ -707,177 +702,177 @@ class Report extends CI_Controller {
         $i++;
 
 
-    }*/
-    echo json_encode($res,JSON_NUMERIC_CHECK);
+      }*/
+        echo json_encode($res,JSON_NUMERIC_CHECK);
 
-
-}
-
-    //https://marvelapp.com/hj9eb56/screen/29382902
-public function r_people(){
-    $bu_id = $_POST['BU_ID'];
-    $bulan = $_POST['BULAN'];
-    $tahun = $_POST['TAHUN'];
-    $y=(int)date("Y");
-    $m=(int)date("m");
-
-    $datareport=$this->M_report->get_user_bu($bu_id);
-
-
-
-    for($i = 0 ; $i <count($datareport);$i++){
-
-            //utilization
-        $utilization=$this->M_report->getTotalHour($datareport[$i]['USER_ID'],$bulan,$tahun);
-
-            //entry
-        $entry=$this->M_report->getEntry($datareport[$i]['USER_ID'],$bulan,$tahun);
-
-            //entry
-        if (($bulan==$m)&& ($tahun==$y) ){
-            $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
-        }
-        else{
-            $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
-        }
-
-        if ($persen_entry<100)
-        {
-            $text_entry='Under';
-        }
-        elseif ($persen_entry==100) {
-            $text_entry='Complete';
-        }
-        else {
-            $text_entry='Over';
-        }
-
-            //utilization
-        if (($bulan==$m)&& ($tahun==$y) ){
-            $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
-        }
-        else{
-            $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
-
-        }
-        if ($persen_utilization<80)
-        {
-            $text_utilization='Under';
-        }
-        elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
-            $text_utilization='Optimal';
-        }
-        else {
-            $text_utilization='Over';
-        }
-
-
-        $datareport[$i]['utilisasi']=round($persen_utilization,2);
-        $datareport[$i]['status_utilisasi']=$text_utilization;
-        $datareport[$i]['entry']=round($persen_entry,2);
-        $datareport[$i]['status_entry']=$text_entry;
 
     }
-    $wrap['report_people'] = $datareport;
-    echo json_encode($wrap);
-}
-    //resource per bu
-public function r_entry_bu(){
 
-    $tahun = $this->input->post('tahun');
+    //https://marvelapp.com/hj9eb56/screen/29382902
+    public function r_people(){
+        $bu_id = $_POST['BU_ID'];
+        $bulan = $_POST['BULAN'];
+        $tahun = $_POST['TAHUN'];
+        $y=(int)date("Y");
+        $m=(int)date("m");
+
+        $datareport=$this->M_report->get_user_bu($bu_id);
+
+
+
+        for($i = 0 ; $i <count($datareport);$i++){
+
+            //utilization
+            $utilization=$this->M_report->getTotalHour($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+            //entry
+            $entry=$this->M_report->getEntry($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+            //entry
+            if (($bulan==$m)&& ($tahun==$y) ){
+                $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
+            }
+            else{
+                $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
+            }
+
+            if ($persen_entry<100)
+            {
+                $text_entry='Under';
+            }
+            elseif ($persen_entry==100) {
+                $text_entry='Complete';
+            }
+            else {
+                $text_entry='Over';
+            }
+
+            //utilization
+            if (($bulan==$m)&& ($tahun==$y) ){
+                $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
+            }
+            else{
+                $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
+
+            }
+            if ($persen_utilization<80)
+            {
+                $text_utilization='Under';
+            }
+            elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
+                $text_utilization='Optimal';
+            }
+            else {
+                $text_utilization='Over';
+            }
+
+
+            $datareport[$i]['utilisasi']=round($persen_utilization,2);
+            $datareport[$i]['status_utilisasi']=$text_utilization;
+            $datareport[$i]['entry']=round($persen_entry,2);
+            $datareport[$i]['status_entry']=$text_entry;
+
+        }
+        $wrap['report_people'] = $datareport;
+        echo json_encode($wrap);
+    }
+    //resource per bu
+    public function r_entry_bu(){
+
+        $tahun = $this->input->post('tahun');
         // $tahun = '2016';
         //  $bu = 37;
-    $bu = $this->input->post('bu_id');
+        $bu = $this->input->post('bu_id');
 
-    $y=(int)date("Y");
+        $y=(int)date("Y");
         // $m=(int)date("m");
         //echo print_r ($thn);
 
 
-    $c=$this->M_report->getbu($bu);
-    if ($c['BU_PARENT_ID']=='0') {
-      $count_user=0;
-      $child=$this->M_report->getbuchild($bu);
-      $res['jml_entry']=0;
-      $count=count($child);
-      foreach ($child as $ch) {
-        $count_user=$this->M_report->getCountUser($ch['BU_ID']);
-        if ($count_user==0) {
-          $count=$count-1;
-      }else{
-          if (($tahun==$y)){
-              $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2));
-          }else{
-              $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2));
+        $c=$this->M_report->getbu($bu);
+        if ($c['BU_PARENT_ID']=='0') {
+          $count_user=0;
+          $child=$this->M_report->getbuchild($bu);
+          $res['jml_entry']=0;
+          $count=count($child);
+          foreach ($child as $ch) {
+            $count_user=$this->M_report->getCountUser($ch['BU_ID']);
+            if ($count_user==0) {
+              $count=$count-1;
+            }else{
+              if (($tahun==$y)){
+                  $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2));
+              }else{
+                  $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2));
+              }
+            }
           }
-      }
-  }
-  $res['jml_entry']=$res['jml_entry']/$count;
-  if ($res['jml_entry']<100)
-  {
-      $res['status']='Under';
-  }
-  elseif ($res['jml_entry']==100) {
-      $res['status']='Complete';
-  }
-  else {
-      $res['status']='Over';
-  }
-  $res['allentry']=[];
-  foreach ($child as $chs) {
-    $allentry=$this->M_report->gettahunanbu($chs['BU_ID'],$tahun);
-    $i=1;
-    foreach ($allentry as $has) {
-        $count_user=$this->M_report->getCountUser($chs['BU_ID']);
-        if ($count_user>0) {
+          $res['jml_entry']=$res['jml_entry']/$count;
+          if ($res['jml_entry']<100)
+          {
+              $res['status']='Under';
+          }
+          elseif ($res['jml_entry']==100) {
+              $res['status']='Complete';
+          }
+          else {
+              $res['status']='Over';
+          }
+          $res['allentry']=[];
+          foreach ($child as $chs) {
+            $allentry=$this->M_report->gettahunanbu($chs['BU_ID'],$tahun);
+            $i=1;
+            foreach ($allentry as $has) {
+                $count_user=$this->M_report->getCountUser($chs['BU_ID']);
+                if ($count_user>0) {
                     $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
                     if($i<=12)
-                        array_push($res['allentry'],['label'=>$monthName,'value'=>$res['allentry'][$i][1]+($has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun)))]);
-                    $i++;
+                    array_push($res['allentry'],['label'=>$monthName,'value'=>$res['allentry'][$i][1]+($has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun)))]);
+                  $i++;
                 }
 
             }
 
 
-        }
-        for ($v=1; $v<=12 ; $v++) {
+          }
+          for ($v=1; $v<=12 ; $v++) {
             $res['allentry'][$v][1]=$res['allentry'][$v][1]/$count;
-        }
-    }else{
-      $count_user=$this->M_report->getCountUser($bu);
+          }
+        }else{
+          $count_user=$this->M_report->getCountUser($bu);
           //echo print_r($tahun);
-      $count_user = ($count_user > 0) ? $count_user : 1;
+            $count_user = ($count_user > 0) ? $count_user : 1;
 
-      if (($tahun==$y)){
-          $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
-      }
-      else{
-          $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
+          if (($tahun==$y)){
+              $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
+          }
+          else{
+              $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
 
-      }
+          }
           // Entry text
-      if ($res['jml_entry']<100)
-      {
-          $res['status']='Under';
-      }
-      elseif ($res['jml_entry']==100) {
-          $res['status']='Complete';
-      }
-      else {
-          $res['status']='Over';
-      }
+          if ($res['jml_entry']<100)
+          {
+              $res['status']='Under';
+          }
+          elseif ($res['jml_entry']==100) {
+              $res['status']='Complete';
+          }
+          else {
+              $res['status']='Over';
+          }
 
 
-      $allentry=$this->M_report->gettahunanbu($bu,$tahun);
-      $res['allentry']=[];
-      $i=1;
-      foreach ($allentry as $has) {
+          $allentry=$this->M_report->gettahunanbu($bu,$tahun);
+          $res['allentry']=[];
+          $i=1;
+          foreach ($allentry as $has) {
               $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
               array_push($res['allentry'],['label'=>$monthName,'value'=>$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun))]);
 
               $i++;
           }
-      }
+        }
 
         //   json_encode($res,JSON_NUMERIC_CHECK);
         //$i=1;
@@ -896,7 +891,7 @@ public function r_entry_bu(){
 
     }*/
 
-    $result["r_entry_bu"] = $res;
+        $result["r_entry_bu"] = $res;
 
     echo json_encode($result,JSON_NUMERIC_CHECK);
 
@@ -906,110 +901,110 @@ public function r_entry_bu(){
 }
 
     //resource per bu
-public function r_util_bu(){
+    public function r_util_bu(){
 
-    $tahun = $this->input->post('tahun');
+        $tahun = $this->input->post('tahun');
             // $tahun = '2016';
             //  $bu = 37;
-    $bu = $this->input->post('bu_id');
+        $bu = $this->input->post('bu_id');
 
-    $y=(int)date("Y");
+        $y=(int)date("Y");
             // $m=(int)date("m");
             //echo print_r ($thn);
-    $c=$this->M_report->getbu($bu);
-    if ($c['BU_PARENT_ID']=='0') {
-      $count_user=0;
-      $child=$this->M_report->getbuchild($bu);
-      $res['jml_util']=0;
-      $count=count($child);
-      foreach ($child as $ch) {
-        $count_user=$this->M_report->getCountUser($ch['BU_ID']);
-        if ($count_user==0) {
-          $count=$count-1;
-          $count_user=1;
-      }else{
-          if (($tahun==$y)){
-              $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2));
+        $c=$this->M_report->getbu($bu);
+        if ($c['BU_PARENT_ID']=='0') {
+          $count_user=0;
+          $child=$this->M_report->getbuchild($bu);
+          $res['jml_util']=0;
+          $count=count($child);
+          foreach ($child as $ch) {
+            $count_user=$this->M_report->getCountUser($ch['BU_ID']);
+            if ($count_user==0) {
+              $count=$count-1;
+                $count_user=1;
+            }else{
+              if (($tahun==$y)){
+                  $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2));
+              }
+              else{
+                  $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2));
+              }
+            }
           }
-          else{
-              $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2));
+          $res['jml_util']=$res['jml_util']/$count;
+          if ($res['jml_util']<80)
+          {
+              $res['status_utilization']='Under';
           }
-      }
-  }
-  $res['jml_util']=$res['jml_util']/$count;
-  if ($res['jml_util']<80)
-  {
-      $res['status_utilization']='Under';
-  }
-  elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
-      $res['status_utilization']='Optimal';
-  }
-  else {
-      $res['status_utilization']='Over';
-  }
-  $res['allhour']=[];
+          elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
+              $res['status_utilization']='Optimal';
+          }
+          else {
+              $res['status_utilization']='Over';
+          }
+          $res['allhour']=[];
           // $i=1;
           // foreach ($allhour as $hus) {
           //     $res['allhour'][$i][0]= $hus['BULAN'];
           //     $res['allhour'][$i][1]=$hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun));
           //     $i++;
           // }
-  foreach ($child as $chs) {
-    $allhour=$this->M_report->getAllHourBU($chs['BU_ID'],$tahun);
-    $i=1;
-    foreach ($allhour as $hus) {
-        $count_user=$this->M_report->getCountUser($chs['BU_ID']);
-        if ($count_user>0) {
+          foreach ($child as $chs) {
+            $allhour=$this->M_report->getAllHourBU($chs['BU_ID'],$tahun);
+            $i=1;
+            foreach ($allhour as $hus) {
+                $count_user=$this->M_report->getCountUser($chs['BU_ID']);
+                if ($count_user>0) {
                     $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
                     array_push($res['allhour'],['label'=>$monthName,'value'=>($hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun)))]);
 
-                    $i++;
+                  $i++;
                 }
 
             }
 
-        }
-        for ($v=1; $v<=12 ; $v++) {
+          }
+          for ($v=1; $v<=12 ; $v++) {
             $res['allhour'][$v][1]=$res['allhour'][$v][1]/$count;
-        }
-    }else {
-      $count_user=$this->M_report->getCountUser($bu);
+          }
+        }else {
+          $count_user=$this->M_report->getCountUser($bu);
               //echo print_r($tahun);
-      if ($count_user==0) {
-        $count=$count-1;
-        $count_user=1;
-    }
-    else if (($tahun==$y)){
+            if ($count_user==0) {
+                $count=$count-1;
+                $count_user=1;
+            }
+            else if (($tahun==$y)){
 
-      $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
-  }
-  else{
-      $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
+              $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
+          }
+          else{
+              $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
 
-  }
+          }
 
 
               //Utilization text
-  if ($res['jml_util']<80)
-  {
-      $res['status_utilization']='Under';
-  }
-  elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
-      $res['status_utilization']='Optimal';
-  }
-  else {
-      $res['status_utilization']='Over';
-  }
+          if ($res['jml_util']<80)
+          {
+              $res['status_utilization']='Under';
+          }
+          elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
+              $res['status_utilization']='Optimal';
+          }
+          else {
+              $res['status_utilization']='Over';
+          }
 
-  $allhour=$this->M_report->getAllHourBU($bu,$tahun);
-  $res['allhour']=[];
-  $i=1;
-  foreach ($allhour as $hus) {
+          $allhour=$this->M_report->getAllHourBU($bu,$tahun);
+          $res['allhour']=[];
+          $i=1;
+          foreach ($allhour as $hus) {
               $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
               array_push($res['allhour'],['label'=>$monthName,'value'=>($hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun)))]);
-              $i++;
+         $i++;
           }
-      }
+        }
 
 
 
@@ -1171,8 +1166,8 @@ public function r_util_bu(){
             and b.BU_CODE !='PROUDS'
             and b.BU_code !='GTS'
             and b.BU_code !='NSM'
-            group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id,b.order_level
-            order by b.order_level");
+            group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+            order by b.bu_name");
         $result["r_monthly"] = $query->result();
         $known = array();
         $knownz = array();
@@ -1193,63 +1188,63 @@ public function r_util_bu(){
     }
         //report yearly overview
     public function r_yearly($year=false){
-        if(!$year)
-        {
-            $year=date("Y");
-        }
-        $listBU=explode(",",$this->input->post('bu_aliases'));
-        foreach ($listBU as &$value) {
-            $list[] = "'".$value."'";
-        }
-        for($i=1; $i<=12; $i++)
-        {
-            $month = date("M", mktime(0, 0, 0, $i, 10));
-            $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-                round(sum(ev)/count(c.project_id),2) as EV,
-                round(sum(pv)/count(c.project_id),2) as PV,
-                round(sum(AC)/count(c.project_id),2) as AC,
-                case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-                case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-                from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-                case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-                case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-                project_id
-                from tb_rekap_project
-                where  to_char(tanggal,'Mon-YYYY')='$month-$year'
-                group by project_id) a inner join
-                projects c on c.project_id=a.project_id
-                inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-                where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
-                and type_of_effort in ('1','2')
-                and pv!='0'
-                and b.BU_CODE !='PROUDS'
-                and b.BU_code !='GTS'
-                and b.BU_code !='NSM'
-                group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id, b.order_level
-                order by b.order_level");
-            $hasil =$query->result();
-            $anu = array("name" => $month);
-            $anuz = array("name" => $month);
+    if(!$year)
+    {
+        $year=date("Y");
+    }
+    $listBU=explode(",",$this->input->post('bu_aliases'));
+    foreach ($listBU as &$value) {
+        $list[] = "'".$value."'";
+    }
+    for($i=1; $i<=12; $i++)
+    {
+        $month = date("M", mktime(0, 0, 0, $i, 10));
+        $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+            round(sum(ev)/count(c.project_id),2) as EV,
+            round(sum(pv)/count(c.project_id),2) as PV,
+            round(sum(AC)/count(c.project_id),2) as AC,
+            case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+            case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+            from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
+            case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
+            case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+            project_id
+            from tb_rekap_project
+            where  to_char(tanggal,'Mon-YYYY')='$month-$year'
+            group by project_id) a inner join
+            projects c on c.project_id=a.project_id
+            inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
+            and type_of_effort in ('1','2')
+            and pv!='0'
+            and b.BU_CODE !='PROUDS'
+            and b.BU_code !='GTS'
+            and b.BU_code !='NSM'
+            group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+            order by b.bu_name");
+        $hasil =$query->result();
+        $anu = array("name" => $month);
+        $anuz = array("name" => $month);
 
-            for($o=0; $o<count($hasil); $o++)
-            {
-                $anu[$hasil[$o]->BU_ALIAS]=$hasil[$o]->CPI;
-                $anuz[$hasil[$o]->BU_ALIAS]=$hasil[$o]->SPI;
-            }
+        for($o=0; $o<count($hasil); $o++)
+        {
+            $anu[$hasil[$o]->BU_ALIAS]=$hasil[$o]->CPI;
+            $anuz[$hasil[$o]->BU_ALIAS]=$hasil[$o]->SPI;
+        }
 
-            $result["r_yearly_cpi"][]=$anu;
-            $result["r_yearly_spi"][]=$anuz;
+        $result["r_yearly_cpi"][]=$anu;
+        $result["r_yearly_spi"][]=$anuz;
 
             // $result["r_yearly"][]["month_name"] = $month;
-        }
-        echo json_encode($result);
-
     }
+    echo json_encode($result);
+
+}
 
     public function report_filter(){
         $query ="select project_name,project_status,project_complete as percent,amount,
-        customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
-        ";
+                 customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
+                 ";
         $i = 0;
         $value = $this->input->post('value');
         $status = $this->input->post('status');
@@ -1260,62 +1255,61 @@ public function r_util_bu(){
             $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where 1=1 ";
+                    $query .= " where ";
                     $i++;
                 }
-                elseif($value[$a] == 1 ){
-                    $query .= " ";
+                elseif($value[$a] == 1){
+                    $query .= " or ";
                 }
                 if($value[$a] == 1){
-                    $query .= "or amount '".$valueVal[$a]."'";
+                    $query .= " amount '".$valueVal[$a]."'";
                 }
             }
         }if(!empty($status)){
             $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
             for($a = 0 ; $a < count($valueVal);$a++){
-
                 if($i == 0){
-                    $query .= " where 1=1 ";
+                    $query .= " where ";
                     $i++;
                 }
-                elseif($status[$a] == 1 ){
-                    $query .= "  ";
+                elseif($status[$a] == 1){
+                    $query .= " or ";
                 }
                 if($status[$a] == 1){
-                    $query .= " or project_status =  '".$valueVal[$a]."'";
+                    $query .= " project_status =  '".$valueVal[$a]."'";
                 }
             }
         }if(!empty($schedule)){
             $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where 1=1 ";
+                    $query .= " where ";
                     $i++;
                 }
-                elseif($schedule[$a] == 1 ){
-                    //echo $c;
-                    $query .= " ";
+                elseif($schedule[$a] == 1){
+                    $query .= " or ";
                 }
                 if($schedule[$a] == 1){
-                    $query .= " or schedule_status = '".$valueVal[$a]."'";
+                    $query .= " schedule_status = '".$valueVal[$a]."'";
                 }
             }
         }if(!empty($budget)){
             $valueVal = ["Over Budget","On Budget","Ahead Budget"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where 1=1 ";
+                    $query .= " where ";
                     $i++;
                 }
                 elseif($budget[$a] == 1){
-                    $query .= " ";
+                    $query .= " or ";
                 }
                 if($budget[$a] == 1){
-                    $query .= " or budget_status = '".$valueVal[$a]."'";
+                    $query .= " budget_status = '".$valueVal[$a]."'";
                 }
 
             }
         }
+
 
         $result['project'] = $this->db->query($query)->result_array();
         echo json_encode($result);
@@ -1335,8 +1329,8 @@ public function r_util_bu(){
 
 
         $query ="select project_name,project_status,project_complete as percent,amount,
-        customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
-        ";
+                 customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
+                 ";
         $i = 0;
         $value = $this->input->post('value');
         $status = $this->input->post('status');
@@ -1347,35 +1341,35 @@ public function r_util_bu(){
             $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where 1=1 ";
+                    $query .= " where ";
                     $i++;
                 }
                 elseif($value[$a] == 1){
-                    $query .= " ";
+                    $query .= " or ";
                 }
                 if($value[$a] == 1){
-                    $query .= " or amount '".$valueVal[$a]."'";
+                    $query .= " amount '".$valueVal[$a]."'";
                 }
             }
         }if(!empty($status)){
             $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where 1=1 ";
+                    $query .= " where ";
                     $i++;
                 }
                 elseif($status[$a] == 1){
-                    $query .= " ";
+                    $query .= " or ";
                 }
                 if($status[$a] == 1){
-                    $query .= " or project_status =  '".$valueVal[$a]."'";
+                    $query .= " project_status =  '".$valueVal[$a]."'";
                 }
             }
         }if(!empty($schedule)){
             $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where 1=1 ";
+                    $query .= " where ";
                     $i++;
                 }
                 elseif($schedule[$a] == 1){
@@ -1389,14 +1383,14 @@ public function r_util_bu(){
             $valueVal = ["Over Budget","On Budget","Ahead Budget"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where 1=1 ";
+                    $query .= " where ";
                     $i++;
                 }
                 elseif($budget[$a] == 1){
-                    $query .= " ";
+                    $query .= " or ";
                 }
                 if($budget[$a] == 1){
-                    $query .= " or budget_status = '".$valueVal[$a]."'";
+                    $query .= " budget_status = '".$valueVal[$a]."'";
                 }
 
             }
