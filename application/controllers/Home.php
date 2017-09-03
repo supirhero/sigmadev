@@ -18,7 +18,7 @@ class Home extends CI_Controller {
                                         'timesheet_approval'=>false,
                                         'creat_edit_upload_percent_member_task'=>false,
                                         'project_member'=>false,
-                                        'upload_doc_and_issue'=>false,
+                                        'upload_doc'=>false,
                                         'upload_issue'=>false,
                                         ];
         error_reporting(E_ALL  & ~E_NOTICE);
@@ -82,6 +82,57 @@ class Home extends CI_Controller {
         }
 
 
+        /*================================================================================*/
+        /* FOR PRIVILEGE INTEGRATION */
+        $user_privilege = $this->db->query("select a.access_name,b.access_id,b.privilege 
+                                            from access_list a join profile_access_list b 
+                                            on a.access_id = b.access_id 
+                                            where b.profile_id = '".$this->datajson['userdata']['PROF_ID']."'")->result_array();
+        if($user_privilege[0]['PRIVILEGE'] == 'all_bu'){
+            $this->datajson['privilege']['master_data_access']=true;
+            $this->datajson['privilege']['manage_role_access']=true;
+        }
+        if($user_privilege[2]['PRIVILEGE'] == 'all_bu' || $user_privilege[2]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['bu_access']=true;
+        }
+        if($user_privilege[3]['PRIVILEGE'] == 'all_bu' || $user_privilege[3]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['bu_invite_member']=true;
+        }
+        if($user_privilege[4]['PRIVILEGE'] == 'all_bu' || $user_privilege[4]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['report_overview']=true;
+        }
+        if($user_privilege[5]['PRIVILEGE'] == 'all_bu' || $user_privilege[5]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['report_bu_directorat']=true;
+        }
+        if($user_privilege[7]['PRIVILEGE'] == 'all_bu' || $user_privilege[7]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['report_find_project']=true;
+        }
+        if($user_privilege[8]['PRIVILEGE'] == 'all_bu' || $user_privilege[8]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['edit_project']=true;
+        }
+        if($user_privilege[9]['PRIVILEGE'] == 'all_bu' || $user_privilege[9]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['timesheet_approval']=true;
+        }
+        if($user_privilege[10]['PRIVILEGE'] == 'all_bu' || $user_privilege[10]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['creat_edit_upload_percent_member_task']=true;
+        }
+        if($user_privilege[11]['PRIVILEGE'] == 'all_bu' || $user_privilege[11]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['project_member']=true;
+        }
+        if($user_privilege[12]['PRIVILEGE'] == 'all_bu' || $user_privilege[12]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['upload_doc']=true;
+        }
+        if($user_privilege[13]['PRIVILEGE'] == 'all_bu' || $user_privilege[13]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['upload_issue']=true;
+        }
+
+
+
+
+
+
+        /*================================================================================*/
+
 
         //newest
         /*FOR PRIVILEGE*/
@@ -96,8 +147,7 @@ class Home extends CI_Controller {
                                     on
                                     pal.access_id = au.access_id
                                     where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
-                                    order by al.type asc
-                                    ")->result_array();
+                                    order by al.type asc")->result_array();
         $profile_id = $this->datajson['userdata']['PROF_ID'];
         foreach($privilege as $priv){
             $will_die = 0;
