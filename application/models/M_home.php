@@ -96,7 +96,7 @@ Class M_home extends CI_Model{
     function assignmentProject($id){
         return $this->db->query("select * from v_project_team_member where user_id='". $id ."'")->result_array();
     }
-
+    //add is approved filter
     function getTotalHour($user_id,$bulan,$tahun)
     {
         return $this->db->query("SELECT
@@ -112,10 +112,12 @@ Class M_home extends CI_Model{
       UNION ALL
       SELECT 0,'".$bulan."'
       FROM dual
-      WHERE NOT EXISTS (SELECT SUM(HOUR_TOTAL) AS JML_JAM_BULANAN, TO_CHAR (TS_DATE, 'mm')
+      WHERE NOT EXISTS (
+      SELECT SUM(HOUR_TOTAL) AS JML_JAM_BULANAN, TO_CHAR (TS_DATE, 'mm')
       FROM user_timesheet b
       WHERE
       user_id = '".$user_id."'
+      AND IS_APPROVED =1
       AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
       AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
       GROUP BY user_id,TO_CHAR (TS_DATE, 'mm'))
@@ -146,6 +148,7 @@ Class M_home extends CI_Model{
         FROM user_timesheet
         WHERE
         user_id = '".$user_id."'
+        AND IS_APPROVED = 1
         AND TO_CHAR (TS_DATE, 'mm') = '".$bulan."'
         AND TO_CHAR (TS_DATE, 'yyyy') = '".$tahun."'
         AND (HOUR_TOTAL is not null and HOUR_TOTAL!='0')

@@ -51,7 +51,6 @@ class Login extends CI_Controller {
     //for login activity
     function login()
     {
-
         if($_POST['user_id'] != "" && $_POST['password'] != "" && $_POST['fpid'] != ""){
             $user_id = $this->input->post('user_id');
             $password = $this->input->post('password');
@@ -82,7 +81,7 @@ class Login extends CI_Controller {
                         //redirect to login as admin
                         //print_r($_SESSION);
                         $token = $this->M_session->insert_session($result['userdata']["USER_ID"]);
-                        redirect('/login/welcome?token='.$token.'&id='.$result['userdata']['USER_ID']);
+                        redirect('login/welcome?token='.$token.'&id='.$result['userdata']['USER_ID']);
                     }
 
                 }
