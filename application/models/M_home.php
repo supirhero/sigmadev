@@ -35,8 +35,7 @@ Class M_home extends CI_Model{
 
         //get bu name and project name
         foreach ($hasil as $data){
-            array_push($bu_temp,$data['BU_NAME']);
-            array_push($bu_temp,$data['BU_CODE']);
+            array_push($bu_temp,array($data['BU_NAME'],$data['BU_CODE']));
             array_push($project_temp,$data['PROJECT_NAME']);
         }
 
