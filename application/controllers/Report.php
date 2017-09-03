@@ -1222,8 +1222,8 @@ class Report extends CI_Controller {
             and b.BU_CODE !='PROUDS'
             and b.BU_code !='GTS'
             and b.BU_code !='NSM'
-            group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
-            order by b.bu_name");
+            group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id, b.order_level
+            order by b.order_level");
         $hasil =$query->result();
         $anu = array("name" => $month);
         $anuz = array("name" => $month);
