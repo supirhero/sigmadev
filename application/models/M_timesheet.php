@@ -40,7 +40,7 @@ Class M_timesheet extends CI_Model{
                                   WHERE user_id='".$user_id."'
                                   and  to_char(ts_date,'Mon-YYYY')='$month-$year'");
         $hasil = $query->result_array();
-        return $hasil;
+        return $query;
 
     }
     function Timesheet_bydate($user_id,$date){
