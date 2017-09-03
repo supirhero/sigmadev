@@ -333,6 +333,29 @@ Return data json object yang di terima :
  -> message
  ```
  
+ 
+ 
+### Add new timesheet
+URI yang digunakan 
+```
+http://45.77.45.126/dev/home/edittimesheet
+```
+
+Input yang harus di provide :
+```
+-> TS_ID
+-> TS_DATE
+-> SUBJECT
+-> MESSAGE
+-> HOUR
+```
+
+Return data json object yang di terima :
+```
+ -> title 
+ -> message
+ ```
+ 
  ## My Assignment
  Daftar assignment user, URI :
  ```
