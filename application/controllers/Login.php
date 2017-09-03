@@ -180,24 +180,26 @@ class Login extends CI_Controller {
             //check if vendor exist
             case 'registVendor':
                 if($this->M_login->validateUser('V_USER_ID')==TRUE){
-                    $errorMsg='err1';
+                    $this->output->set_status_header(400);
+                    $errorMsg='user id sudah di gunakan';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
                 }elseif($this->M_login->validateUser('V_EMAIL')==TRUE){
-                    $errorMsg='err2';
+                    $this->output->set_status_header(400);
+                    $errorMsg='email sudah di gunakan';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
                 }elseif($this->M_login->validateUser('V_EMAIL_SUP')==FALSE){
-                    $errorMsg='err4';
+                    $this->output->set_status_header(400);
+                    $errorMsg='Email supervisor tidak valid';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
                 }
                 else{
                     $this->M_login->addUserVendor();
-
                     $this->M_login->recordVerificationV();
                     $this->sendVerificationV($this->input->post('V_EMAIL_SUP'));
                     $data['title']= 'success';
@@ -210,6 +212,7 @@ class Login extends CI_Controller {
             case 'registSigma':
 
                 if(substr($_POST['EMAIL'],12) != '@sigma.co.id'){
+                    $this->output->set_status_header(400);
                     $data['title'] = 'error';
                     $data['message'] = 'Email internal harus memakai @sigma.co.id';
                     echo json_encode($data);
@@ -217,13 +220,15 @@ class Login extends CI_Controller {
                 };
                 if($this->M_login->validateUser('USER_ID')==TRUE){
                     //sudah ada user id
-                    $errorMsg='err1';
+                    $this->output->set_status_header(400);
+                    $errorMsg='User id sudah di pakai';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
                 }elseif($this->M_login->validateUser('EMAIL')==TRUE){
                     //sudah ada email
-                    $errorMsg='err2';
+                    $this->output->set_status_header(400);
+                    $errorMsg='Email sudah di pakai';
                     $data['title']= 'error';
                     $data['message']=$errorMsg;
                     print_r(json_encode($data));
