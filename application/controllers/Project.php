@@ -465,8 +465,17 @@ class Project extends CI_Controller
 
         $project_id = $this->M_detail_project->getRPProject($id);
         //echo $project_id;
-        $this->M_detail_project->deleteRPmember($id);
-$result["status"] = "success";
+        if($id > 1)
+        {
+
+            $this->M_detail_project->deleteRPmember($id);
+            $result["status"] = "success";
+        }
+        else{
+            $result["status"] = "failed";
+            $result["message"] = "Member can not be empty";
+
+        }
 echo json_encode($result);
     }
 
