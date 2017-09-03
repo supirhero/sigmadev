@@ -319,7 +319,8 @@ class Role extends CI_Controller
                                                         on profile.prof_id = pac.profile_id
                                                         join access_list al
                                                         on al.access_id=pac.access_id
-                                                        where profile.prof_id = '".$prof_id."'")->result_array();
+                                                        where profile.prof_id = '".$prof_id."'
+                                                        order by al.access_id asc ")->result_array();
         echo json_encode($data);
     }
 
@@ -343,7 +344,6 @@ class Role extends CI_Controller
         $role[12] = $this->input->post('role_13');
         $role[13] = $this->input->post('role_14');
         $role[14] = $this->input->post('role_15');
-        $role[15] = $this->input->post('role_16');
 
         $this->db->query("update profile set prof_name = '$prof_name',prof_desc = '$prof_desc' where prof_id = '$prof_id'");
         if($this->db->affected_rows() == 1){
