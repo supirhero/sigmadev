@@ -162,20 +162,20 @@ class Report extends CI_Controller {
                 elseif($priv['TYPE'] == 'PROJECT'){
                     //fetching granted project list
                     $granted_project = $this->db->query("SELECT   distinct project_id
-                     FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
-                     c.project_complete, c.project_status, c.project_desc,
-                     c.created_by
-                     FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
-                     INNER JOIN projects c ON b.project_id = c.project_id
-                     INNER JOIN p_bu z on c.bu_code = z.bu_code
-                     UNION
-                     SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
-                     b.project_complete, b.project_status, b.project_desc,
-                     b.created_by
-                     FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
-                     INNER JOIN p_bu z on b.bu_code = z.bu_code
-                     )
-                     where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
+                       FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
+                       c.project_complete, c.project_status, c.project_desc,
+                       c.created_by
+                       FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
+                       INNER JOIN projects c ON b.project_id = c.project_id
+                       INNER JOIN p_bu z on c.bu_code = z.bu_code
+                       UNION
+                       SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
+                       b.project_complete, b.project_status, b.project_desc,
+                       b.created_by
+                       FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
+                       INNER JOIN p_bu z on b.bu_code = z.bu_code
+                       )
+                       where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
                     $granted_project_list = [];
                     $granted_project_list[] = null;
 
@@ -1245,6 +1245,7 @@ public function r_util_bu(){
     public function report_filter(){
         $query ="select project_name,project_status,project_complete as percent,amount,
         customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
+        where 1=1 
         ";
         $i = 0;
         $value = $this->input->post('value');
@@ -1254,65 +1255,89 @@ public function r_util_bu(){
 
         if(!empty($value)){
             $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
+            $query.=" and ( ";
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where ";
+                    //$query .= " where ";
                     $i++;
                 }
-                elseif($value[$a] == 1 ){
-                    $query .= " or ";
+                // elseif($value[$a] == 1 ){
+                //     $query .= " or ";
+                // }
+                if($value[$a] == 1 && $a==0){
+                    $query .= " amount '".$valueVal[$a]."' ";
                 }
-                if($value[$a] == 1){
-                    $query .= "amount '".$valueVal[$a]."'";
+                elseif($value[$a] == 1 && $a>0){
+                    $query .= " or amount '".$valueVal[$a]."' ";   
                 }
             }
+            $query.=" ) ";
         }if(!empty($status)){
             $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
+            $query.=" and ( ";
             for($a = 0 ; $a < count($valueVal);$a++){
 
                 if($i == 0){
-                    $query .= " where ";
+                    //$query .= " where ";
                     $i++;
                 }
-                elseif($status[$a] == 1 ){
-                    $query .= " or ";
-                }
-                if($status[$a] == 1){
+                // elseif($status[$a] == 1 ){
+                //     $query .= " or ";
+                // }
+                if($status[$a] == 0 && $a==0){
                     $query .= " project_status =  '".$valueVal[$a]."'";
+                }elseif ($status[$a] == 0 && $a>0) {
+                    $query .= " or project_status =  '".$valueVal[$a]."'";
                 }
+                // else{
+                //     $query .= " or project_status =  '".$valueVal[$a]."'";
+                // }
             }
+
+            $query.=" ) ";
         }if(!empty($schedule)){
+            $query.=" and ( ";
+            
             $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where ";
+                    //$query .= " where ";
                     $i++;
                 }
-                elseif($schedule[$a] == 1 ){
-                    //echo $c;
-                    $query .= " or ";
-                }
-                if($schedule[$a] == 1){
+                // elseif($schedule[$a] == 1 ){
+                //     //echo $c;
+                //     $query .= " or ";
+                // }
+                if($schedule[$a] == 1&& $a==0){
                     $query .= " schedule_status = '".$valueVal[$a]."'";
                 }
+                elseif($schedule[$a] == 1&& $a>0){
+                    $query .= " or schedule_status = '".$valueVal[$a]."'";
+                }
             }
+            $query.=" ) ";
         }if(!empty($budget)){
+
+            $query.=" and ( ";
             $valueVal = ["Over Budget","On Budget","Ahead Budget"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where ";
+                    //$query .= " where ";
                     $i++;
                 }
-                elseif($budget[$a] == 1){
-                    $query .= " or ";
-                }
-                if($budget[$a] == 1){
+                // elseif($budget[$a] == 1){
+                //     $query .= " or ";
+                // }
+                if($budget[$a] == 1&& $a==0){
                     $query .= " budget_status = '".$valueVal[$a]."'";
+                }elseif($budget[$a] == 1&& $a>0){
+                    $query .= " or budget_status = '".$valueVal[$a]."'";
                 }
 
             }
-        }
 
+            $query.=" ) ";
+        }
         $result['project'] = $this->db->query($query)->result_array();
         echo json_encode($result);
     }
