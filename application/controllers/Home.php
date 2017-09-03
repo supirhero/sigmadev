@@ -1194,7 +1194,7 @@ $data["error_upload"] = $this->upload->display_errors();
         $this->email->initialize($config);
         $this->email->from('salma.ulhaq@sigma.co.id', 'Project & Resources Development System');
         //  $this->email->to($email_vp);
-        $this->email->cc('dyaskur@sigma.co.id');
+        $this->email->cc('salma.ulhaq@sigma.co.id');
         //$this->email->bcc('pmo@sigma.co.id');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
