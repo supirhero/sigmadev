@@ -460,7 +460,7 @@ class Project extends CI_Controller
     }
     //action delete project member
     public function ProjectMember_delete(){
-        $id = $_POST['MEMBER'];
+        $id = $_POST['member']?$_POST['member']:$_POST['MEMBER'];
         //echo $id;
 
         $project_id = $this->M_detail_project->getRPProject($id);

@@ -380,8 +380,8 @@ Class M_detail_project extends CI_Model{
 
 
                 public function deleteRPmember($id){
-                    //$sql = "delete from resource_pool where rp_id=$id";
-                   // $q = $this->db->query($sql);
+                    $sql = "delete from resource_pool where rp_id=$id";
+                    $q = $this->db->query($sql);
                   $this->db->delete('RESOURCE_POOL', array('RP_ID' => $id));
                 }
 
