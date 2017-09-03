@@ -162,20 +162,20 @@ class Report extends CI_Controller {
                 elseif($priv['TYPE'] == 'PROJECT'){
                     //fetching granted project list
                     $granted_project = $this->db->query("SELECT   distinct project_id
-                     FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
-                     c.project_complete, c.project_status, c.project_desc,
-                     c.created_by
-                     FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
-                     INNER JOIN projects c ON b.project_id = c.project_id
-                     INNER JOIN p_bu z on c.bu_code = z.bu_code
-                     UNION
-                     SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
-                     b.project_complete, b.project_status, b.project_desc,
-                     b.created_by
-                     FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
-                     INNER JOIN p_bu z on b.bu_code = z.bu_code
-                     )
-                     where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
+                       FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
+                       c.project_complete, c.project_status, c.project_desc,
+                       c.created_by
+                       FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
+                       INNER JOIN projects c ON b.project_id = c.project_id
+                       INNER JOIN p_bu z on c.bu_code = z.bu_code
+                       UNION
+                       SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
+                       b.project_complete, b.project_status, b.project_desc,
+                       b.created_by
+                       FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
+                       INNER JOIN p_bu z on b.bu_code = z.bu_code
+                       )
+                       where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
                     $granted_project_list = [];
                     $granted_project_list[] = null;
 
@@ -1381,7 +1381,6 @@ public function r_util_bu(){
         $status = $this->input->post('status');
         $schedule = $this->input->post('schedule');
         $budget = $this->input->post('budget');
-
 
         if(!empty($value)){
             $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
