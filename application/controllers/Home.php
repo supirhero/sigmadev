@@ -1163,7 +1163,7 @@ $data["error_upload"] = $this->upload->display_errors();
             $data = array('upload_data' => $this->upload->data());
             $newid = $this->db->query("select max(DOC_ID) as id from project_doc")->row();
             $insert = array(
-                'DOC_ID' => intval($newid->ID),
+                'DOC_ID' => intval($newid->ID)+1,
                 'PROJECT_ID' => $projectid,
                 'DOC_NAME' => $data['upload_data']['file_name'],
                 'URL' => $data['upload_data']['file_name'],
