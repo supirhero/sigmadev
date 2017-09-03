@@ -239,6 +239,17 @@ Return data json object yang di terima :
 -> userdata
 -> project_doc_list <= berisi array informasi setiap doc untuk project ybs
 ```
+
+### View Docs and Files list
+URI yang di gunakan untuk akses API ini :
+```
+http://45.77.45.126/dev/home/delprojectdoc
+```
+Return data json object yang di terima :
+```
+-> doc_id
+```
+
 ### Upload Project Doc/Files
 URI yang di gunakan :
 ```
