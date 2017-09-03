@@ -71,8 +71,6 @@ class Report extends CI_Controller {
         else{
             $this->M_session->update_session($this->datajson['token']);
         }
-
-
         //newest
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
@@ -161,7 +159,7 @@ class Report extends CI_Controller {
 
                 }
                 //jika akses tipe nya project
-                if($priv['TYPE'] == 'PROJECT'){
+                elseif($priv['TYPE'] == 'PROJECT'){
                     //fetching granted project list
                     $granted_project = $this->db->query("SELECT   distinct project_id
                                                            FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
@@ -246,7 +244,6 @@ class Report extends CI_Controller {
                 else{
                     $will_die = 1;
                 }
-
                 if($will_die ==1){
                     $this->output->set_status_header(403);
                     $returndata['status'] = 'failed';
