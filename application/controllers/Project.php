@@ -472,6 +472,7 @@ class Project extends CI_Controller
             $result["status"] = "success";
         }
         else{
+            $this->output->set_status_header(402);
             $result["status"] = "failed";
             $result["message"] = "Member can not be empty";
 
