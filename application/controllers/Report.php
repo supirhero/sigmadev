@@ -1274,9 +1274,8 @@ public function r_util_bu(){
             $query.=" ) ";
         }if(!empty($status)){
             $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
-            $query.=" and ( ";
+            $query.=" and project_status in ( ";
             for($a = 0 ; $a < count($valueVal);$a++){
-
                 if($i == 0){
                     //$query .= " where ";
                     $i++;
@@ -1284,19 +1283,25 @@ public function r_util_bu(){
                 // elseif($status[$a] == 1 ){
                 //     $query .= " or ";
                 // }
-                if($status[$a] == 0 && $a==0){
-                    $query .= " project_status =  '".$valueVal[$a]."'";
-                }elseif ($status[$a] == 0 && $a>0) {
-                    $query .= " or project_status =  '".$valueVal[$a]."'";
-                }
+                // if($status[$a] == 1 && $a==0){
+                //     $query .= " project_status =  '".$valueVal[$a]."'";
+                // }elseif ($status[$a] == 1 && $a>0) {
+                //     $query .= " or project_status =  '".$valueVal[$a]."'";
+                // }
                 // else{
                 //     $query .= " or project_status =  '".$valueVal[$a]."'";
                 // }
+                if($status[$a] == 1){
+                    $query.=" '".$valueVal[$a]."',";
+                }
+                if ($a==count($valueVal)-1) {
+                    $query=rtrim($query,",");
+                }
             }
 
             $query.=" ) ";
         }if(!empty($schedule)){
-            $query.=" and ( ";
+            $query.=" and schedule_status in ( ";
             
             $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
             for($a = 0 ; $a < count($valueVal);$a++){
@@ -1308,17 +1313,24 @@ public function r_util_bu(){
                 //     //echo $c;
                 //     $query .= " or ";
                 // }
-                if($schedule[$a] == 1&& $a==0){
-                    $query .= " schedule_status = '".$valueVal[$a]."'";
+                // if($schedule[$a] == 1&& $a==0){
+                //     $query .= " schedule_status = '".$valueVal[$a]."'";
+                // }
+                // elseif($schedule[$a] == 1&& $a>0){
+                //     $query .= " or schedule_status = '".$valueVal[$a]."'";
+                // }
+                if($schedule[$a] == 1){
+                    $query.=" '".$valueVal[$a]."',";
                 }
-                elseif($schedule[$a] == 1&& $a>0){
-                    $query .= " or schedule_status = '".$valueVal[$a]."'";
+                if ($a==count($valueVal)-1) {
+                    $query=rtrim($query,",");
                 }
+
             }
             $query.=" ) ";
         }if(!empty($budget)){
 
-            $query.=" and ( ";
+            $query.=" and budget_status in ( ";
             $valueVal = ["Over Budget","On Budget","Ahead Budget"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
@@ -1328,10 +1340,16 @@ public function r_util_bu(){
                 // elseif($budget[$a] == 1){
                 //     $query .= " or ";
                 // }
-                if($budget[$a] == 1&& $a==0){
-                    $query .= " budget_status = '".$valueVal[$a]."'";
-                }elseif($budget[$a] == 1&& $a>0){
-                    $query .= " or budget_status = '".$valueVal[$a]."'";
+                // if($budget[$a] == 1&& $a==0){
+                //     $query .= " budget_status = '".$valueVal[$a]."'";
+                // }elseif($budget[$a] == 1&& $a>0){
+                //     $query .= " or budget_status = '".$valueVal[$a]."'";
+                // }
+                if($budget[$a] == 1){
+                    $query.=" '".$valueVal[$a]."',";
+                }
+                if ($a==count($valueVal)-1) {
+                    $query=rtrim($query,",");
                 }
 
             }
@@ -1357,7 +1375,7 @@ public function r_util_bu(){
 
         $query ="select project_name,project_status,project_complete as percent,amount,
         customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
-        ";
+        where 1=1";
         $i = 0;
         $value = $this->input->post('value');
         $status = $this->input->post('status');
@@ -1366,61 +1384,106 @@ public function r_util_bu(){
 
         if(!empty($value)){
             $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
+            $query.=" and ( ";
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where";
+                    //$query .= " where ";
                     $i++;
                 }
-                elseif($value[$a] == 1){
-                    $query .= " or ";
+                // elseif($value[$a] == 1 ){
+                //     $query .= " or ";
+                // }
+                if($value[$a] == 1 && $a==0){
+                    $query .= " amount '".$valueVal[$a]."' ";
                 }
-                if($value[$a] == 1){
-                    $query .= " amount '".$valueVal[$a]."'";
+                elseif($value[$a] == 1 && $a>0){
+                    $query .= " or amount '".$valueVal[$a]."' ";   
                 }
             }
+            $query.=" ) ";
         }if(!empty($status)){
             $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
+            $query.=" and project_status in ( ";
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where";
+                    //$query .= " where ";
                     $i++;
                 }
-                elseif($status[$a] == 1){
-                    $query .= " or ";
-                }
+                // elseif($status[$a] == 1 ){
+                //     $query .= " or ";
+                // }
+                // if($status[$a] == 1 && $a==0){
+                //     $query .= " project_status =  '".$valueVal[$a]."'";
+                // }elseif ($status[$a] == 1 && $a>0) {
+                //     $query .= " or project_status =  '".$valueVal[$a]."'";
+                // }
+                // else{
+                //     $query .= " or project_status =  '".$valueVal[$a]."'";
+                // }
                 if($status[$a] == 1){
-                    $query .= " project_status =  '".$valueVal[$a]."'";
+                    $query.=" '".$valueVal[$a]."',";
+                }
+                if ($a==count($valueVal)-1) {
+                    $query=rtrim($query,",");
                 }
             }
+
+            $query.=" ) ";
         }if(!empty($schedule)){
+            $query.=" and schedule_status in ( ";
+            
             $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
             for($a = 0 ; $a < count($valueVal);$a++){
                 if($i == 0){
-                    $query .= " where ";
+                    //$query .= " where ";
                     $i++;
                 }
-                elseif($schedule[$a] == 1){
-                    $query .= " or ";
-                }
+                // elseif($schedule[$a] == 1 ){
+                //     //echo $c;
+                //     $query .= " or ";
+                // }
+                // if($schedule[$a] == 1&& $a==0){
+                //     $query .= " schedule_status = '".$valueVal[$a]."'";
+                // }
+                // elseif($schedule[$a] == 1&& $a>0){
+                //     $query .= " or schedule_status = '".$valueVal[$a]."'";
+                // }
                 if($schedule[$a] == 1){
-                    $query .= " schedule_status = '".$valueVal[$a]."'";
+                    $query.=" '".$valueVal[$a]."',";
                 }
-            }
-        }if(!empty($budget)){
-            $valueVal = ["Over Budget","On Budget","Ahead Budget"];
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                    $query .= " where";
-                    $i++;
-                }
-                elseif($budget[$a] == 1){
-                    $query .= " or ";
-                }
-                if($budget[$a] == 1){
-                    $query .= " budget_status = '".$valueVal[$a]."'";
+                if ($a==count($valueVal)-1) {
+                    $query=rtrim($query,",");
                 }
 
             }
+            $query.=" ) ";
+        }if(!empty($budget)){
+
+            $query.=" and budget_status in ( ";
+            $valueVal = ["Over Budget","On Budget","Ahead Budget"];
+            for($a = 0 ; $a < count($valueVal);$a++){
+                if($i == 0){
+                    //$query .= " where ";
+                    $i++;
+                }
+                // elseif($budget[$a] == 1){
+                //     $query .= " or ";
+                // }
+                // if($budget[$a] == 1&& $a==0){
+                //     $query .= " budget_status = '".$valueVal[$a]."'";
+                // }elseif($budget[$a] == 1&& $a>0){
+                //     $query .= " or budget_status = '".$valueVal[$a]."'";
+                // }
+                if($budget[$a] == 1){
+                    $query.=" '".$valueVal[$a]."',";
+                }
+                if ($a==count($valueVal)-1) {
+                    $query=rtrim($query,",");
+                }
+
+            }
+
+            $query.=" ) ";
         }
 
         //echo $query.$cond;
