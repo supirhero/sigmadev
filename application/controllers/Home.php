@@ -1006,8 +1006,7 @@ $data["error_upload"] = $this->upload->display_errors();
         }
 
 
-        $this->transformKeys($this->datajson);
-        print_r(json_encode($this->datajson));
+        print_r(json_encode($result));
     }
 
     /*Issue Manajement*/
