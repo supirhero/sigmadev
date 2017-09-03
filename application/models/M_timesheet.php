@@ -595,7 +595,7 @@ GROUP BY TS_DATE")->result_array();
             $SUBMITDATE = $data['SUBMIT_DATE'];
 
             $this->db->query("UPDATE TEMPORARY_TIMESHEET 
-                             set TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE ='$TS_DATE', WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',IS_VALID=1,SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),ACTION = 'edit',RH_ID='$rh_id' 
+                             set TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE ='$TS_DATE', WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS') 
                            where TS_ID = '$TS_ID'");
 
     }
