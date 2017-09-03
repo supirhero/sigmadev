@@ -945,7 +945,7 @@ $data["error_upload"] = $this->upload->display_errors();
         $this->datajson['project_performance_index']['spi'] = $this->datajson['project_detail']['spi'];
 
         //Project Team
-        $this->datajson['project_team'] = $this->db->query("SELECT users.user_id,users.user_name,users.email,profile.prof_name FROM RESOURCE_POOL
+        $this->datajson['project_team'] = $this->db->query("SELECT users.user_id,users.user_name,users.email,profile.prof_name,RESOURCE_POOL.RP_ID FROM RESOURCE_POOL
                                                              join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
                                                              join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
                                                              WHERE PROJECT_ID='".$this->uri->segment(3)."'")->result_array();
