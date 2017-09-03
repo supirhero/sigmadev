@@ -83,7 +83,7 @@ class M_project extends CI_Model {
     }
     public function getUserInProject($project_id){
       $result = null;
-      $sql = "SELECT USER_NAME, USERS.USER_ID,EMAIL, BU_NAME,USER_TYPE_ID FROM USERS JOIN P_BU ON
+      $sql = "SELECT USER_NAME, USERS.USER_ID,EMAIL, BU_NAME,USER_TYPE_ID,RP.RP_ID FROM USERS JOIN P_BU ON
        USERS.BU_ID=P_BU.BU_ID  JOIN RESOURCE_POOL RP on USERS.USER_ID=RP.USER_ID WHERE RP.PROJECT_ID='".$project_id."' AND USERS.IS_ACTIVE='1'  order by USER_NAME";
       $q = $this->db->query($sql);
       if ($q->num_rows() > 0) {
