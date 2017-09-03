@@ -609,7 +609,7 @@ class Report extends CI_Controller {
                 $data['finance']['total_project_value']=$data['finance']['total_project_value']+$this->M_report->Portofolio_Total_Project_Value($ch['BU_ID'],$tahun);
 
             }
-            $data['finance']['total_project_value'] =  money_format('%.2n', $data['finance']['total_project_value']);
+            $data['finance']['total_project_value'] =  number_format($data['finance']['total_project_value'], 2, ',', '.');
 
         }
         //if business unit
@@ -619,7 +619,7 @@ class Report extends CI_Controller {
             $data['project_dir']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
             $data['project_dir']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
             $data['project_dir']['jumlah']= $this->M_report->Portofolio_Total_Project($bu,$tahun);
-            $data['finance']['total_project_value'] =  money_format('%.2n', $this->M_report->Portofolio_Total_Project_Value($bu,$tahun));
+            $data['finance']['total_project_value'] =  number_format($this->M_report->Portofolio_Total_Project_Value($bu,$tahun), 2, ',', '.');
         }
         print_r(json_encode($data));
     }
