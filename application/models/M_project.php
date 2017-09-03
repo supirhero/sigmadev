@@ -424,7 +424,7 @@ class M_project extends CI_Model {
       }
     }
     public function gethistorydetail($wbs_id){
-      $sql="select to_char(date_cap,'yyyy-mm-dd') as updated_on, wbs_name, dc.work_percent_complete as percentage, user_name as update_by from detail_capture dc
+      $sql="select to_char(date_cap,'yyyy-mm-dd') as updated_on,dc.description, wbs_name, dc.work_percent_complete as percentage, user_name as update_by from detail_capture dc
             join users us on dc.user_id=us.user_id
             join wbs w on w.wbs_id=dc.wbs_id
             where dc.wbs_id='".$wbs_id."' ORDER BY DETAIL_CAP_ID";
