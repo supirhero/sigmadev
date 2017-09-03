@@ -1701,7 +1701,7 @@ $data["error_upload"] = $this->upload->display_errors();
             $c['status']="Success";
             $c['message']="User berhasil diinvite";
           }else{
-            $this->output->set_status_header(500);
+            $this->output->set_status_header(400);
             $c['status']="Error";
             $c['message']="User gagal diinvite";
           }
