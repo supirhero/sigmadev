@@ -594,6 +594,7 @@ class Report extends CI_Controller {
         $c=$this->M_report->getbu($bu);
         //if directorat
         if ($c['BU_PARENT_ID']=='0') {
+            $data['type']='directorate';
             $data['project_dir']['completed'] =0;
             $data['project_dir']['in_progress']=0;
             $data['project_dir']['not_started']=0;
@@ -610,6 +611,7 @@ class Report extends CI_Controller {
         }
         //if business unit
         else{
+          $data['type']='business_unit';
             $data['project_dir']['completed'] = $this->M_report->Portofolio_completed_Project($bu,$tahun);
             $data['project_dir']['in_progress']= $this->M_report->Portofolio_Active_Project($bu,$tahun);
             $data['project_dir']['not_started'] = $this->M_report->Portofolio_notstarted_Project($bu,$tahun);
