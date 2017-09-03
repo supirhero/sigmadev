@@ -107,7 +107,7 @@ class Home extends CI_Controller {
         if($user_privilege[7]['PRIVILEGE'] == 'all_bu' || $user_privilege[7]['PRIVILEGE'] == 'only_bu'){
             $this->datajson['privilege']['report_find_project']=true;
         }
-        if($user_privilege[8]['PRIVILEGE'] == 'all_bu' || $user_privilege[8]['PRIVILEGE'] == 'only_bu'){
+        if($user_privilege[8]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['edit_project']=true;
         }
         if($user_privilege[9]['PRIVILEGE'] == 'can'){
