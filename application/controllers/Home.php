@@ -684,7 +684,7 @@ $data["error_upload"] = $this->upload->display_errors();
         //$this->load->view('v_home_activity', $data);
         //$data['footer']=($this->load->view('v_footer2'));
         $this->transformKeys($data);
-        print_r(json_encode($this->M_timesheet->selectTimesheet_bymonth($user_id,$month,$year)));
+        print_r(json_encode($data));
     }
 
 

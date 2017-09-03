@@ -40,14 +40,7 @@ Class M_timesheet extends CI_Model{
                                   WHERE user_id='".$user_id."'
                                   and  to_char(ts_date,'Mon-YYYY')='$month-$year'");
         $hasil = $query->result_array();
-        return "
-                                  SELECT *
-                                  FROM
-                                  (SELECT *
-                                  FROM USER_TIMESHEET_NEW
-                                  ORDER BY SUBMIT_DATE DESC)
-                                  WHERE user_id='".$user_id."'
-                                  and  to_char(ts_date,'Mon-YYYY')='$month-$year'";
+        return $hasil;
 
     }
     function Timesheet_bydate($user_id,$date){
