@@ -10,7 +10,7 @@ class M_project extends CI_Model {
     function getProject($id) {
         return $this->db->query("SELECT B.BU_NAME,D.USER_NAME as AM_NAME,D.USER_ID as USER_AM_ID, C.PROJECT_ID,C.PROJECT_NAME,C.PM_ID,C.IWO_NO,C.BU_CODE,C.RELATED_BU,to_char(C.SCHEDULE_START,'YYYY-MM-DD')
     AS SCHEDULE_START,to_char(C.SCHEDULE_END,'YYYY-MM-DD') AS SCHEDULE_END,C.CUR_ID,C.AMOUNT,C.PROJECT_TYPE_ID,C.AM_ID,C.CUST_ID,C.CUST_END_ID,C.PROJECT_STATUS,C.PROJECT_DESC,C.EXCHANGE_RATE,C.MARGIN,C.ACTUAL_START_DATE,C.ACTUAL_START_DATE,C.APPLY_TEMPLATE,C.FUNCTIONAL_AREA,C.PRIORITY,C.TYPE_OF_EFFORT,C.PRODUCT_TYPE,C.VISIBILITY,C.CALCULATION_METHOD,C.TYPE_OF_EXPENSE,C.PROJECT_OVERHEAD,C.ACTUAL_COST,
-    C.COST_CENTER,C.COGS,C.ESTIMATED_IRR,C.REAL_IRR,C.PAYBACK_TIME,C.PAYBACK_UNITS,C.COMMENTS,C.CREATED_BY,C.PROJECT_COMPLETE,C.RISK_RATING FROM PROJECTS C LEFT JOIN P_BU B ON C.BU_CODE=B.BU_CODE LEFT JOIN USERS D ON C.AM_ID=D.USER_ID  WHERE PROJECT_ID='" . $id . "'")->row_array();
+    C.COST_CENTER,C.COGS,C.ESTIMATED_IRR,C.REAL_IRR,C.PAYBACK_TIME,C.PAYBACK_UNITS,C.COMMENTS,C.CREATED_BY,C.PROJECT_COMPLETE,C.RISK_RATING,C.HO_OPERATION FROM PROJECTS C LEFT JOIN P_BU B ON C.BU_CODE=B.BU_CODE LEFT JOIN USERS D ON C.AM_ID=D.USER_ID  WHERE PROJECT_ID='" . $id . "'")->row_array();
     }
     function getBUCodeByProjectID($project){
         return $this->db->query("SELECT BU_CODE FROM PROJECTS WHERE PROJECT_ID='$project'")->row();
@@ -424,7 +424,7 @@ class M_project extends CI_Model {
       }
     }
     public function gethistorydetail($wbs_id){
-      $sql="select to_char(date_cap,'yyyy-mm-dd') as updated_on, wbs_name, dc.work_percent_complete as percentage, user_name as update_by from detail_capture dc
+      $sql="select to_char(date_cap,'yyyy-mm-dd') as updated_on,dc.description, wbs_name, dc.work_percent_complete as percentage, user_name as update_by from detail_capture dc
             join users us on dc.user_id=us.user_id
             join wbs w on w.wbs_id=dc.wbs_id
             where dc.wbs_id='".$wbs_id."' ORDER BY DETAIL_CAP_ID";
