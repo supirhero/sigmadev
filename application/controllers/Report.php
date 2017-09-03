@@ -602,11 +602,11 @@ class Report extends CI_Controller {
             $data['finance']['total_project_value']=0;
             $child=$this->M_report->getbuchild($bu);
             foreach ($child as $ch) {
-                $data['project_dir']['completed'] =$data['project']['completed']+$this->M_report->Portofolio_completed_Project($ch['BU_ID'],$tahun);
-                $data['project_dir']['in_progress']=$data['project']['in_progress']+$this->M_report->Portofolio_Active_Project($ch['BU_ID'],$tahun);
-                $data['project_dir']['not_started']=$data['project']['not_started']+$this->M_report->Portofolio_notstarted_Project($ch['BU_ID'],$tahun);
-                $data['project_dir']['jumlah']=$data['project']['jumlah']+$this->M_report->Portofolio_Total_Project($ch['BU_ID'],$tahun);
-                $data['finance']['total_project_value']=$data['project']['total_project_value']+$this->M_report->Portofolio_Total_Project_Value($ch['BU_ID'],$tahun);
+                $data['project_dir']['completed'] =$data['project_dir']['completed']+$this->M_report->Portofolio_completed_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['in_progress']=$data['project_dir']['in_progress']+$this->M_report->Portofolio_Active_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['not_started']=$data['project_dir']['not_started']+$this->M_report->Portofolio_notstarted_Project($ch['BU_ID'],$tahun);
+                $data['project_dir']['jumlah']=$data['project_dir']['jumlah']+$this->M_report->Portofolio_Total_Project($ch['BU_ID'],$tahun);
+                $data['finance']['total_project_value']=$data['finance']['total_project_value']+$this->M_report->Portofolio_Total_Project_Value($ch['BU_ID'],$tahun);
             }
         }
         //if business unit
