@@ -674,10 +674,7 @@ $data["error_upload"] = $this->upload->display_errors();
         //$data['nav']=($this->load->view('v_nav1'));
         //$data['assignment']=($this->M_home->assignmentView($user_id));
         //$data['pr_list']=$this->M_home->assignmentProject($user_id);
-        if(isset($this->input->post('tahun')))
-        {
-            $year= $this->input->post('tahun');
-        }
+
         $year = $this->input->post('tahun')!= ""?$this->input->post('tahun'):date('Y', strtotime('today'));
         $bulan = $this->input->post('bulan')!= ""?$this->input->post('bulan'):date('m', strtotime('today'));
         $month = date("M", mktime(0, 0, 0, $bulan, 10));
