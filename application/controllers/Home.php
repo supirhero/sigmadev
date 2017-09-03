@@ -84,9 +84,9 @@ class Home extends CI_Controller {
 
         /*================================================================================*/
         /* FOR PRIVILEGE INTEGRATION */
-        $user_privilege = $this->db->query("select a.access_name,b.access_id,b.privilege 
-                                            from access_list a join profile_access_list b 
-                                            on a.access_id = b.access_id 
+        $user_privilege = $this->db->query("select a.access_name,b.access_id,b.privilege
+                                            from access_list a join profile_access_list b
+                                            on a.access_id = b.access_id
                                             where b.profile_id = '".$this->datajson['userdata']['PROF_ID']."'")->result_array();
         if($user_privilege[0]['PRIVILEGE'] == 'all_bu'){
             $this->datajson['privilege']['master_data_access']=true;
@@ -428,6 +428,7 @@ $data["error_upload"] = $this->upload->display_errors();
         // end check
         $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code'],$keyword,$status,$type,$effort);
         $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code'")->result_array();
+        $data['nonmember'] = $this->db->query("select user_id, user_name from users where bu_id != '$code'")->result_array();
         $data['bu_id'] = $code;
         $data['bu_code'] = $_POST['bu_code'];
 
