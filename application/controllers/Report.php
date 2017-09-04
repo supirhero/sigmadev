@@ -1249,6 +1249,8 @@ class Report extends CI_Controller {
     
     public function report_filter(){
         $keyword = $this->input->post('keyword');
+        $page = $this->input->post('page');
+        $limit =$this->input->post('limit_offset');
         $query ="select project_name,project_status,project_complete as percent,amount,
         customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
         where 1=1 
@@ -1363,11 +1365,19 @@ class Report extends CI_Controller {
             $query.=" ) ";
         }
 
+        //for search by keyword
         if($keyword != null){
             $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
         }
 
+        //for pagination
+        ($page == null ? $page = 1: false);
+        ($limit == null ? $limit = 5:false);
+        $query .= " and rownum between ".(string)($page*$limit-$limit)." and ".(string)($page*$limit);
+
+        //run query
         $result['project_find'] = $this->db->query($query)->result_array();
+
         echo json_encode($result);
     }
 
@@ -1388,6 +1398,10 @@ class Report extends CI_Controller {
         customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
         where 1=1";
         $i = 0;
+
+        $keyword = $this->input->post('keyword');
+        $page = $this->input->post('page');
+        $limit =$this->input->post('limit_offset');
         $value = $this->input->post('value');
         $status = $this->input->post('status');
         $schedule = $this->input->post('schedule');
@@ -1496,6 +1510,16 @@ class Report extends CI_Controller {
 
             $query.=" ) ";
         }
+
+        //for search by keyword
+        if($keyword != null){
+            $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
+        }
+
+        //for pagination
+        ($page == null ? $page = 1: false);
+        ($limit == null ? $limit = 5:false);
+        $query .= " and rownum between ".(string)($page*$limit-$limit)." and ".(string)($page*$limit);
 
         //echo $query.$cond;
         $p =$this->db->query($query)->result_array();
