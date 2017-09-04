@@ -1370,6 +1370,8 @@ class Report extends CI_Controller {
             $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
         }
 
+
+
         //for pagination
         ($page == null ? $page = 1: false);
         ($limit == null ? $limit = 5:false);
@@ -1377,6 +1379,7 @@ class Report extends CI_Controller {
 
         //run query
         $result['project_find'] = $this->db->query($query)->result_array();
+        $result['pagenumber'] = ceil($this->db->query($query)->num_rows()/$limit);
 
         echo json_encode($result);
     }
@@ -1400,8 +1403,6 @@ class Report extends CI_Controller {
         $i = 0;
 
         $keyword = $this->input->post('keyword');
-        $page = $this->input->post('page');
-        $limit =$this->input->post('limit_offset');
         $value = $this->input->post('value');
         $status = $this->input->post('status');
         $schedule = $this->input->post('schedule');
@@ -1516,10 +1517,6 @@ class Report extends CI_Controller {
             $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
         }
 
-        //for pagination
-        ($page == null ? $page = 1: false);
-        ($limit == null ? $limit = 5:false);
-        $query .= " and rownum between ".(string)($page*$limit-$limit)." and ".(string)($page*$limit);
 
         //echo $query.$cond;
         $p =$this->db->query($query)->result_array();

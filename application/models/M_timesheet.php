@@ -48,14 +48,13 @@ Class M_timesheet extends CI_Model{
 
         //echo "date : $date<br>";
         $query = $this->db->query("
-          SELECT HOUR_TOTAL FROM TIMESHEET 
+          SELECT sum(HOUR_TOTAL) as HOUR_TOTAL FROM TIMESHEET 
 JOIN WBS_POOL ON  WBS_POOL.WP_ID=TIMESHEET.WP_ID
 JOIN RESOURCE_POOL ON  RESOURCE_POOL.RP_ID=WBS_POOL.RP_ID
-where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user_id."'");
-        $hasil = $query->result_array();
+where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user_id."' and TIMESHEET.IS_APPROVED = 1");
+        $hasil = $query->row()->HOUR_TOTAL;
         //echo $this->db->last_query();
-        //die;
-        return $hasil["HOUR_TOTAL"];
+        return $hasil;
 
     }
     function selectTimesheet($user_id){

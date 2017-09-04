@@ -725,17 +725,21 @@ $data["error_upload"] = $this->upload->display_errors();
         $day[]= date('Y-m-d', strtotime($date.' Wednesday this week'));
         $day[]= date('Y-m-d', strtotime($date.' Thursday this week'));
         $day[]= date('Y-m-d', strtotime($date.' Friday this week'));
-        for ($i=0; $i<5; $i++)
+        $day[]= date('Y-m-d', strtotime($date.' Saturday this week'));
+        $day[]= date('Y-m-d', strtotime($date.' Sunday this week'));
+        for ($i=0; $i<7; $i++)
         {
             if (in_array($day[$i], $holyday)) {
+                $hour = $this->M_timesheet->Timesheet_bydate($user_id,$day[$i]);
+                $hour = ($hour == NULL) ? 0 : $hour;
                 $data["weekdays"][$i]=array(
                     "day"=>$day[$i],
                     "holiday"=>true,
-                    "work_hour"=>false
+                    "work_hour"=>$hour
                 );
             }
             else{
-                $hour = $this->M_timesheet->Timesheet_bydate($user_id,$date);
+                echo $hour = $this->M_timesheet->Timesheet_bydate($user_id,$day[$i]);
                 $hour = ($hour == NULL) ? 0 : $hour;
 
                 $data["weekdays"][$i]=array(
