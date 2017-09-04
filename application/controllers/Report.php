@@ -1364,7 +1364,7 @@ class Report extends CI_Controller {
         }
 
         if($keyword != null){
-            $query .= "and ( project_name like '$keyword%' or project_name like '%$keyword' or project_name like '%$keyword%')";
+            $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
         }
 
         $result['project'] = $this->db->query($query)->result_array();
