@@ -799,7 +799,7 @@ $data["error_upload"] = $this->upload->display_errors();
         switch ($type) {
         case "normal":
           // no filter no search
-          $projecttemp = $this->M_project->getUsersProject($id,$page);
+          $projecttemp = $this->M_project->getUsersProject($id,$page,null,null,null,null,true);
           break;
         case "filter":
           // filter
