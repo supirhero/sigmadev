@@ -1251,7 +1251,7 @@ class Report extends CI_Controller {
         $keyword = $this->input->post('keyword');
         $page = $this->input->post('page');
         $limit =$this->input->post('limit');
-        $query ="select project_name,project_status,project_complete as percent,amount,
+        $query ="select project_name,iwo_no,project_status,project_complete as percent,amount,
         customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
         where 1=1 
         ";
