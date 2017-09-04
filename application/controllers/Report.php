@@ -1367,7 +1367,7 @@ class Report extends CI_Controller {
             $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
         }
 
-        $result['project'] = $this->db->query($query)->result_array();
+        $result['project_find'] = $this->db->query($query)->result_array();
         echo json_encode($result);
     }
 
