@@ -598,6 +598,22 @@ class Datamaster extends CI_Controller{
                         }
                         echo "</tbody></table>";
                         break;
+                    case 'changepassword':
+                        $user_id = $this->input->post('user_id');
+                        $password = md5($this->input->post('password'));
+
+                        $this->db->query("update users set password = '$password' where user_id = '$user_id'");
+
+                        if($this->db->affected_rows() == 1){
+                            $return['status'] = 'success';
+                            $return['message'] = 'Password updated';
+                        }
+                        else{
+                            $this->output->set_status_header(400);
+                            $return['status'] = 'failed';
+                            $return['message'] = 'Password not updated';
+                        }
+                        break;
                     default:
                         # code...
                         break;
