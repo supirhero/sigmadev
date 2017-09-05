@@ -928,9 +928,8 @@ GROUP BY TS_DATE")->result_array();
       <h4>Timesheet yang telah anda input :</h4>
       <h4>Tanggal : $TS_DATE</h4>
       <h4>Jumlah Jam : $HOUR_TOTAL</h4>
-      <h4>Jumlah Jam : $HOUR_TOTAL</h4>
       <h4>Subject : $SUBJECT</h4>
-      <h3>Telah di <b style='color:white;background-color: red'>$confirmstring</b> pada tanggal $APPROVAL_DATE </h3>
+      <h3>Telah <b style='color:white;background-color: red'>$confirmstring</b> pada tanggal $APPROVAL_DATE </h3>
       <br>
       <br/>
       <p style='text-align: left'>Trouble with timesheet ? Contact us at <a href='mailto:prouds.support@sigma.co.id?Subject=Need%20help' target='_top'>prouds.support@sigma.co.id</a></p>
