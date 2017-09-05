@@ -266,7 +266,7 @@ class Datamaster extends CI_Controller{
 
 
     }
-    public function getData($type,$pagenum=10,$page=1,$keyword=null){
+    public function getData($type,$keyword=null,$pagenum=10,$page=1){
         switch ($type) {
             case 'bu':
             $result[$type]= $this->getbu($keyword);
