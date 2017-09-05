@@ -671,15 +671,14 @@ $report = [
     {
         $query = $this->db->query("
 WITH date_range AS (
-    SELECT  ACTUAL_START_DATE as start_date
-           ,ACTUAL_END_DATE as end_date
-    FROM    PROJECTS where project_id='$project_id'
+  SELECT  min(start_date) as start_date
+         ,max(finish_date) as end_date
+  FROM    wbs where project_id='$project_id' group by project_id
     )
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
             (select max(t1.pv)-min(t1.pv) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
             (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
             (select ROUND(TO_CHAR((max(t1.ev)-min(t1.ev))/nullif(max(t1.pv)-min(t1.pv), 0)),2) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
-
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
@@ -693,10 +692,10 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     function cpi($project_id)
     {
         $query = $this->db->query("WITH date_range AS (
-    SELECT  ACTUAL_START_DATE as start_date
-           ,ACTUAL_END_DATE as end_date
-    FROM    PROJECTS where project_id='$project_id'
-    )
+          SELECT  min(start_date) as start_date
+                 ,max(finish_date) as end_date
+          FROM    wbs where project_id='$project_id' group by project_id
+            )
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
             (select max(t1.ac)-min(t1.ac) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ac,
             (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
