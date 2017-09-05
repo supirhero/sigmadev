@@ -265,9 +265,93 @@ class Timesheet extends CI_Controller {
         $date = ($date!="")?$date:date("Y-m-d");
 
         $userid = $this->datajson['userdata']['USER_ID'];
+        $activity = [];
         $project = $this->db->query("SELECT distinct project_name, project_id , project_status FROM CARI_TASK WHERE PROJECT_STATUS <> 'Completed' AND USER_ID='".$userid."'")->result_array();
-        $activity = $this->M_timesheet->selectTimesheet_bydate($this->datajson['userdata']['USER_ID'],$date);
-
+        $project_list = $this->db->query("SELECT DISTINCT project_id
+          FROM
+          (SELECT *
+          FROM USER_TIMESHEET_NEW where ts_date= to_date('$date','yyyy-mm-dd')
+          ORDER BY ts_date DESC)
+          WHERE user_id ='".$this->datajson['userdata']['USER_ID']."'")->result_array();
+        foreach($project_list as $pl){
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '".$pl['PROJECT_ID']."'")->row()->RH_ID;
+            $activity_list = $this->db->query("
+        SELECT *
+          FROM
+          (SELECT *
+          FROM(
+        SELECT ts_id,
+        substr(
+            ts_id,
+            1,
+            instr(
+                ts_id,
+                '.'
+            ) - 1
+        ) AS wp,
+        substr(
+            ts_id,
+            instr(
+                ts_id,
+                '.'
+            ) + 1
+        ) AS date_id,
+        e.wbs_id,
+        c.rp_id,
+        c.user_id,
+        f.user_name,
+        c.project_id,
+        d.project_name,
+        e.wbs_name,
+        subject,
+        message,
+        hour_total,
+        ts_date,
+        TO_CHAR(
+            ts_date,
+            'mm'
+        ) AS bulan,
+        TO_CHAR(
+            ts_date,
+            'month'
+        ) AS month,
+        TO_CHAR(
+            ts_date,
+            'YYYY'
+        ) AS tahun,
+        longitude,
+        latitude,
+        submit_date,
+        is_approved,
+        b.rebaseline as task_member_rebaseline,
+        e.rebaseline as task_rebaseline,
+        a.rebaseline as timesheet_rebaseline
+        FROM
+          (select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'no' as rebaseline,null as rh_id 
+          from timesheet 
+          union 
+          select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'yes' as rebaseline,rh_id 
+          from temporary_timesheet where rh_id = '$rh_id') a
+          LEFT JOIN (
+          (select wp_id,rp_id,wbs_id,'no' as rebaseline 
+          from wbs_pool) 
+          union 
+          (select wp_id,rp_id,wbs_id,'yes' as rebaseline 
+          from temporary_wbs_pool 
+          where rh_id = '$rh_id')
+          ) b 
+          ON a.wp_id = b.wp_id
+          LEFT JOIN resource_pool c ON b.rp_id = c.rp_id
+          LEFT JOIN projects d ON c.project_id = d.project_id
+          LEFT JOIN (select wbs_id,wbs_name,'no' as rebaseline from wbs union select wbs_id,wbs_name,'yes' as rebaseline 
+          from temporary_wbs where rh_id = '$rh_id') e ON b.wbs_id = e.wbs_id
+          INNER JOIN users f ON c.user_id = f.user_id) where ts_date= to_date('$date','yyyy-mm-dd') and project_id = '".$pl['PROJECT_ID']."' 
+          ORDER BY ts_date DESC )
+          WHERE user_id ='".$this->datajson['userdata']['USER_ID']."'")->result_array();
+            foreach ($activity_list as $al){
+                $activity[] = $al;
+            }
+        }
         $data = [];
         $data['user_project'] = $project;
         $data['user_activities'] = $activity;
@@ -398,9 +482,11 @@ class Timesheet extends CI_Controller {
         $data['SUBMIT_DATE']= date('Y-m-d H:i:s');
         $project_id   = $_POST['PROJECT_ID'];
 
+        //check hour total
+
+
+
         //check bu_id
-
-
         $wp_id = $_POST['WP_ID'];
         if($data['WP_ID'] != "" && $project_id != "")
         {
@@ -501,7 +587,7 @@ class Timesheet extends CI_Controller {
         }
 
         }
-else{
+        else{
 
     $this->output->set_status_header(400);
     $returndata['status'] = "failed";
