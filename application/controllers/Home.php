@@ -739,7 +739,7 @@ $data["error_upload"] = $this->upload->display_errors();
                 );
             }
             else{
-                echo $hour = $this->M_timesheet->Timesheet_bydate($user_id,$day[$i]);
+                $hour = $this->M_timesheet->Timesheet_bydate($user_id,$day[$i]);
                 $hour = ($hour == NULL) ? 0 : $hour;
 
                 $data["weekdays"][$i]=array(
@@ -754,8 +754,7 @@ $data["error_upload"] = $this->upload->display_errors();
         // $data['holiday']=$holidays;
         //$data['tampil_Timesheet']=($this->M_timesheet->selectTimesheet_bydate($user_id,$date));
         $data['tampil_Timesheet']=($this->M_timesheet->Timesheet_bydate($user_id,$date));
-
-        print_r(json_encode($data));
+        echo json_encode($data);
     }
     /*For add Timesheet*/
     public function addtimesheet(){
