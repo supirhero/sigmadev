@@ -539,6 +539,12 @@ class Task extends CI_Controller
         $data['PROJECT_ID']=$this->input->post("PROJECT_ID");
         $data['WORK_PERCENT_COMPLETE']=$this->input->post("WORK_PERCENT_COMPLETE");
 
+        if($this->input->post("WORK_PERCENT_COMPLETE") == 0 || $this->input->post("WORK_PERCENT_COMPLETE") == null){
+            $this->output->set_status_header(400);
+            $returndata['status'] = "success";
+            $returndata['message'] = 'percent must more than 0%';
+            die;
+        }
         //data di null kan , supaya input di modal berhasil
         $data['DESCRIPTION']="";
         $data['DATE']=date("d/m/Y");
