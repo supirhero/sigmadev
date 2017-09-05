@@ -676,9 +676,12 @@ WITH date_range AS (
   FROM    wbs where project_id='$project_id' group by project_id
     )
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
-            (select max(t1.pv)-min(t1.pv) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
-            (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
-            (select ROUND(TO_CHAR((max(t1.ev)-min(t1.ev))/nullif(max(t1.pv)-min(t1.pv), 0)),2) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
+            (select case when max(t1.pv)=min(t1.pv) then max(t1.pv) else max(t1.pv)-min(t1.pv) end as pv from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
+            (select case when max(t1.ev)=min(t1.ev) then max(t1.ev) else max(t1.ev)-min(t1.ev) end as ev from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+            (select
+             case when max(t1.pv)=min(t1.pv) then
+             ROUND(TO_CHAR(max(t1.ev)/max(t1.pv)),2) else
+            ROUND(TO_CHAR((max(t1.ev)-min(t1.ev))/max(t1.pv)-min(t1.pv)),2) end as spi from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
@@ -697,10 +700,12 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
           FROM    wbs where project_id='$project_id' group by project_id
             )
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
-            (select max(t1.ac)-min(t1.ac) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ac,
-            (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
-            (select ROUND(TO_CHAR((max(t1.ev)-min(t1.ev))/nullif(max(t1.ac)-min(t1.ac), 0)),2) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as cpi
-
+(select case when max(t1.ac)=min(t1.ac) then max(t1.ac) else max(t1.ac)-min(t1.ac) end as ac from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ac,
+(select case when max(t1.ev)=min(t1.ev) then max(t1.ev) else max(t1.ev)-min(t1.ev) end as ev from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
+(select
+ case when max(t1.ac)=min(t1.ac) then
+ ROUND(TO_CHAR(max(t1.ev)/max(t1.ac)),2) else
+ROUND(TO_CHAR((max(t1.ev)-min(t1.ev))/max(t1.ac)-min(t1.ac)),2) end as cpi from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as cpi
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
