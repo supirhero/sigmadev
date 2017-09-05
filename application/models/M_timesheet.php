@@ -485,11 +485,18 @@ GROUP BY TS_DATE")->result_array();
 
     function confirmTimesheet($timesheet_id,$approver,$confirm_code){
         $date = date('Y-m-d');
+        $timesheetdata = $this->db->query("select subject,message,hour_total,ts_date,approval_date  from timesheet where ts_id = '$timesheet_id'")->row_array();
+        $userdata = $this->db->query("select u.email,u.user_name from timesheet ts join wbs_pool wp on ts.wp_id = wp.wp_id
+                                   join resource_pool rp  on rp.rp_id = wp.rp_id
+                                   join users u on u.user_id = rp.user_id
+                                   where ts.ts_id = '$timesheet_id'")->row();
         $query = "update timesheet 
                   set IS_APPROVED = $confirm_code, CONFIRMED_BY = '$approver' , APPROVAL_DATE = to_date('$date','yyyy-mm-dd')
                   where TS_ID = '$timesheet_id'";
         $exec = $this->db->query($query);
+
         if($this->db->affected_rows() == 1){
+            $this->confirmationTimesheetEmail($userdata->EMAIL,$userdata->USER_NAME,$timesheetdata,$confirm_code);
             return true;
         }
         else{
@@ -633,6 +640,345 @@ GROUP BY TS_DATE")->result_array();
         else{
             return 'failed';
         }
+    }
+
+    function confirmationTimesheetEmail($email,$name,$timesheetdata,$approval_code){
+        //subject,message,hour_total,ts_date,approval_date
+        extract($timesheetdata);
+        $confirmstring = ($approval_code == 1 ? "DITERIMA" : "DITOLAK");
+        $this->load->library('email');
+        $config['protocol']='smtp';
+        $config['smtp_host']='smtp.sigma.co.id';
+        $config['smtp_user']=SMTP_AUTH_USR;
+        $config['smtp_pass']=SMTP_AUTH_PWD;
+        $config['smtp_port']='587';
+        $config['smtp_timeout']='100';
+        $config['charset']    = 'utf-8';
+        $config['newline']    = "\r\n";
+        $config['mailtype'] = 'html';
+        $config['validation'] = TRUE;
+        $this->email->initialize($config);
+        $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
+        //$this->email->to($email);
+        $this->email->to('geryruslan@gmail.com');
+        $logo=base_url()."asset/image/logo_new_sigma1.png";
+        $css=base_url()."asset/css/confirm.css";
+        $this->email->attach($logo);
+        $this->email->attach($css);
+        $cid_logo = $this->email->attachment_cid($logo);
+        $this->email->subject('User Timesheet Approval');
+        $this->email->message("<!DOCTYPE html>
+      <html>
+      <head>
+      <meta name='viewport' content='width=device-width' />
+      <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+      <title>Account Activation</title>
+
+      <style>
+      /* -------------------------------------
+      GLOBAL
+      ------------------------------------- */
+      * {
+        margin:0;
+        padding:0;
+      }
+      * { font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; }
+
+      img {
+        max-width: 100%;
+      }
+      .collapse {
+        margin:0;
+        padding:0;
+      }
+      body {
+        -webkit-font-smoothing:antialiased;
+        -webkit-text-size-adjust:none;
+        width: 100%!important;
+        height: 100%;
+      }
+
+
+      /* -------------------------------------
+      ELEMENTS
+      ------------------------------------- */
+      a { color: #2BA6CB;}
+
+      .btn {
+        text-decoration:none;
+        color:#FFF;
+        background-color: #1da1db;
+        width:80%;
+        padding:15px 10%;
+        font-weight:bold;
+        text-align:center;
+        cursor:pointer;
+        display:inline-block;
+        border-radius: 5px;
+        box-shadow: 3px 3px 3px 1px #EBEBEB;
+      }
+
+      p.callout {
+        padding:15px;
+        text-align:center;
+        background-color:#ECF8FF;
+        margin-bottom: 15px;
+      }
+      .callout a {
+        font-weight:bold;
+        color: #2BA6CB;
+      }
+
+      .column table { width:100%;}
+      .column {
+        width: 300px;
+        float:left;
+      }
+      .column tr td { padding: 15px; }
+      .column-wrap {
+        padding:0!important;
+        margin:0 auto;
+        max-width:600px!important;
+      }
+      .columns .column {
+        width: 280px;
+        min-width: 279px;
+        float:left;
+      }
+      table.columns, table.column, .columns .column tr, .columns .column td {
+        padding:0;
+        margin:0;
+        border:0;
+        border-collapse:collapse;
+      }
+
+      /* -------------------------------------
+      HEADER
+      ------------------------------------- */
+      table.head-wrap { width: 100%;}
+
+      .header.container table td.logo { padding: 15px; }
+      .header.container table td.label { padding: 15px; padding-left:0px;}
+
+
+      /* -------------------------------------
+      BODY
+      ------------------------------------- */
+      table.body-wrap { width: 100%;}
+
+
+      /* -------------------------------------
+      FOOTER
+      ------------------------------------- */
+      table.footer-wrap { width: 100%;	clear:both!important;
+      }
+      .footer-wrap .container td.content  p { border-top: 1px solid rgb(215,215,215); padding-top:15px;}
+      .footer-wrap .container td.content p {
+        font-size:10px;
+        font-weight: bold;
+
+      }
+
+
+      /* -------------------------------------
+      TYPOGRAPHY
+      ------------------------------------- */
+      h1,h2,h3,h4,h5,h6 {
+        font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; line-height: 1.1; margin-bottom:15px; color:#000;
+      }
+      h1 small, h2 small, h3 small, h4 small, h5 small, h6 small { font-size: 60%; color: #6f6f6f; line-height: 0; text-transform: none; }
+
+      h1 { font-weight:200; font-size: 44px;}
+      h2 { font-weight:200; font-size: 37px;}
+      h3 { font-weight:500; font-size: 27px;}
+      h4 { font-weight:500; font-size: 23px;}
+      h5 { font-weight:900; font-size: 17px;}
+      h6 { font-weight:900; font-size: 14px; text-transform: uppercase; color:#444;}
+
+      .collapse { margin:0!important;}
+
+      p, ul {
+        margin-bottom: 10px;
+        font-weight: normal;
+        font-size:14px;
+        line-height:1.6;
+      }
+      p.lead { font-size:17px; }
+      p.last { margin-bottom:0px;}
+
+      ul li {
+        margin-left:5px;
+        list-style-position: inside;
+      }
+
+      hr {
+        border: 0;
+        height: 0;
+        border-top: 1px dotted rgba(0, 0, 0, 0.1);
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+      }
+
+
+      /* -------------------------------------
+      Shopify
+      ------------------------------------- */
+
+      .products {
+        width:100%;
+        height:40px;padding
+        margin:10px 0 10px 0;
+      }
+      .products img {
+        float:left;
+        height:40px;
+        width:auto;
+        margin-right:20px;
+      }
+      .products span {
+        font-size:17px;
+      }
+
+
+      /* ---------------------------------------------------
+      RESPONSIVENESS
+      Nuke it from orbit. It's the only way to be sure.
+      ------------------------------------------------------ */
+
+      /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
+      .container {
+        display:block!important;
+        max-width:600px!important;
+        margin:0 auto!important; /* makes it centered */
+        clear:both!important;
+      }
+
+      /* This should also be a block element, so that it will fill 100% of the .container */
+      .content {
+        padding: 15px 15px 0 15px;
+        max-width:600px;
+        margin:0 auto;
+        display:block;
+      }
+
+      /* Let's make sure tables in the content area are 100% wide */
+      .content table { width: 100%; }
+
+      /* Be sure to place a .clear element after each set of columns, just to be safe */
+      .clear { display: block; clear: both; }
+
+
+      /* -------------------------------------------
+      PHONE
+      For clients that support media queries.
+      Nothing fancy.
+      -------------------------------------------- */
+      @media only screen and (max-width: 600px) {
+
+        a[class='btn'] { display:block!important; margin-bottom:10px!important; background-image:none!important; margin-right:0!important;}
+
+        div[class='column'] { width: auto!important; float:none!important;}
+
+        table.social div[class='column'] {
+          width:auto!important;
+        }
+
+      }
+
+      </style>
+      </head>
+
+      <body bgcolor='#FFFFFF'>\
+      <table class='head-wrap' bgcolor='#FFFFFF'>
+      <tr>
+      <td></td>
+      <td class='header container'>
+
+      <div class='content'>
+      <table bgcolor='#FFFFFF'>
+      <tr>
+      <td>
+
+      </td>
+
+      </tr>
+      </table>
+      </div>
+
+      </td>
+      <td></td>
+      </tr>
+      </table>
+      <table class='body-wrap'>
+      <tr>
+      <td></td>
+      <td class='container' bgcolor='#FFFFFF'>
+
+      <div class='content'>
+      <table>
+      <tr>
+      <td align='center'>
+      </td>
+      </tr>
+      <tr>
+      <td>
+      <br/>
+      <img src='cid:".$cid_logo."' height='173' width='581' alt='logo Telkomsigma' />
+      <h2>Hi ".$name.",</h3>
+      <br/>
+      <h4>Timesheet yang telah anda input :</h4>
+      <h4>Tanggal : $TS_DATE</h4>
+      <h4>Jumlah Jam : $HOUR_TOTAL</h4>
+      <h4>Jumlah Jam : $HOUR_TOTAL</h4>
+      <h4>Subject : $SUBJECT</h4>
+      <h3>Telah di <b style='color:white;background-color: red'>$confirmstring</b> pada tanggal $APPROVAL_DATE </h3>
+      <br>
+      <br/>
+      <p style='text-align: left'>Trouble with timesheet ? Contact us at <a href='mailto:prouds.support@sigma.co.id?Subject=Need%20help' target='_top'>prouds.support@sigma.co.id</a></p>
+      </td>
+      </tr>
+
+      </table>
+      </div>
+
+      </td>
+
+      </tr>
+      </table>
+      <!-- /BODY -->
+
+      <!-- FOOTER -->
+      <table class='footer-wrap' bgcolor='#FFFFFF'>
+      <tr>
+      <td></td>
+      <td class='container'>
+
+      <!-- content -->
+      <div class='content' style='margin-top: -15px'>
+      <table>
+      <tr>
+      <br/>
+
+      </br/>
+      </tr>
+      </table>
+      </div>
+      <!-- /content -->
+
+      </td>
+      <td></td>
+      </tr>
+      </table>
+
+      </body>
+
+      </html>");
+
+        if($this->email->send()){
+            return true;
+        }else{
+            return false;
+        }
+
     }
 
 }
