@@ -735,14 +735,11 @@ SELECT sum(CASE
                                           to_number(regexp_substr(orde, '\d+')))");
         $total_pv = $query->row()->TOTAL;
 
-        $query = $this->db->query("
-WITH date_range AS (
-    SELECT  ACTUAL_START_DATE as start_date
-           ,ACTUAL_END_DATE as end_date
-    FROM    PROJECTS where project_id='$project_id'
-    )
-
-
+        $query = $this->db->query("WITH date_range AS (
+          SELECT  min(start_date) as start_date
+                 ,max(finish_date) as end_date
+          FROM    wbs where project_id='$project_id' group by project_id
+            )
 SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
             (select max(t1.pv) ac from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
             (select max(t1.ev) ev from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev
