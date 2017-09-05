@@ -677,8 +677,8 @@ WITH date_range AS (
     ), max_rekap AS (
 
 SELECT  t2.\"Week\" as week,t2.\"startdate\" as startdate,t2.\"enddate\" as enddate,
-            (select max(t1.pv) from tb_rekap_project t1 where project_id='8682529' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_pv,
-            (select max(t1.ev) from tb_rekap_project t1 where project_id='8682529' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_ev
+            (select max(t1.pv) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_pv,
+            (select max(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_ev
             
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
