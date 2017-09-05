@@ -430,6 +430,8 @@ $data["error_upload"] = $this->upload->display_errors();
         $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code'")->result_array();
         $data['nonmember'] = $this->db->query("select user_id, user_name from users where bu_id != '$code'")->result_array();
         $data['bu_id'] = $code;
+        $data['bu_spi']=$this->M_home->buspicpi($code)[0]->SPI;
+        $data['bu_cpi']=$this->M_home->buspicpi($code)[0]->CPI;
         $data['bu_code'] = $_POST['bu_code'];
 
         echo json_encode($data);

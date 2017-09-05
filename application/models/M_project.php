@@ -398,23 +398,25 @@ class M_project extends CI_Model {
 
     function getUsersProjectBasedBU($id,$bucode,$keyword=null,$status=null,$type=null,$effort=null) {
         $sql="SELECT   distinct project_id, project_name,IWO_NO, PROJECT_TYPE,bu_code,bu_id, effort_type,bu_name, bu_code,to_char(round(project_complete,2)) as project_complete,
-            project_status, project_desc, created_by
+            project_status, project_desc, created_by, SPI, CPI
        FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,z.bu_id,
                     c.project_complete, c.project_status, c.project_desc,
-                    c.created_by, iwo_NO, pc.project_type, category as effort_type
+                    c.created_by, c.iwo_NO, pc.project_type, pc.category as effort_type, tpb.SPI, tpb.CPI
                FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
                     INNER JOIN projects c ON b.project_id = c.project_id
                     INNER JOIN p_bu z on c.bu_code = z.bu_code
                     INNER JOIN p_project_category pc on c.type_of_effort=pc.id
+                    LEFT JOIN tb_project_bu tpb on c.project_id=tpb.project_id
                     WHERE c.bu_code='".$bucode."'
              UNION
              SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,z.bu_id,
                     b.project_complete, b.project_status, b.project_desc,
-                    b.created_by,iwo_NO, pc.project_type, category as effort_type
+                    b.created_by,b.iwo_NO, pc.project_type, pc.category as effort_type, tpb.SPI, tpb.CPI
                FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
                INNER JOIN p_bu z on b.bu_code = z.bu_code
+               LEFT JOIN tb_project_bu tpb on b.project_id=tpb.project_id
                     INNER JOIN p_project_category pc on b.type_of_effort=pc.id
-               WHERE b.bu_code='".$bucode."') where 1=1 ";
+               WHERE b.bu_code='".$bucode."') asd where 1=1 ";
                if ($keyword!=null) {
                  $keyword=strtolower($keyword);
                  $sql.=" and (lower(project_name) like '%".$keyword."%' or lower(iwo_no) like '%".$keyword."%') ";

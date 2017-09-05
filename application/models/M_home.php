@@ -218,7 +218,7 @@ Class M_home extends CI_Model{
                       join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
                       WHERE PROJECT_ID= '$idproject'")->result_array();
         for($i = 0; $i < count($returndata); $i++){
-            $posisi = $this->db->query("select position from resource_pool 
+            $posisi = $this->db->query("select position from resource_pool
                                         where project_id = $idproject and user_id = '".$returndata[$i]['USER_ID']."'")->row();
             $returndata[$i]['position'] = $posisi->POSITION;
         }
@@ -245,5 +245,30 @@ Class M_home extends CI_Model{
         $returndata = $query->result_array();
         return $returndata;
     }
-
+    public function buspicpi($bu){
+      $sql="select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+                round(sum(ev)/count(c.project_id),2) as EV,
+                round(sum(pv)/count(c.project_id),2) as PV,
+                round(sum(AC)/count(c.project_id),2) as AC,
+                case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+                case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+            from
+            (select ev, pv, case when pv=0 then 0 else round(ev/pv,2) end as spi,case when ev=0 then 0 else ac end as ac,case when ac=0 then 1 when round(ev/ac,2)>1 then 1 else round(ev/ac,2) end as cpi, a.project_id
+            from tb_ev_project a
+            left join tb_pv_project b
+            on a.project_id=b.project_id
+            left join tb_ac_project c on
+            a.project_id=c.project_id) a inner join
+            projects c on c.project_id=a.project_id
+            inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+            where project_status='In Progress'
+            and type_of_effort in (1,2)
+                and pv!=0
+            and bu_id='".$bu."'
+            group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+            order by b.bu_name";
+                $query = $this->db->query($sql);
+                $hasil = $query->result();
+                return $hasil;
+    }
 }
