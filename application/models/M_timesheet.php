@@ -634,7 +634,13 @@ GROUP BY TS_DATE")->result_array();
                   set IS_APPROVED = $confirm_code, CONFIRMED_BY = '$approver' , APPROVAL_DATE = to_date('$date','yyyy-mm-dd')
                   where TS_ID = '$timesheet_id'";
         $exec = $this->db->query($query);
-        if($exec){
+        $timesheetdata = $this->db->query("select subject,message,hour_total,ts_date,approval_date  from timesheet where ts_id = '$timesheet_id'")->row_array();
+        $userdata = $this->db->query("select u.email,u.user_name from timesheet ts join wbs_pool wp on ts.wp_id = wp.wp_id
+                                   join resource_pool rp  on rp.rp_id = wp.rp_id
+                                   join users u on u.user_id = rp.user_id
+                                   where ts.ts_id = '$timesheet_id'")->row();
+        if($this->db->affected_rows() == 1){
+            $this->confirmationTimesheetEmail($userdata->EMAIL,$userdata->USER_NAME,$timesheetdata,$confirm_code);
             return 'success';
         }
         else{
