@@ -782,9 +782,9 @@ public function r_people(){
     echo json_encode($wrap);
 }
 public function r_people_download(){
-    $bu_id = $_GET['BU_ID'];
-    $bulan = $_GET['BULAN'];
-    $tahun = $_GET['TAHUN'];
+    $bu_id = $_POST['BU_ID'];
+    $bulan = $_POST['BULAN'];
+    $tahun = $_POST['TAHUN'];
     $y=(int)date("Y");
     $m=(int)date("m");
 
@@ -845,7 +845,7 @@ public function r_people_download(){
         $datareport[$i]['status_entry']=$text_entry;
 
     }
-    $wrap['report_people'] = $datareport;
+    $wrap= $datareport;
     $this->load->library('excel');
 
     $this->excel->setActiveSheetIndex(0);
@@ -855,7 +855,7 @@ public function r_people_download(){
     $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
 
 
-    //$this->excel->getActiveSheet()->fromArray($wrap);
+    $this->excel->getActiveSheet()->fromArray($wrap);
 
         $filename='Project Report.xls'; //save our workbook as this file name
 
