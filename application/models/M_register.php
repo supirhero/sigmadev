@@ -18,7 +18,7 @@ class M_register extends CI_Model {
             'email' => $this->input->post('email'),
             'password'      => mysql_real_escape_string($_POST['pass']),
             'password' => md5('password')
-        );
+            );
         $simpan_data = $this->db->insert($this->users, $data_baru);
         return $simpan_data;
     }
@@ -94,15 +94,14 @@ class M_register extends CI_Model {
                 //'ADDRESS'=>$dataarray[$i]['ADDRESS'],
                 //'IS_SHIFT'=>$dataarray[$i]['IS_SHIFT'],
                 //'IMAGE'=>$dataarray[$i]['IMAGE'],
-            );
+                );
 
             $get = $this->db->query("SELECT * FROM users where EMAIL like '%".$dataarray[$i]['EMAIL']."%'");
             $hasil = $get->row();
-            $updaterp = $this->db->query("update resource_pool set USER_ID='".$dataarray[$i]['USER_ID']."' where EMAIL like '%".$dataarray[$i]['EMAIL']."%'");
             if (isset($hasil->EMAIL)) {
+                $updaterp = $this->db->query("update resource_pool set USER_ID='".$dataarray[$i]['USER_ID']."' where USER_ID like '%".$hasil->USER_ID."%'");
                 $this->db->where('EMAIL', $dataarray[$i]['EMAIL']);
                 $this->db->update('USERS', $data);
-                $updaterp = $this->db->query("update resource_pool set USER_ID='".$dataarray[$i]['USER_ID']."' where EMAIL like '%".$dataarray[$i]['EMAIL']."%'");
             }
             else{
                 $this->db->insert('USERS', $data);
@@ -128,7 +127,7 @@ class M_register extends CI_Model {
                 'IS_SHIFT'=>$dataarray[$i]['IS_SHIFT'],
                 'IMAGE'=>$dataarray[$i]['IMAGE']
 
-            );
+                );
             $get = $this->db->query("SELECT * FROM users where USER_ID='".$dataarray[$i]['USER_ID']."'");
             $hasil = $get->row();
             if (isset($hasil->USER_ID)) {

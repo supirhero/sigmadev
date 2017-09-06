@@ -715,15 +715,19 @@ class Datamaster extends CI_Controller{
             }
             public function upload_users()
             {
-                $config['upload_path'] = './temp_upload/';
+                $config['upload_path'] = 'document_assets';
                 $config['allowed_types'] = 'xlsx|xls|csv';
-
+                $this->load->helper('file');
                 $this->load->library('upload', $config);
-
+               //echo $_FILES['userfile']."bob";
+                //echo json_encode($_FILES['userfile']);
                 if ( ! $this->upload->do_upload('userfile'))
                 {
                     $data = array('error' => $this->upload->display_errors());
-                    $data['msg']="Gagal Upload, Cek kembali lampiran anda hanya file XLS yang diizinkan";
+                    $pesan['msg']="Gagal Upload, Cek kembali lampiran anda hanya file XLS yang diizinkan";
+                    $pesan['error']=$data;
+
+                    echo json_encode($pesan);
                 }
                 else
                 {
@@ -771,7 +775,10 @@ class Datamaster extends CI_Controller{
             //$this->session->set_flashdata("pesan","<div class=\"alert alert-success\" id=\"alert\"><i class=\"glyphicon glyphicon-ok\"></i> Data berhasil di upload,berhasil di upload </div>");
                     $baris = count($dataexcel);
                     $total = $baris-1;
-                    $data['msg']="Data berhasil di upload sebanyak".$baris."baris data";
+                    $pesan['msg']="Data berhasil di upload ";
+                    delete_files($file);
+                    echo json_encode($pesan);
                 }
+
             }
         }

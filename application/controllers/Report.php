@@ -545,11 +545,10 @@ class Report extends CI_Controller {
     public function r_list_bu(){
         $data_bu = $this->M_business->getAllBU();
 
-        //add field children
         for($i = 0 ; $i < count($data_bu) ; $i++){
             $data_bu[$i]['children'] = null;
         }
-        //$fixdata = ['directorat'=>[],'company'=>[],'business_unit'=>[]];
+        $fixdata = ['directorat'=>[],'company'=>[],'business_unit'=>[]];
 
 
         $tree['list_bu'] = $this->buildTree($data_bu);
@@ -715,263 +714,397 @@ class Report extends CI_Controller {
 }
 
     //https://marvelapp.com/hj9eb56/screen/29382902
-    public function r_people(){
-        $bu_id = $_POST['BU_ID'];
-        $bulan = $_POST['BULAN'];
-        $tahun = $_POST['TAHUN'];
-        $y=(int)date("Y");
-        $m=(int)date("m");
+public function r_people(){
+    $bu_id = $_POST['BU_ID'];
+    $bulan = $_POST['BULAN'];
+    $tahun = $_POST['TAHUN'];
+    $y=(int)date("Y");
+    $m=(int)date("m");
 
-        $datareport=$this->M_report->get_user_bu($bu_id);
-
-
-
-        for($i = 0 ; $i <count($datareport);$i++){
-
-            //utilization
-            $utilization=$this->M_report->getTotalHour($datareport[$i]['USER_ID'],$bulan,$tahun);
-
-            //entry
-            $entry=$this->M_report->getEntry($datareport[$i]['USER_ID'],$bulan,$tahun);
-
-            //entry
-            if (($bulan==$m)&& ($tahun==$y) ){
-                $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
-            }
-            else{
-                $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
-            }
-
-            if ($persen_entry<100)
-            {
-                $text_entry='Under';
-            }
-            elseif ($persen_entry==100) {
-                $text_entry='Complete';
-            }
-            else {
-                $text_entry='Over';
-            }
-
-            //utilization
-            if (($bulan==$m)&& ($tahun==$y) ){
-                $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
-            }
-            else{
-                $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
-
-            }
-            if ($persen_utilization<80)
-            {
-                $text_utilization='Under';
-            }
-            elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
-                $text_utilization='Optimal';
-            }
-            else {
-                $text_utilization='Over';
-            }
+    $datareport=$this->M_report->get_user_bu($bu_id);
 
 
-            $datareport[$i]['utilisasi']=round($persen_utilization,2);
-            $datareport[$i]['status_utilisasi']=$text_utilization;
-            $datareport[$i]['entry']=round($persen_entry,2);
-            $datareport[$i]['status_entry']=$text_entry;
 
+    for($i = 0 ; $i <count($datareport);$i++){
+
+        //utilization
+        $utilization=$this->M_report->getTotalHour($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+        //entry
+        $entry=$this->M_report->getEntry($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+        //entry
+        if (($bulan==$m)&& ($tahun==$y) ){
+            $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
         }
-        $wrap['report_people'] = $datareport;
-        echo json_encode($wrap);
-    }
-    public function r_people_download(){
-        $bu_id = $_GET['BU_ID'];
-        $bulan = $_GET['BULAN'];
-        $tahun = $_GET['TAHUN'];
-        $y=(int)date("Y");
-        $m=(int)date("m");
-
-        $datareport=$this->M_report->get_user_bu($bu_id);
-
-
-
-        for($i = 0 ; $i <count($datareport);$i++){
-
-            //utilization
-            $utilization=$this->M_report->getTotalHour($datareport[$i]['USER_ID'],$bulan,$tahun);
-
-            //entry
-            $entry=$this->M_report->getEntry($datareport[$i]['USER_ID'],$bulan,$tahun);
-
-            //entry
-            if (($bulan==$m)&& ($tahun==$y) ){
-                $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
-            }
-            else{
-                $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
-            }
-
-            if ($persen_entry<100)
-            {
-                $text_entry='Under';
-            }
-            elseif ($persen_entry==100) {
-                $text_entry='Complete';
-            }
-            else {
-                $text_entry='Over';
-            }
-
-            //utilization
-            if (($bulan==$m)&& ($tahun==$y) ){
-                $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
-            }
-            else{
-                $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
-
-            }
-            if ($persen_utilization<80)
-            {
-                $text_utilization='Under';
-            }
-            elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
-                $text_utilization='Optimal';
-            }
-            else {
-                $text_utilization='Over';
-            }
-
-
-            $datareport[$i]['utilisasi']=round($persen_utilization,2);
-            $datareport[$i]['status_utilisasi']=$text_utilization;
-            $datareport[$i]['entry']=round($persen_entry,2);
-            $datareport[$i]['status_entry']=$text_entry;
-
+        else{
+            $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
         }
-        $wrap['report_people'] = $datareport;
-        $this->load->library('excel');
 
-        $this->excel->setActiveSheetIndex(0);
-            //name the worksheet
-        $this->excel->getActiveSheet()->setTitle('Report Project');
-            //set cell A1 content with some text
-        $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
-
-
-        //$this->excel->getActiveSheet()->fromArray($wrap);
-
-            $filename='Project Report.xls'; //save our workbook as this file name
-
-            header('Content-Type: application/vnd.ms-excel'); //mime type
-
-            header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
-
-            header('Cache-Control: max-age=0'); //no cache
-
-            //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
-            //if you want to save it as .XLSX Excel 2007 format
-
-            $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
-
-            //force user to download the Excel file without writing it to server's HD
-            $objWriter->save('php://output');
-            echo json_encode($wrap);
-    }
-        //resource per bu
-    public function r_entry_bu(){
-
-        $tahun = $this->input->post('tahun');
-        // $tahun = '2016';
-        //  $bu = 37;
-        $bu = $this->input->post('bu_id');
-
-        $y=(int)date("Y");
-        // $m=(int)date("m");
-        //echo print_r ($thn);
-
-
-        $c=$this->M_report->getbu($bu);
-        if ($c['BU_PARENT_ID']=='0') {
-            $count_user=0;
-            $child=$this->M_report->getbuchild($bu);
-            $res['jml_entry']=0;
-            $count=count($child);
-            foreach ($child as $ch) {
-                $count_user=$this->M_report->getCountUser($ch['BU_ID']);
-                if ($count_user==0) {
-                  $count=$count-1;
-              }else{
-                  if (($tahun==$y)){
-                      $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2));
-                  }else{
-                      $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2));
-                  }
-              }
-          }
-          $res['jml_entry']=$res['jml_entry']/$count;
-          if ($res['jml_entry']<100)
-          {
-            $res['status']='Under';
+        if ($persen_entry<100)
+        {
+            $text_entry='Under';
         }
-        elseif ($res['jml_entry']==100) {
-            $res['status']='Complete';
+        elseif ($persen_entry==100) {
+            $text_entry='Complete';
         }
         else {
-            $res['status']='Over';
+            $text_entry='Over';
         }
-        $res['allentry']=[];
-        foreach ($child as $chs) {
-            $allentry=$this->M_report->gettahunanbu($chs['BU_ID'],$tahun);
-            $i=1;
-            foreach ($allentry as $has) {
-                $count_user=$this->M_report->getCountUser($chs['BU_ID']);
-                if ($count_user>0) {
-                    $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
-                    if($i<=12)
-                        array_push($res['allentry'],['label'=>$monthName,'value'=>$res['allentry'][$i][1]+($has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun)))]);
-                    $i++;
-                }
 
-            }
-
+        //utilization
+        if (($bulan==$m)&& ($tahun==$y) ){
+            $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
+        }
+        else{
+            $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
 
         }
-        for ($v=1; $v<=12 ; $v++) {
-            $res['allentry'][$v][1]=$res['allentry'][$v][1]/$count;
+        if ($persen_utilization<80)
+        {
+            $text_utilization='Under';
         }
-    }else{
-        $count_user=$this->M_report->getCountUser($bu);
-          //echo print_r($tahun);
-        $count_user = ($count_user > 0) ? $count_user : 1;
-
-        if (($tahun==$y)){
-          $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
-      }
-      else{
-          $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
-
-      }
-          // Entry text
-      if ($res['jml_entry']<100)
-      {
-          $res['status']='Under';
-      }
-      elseif ($res['jml_entry']==100) {
-          $res['status']='Complete';
-      }
-      else {
-          $res['status']='Over';
-      }
+        elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
+            $text_utilization='Optimal';
+        }
+        else {
+            $text_utilization='Over';
+        }
 
 
-      $allentry=$this->M_report->gettahunanbu($bu,$tahun);
-      $res['allentry']=[];
-      $i=1;
-      foreach ($allentry as $has) {
-              $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
-              array_push($res['allentry'],['label'=>$monthName,'value'=>$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun))]);
+        $datareport[$i]['utilisasi']=round($persen_utilization,2);
+        $datareport[$i]['status_utilisasi']=$text_utilization;
+        $datareport[$i]['entry']=round($persen_entry,2);
+        $datareport[$i]['status_entry']=$text_entry;
 
-              $i++;
+    }
+    $wrap['report_people'] = $datareport;
+    echo json_encode($wrap);
+}
+public function r_people_download(){
+    $bu_id = $_GET['BU_ID'];
+    $bulan = $_GET['BULAN'];
+    $tahun = $_GET['TAHUN'];
+    $y=(int)date("Y");
+    $m=(int)date("m");
+
+    $datareport=$this->M_report->get_user_bu($bu_id);
+
+
+
+    for($i = 0 ; $i <count($datareport);$i++){
+
+        //utilization
+        $utilization=$this->M_report->getTotalHour($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+        //entry
+        $entry=$this->M_report->getEntry($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+        //entry
+        if (($bulan==$m)&& ($tahun==$y) ){
+            $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
+        }
+        else{
+            $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
+        }
+
+        if ($persen_entry<100)
+        {
+            $text_entry='Under';
+        }
+        elseif ($persen_entry==100) {
+            $text_entry='Complete';
+        }
+        else {
+            $text_entry='Over';
+        }
+
+        //utilization
+        if (($bulan==$m)&& ($tahun==$y) ){
+            $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
+        }
+        else{
+            $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
+
+        }
+        if ($persen_utilization<80)
+        {
+            $text_utilization='Under';
+        }
+        elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
+            $text_utilization='Optimal';
+        }
+        else {
+            $text_utilization='Over';
+        }
+
+
+        $datareport[$i]['utilisasi']=round($persen_utilization,2);
+        $datareport[$i]['status_utilisasi']=$text_utilization;
+        $datareport[$i]['entry']=round($persen_entry,2);
+        $datareport[$i]['status_entry']=$text_entry;
+
+    }
+    $wrap['report_people'] = $datareport;
+    $this->load->library('excel');
+
+    $this->excel->setActiveSheetIndex(0);
+        //name the worksheet
+    $this->excel->getActiveSheet()->setTitle('Report Project');
+        //set cell A1 content with some text
+    $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
+
+
+    //$this->excel->getActiveSheet()->fromArray($wrap);
+
+        $filename='Project Report.xls'; //save our workbook as this file name
+
+        header('Content-Type: application/vnd.ms-excel'); //mime type
+
+        header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
+
+        header('Cache-Control: max-age=0'); //no cache
+
+        //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
+        //if you want to save it as .XLSX Excel 2007 format
+
+        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
+
+        //force user to download the Excel file without writing it to server's HD
+        $objWriter->save('php://output');
+        echo json_encode($wrap);
+}
+    //resource per bu
+public function r_entry_bu(){
+
+    $tahun = $this->input->post('tahun');
+    // $tahun = '2016';
+    //  $bu = 37;
+    $bu = $this->input->post('bu_id');
+
+    $y=(int)date("Y");
+    // $m=(int)date("m");
+    //echo print_r ($thn);
+
+
+    $c=$this->M_report->getbu($bu);
+    if ($c['BU_PARENT_ID']=='0') {
+        $count_user=0;
+        $child=$this->M_report->getbuchild($bu);
+        $res['jml_entry']=0;
+        $count=count($child);
+        foreach ($child as $ch) {
+            $count_user=$this->M_report->getCountUser($ch['BU_ID']);
+            if ($count_user==0) {
+              $count=$count-1;
+          }else{
+              if (($tahun==$y)){
+                  $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2));
+              }else{
+                  $res['jml_entry']=$res['jml_entry']+(round($this->M_report->getEntryBUYearly($ch['BU_ID'],$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2));
+              }
           }
       }
+      $res['jml_entry']=$res['jml_entry']/$count;
+      if ($res['jml_entry']<100)
+      {
+        $res['status']='Under';
+    }
+    elseif ($res['jml_entry']==100) {
+        $res['status']='Complete';
+    }
+    else {
+        $res['status']='Over';
+    }
+    $res['allentry']=[];
+    foreach ($child as $chs) {
+        $allentry=$this->M_report->gettahunanbu($chs['BU_ID'],$tahun);
+        $i=1;
+        foreach ($allentry as $has) {
+            $count_user=$this->M_report->getCountUser($chs['BU_ID']);
+            if ($count_user>0) {
+                $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
+                if($i<=12)
+                    array_push($res['allentry'],['label'=>$monthName,'value'=>$res['allentry'][$i][1]+($has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun)))]);
+                $i++;
+            }
+
+        }
+
+
+    }
+    for ($v=1; $v<=12 ; $v++) {
+        $res['allentry'][$v][1]=$res['allentry'][$v][1]/$count;
+    }
+}else{
+    $count_user=$this->M_report->getCountUser($bu);
+      //echo print_r($tahun);
+    $count_user = ($count_user > 0) ? $count_user : 1;
+
+    if (($tahun==$y)){
+      $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", date("Y/m/d")) *100/$count_user,2);
+  }
+  else{
+      $res['jml_entry']=round($this->M_report->getEntryBUYearly($bu,$tahun)/$this->countDuration($tahun."/1/1", $tahun."/12/31") *100/$count_user,2);
+
+  }
+      // Entry text
+  if ($res['jml_entry']<100)
+  {
+      $res['status']='Under';
+  }
+  elseif ($res['jml_entry']==100) {
+      $res['status']='Complete';
+  }
+  else {
+      $res['status']='Over';
+  }
+
+
+  $allentry=$this->M_report->gettahunanbu($bu,$tahun);
+  $res['allentry']=[];
+  $i=1;
+  foreach ($allentry as $has) {
+          $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
+          array_push($res['allentry'],['label'=>$monthName,'value'=>$has['JML_ENTRY_BULANAN']*100/($count_user*$this->getdurationmonth($has['BULAN'],$tahun))]);
+
+          $i++;
+      }
+  }
+
+    //   json_encode($res,JSON_NUMERIC_CHECK);
+    //$i=1;
+    /*  $data['res'][0]=array('Month','Entry');
+
+    foreach ($res as $r) {
+
+
+
+    //  $hasil['res'][$i][0]=  $dateObj->format('M');
+    $data['res'][$i][0]=  $r['JML_ENTRY_BULANAN'];
+    $data['res'][$i][1]=  $r['BULAN'];
+
+    $i++;
+
+
+}*/
+
+$result["r_entry_bu"] = $res;
+
+echo json_encode($result,JSON_NUMERIC_CHECK);
+
+
+
+
+}
+
+    //resource per bu
+public function r_util_bu(){
+
+    $tahun = $this->input->post('tahun');
+        // $tahun = '2016';
+        //  $bu = 37;
+    $bu = $this->input->post('bu_id');
+
+    $y=(int)date("Y");
+        // $m=(int)date("m");
+        //echo print_r ($thn);
+    $c=$this->M_report->getbu($bu);
+    if ($c['BU_PARENT_ID']=='0') {
+        $count_user=0;
+        $child=$this->M_report->getbuchild($bu);
+        $res['jml_util']=0;
+        $count=count($child);
+        foreach ($child as $ch) {
+            $count_user=$this->M_report->getCountUser($ch['BU_ID']);
+            if ($count_user==0) {
+              $count=$count-1;
+              $count_user=1;
+          }else{
+              if (($tahun==$y)){
+                  $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2));
+              }
+              else{
+                  $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2));
+              }
+          }
+      }
+      $res['jml_util']=$res['jml_util']/$count;
+      if ($res['jml_util']<80)
+      {
+        $res['status_utilization']='Under';
+    }
+    elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
+        $res['status_utilization']='Optimal';
+    }
+    else {
+        $res['status_utilization']='Over';
+    }
+    $res['allhour']=[];
+      // $i=1;
+      // foreach ($allhour as $hus) {
+      //     $res['allhour'][$i][0]= $hus['BULAN'];
+      //     $res['allhour'][$i][1]=$hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun));
+      //     $i++;
+      // }
+    foreach ($child as $chs) {
+        $allhour=$this->M_report->getAllHourBU($chs['BU_ID'],$tahun);
+        $i=1;
+        foreach ($allhour as $hus) {
+            $count_user=$this->M_report->getCountUser($chs['BU_ID']);
+            if ($count_user>0) {
+                $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
+                array_push($res['allhour'],['label'=>$monthName,'value'=>($hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun)))]);
+
+                $i++;
+            }
+
+        }
+
+    }
+    for ($v=1; $v<=12 ; $v++) {
+        $res['allhour'][$v][1]=$res['allhour'][$v][1]/$count;
+    }
+}else {
+    $count_user=$this->M_report->getCountUser($bu);
+          //echo print_r($tahun);
+    if ($count_user==0) {
+        $count=$count-1;
+        $count_user=1;
+    }
+    else if (($tahun==$y)){
+
+        $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
+    }
+    else{
+        $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
+
+    }
+
+
+          //Utilization text
+    if ($res['jml_util']<80)
+    {
+        $res['status_utilization']='Under';
+    }
+    elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
+        $res['status_utilization']='Optimal';
+    }
+    else {
+        $res['status_utilization']='Over';
+    }
+
+    $allhour=$this->M_report->getAllHourBU($bu,$tahun);
+    $res['allhour']=[];
+    $i=1;
+    foreach ($allhour as $hus) {
+          $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
+          array_push($res['allhour'],['label'=>$monthName,'value'=>($hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun)))]);
+          $i++;
+      }
+  }
+
+
 
         //   json_encode($res,JSON_NUMERIC_CHECK);
         //$i=1;
@@ -989,192 +1122,96 @@ class Report extends CI_Controller {
 
 
     }*/
+    $res['allhour']=$res['allhour'];
 
-    $result["r_entry_bu"] = $res;
+    $result["r_util_bu"] = $res;
 
     echo json_encode($result,JSON_NUMERIC_CHECK);
+}
 
-
-
-
+function getdurationmonth($month,$tahun){
+    switch ($month) {
+        case '01':
+        $dur=$this->countDuration($tahun."/1/1", $tahun."/1/31");
+        break;
+        case '02':
+        $dur=$this->countDuration($tahun."/2/1", $tahun."/2/28");
+        break;
+        case '03':
+        $dur=$this->countDuration($tahun."/3/1", $tahun."/3/31");
+        break;
+        case '04':
+        $dur=$this->countDuration($tahun."/4/1", $tahun."/4/30");
+        break;
+        case '05':
+        $dur=$this->countDuration($tahun."/5/1", $tahun."/5/31");
+        break;
+        case '06':
+        $dur=$this->countDuration($tahun."/6/1", $tahun."/6/30");
+        break;
+        case '07':
+        $dur=$this->countDuration($tahun."/7/1", $tahun."/7/31");
+        break;
+        case '08':
+        $dur=$this->countDuration($tahun."/8/1", $tahun."/8/31");
+        break;
+        case '09':
+        $dur=$this->countDuration($tahun."/9/1", $tahun."/9/30");
+        break;
+        case '10':
+        $dur=$this->countDuration($tahun."/10/1", $tahun."/10/31");
+        break;
+        case '11':
+        $dur=$this->countDuration($tahun."/11/1", $tahun."/11/30");
+        break;
+        case '12':
+        $dur=$this->countDuration($tahun."/12/1", $tahun."/12/31");
+        break;
     }
+    return $dur;
+}
+        //report overview
+public function r_overview(){
 
-        //resource per bu
-    public function r_util_bu(){
+    $date=date("M-Y");
+    $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+        round(sum(ev)/count(c.project_id),2) as EV,
+        round(sum(pv)/count(c.project_id),2) as PV,
+        round(sum(AC)/count(c.project_id),2) as AC,
+        case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+        case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+        from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
+        case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
+        case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+        project_id
+        from tb_rekap_project
+        where  to_char(tanggal,'Mon-YYYY')='$date'
+        group by project_id) a inner join
+        projects c on c.project_id=a.project_id
+        inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+        where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
+        and type_of_effort in (1,2)
+        and pv!='0'
+        and b.BU_CODE !='PROUDS'
+        and b.BU_code !='GTS'
+        and b.BU_code !='NSM'
+        group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+        order by case when b.bu_code = 'SMS' then 1
+        when b.bu_code = 'SSI' then 2
+        when b.bu_code = 'SGP' then 3
+        else 5
+         end DESC");
+    $result["r_monthly"] = $query->result();
+    $year=date("Y");
 
-        $tahun = $this->input->post('tahun');
-            // $tahun = '2016';
-            //  $bu = 37;
-        $bu = $this->input->post('bu_id');
-
-        $y=(int)date("Y");
-            // $m=(int)date("m");
-            //echo print_r ($thn);
-        $c=$this->M_report->getbu($bu);
-        if ($c['BU_PARENT_ID']=='0') {
-            $count_user=0;
-            $child=$this->M_report->getbuchild($bu);
-            $res['jml_util']=0;
-            $count=count($child);
-            foreach ($child as $ch) {
-                $count_user=$this->M_report->getCountUser($ch['BU_ID']);
-                if ($count_user==0) {
-                  $count=$count-1;
-                  $count_user=1;
-              }else{
-                  if (($tahun==$y)){
-                      $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2));
-                  }
-                  else{
-                      $res['jml_util']=$res['jml_util']+(round($this->M_report->getUtilBUYearly($ch['BU_ID'],$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2));
-                  }
-              }
-          }
-          $res['jml_util']=$res['jml_util']/$count;
-          if ($res['jml_util']<80)
-          {
-            $res['status_utilization']='Under';
-        }
-        elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
-            $res['status_utilization']='Optimal';
-        }
-        else {
-            $res['status_utilization']='Over';
-        }
-        $res['allhour']=[];
-          // $i=1;
-          // foreach ($allhour as $hus) {
-          //     $res['allhour'][$i][0]= $hus['BULAN'];
-          //     $res['allhour'][$i][1]=$hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun));
-          //     $i++;
-          // }
-        foreach ($child as $chs) {
-            $allhour=$this->M_report->getAllHourBU($chs['BU_ID'],$tahun);
-            $i=1;
-            foreach ($allhour as $hus) {
-                $count_user=$this->M_report->getCountUser($chs['BU_ID']);
-                if ($count_user>0) {
-                    $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
-                    array_push($res['allhour'],['label'=>$monthName,'value'=>($hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun)))]);
-
-                    $i++;
-                }
-
-            }
-
-        }
-        for ($v=1; $v<=12 ; $v++) {
-            $res['allhour'][$v][1]=$res['allhour'][$v][1]/$count;
-        }
-    }else {
-        $count_user=$this->M_report->getCountUser($bu);
-              //echo print_r($tahun);
-        if ($count_user==0) {
-            $count=$count-1;
-            $count_user=1;
-        }
-        else if (($tahun==$y)){
-
-            $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", date("Y/m/d"))*8) *100/$count_user,2);
-        }
-        else{
-            $res['jml_util']=round($this->M_report->getUtilBUYearly($bu,$tahun)/($this->countDuration($tahun."/1/1", $tahun."/12/31")*8) *100/$count_user,2);
-
-        }
-
-
-              //Utilization text
-        if ($res['jml_util']<80)
-        {
-            $res['status_utilization']='Under';
-        }
-        elseif (($res['jml_util']>=80)&& ($res['jml_util']<=100)   ){
-            $res['status_utilization']='Optimal';
-        }
-        else {
-            $res['status_utilization']='Over';
-        }
-
-        $allhour=$this->M_report->getAllHourBU($bu,$tahun);
-        $res['allhour']=[];
-        $i=1;
-        foreach ($allhour as $hus) {
-              $monthName = date('M', mktime(0, 0, 0, $i, 10)); // March
-              array_push($res['allhour'],['label'=>$monthName,'value'=>($hus['JML_ENTRY_BULANAN']*100/(8*$count_user*$this->getdurationmonth($hus['BULAN'],$tahun)))]);
-              $i++;
-          }
-      }
-
-
-
-            //   json_encode($res,JSON_NUMERIC_CHECK);
-            //$i=1;
-            /*  $data['res'][0]=array('Month','Entry');
-
-            foreach ($res as $r) {
-
-
-
-            //  $hasil['res'][$i][0]=  $dateObj->format('M');
-            $data['res'][$i][0]=  $r['JML_ENTRY_BULANAN'];
-            $data['res'][$i][1]=  $r['BULAN'];
-
-            $i++;
-
-
-        }*/
-        $res['allhour']=$res['allhour'];
-
-        $result["r_util_bu"] = $res;
-
-        echo json_encode($result,JSON_NUMERIC_CHECK);
+    $listBU=explode(",",$this->input->post('bu_aliases'));
+    foreach ($listBU as &$value) {
+        $list[] = "'".$value."'";
     }
-
-    function getdurationmonth($month,$tahun){
-        switch ($month) {
-            case '01':
-            $dur=$this->countDuration($tahun."/1/1", $tahun."/1/31");
-            break;
-            case '02':
-            $dur=$this->countDuration($tahun."/2/1", $tahun."/2/28");
-            break;
-            case '03':
-            $dur=$this->countDuration($tahun."/3/1", $tahun."/3/31");
-            break;
-            case '04':
-            $dur=$this->countDuration($tahun."/4/1", $tahun."/4/30");
-            break;
-            case '05':
-            $dur=$this->countDuration($tahun."/5/1", $tahun."/5/31");
-            break;
-            case '06':
-            $dur=$this->countDuration($tahun."/6/1", $tahun."/6/30");
-            break;
-            case '07':
-            $dur=$this->countDuration($tahun."/7/1", $tahun."/7/31");
-            break;
-            case '08':
-            $dur=$this->countDuration($tahun."/8/1", $tahun."/8/31");
-            break;
-            case '09':
-            $dur=$this->countDuration($tahun."/9/1", $tahun."/9/30");
-            break;
-            case '10':
-            $dur=$this->countDuration($tahun."/10/1", $tahun."/10/31");
-            break;
-            case '11':
-            $dur=$this->countDuration($tahun."/11/1", $tahun."/11/30");
-            break;
-            case '12':
-            $dur=$this->countDuration($tahun."/12/1", $tahun."/12/31");
-            break;
-        }
-        return $dur;
-    }
-            //report overview
-    public function r_overview(){
-
-        $date=date("M-Y");
+    $listBU = implode(",",$list);
+    for($i=1; $i<=12; $i++)
+    {
+        $month = date("M", mktime(0, 0, 0, $i, 10));
         $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
             round(sum(ev)/count(c.project_id),2) as EV,
             round(sum(pv)/count(c.project_id),2) as PV,
@@ -1186,7 +1223,7 @@ class Report extends CI_Controller {
             case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
             project_id
             from tb_rekap_project
-            where  to_char(tanggal,'Mon-YYYY')='$date'
+            where  to_char(tanggal,'Mon-YYYY')='$month-$year'
             group by project_id) a inner join
             projects c on c.project_id=a.project_id
             inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
@@ -1196,62 +1233,82 @@ class Report extends CI_Controller {
             and b.BU_CODE !='PROUDS'
             and b.BU_code !='GTS'
             and b.BU_code !='NSM'
+            and b.BU_alias in ($listBU)
             group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
             order by case when b.bu_code = 'SMS' then 1
             when b.bu_code = 'SSI' then 2
             when b.bu_code = 'SGP' then 3
             else 5
-             end DESC");
-        $result["r_monthly"] = $query->result();
-        $year=date("Y");
-
-        $listBU=explode(",",$this->input->post('bu_aliases'));
-        foreach ($listBU as &$value) {
-            $list[] = "'".$value."'";
-        }
-        $listBU = implode(",",$list);
-        for($i=1; $i<=12; $i++)
-        {
-            $month = date("M", mktime(0, 0, 0, $i, 10));
-            $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-                round(sum(ev)/count(c.project_id),2) as EV,
-                round(sum(pv)/count(c.project_id),2) as PV,
-                round(sum(AC)/count(c.project_id),2) as AC,
-                case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-                case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-                from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-                case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-                case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-                project_id
-                from tb_rekap_project
-                where  to_char(tanggal,'Mon-YYYY')='$month-$year'
-                group by project_id) a inner join
-                projects c on c.project_id=a.project_id
-                inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-                where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
-                and type_of_effort in (1,2)
-                and pv!='0'
-                and b.BU_CODE !='PROUDS'
-                and b.BU_code !='GTS'
-                and b.BU_code !='NSM'
-                and b.BU_alias in ($listBU)
-                group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
-                order by case when b.bu_code = 'SMS' then 1
-                when b.bu_code = 'SSI' then 2
-                when b.bu_code = 'SGP' then 3
-                else 5
-                   end DESC");
-            $result["r_yearly"][$i] = $query->result();
-            $result["r_yearly"][$i]["month_name"] = $month;
-        }
-        echo json_encode($result);
+               end DESC");
+        $result["r_yearly"][$i] = $query->result();
+        $result["r_yearly"][$i]["month_name"] = $month;
     }
+    echo json_encode($result);
+}
 
-            //report monthly overview
-    public function r_month(){
-        $tahun = $this->input->post('tahun');
-        $month = date("M", mktime(0, 0, 0, $this->input->post('bulan'), 10));
+        //report monthly overview
+public function r_month(){
+    $tahun = $this->input->post('tahun');
+    $month = date("M", mktime(0, 0, 0, $this->input->post('bulan'), 10));
 
+    $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+        round(sum(ev)/count(c.project_id),2) as EV,
+        round(sum(pv)/count(c.project_id),2) as PV,
+        round(sum(AC)/count(c.project_id),2) as AC,
+        case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+        case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+        from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
+        case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
+        case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+        project_id
+        from tb_rekap_project
+        where  to_char(tanggal,'Mon-YYYY')='$month-$tahun'
+        group by project_id) a inner join
+        projects c on c.project_id=a.project_id
+        inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+        where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
+        and type_of_effort in ('1','2')
+        and pv!='0'
+        and b.BU_CODE !='PROUDS'
+        and b.BU_code !='GTS'
+        and b.BU_code !='NSM'
+        group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+        order by case when b.bu_code = 'SMS' then 1
+        when b.bu_code = 'SSI' then 2
+        when b.bu_code = 'SGP' then 3
+        else 5
+         end DESC");
+    $result["r_monthly"] = $query->result();
+    $known = array();
+    $knownz = array();
+    $filtered["r_monthly"] = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
+        $unique = !in_array($val->BU_ALIAS, $knownz);
+        array_push($known,$val);
+
+        $knownz[] = $val->BU_ALIAS;
+        return $unique;
+    });
+    $object = new stdClass();
+    foreach ($filtered as $key => $value)
+    {
+        $object->$key = $value;
+    }
+    $filteredz["r_monthly"] = array($object);
+    echo json_encode($filtered);
+}
+        //report yearly overview
+public function r_yearly($year=false){
+    if(!$year)
+    {
+        $year=date("Y");
+    }
+    $listBU=explode(",",$this->input->post('bu_aliases'));
+    foreach ($listBU as &$value) {
+        $list[] = "'".$value."'";
+    }
+    for($i=1; $i<=12; $i++)
+    {
+        $month = date("M", mktime(0, 0, 0, $i, 10));
         $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
             round(sum(ev)/count(c.project_id),2) as EV,
             round(sum(pv)/count(c.project_id),2) as PV,
@@ -1263,7 +1320,7 @@ class Report extends CI_Controller {
             case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
             project_id
             from tb_rekap_project
-            where  to_char(tanggal,'Mon-YYYY')='$month-$tahun'
+            where  to_char(tanggal,'Mon-YYYY')='$month-$year'
             group by project_id) a inner join
             projects c on c.project_id=a.project_id
             inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
@@ -1278,383 +1335,325 @@ class Report extends CI_Controller {
             when b.bu_code = 'SSI' then 2
             when b.bu_code = 'SGP' then 3
             else 5
-             end DESC");
-        $result["r_monthly"] = $query->result();
-        $known = array();
-        $knownz = array();
-        $filtered["r_monthly"] = array_filter($result["r_monthly"], function ($val) use (&$known,&$knownz) {
-            $unique = !in_array($val->BU_ALIAS, $knownz);
-            array_push($known,$val);
+               end DESC");
+        $hasil =$query->result();
+        $anu = array("name" => $month);
+        $anuz = array("name" => $month);
 
-            $knownz[] = $val->BU_ALIAS;
-            return $unique;
-        });
-        $object = new stdClass();
-        foreach ($filtered as $key => $value)
+        for($o=0; $o<count($hasil); $o++)
         {
-            $object->$key = $value;
+            $anu[$hasil[$o]->BU_ALIAS]=$hasil[$o]->CPI;
+            $anuz[$hasil[$o]->BU_ALIAS]=$hasil[$o]->SPI;
         }
-        $filteredz["r_monthly"] = array($object);
-        echo json_encode($filtered);
+
+        $result["r_yearly_cpi"][]=$anu;
+        $result["r_yearly_spi"][]=$anuz;
+
+            // $result["r_yearly"][]["month_name"] = $month;
     }
-            //report yearly overview
-    public function r_yearly($year=false){
-        if(!$year)
-        {
-            $year=date("Y");
-        }
-        $listBU=explode(",",$this->input->post('bu_aliases'));
-        foreach ($listBU as &$value) {
-            $list[] = "'".$value."'";
-        }
-        for($i=1; $i<=12; $i++)
-        {
-            $month = date("M", mktime(0, 0, 0, $i, 10));
-            $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-                round(sum(ev)/count(c.project_id),2) as EV,
-                round(sum(pv)/count(c.project_id),2) as PV,
-                round(sum(AC)/count(c.project_id),2) as AC,
-                case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-                case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-                from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-                case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-                case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-                project_id
-                from tb_rekap_project
-                where  to_char(tanggal,'Mon-YYYY')='$month-$year'
-                group by project_id) a inner join
-                projects c on c.project_id=a.project_id
-                inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-                where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
-                and type_of_effort in ('1','2')
-                and pv!='0'
-                and b.BU_CODE !='PROUDS'
-                and b.BU_code !='GTS'
-                and b.BU_code !='NSM'
-                group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
-                order by case when b.bu_code = 'SMS' then 1
-                when b.bu_code = 'SSI' then 2
-                when b.bu_code = 'SGP' then 3
-                else 5
-                   end DESC");
-            $hasil =$query->result();
-            $anu = array("name" => $month);
-            $anuz = array("name" => $month);
+    echo json_encode($result);
 
-            for($o=0; $o<count($hasil); $o++)
-            {
-                $anu[$hasil[$o]->BU_ALIAS]=$hasil[$o]->CPI;
-                $anuz[$hasil[$o]->BU_ALIAS]=$hasil[$o]->SPI;
+}
+
+
+public function report_filter(){
+    $keyword = $this->input->post('keyword');
+    $page = $this->input->post('page');
+    $limit =$this->input->post('limit');
+    $query ="select project_name,iwo_no,project_status,project_complete as percent,amount,
+    customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
+    where 1=1
+    ";
+    $i = 0;
+    $value = $this->input->post('value');
+    $status = $this->input->post('status');
+    $schedule = $this->input->post('schedule');
+    $budget = $this->input->post('budget');
+
+    if(!empty($value)){
+        $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
+        $query.=" and ( ";
+        for($a = 0 ; $a < count($valueVal);$a++){
+            if($i == 0){
+                    //$query .= " where ";
+                $i++;
+            }
+                // elseif($value[$a] == 1 ){
+                //     $query .= " or ";
+                // }
+            if($value[$a] == 1 && $a==0){
+                $query .= " amount '".$valueVal[$a]."' ";
+            }
+            elseif($value[$a] == 1 && $a>0){
+                $query .= " or amount '".$valueVal[$a]."' ";
+            }
+        }
+        $query.=" ) ";
+    }if(!empty($status)){
+        $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
+        $query.=" and project_status in ( ";
+        for($a = 0 ; $a < count($valueVal);$a++){
+            if($i == 0){
+                    //$query .= " where ";
+                $i++;
+            }
+                // elseif($status[$a] == 1 ){
+                //     $query .= " or ";
+                // }
+                // if($status[$a] == 1 && $a==0){
+                //     $query .= " project_status =  '".$valueVal[$a]."'";
+                // }elseif ($status[$a] == 1 && $a>0) {
+                //     $query .= " or project_status =  '".$valueVal[$a]."'";
+                // }
+                // else{
+                //     $query .= " or project_status =  '".$valueVal[$a]."'";
+                // }
+            if($status[$a] == 1){
+                $query.=" '".$valueVal[$a]."',";
+            }
+            if ($a==count($valueVal)-1) {
+                $query=rtrim($query,",");
+            }
+        }
+
+        $query.=" ) ";
+    }if(!empty($schedule)){
+        $query.=" and schedule_status in ( ";
+
+        $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
+        for($a = 0 ; $a < count($valueVal);$a++){
+            if($i == 0){
+                    //$query .= " where ";
+                $i++;
+            }
+                // elseif($schedule[$a] == 1 ){
+                //     //echo $c;
+                //     $query .= " or ";
+                // }
+                // if($schedule[$a] == 1&& $a==0){
+                //     $query .= " schedule_status = '".$valueVal[$a]."'";
+                // }
+                // elseif($schedule[$a] == 1&& $a>0){
+                //     $query .= " or schedule_status = '".$valueVal[$a]."'";
+                // }
+            if($schedule[$a] == 1){
+                $query.=" '".$valueVal[$a]."',";
+            }
+            if ($a==count($valueVal)-1) {
+                $query=rtrim($query,",");
             }
 
-            $result["r_yearly_cpi"][]=$anu;
-            $result["r_yearly_spi"][]=$anuz;
-
-                // $result["r_yearly"][]["month_name"] = $month;
         }
-        echo json_encode($result);
+        $query.=" ) ";
+    }if(!empty($budget)){
 
+        $query.=" and budget_status in ( ";
+        $valueVal = ["Over Budget","On Budget","Ahead Budget"];
+        for($a = 0 ; $a < count($valueVal);$a++){
+            if($i == 0){
+                    //$query .= " where ";
+                $i++;
+            }
+                // elseif($budget[$a] == 1){
+                //     $query .= " or ";
+                // }
+                // if($budget[$a] == 1&& $a==0){
+                //     $query .= " budget_status = '".$valueVal[$a]."'";
+                // }elseif($budget[$a] == 1&& $a>0){
+                //     $query .= " or budget_status = '".$valueVal[$a]."'";
+                // }
+            if($budget[$a] == 1){
+                $query.=" '".$valueVal[$a]."',";
+            }
+            if ($a==count($valueVal)-1) {
+                $query=rtrim($query,",");
+            }
+
+        }
+
+        $query.=" ) ";
     }
 
-
-    public function report_filter(){
-        $keyword = $this->input->post('keyword');
-        $page = $this->input->post('page');
-        $limit =$this->input->post('limit');
-        $query ="select project_name,iwo_no,project_status,project_complete as percent,amount,
-        customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
-        where 1=1
-        ";
-        $i = 0;
-        $value = $this->input->post('value');
-        $status = $this->input->post('status');
-        $schedule = $this->input->post('schedule');
-        $budget = $this->input->post('budget');
-
-        if(!empty($value)){
-            $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
-            $query.=" and ( ";
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                        //$query .= " where ";
-                    $i++;
-                }
-                    // elseif($value[$a] == 1 ){
-                    //     $query .= " or ";
-                    // }
-                if($value[$a] == 1 && $a==0){
-                    $query .= " amount '".$valueVal[$a]."' ";
-                }
-                elseif($value[$a] == 1 && $a>0){
-                    $query .= " or amount '".$valueVal[$a]."' ";
-                }
-            }
-            $query.=" ) ";
-        }if(!empty($status)){
-            $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
-            $query.=" and project_status in ( ";
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                        //$query .= " where ";
-                    $i++;
-                }
-                    // elseif($status[$a] == 1 ){
-                    //     $query .= " or ";
-                    // }
-                    // if($status[$a] == 1 && $a==0){
-                    //     $query .= " project_status =  '".$valueVal[$a]."'";
-                    // }elseif ($status[$a] == 1 && $a>0) {
-                    //     $query .= " or project_status =  '".$valueVal[$a]."'";
-                    // }
-                    // else{
-                    //     $query .= " or project_status =  '".$valueVal[$a]."'";
-                    // }
-                if($status[$a] == 1){
-                    $query.=" '".$valueVal[$a]."',";
-                }
-                if ($a==count($valueVal)-1) {
-                    $query=rtrim($query,",");
-                }
-            }
-
-            $query.=" ) ";
-        }if(!empty($schedule)){
-            $query.=" and schedule_status in ( ";
-
-            $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                        //$query .= " where ";
-                    $i++;
-                }
-                    // elseif($schedule[$a] == 1 ){
-                    //     //echo $c;
-                    //     $query .= " or ";
-                    // }
-                    // if($schedule[$a] == 1&& $a==0){
-                    //     $query .= " schedule_status = '".$valueVal[$a]."'";
-                    // }
-                    // elseif($schedule[$a] == 1&& $a>0){
-                    //     $query .= " or schedule_status = '".$valueVal[$a]."'";
-                    // }
-                if($schedule[$a] == 1){
-                    $query.=" '".$valueVal[$a]."',";
-                }
-                if ($a==count($valueVal)-1) {
-                    $query=rtrim($query,",");
-                }
-
-            }
-            $query.=" ) ";
-        }if(!empty($budget)){
-
-            $query.=" and budget_status in ( ";
-            $valueVal = ["Over Budget","On Budget","Ahead Budget"];
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                        //$query .= " where ";
-                    $i++;
-                }
-                    // elseif($budget[$a] == 1){
-                    //     $query .= " or ";
-                    // }
-                    // if($budget[$a] == 1&& $a==0){
-                    //     $query .= " budget_status = '".$valueVal[$a]."'";
-                    // }elseif($budget[$a] == 1&& $a>0){
-                    //     $query .= " or budget_status = '".$valueVal[$a]."'";
-                    // }
-                if($budget[$a] == 1){
-                    $query.=" '".$valueVal[$a]."',";
-                }
-                if ($a==count($valueVal)-1) {
-                    $query=rtrim($query,",");
-                }
-
-            }
-
-            $query.=" ) ";
-        }
-
-            //for search by keyword
-        if($keyword != null){
-            $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
-        }
-
-
-
-        $query_pagination = $query;
-            //for pagination
-        ($page == null ? $page = 1: false);
-        ($limit == null ? $limit = 5:false);
-        $query .= " and rownum between ".(string)($page*$limit-$limit)." and ".(string)($page*$limit);
-
-        $query .= "order by date_created";
-
-            //run query
-        $result['project_find'] = $this->db->query($query)->result_array();
-        $result['pagenumber'] = ceil($this->db->query($query_pagination)->num_rows()/$limit);
-
-        echo json_encode($result);
+        //for search by keyword
+    if($keyword != null){
+        $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
     }
 
 
 
-    public function report_filter_download(){
+    $query_pagination = $query;
+        //for pagination
+    ($page == null ? $page = 1: false);
+    ($limit == null ? $limit = 5:false);
+    $query .= " and rownum between ".(string)($page*$limit-$limit)." and ".(string)($page*$limit);
 
-        $this->load->library('excel');
+    $query .= "order by date_created";
 
-        $this->excel->setActiveSheetIndex(0);
-            //name the worksheet
-        $this->excel->getActiveSheet()->setTitle('Report Project');
-            //set cell A1 content with some text
-        $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
+        //run query
+    $result['project_find'] = $this->db->query($query)->result_array();
+    $result['pagenumber'] = ceil($this->db->query($query_pagination)->num_rows()/$limit);
+
+    echo json_encode($result);
+}
 
 
-        $query ="select project_name,project_status,project_complete as percent,amount,
-        customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
-        where 1=1";
-        $i = 0;
 
-        $keyword = $this->input->post('keyword');
-        $value = $this->input->post('value');
-        $status = $this->input->post('status');
-        $schedule = $this->input->post('schedule');
-        $budget = $this->input->post('budget');
+public function report_filter_download(){
 
-        if(!empty($value)){
-            $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
-            $query.=" and ( ";
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                        //$query .= " where ";
-                    $i++;
-                }
-                    // elseif($value[$a] == 1 ){
-                    //     $query .= " or ";
-                    // }
-                if($value[$a] == 1 && $a==0){
-                    $query .= " amount '".$valueVal[$a]."' ";
-                }
-                elseif($value[$a] == 1 && $a>0){
-                    $query .= " or amount '".$valueVal[$a]."' ";
-                }
+    $this->load->library('excel');
+
+    $this->excel->setActiveSheetIndex(0);
+        //name the worksheet
+    $this->excel->getActiveSheet()->setTitle('Report Project');
+        //set cell A1 content with some text
+    $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
+
+
+    $query ="select project_name,project_status,project_complete as percent,amount,
+    customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
+    where 1=1";
+    $i = 0;
+
+    $keyword = $this->input->post('keyword');
+    $value = $this->input->post('value');
+    $status = $this->input->post('status');
+    $schedule = $this->input->post('schedule');
+    $budget = $this->input->post('budget');
+
+    if(!empty($value)){
+        $valueVal = ["< 1000000000","between 1000000000 and 5000000000","> 5000000000"];
+        $query.=" and ( ";
+        for($a = 0 ; $a < count($valueVal);$a++){
+            if($i == 0){
+                    //$query .= " where ";
+                $i++;
             }
-            $query.=" ) ";
-        }if(!empty($status)){
-            $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
-            $query.=" and project_status in ( ";
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                        //$query .= " where ";
-                    $i++;
-                }
-                    // elseif($status[$a] == 1 ){
-                    //     $query .= " or ";
-                    // }
-                    // if($status[$a] == 1 && $a==0){
-                    //     $query .= " project_status =  '".$valueVal[$a]."'";
-                    // }elseif ($status[$a] == 1 && $a>0) {
-                    //     $query .= " or project_status =  '".$valueVal[$a]."'";
-                    // }
-                    // else{
-                    //     $query .= " or project_status =  '".$valueVal[$a]."'";
-                    // }
-                if($status[$a] == 1){
-                    $query.=" '".$valueVal[$a]."',";
-                }
-                if ($a==count($valueVal)-1) {
-                    $query=rtrim($query,",");
-                }
+                // elseif($value[$a] == 1 ){
+                //     $query .= " or ";
+                // }
+            if($value[$a] == 1 && $a==0){
+                $query .= " amount '".$valueVal[$a]."' ";
             }
-
-            $query.=" ) ";
-        }if(!empty($schedule)){
-            $query.=" and schedule_status in ( ";
-
-            $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                        //$query .= " where ";
-                    $i++;
-                }
-                    // elseif($schedule[$a] == 1 ){
-                    //     //echo $c;
-                    //     $query .= " or ";
-                    // }
-                    // if($schedule[$a] == 1&& $a==0){
-                    //     $query .= " schedule_status = '".$valueVal[$a]."'";
-                    // }
-                    // elseif($schedule[$a] == 1&& $a>0){
-                    //     $query .= " or schedule_status = '".$valueVal[$a]."'";
-                    // }
-                if($schedule[$a] == 1){
-                    $query.=" '".$valueVal[$a]."',";
-                }
-                if ($a==count($valueVal)-1) {
-                    $query=rtrim($query,",");
-                }
-
+            elseif($value[$a] == 1 && $a>0){
+                $query .= " or amount '".$valueVal[$a]."' ";
             }
-            $query.=" ) ";
-        }if(!empty($budget)){
-
-            $query.=" and budget_status in ( ";
-            $valueVal = ["Over Budget","On Budget","Ahead Budget"];
-            for($a = 0 ; $a < count($valueVal);$a++){
-                if($i == 0){
-                        //$query .= " where ";
-                    $i++;
-                }
-                    // elseif($budget[$a] == 1){
-                    //     $query .= " or ";
-                    // }
-                    // if($budget[$a] == 1&& $a==0){
-                    //     $query .= " budget_status = '".$valueVal[$a]."'";
-                    // }elseif($budget[$a] == 1&& $a>0){
-                    //     $query .= " or budget_status = '".$valueVal[$a]."'";
-                    // }
-                if($budget[$a] == 1){
-                    $query.=" '".$valueVal[$a]."',";
-                }
-                if ($a==count($valueVal)-1) {
-                    $query=rtrim($query,",");
-                }
-
+        }
+        $query.=" ) ";
+    }if(!empty($status)){
+        $valueVal = ["Not Started","In Progress","On Hold","Completed","In Planning","Cancelled"];
+        $query.=" and project_status in ( ";
+        for($a = 0 ; $a < count($valueVal);$a++){
+            if($i == 0){
+                    //$query .= " where ";
+                $i++;
             }
-
-            $query.=" ) ";
+                // elseif($status[$a] == 1 ){
+                //     $query .= " or ";
+                // }
+                // if($status[$a] == 1 && $a==0){
+                //     $query .= " project_status =  '".$valueVal[$a]."'";
+                // }elseif ($status[$a] == 1 && $a>0) {
+                //     $query .= " or project_status =  '".$valueVal[$a]."'";
+                // }
+                // else{
+                //     $query .= " or project_status =  '".$valueVal[$a]."'";
+                // }
+            if($status[$a] == 1){
+                $query.=" '".$valueVal[$a]."',";
+            }
+            if ($a==count($valueVal)-1) {
+                $query=rtrim($query,",");
+            }
         }
 
-            //for search by keyword
-        if($keyword != null){
-            $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
-        }
+        $query.=" ) ";
+    }if(!empty($schedule)){
+        $query.=" and schedule_status in ( ";
 
-
-            //echo $query.$cond;
-        $p =$this->db->query($query)->result_array();
-
-            // read data to active sheet
-        $this->excel->getActiveSheet()->fromArray($p);
-
-            $filename='Project Report.xls'; //save our workbook as this file name
-
-            header('Content-Type: application/vnd.ms-excel'); //mime type
-
-            header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
-
-            header('Cache-Control: max-age=0'); //no cache
-
-            //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
-            //if you want to save it as .XLSX Excel 2007 format
-
-            $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
-
-            //force user to download the Excel file without writing it to server's HD
-            $objWriter->save('php://output');
-
+        $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
+        for($a = 0 ; $a < count($valueVal);$a++){
+            if($i == 0){
+                    //$query .= " where ";
+                $i++;
+            }
+                // elseif($schedule[$a] == 1 ){
+                //     //echo $c;
+                //     $query .= " or ";
+                // }
+                // if($schedule[$a] == 1&& $a==0){
+                //     $query .= " schedule_status = '".$valueVal[$a]."'";
+                // }
+                // elseif($schedule[$a] == 1&& $a>0){
+                //     $query .= " or schedule_status = '".$valueVal[$a]."'";
+                // }
+            if($schedule[$a] == 1){
+                $query.=" '".$valueVal[$a]."',";
+            }
+            if ($a==count($valueVal)-1) {
+                $query=rtrim($query,",");
+            }
 
         }
+        $query.=" ) ";
+    }if(!empty($budget)){
+
+        $query.=" and budget_status in ( ";
+        $valueVal = ["Over Budget","On Budget","Ahead Budget"];
+        for($a = 0 ; $a < count($valueVal);$a++){
+            if($i == 0){
+                    //$query .= " where ";
+                $i++;
+            }
+                // elseif($budget[$a] == 1){
+                //     $query .= " or ";
+                // }
+                // if($budget[$a] == 1&& $a==0){
+                //     $query .= " budget_status = '".$valueVal[$a]."'";
+                // }elseif($budget[$a] == 1&& $a>0){
+                //     $query .= " or budget_status = '".$valueVal[$a]."'";
+                // }
+            if($budget[$a] == 1){
+                $query.=" '".$valueVal[$a]."',";
+            }
+            if ($a==count($valueVal)-1) {
+                $query=rtrim($query,",");
+            }
+
+        }
+
+        $query.=" ) ";
+    }
+
+        //for search by keyword
+    if($keyword != null){
+        $query .= "and ( lower(project_name) like lower('$keyword') || '%' or lower(project_name) like '%' || lower('$keyword') or lower(project_name) like '%'|| lower('$keyword') || '%')";
+    }
+
+
+        //echo $query.$cond;
+    $p =$this->db->query($query)->result_array();
+
+        // read data to active sheet
+    $this->excel->getActiveSheet()->fromArray($p);
+
+        $filename='Project Report.xls'; //save our workbook as this file name
+
+        header('Content-Type: application/vnd.ms-excel'); //mime type
+
+        header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
+
+        header('Cache-Control: max-age=0'); //no cache
+
+        //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
+        //if you want to save it as .XLSX Excel 2007 format
+
+        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
+
+        //force user to download the Excel file without writing it to server's HD
+        $objWriter->save('php://output');
+
+
+    }
 
 
 }
