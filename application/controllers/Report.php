@@ -846,6 +846,7 @@ public function r_people_download(){
 
     }
     $wrap['report_people'] = $datareport;
+    echo json_encode($wrap);
     $this->load->library('excel');
 
     $this->excel->setActiveSheetIndex(0);
@@ -872,7 +873,7 @@ public function r_people_download(){
 
         //force user to download the Excel file without writing it to server's HD
         $objWriter->save('php://output');
-        echo json_encode($wrap);
+
 }
     //resource per bu
 public function r_entry_bu(){
