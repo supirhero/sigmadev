@@ -134,6 +134,9 @@ class Report extends CI_Controller {
                             case '3':
                             $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
                             break;
+                            case '5':
+                                $bu_id = "masuk";
+                                break;
                             case '6':
                             $bu_id = $_POST['bu'];
                             break;
