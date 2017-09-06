@@ -314,7 +314,7 @@ class Login extends CI_Controller {
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to('geryruslan@gmail.com');
+        $this->email->to('salma.ulhaq@sigma.co.id');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -652,7 +652,7 @@ class Login extends CI_Controller {
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to('geryruslan@gmail.com');
+        $this->email->to('salma.ulhaq@sigma.co.id,');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -1037,7 +1037,7 @@ class Login extends CI_Controller {
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to('geryruslan@gmail.com');
+        $this->email->to('salma.ulhaq@sigma.co.id');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
