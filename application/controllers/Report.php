@@ -852,8 +852,8 @@ public function r_people_download(){
     $this->excel->setActiveSheetIndex(0);
         //name the worksheet
     $this->excel->getActiveSheet()->setTitle('Report Project');
-        //set cell A1 content with some text
-    $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
+    //     //set cell A1 content with some text
+    // $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
 
 
     //$this->excel->getActiveSheet()->fromArray($wrap);
@@ -864,7 +864,7 @@ public function r_people_download(){
 
         header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
 
-        header('Cache-Control: max-age=0'); //no cache
+        //header('Cache-Control: max-age=0'); //no cache
 
         //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
         //if you want to save it as .XLSX Excel 2007 format
