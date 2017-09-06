@@ -544,16 +544,23 @@ class Report extends CI_Controller {
     //get list all bu
     public function r_list_bu(){
         $user_bu = $this->datajson['userdata']['BU_ID'];
-        $bu_parent_id = $this->db->query("select * from p_bu where bu_parent_id is null")->row_array();
+        $user_bu = 20;
         $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
+
+        //if company
         if($user_bu_parent == null){
             $data_bu = $this->M_business->getAllBU();
+            $tree['jenis'] = 'company';
         }
+        //elseif directorat
         elseif ($user_bu_parent == 0){
-            $data_bu = $this->db->query("select * ");
+            $data_bu = $this->db->query("select * from p_bu where bu_parent_id = '$user_bu' or bu_id = '$user_bu' or bu_id = '0'")->result_array();
+            $tree['jenis'] = 'directorat';
         }
+        //if bu
         else{
-
+            $data_bu = $this->db->query("select * from p_bu where bu_id = '$user_bu_parent' or bu_id = '$user_bu' or bu_id = '0'")->result_array();
+            $tree['jenis'] = 'business_unit';
         }
 
         for($i = 0 ; $i < count($data_bu) ; $i++){
