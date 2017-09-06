@@ -543,7 +543,18 @@ class Report extends CI_Controller {
 
     //get list all bu
     public function r_list_bu(){
-        $data_bu = $this->M_business->getAllBU();
+        $user_bu = $this->datajson['userdata']['BU_ID'];
+        $bu_parent_id = $this->db->query("select * from p_bu where bu_parent_id is null")->row_array();
+        $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
+        if($user_bu_parent == null){
+            $data_bu = $this->M_business->getAllBU();
+        }
+        elseif ($user_bu_parent == 0){
+            $data_bu = $this->db->query("select * ");
+        }
+        else{
+
+        }
 
         for($i = 0 ; $i < count($data_bu) ; $i++){
             $data_bu[$i]['children'] = null;
@@ -1360,7 +1371,7 @@ public function report_filter(){
     $keyword = $this->input->post('keyword');
     $page = $this->input->post('page');
     $limit =$this->input->post('limit');
-    $query ="select project_name,iwo_no,project_status,project_complete as percent,amount,
+    $query ="select * from (select rownum as rn, project_name,iwo_no,project_status,project_complete as percent,amount,
     customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
     where 1=1
     ";
@@ -1481,17 +1492,16 @@ public function report_filter(){
 
 
 
-    $query_pagination = $query;
+    $query_pagination = "select count(*) as jumlah from v_find_project";
         //for pagination
     ($page == null ? $page = 1: false);
     ($limit == null ? $limit = 5:false);
-    $query .= " and rownum between ".(string)($page*$limit-$limit)." and ".(string)($page*$limit);
 
-    $query .= "order by date_created";
+    $query .= " order by date_created) where rn between ".(string)($page*$limit-$limit)." and ".(string)($page*$limit);
 
         //run query
     $result['project_find'] = $this->db->query($query)->result_array();
-    $result['pagenumber'] = ceil($this->db->query($query_pagination)->num_rows()/$limit);
+    $result['pagenumber'] = ceil($this->db->query($query_pagination)->row()->JUMLAH/$limit);
 
     echo json_encode($result);
 }
