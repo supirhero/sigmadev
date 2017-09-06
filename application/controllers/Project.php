@@ -674,17 +674,23 @@ WITH date_range AS (
   SELECT  min(start_date) as start_date
          ,max(finish_date) as end_date
   FROM    wbs where project_id='$project_id' group by project_id
-    )
-SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
-            (select max(t1.pv)-min(t1.pv) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as pv,
-            (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
-            (select ROUND(TO_CHAR((max(t1.ev)-min(t1.ev))/nullif(max(t1.pv)-min(t1.pv), 0)),2) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as spi
+    ), max_rekap AS (
+
+SELECT  t2.\"Week\" as week,t2.\"startdate\" as startdate,t2.\"enddate\" as enddate,
+            (select max(t1.pv) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_pv,
+            (select max(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_ev
+            
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
        ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
+)
+select week,startdate,enddate,(max_pv-(lag(max_pv,1,0) over (order by week))) as pv,
+(max_ev-(lag(max_ev,1,0) over (order by week))) as ev,
+round(TO_CHAR((max_ev-(lag(max_ev,1,0) over (order by week)))/nullif((max_pv-(lag(max_pv,1,0) over (order by week))),0)),2) as SPI
+from max_rekap
 ");
         $result["spi"] = $query->result();
         echo json_encode($result);
@@ -695,18 +701,24 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
           SELECT  min(start_date) as start_date
                  ,max(finish_date) as end_date
           FROM    wbs where project_id='$project_id' group by project_id
-            )
-SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
-            (select max(t1.ac)-min(t1.ac) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ac,
-            (select max(t1.ev)-min(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as ev,
-            (select ROUND(TO_CHAR((max(t1.ev)-min(t1.ev))/nullif(max(t1.ac)-min(t1.ac), 0)),2) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as cpi
+            ),max_rekap AS (
 
+SELECT  t2.\"Week\" as week,t2.\"startdate\" as startdate,t2.\"enddate\" as enddate,
+            (select max(t1.ac) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_ac,
+            (select max(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_ev
+            
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
        ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
 FROM   date_range t2
-CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2");
+CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
+)
+select week,startdate,enddate,(max_ac-(lag(max_ac,1,0) over (order by week))) as ac,
+(max_ev-(lag(max_ev,1,0) over (order by week))) as ev,
+round(TO_CHAR((max_ev-(lag(max_ev,1,0) over (order by week)))/nullif((max_ac-(lag(max_ac,1,0) over (order by week))),0)),2) as CPI
+from max_rekap
+");
         $result["cpi"] = $query->result();
         echo json_encode($result);
     }
