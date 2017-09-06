@@ -782,9 +782,9 @@ public function r_people(){
     echo json_encode($wrap);
 }
 public function r_people_download(){
-    $bu_id = $_POST['BU_ID'];
-    $bulan = $_POST['BULAN'];
-    $tahun = $_POST['TAHUN'];
+    $bu_id = $_GET['BU_ID'];
+    $bulan = $_GET['BULAN'];
+    $tahun = $_GET['TAHUN'];
     $y=(int)date("Y");
     $m=(int)date("m");
 
