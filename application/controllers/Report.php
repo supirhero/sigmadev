@@ -782,9 +782,9 @@ public function r_people(){
     echo json_encode($wrap);
 }
 public function r_people_download(){
-    $bu_id = $_GET['BU_ID'];
-    $bulan = $_GET['BULAN'];
-    $tahun = $_GET['TAHUN'];
+    $bu_id = $_POST['BU_ID'];
+    $bulan = $_POST['BULAN'];
+    $tahun = $_POST['TAHUN'];
     $y=(int)date("Y");
     $m=(int)date("m");
 
@@ -847,6 +847,11 @@ public function r_people_download(){
     }
     $wrap=$datareport;
     echo json_encode($wrap);
+    //header('Content-Type: application/vnd.ms-excel'); //mime type
+
+    //header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
+
+    //header('Cache-Control: max-age=0'); //no cache
     $this->load->library('excel');
 
     $this->excel->setActiveSheetIndex(0);
@@ -856,15 +861,11 @@ public function r_people_download(){
     // $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
 
 
-    //$this->excel->getActiveSheet()->fromArray($wrap);
+    $this->excel->getActiveSheet()->fromArray($wrap);
 
         $filename='Timesheet Report.xls'; //save our workbook as this file name
 
-        header('Content-Type: application/vnd.ms-excel'); //mime type
 
-        header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
-
-        //header('Cache-Control: max-age=0'); //no cache
 
         //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
         //if you want to save it as .XLSX Excel 2007 format
