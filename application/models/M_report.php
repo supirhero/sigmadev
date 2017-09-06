@@ -4,7 +4,7 @@ Class M_report extends CI_Model{
 
 
 function get_user_bu($buid){
-    $query = $this->db->query("select User_name, email from users where bu_id in (SELECT p_bu.bu_id
+    $query = $this->db->query("select user_id, user_name, email from users where bu_id in (SELECT p_bu.bu_id
 FROM p_bu  CONNECT BY  bu_PARENT_ID= PRIOR bu_ID
 START WITH bu_ID='$buid') order by bu_id");
  $hasil = $query->result_array();
