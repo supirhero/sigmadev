@@ -547,7 +547,7 @@ class Report extends CI_Controller {
         $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
 
         //if company
-        if($user_bu_parent == null || $this->datajson['userdata']['PROF_ID'] == 7){
+        if($user_bu_parent == null || $this->datajson['userdata']['PROF_ID'] == 7 || $this->datajson['userdata']['PROF_ID'] == 0){
             $data_bu = $this->M_business->getAllBU();
             $tree['jenis'] = 'company';
         }
