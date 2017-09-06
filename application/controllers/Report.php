@@ -781,6 +781,98 @@ public function r_people(){
     $wrap['report_people'] = $datareport;
     echo json_encode($wrap);
 }
+public function r_people_download(){
+    $bu_id = $_POST['BU_ID'];
+    $bulan = $_POST['BULAN'];
+    $tahun = $_POST['TAHUN'];
+    $y=(int)date("Y");
+    $m=(int)date("m");
+
+    $datareport=$this->M_report->get_user_bu($bu_id);
+
+
+
+    for($i = 0 ; $i <count($datareport);$i++){
+
+        //utilization
+        $utilization=$this->M_report->getTotalHour($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+        //entry
+        $entry=$this->M_report->getEntry($datareport[$i]['USER_ID'],$bulan,$tahun);
+
+        //entry
+        if (($bulan==$m)&& ($tahun==$y) ){
+            $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", date("Y/m/d")) *100;
+        }
+        else{
+            $persen_entry=$entry/$this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun)) *100;
+        }
+
+        if ($persen_entry<100)
+        {
+            $text_entry='Under';
+        }
+        elseif ($persen_entry==100) {
+            $text_entry='Complete';
+        }
+        else {
+            $text_entry='Over';
+        }
+
+        //utilization
+        if (($bulan==$m)&& ($tahun==$y) ){
+            $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", date("Y/m/d"))*8) *100;
+        }
+        else{
+            $persen_utilization=$utilization/($this->countDuration($tahun."/".$bulan."/1", $this->last_day($bulan,$tahun))*8) *100;
+
+        }
+        if ($persen_utilization<80)
+        {
+            $text_utilization='Under';
+        }
+        elseif (($persen_utilization>=80)&& ($persen_utilization<=100)   ){
+            $text_utilization='Optimal';
+        }
+        else {
+            $text_utilization='Over';
+        }
+
+
+        $datareport[$i]['utilisasi']=round($persen_utilization,2);
+        $datareport[$i]['status_utilisasi']=$text_utilization;
+        $datareport[$i]['entry']=round($persen_entry,2);
+        $datareport[$i]['status_entry']=$text_entry;
+
+    }
+    $wrap['report_people'] = $datareport;
+    $this->load->library('excel');
+
+    $this->excel->setActiveSheetIndex(0);
+        //name the worksheet
+    $this->excel->getActiveSheet()->setTitle('Report Project');
+        //set cell A1 content with some text
+    $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
+
+
+    $this->excel->getActiveSheet()->fromArray($wrap);
+
+        $filename='Project Report.xls'; //save our workbook as this file name
+
+        header('Content-Type: application/vnd.ms-excel'); //mime type
+
+        header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
+
+        header('Cache-Control: max-age=0'); //no cache
+
+        //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
+        //if you want to save it as .XLSX Excel 2007 format
+
+        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
+
+        //force user to download the Excel file without writing it to server's HD
+        $objWriter->save('php://output');
+}
     //resource per bu
 public function r_entry_bu(){
 
@@ -1269,7 +1361,7 @@ public function report_filter(){
     $limit =$this->input->post('limit');
     $query ="select project_name,iwo_no,project_status,project_complete as percent,amount,
     customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
-    where 1=1 
+    where 1=1
     ";
     $i = 0;
     $value = $this->input->post('value');
@@ -1292,7 +1384,7 @@ public function report_filter(){
                 $query .= " amount '".$valueVal[$a]."' ";
             }
             elseif($value[$a] == 1 && $a>0){
-                $query .= " or amount '".$valueVal[$a]."' ";   
+                $query .= " or amount '".$valueVal[$a]."' ";
             }
         }
         $query.=" ) ";
@@ -1326,7 +1418,7 @@ public function report_filter(){
         $query.=" ) ";
     }if(!empty($schedule)){
         $query.=" and schedule_status in ( ";
-        
+
         $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
         for($a = 0 ; $a < count($valueVal);$a++){
             if($i == 0){
@@ -1442,7 +1534,7 @@ public function report_filter_download(){
                 $query .= " amount '".$valueVal[$a]."' ";
             }
             elseif($value[$a] == 1 && $a>0){
-                $query .= " or amount '".$valueVal[$a]."' ";   
+                $query .= " or amount '".$valueVal[$a]."' ";
             }
         }
         $query.=" ) ";
@@ -1476,7 +1568,7 @@ public function report_filter_download(){
         $query.=" ) ";
     }if(!empty($schedule)){
         $query.=" and schedule_status in ( ";
-        
+
         $valueVal = ["Schedule Overrun","On Schedule","Ahead Schedule"];
         for($a = 0 ; $a < count($valueVal);$a++){
             if($i == 0){
