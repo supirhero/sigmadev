@@ -99,7 +99,9 @@ class M_register extends CI_Model {
             $get = $this->db->query("SELECT * FROM users where EMAIL like '%".$dataarray[$i]['EMAIL']."%'");
             $hasil = $get->row();
             if (isset($hasil->EMAIL)) {
-                $updaterp = $this->db->query("update resource_pool set USER_ID='".$dataarray[$i]['USER_ID']."' where USER_ID like '%".$hasil->USER_ID."%'");
+                if ($dataarray[$i]['USER_ID']!=$hasil->USER_ID) {
+                    $updaterp = $this->db->query("update resource_pool set USER_ID='".$dataarray[$i]['USER_ID']."' where USER_ID like '%".$hasil->USER_ID."%'");
+                }
                 $this->db->where('EMAIL', $dataarray[$i]['EMAIL']);
                 $this->db->update('USERS', $data);
             }

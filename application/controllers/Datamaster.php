@@ -715,7 +715,7 @@ class Datamaster extends CI_Controller{
             }
             public function upload_users()
             {
-                $config['upload_path'] = 'document_assets';
+                $config['upload_path'] = 'document_assets/';
                 $config['allowed_types'] = 'xlsx|xls|csv';
                 $this->load->helper('file');
                 $this->load->library('upload', $config);
