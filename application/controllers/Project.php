@@ -479,7 +479,7 @@ class Project extends CI_Controller
             $config['validation'] = TRUE;
             $this->email->initialize($config);
             $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-            $this->email->to('salma.ulhaq@sigma.co.id');
+            $this->email->to('geryruslan@gmail.com');
             $logo=base_url()."asset/image/logo_new_sigma1.png";
             $css=base_url()."asset/css/confirm.css";
             $this->email->attach($logo);
@@ -497,7 +497,7 @@ class Project extends CI_Controller
             $result["status"] = "failed";
             $result["message"] = "Member can not be empty";
         }
-echo json_encode($result);
+        echo json_encode($result);
     }
 
 
