@@ -846,12 +846,12 @@ public function r_people_download(){
 
     }
     $wrap=$datareport;
-    echo json_encode($wrap);
-    //header('Content-Type: application/vnd.ms-excel'); //mime type
+    //echo json_encode($wrap);
+    header('Content-Type: application/vnd.ms-excel'); //mime type
 
-    //header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
+    header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
 
-    //header('Cache-Control: max-age=0'); //no cache
+    header('Cache-Control: max-age=0'); //no cache
     $this->load->library('excel');
 
     $this->excel->setActiveSheetIndex(0);
