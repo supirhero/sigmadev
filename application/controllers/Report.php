@@ -857,7 +857,7 @@ public function r_people_download(){
 
     //$this->excel->getActiveSheet()->fromArray($wrap);
 
-        $filename='Project Report.xls'; //save our workbook as this file name
+        $filename='Timesheet Report.xls'; //save our workbook as this file name
 
         header('Content-Type: application/vnd.ms-excel'); //mime type
 
