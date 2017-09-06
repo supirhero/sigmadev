@@ -845,7 +845,7 @@ public function r_people_download(){
         $datareport[$i]['status_entry']=$text_entry;
 
     }
-    $wrap['report_people'] = $datareport;
+    $wrap=$datareport;
     echo json_encode($wrap);
     $this->load->library('excel');
 
