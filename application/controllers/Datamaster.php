@@ -170,20 +170,20 @@ class Datamaster extends CI_Controller{
                 elseif($priv['TYPE'] == 'PROJECT'){
                     //fetching granted project list
                     $granted_project = $this->db->query("SELECT   distinct project_id
-                       FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
-                       c.project_complete, c.project_status, c.project_desc,
-                       c.created_by
-                       FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
-                       INNER JOIN projects c ON b.project_id = c.project_id
-                       INNER JOIN p_bu z on c.bu_code = z.bu_code
-                       UNION
-                       SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
-                       b.project_complete, b.project_status, b.project_desc,
-                       b.created_by
-                       FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
-                       INNER JOIN p_bu z on b.bu_code = z.bu_code
-                       )
-                       where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
+                     FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
+                     c.project_complete, c.project_status, c.project_desc,
+                     c.created_by
+                     FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
+                     INNER JOIN projects c ON b.project_id = c.project_id
+                     INNER JOIN p_bu z on c.bu_code = z.bu_code
+                     UNION
+                     SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
+                     b.project_complete, b.project_status, b.project_desc,
+                     b.created_by
+                     FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
+                     INNER JOIN p_bu z on b.bu_code = z.bu_code
+                     )
+                     where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
                     $granted_project_list = [];
                     $granted_project_list[] = null;
 
@@ -715,16 +715,19 @@ class Datamaster extends CI_Controller{
             }
             public function upload_users()
             {
-                $config['upload_path'] = './temp_upload/';
+                $config['upload_path'] = 'document_assets';
                 $config['allowed_types'] = 'xlsx|xls|csv';
-
+                $this->load->helper('file');
                 $this->load->library('upload', $config);
-
+               //echo $_FILES['userfile']."bob";
+                //echo json_encode($_FILES['userfile']);
                 if ( ! $this->upload->do_upload('userfile'))
                 {
                     $data = array('error' => $this->upload->display_errors());
                     $pesan['msg']="Gagal Upload, Cek kembali lampiran anda hanya file XLS yang diizinkan";
                     $pesan['error']=$data;
+
+                    echo json_encode($pesan);
                 }
                 else
                 {
@@ -772,9 +775,10 @@ class Datamaster extends CI_Controller{
             //$this->session->set_flashdata("pesan","<div class=\"alert alert-success\" id=\"alert\"><i class=\"glyphicon glyphicon-ok\"></i> Data berhasil di upload,berhasil di upload </div>");
                     $baris = count($dataexcel);
                     $total = $baris-1;
-                    $pesan['msg']="Data berhasil di upload sebanyak".$baris."baris data";
+                    $pesan['msg']="Data berhasil di upload ";
+                    delete_files($file);
+                    echo json_encode($pesan);
                 }
 
-                echo json_encode($pesan);
             }
         }
