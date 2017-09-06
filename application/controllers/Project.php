@@ -130,7 +130,12 @@ class Project extends CI_Controller
                                 }
                                 break;
                             case '2':
-                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                if($url_dest == 'project/addproject_acion'){
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                }
+                                elseif ($url_dest == 'project/addproject_view'){
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
+                                }
                                 break;
                             case '3':
                                 $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
