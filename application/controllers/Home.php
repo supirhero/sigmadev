@@ -861,7 +861,7 @@ $data["error_upload"] = $this->upload->display_errors();
         if(count($projecttemp) == 0){
             $user_bu = $this->datajson['userdata']['BU_ID'];
             $projecttempfix[0]['bu_code'] = $this->db->query("select bu_code from p_bu where bu_id = '$user_bu'")->row()->BU_CODE;
-            $projecttempfix[0]['bu_name'] = $this->db->query("select bu_name from p_bu where bu_id = '$user_bu'")->row()->BU_CODE;
+            $projecttempfix[0]['bu_name'] = $this->db->query("select bu_name from p_bu where bu_id = '$user_bu'")->row()->BU_NAME;
             $projecttempfix[0]['project'] = [];
         }
 
