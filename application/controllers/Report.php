@@ -544,7 +544,6 @@ class Report extends CI_Controller {
     //get list all bu
     public function r_list_bu(){
         $user_bu = $this->datajson['userdata']['BU_ID'];
-        $user_bu = 20;
         $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
 
         //if company
