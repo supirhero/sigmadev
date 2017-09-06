@@ -855,7 +855,7 @@ public function r_people_download(){
     $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
 
 
-    $this->excel->getActiveSheet()->fromArray($wrap);
+    //$this->excel->getActiveSheet()->fromArray($wrap);
 
         $filename='Project Report.xls'; //save our workbook as this file name
 
@@ -872,6 +872,7 @@ public function r_people_download(){
 
         //force user to download the Excel file without writing it to server's HD
         $objWriter->save('php://output');
+        echo json_encode($wrap);
 }
     //resource per bu
 public function r_entry_bu(){
