@@ -1270,10 +1270,14 @@ public function r_overview(){
 
         //report monthly overview
 public function r_month(){
+    $user_bu = $this->datajson['userdata']['BU_ID'];
+    $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
+
     $tahun = $this->input->post('tahun');
     $month = date("M", mktime(0, 0, 0, $this->input->post('bulan'), 10));
-
-    $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+    //if company
+    if($user_bu_parent == null || $this->datajson['userdata']['PROF_ID'] == 7 || $this->datajson['userdata']['PROF_ID'] == 0){
+        $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
         round(sum(ev)/count(c.project_id),2) as EV,
         round(sum(pv)/count(c.project_id),2) as PV,
         round(sum(AC)/count(c.project_id),2) as AC,
@@ -1300,6 +1304,76 @@ public function r_month(){
         when b.bu_code = 'SGP' then 3
         else 5
          end DESC");
+    }
+    //elseif directorat
+    elseif ($user_bu_parent == 0){
+        $allwoed_bu =$this->db->query("select bu_code from p_bu where bu_parent_id = '$user_bu'")->result_array();
+        $allwoed_bu_string="";
+        for($iter = 0 ; $iter < count($allwoed_bu); $iter ++){
+            $allwoed_bu_string .= "'".$allwoed_bu[$iter]['BU_CODE']."'";
+            if($iter != count($allwoed_bu)-1){
+                $allwoed_bu_string .= ",";
+            }
+        }
+        $query = $this->db->query("select * from (select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+        round(sum(ev)/count(c.project_id),2) as EV,
+        round(sum(pv)/count(c.project_id),2) as PV,
+        round(sum(AC)/count(c.project_id),2) as AC,
+        case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+        case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+        from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
+        case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
+        case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+        project_id
+        from tb_rekap_project
+        where  to_char(tanggal,'Mon-YYYY')='$month-$tahun'
+        group by project_id) a inner join
+        projects c on c.project_id=a.project_id
+        inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+        where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
+        and type_of_effort in ('1','2')
+        and pv!='0'
+        and b.BU_CODE !='PROUDS'
+        and b.BU_code !='GTS'
+        and b.BU_code !='NSM'
+        group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+        order by case when b.bu_code = 'SMS' then 1
+        when b.bu_code = 'SSI' then 2
+        when b.bu_code = 'SGP' then 3
+        else 5
+         end DESC) where bu_code in ($allwoed_bu_string)");
+    }
+    //if bu
+    else{
+        $allwoed_bu ="'".$this->db->query("select bu_code from p_bu where bu_id = '$user_bu'")->row()->BU_CODE."'";
+        $query = $this->db->query("select * from(select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+        round(sum(ev)/count(c.project_id),2) as EV,
+        round(sum(pv)/count(c.project_id),2) as PV,
+        round(sum(AC)/count(c.project_id),2) as AC,
+        case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+        case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+        from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
+        case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
+        case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+        project_id
+        from tb_rekap_project
+        where  to_char(tanggal,'Mon-YYYY')='$month-$tahun'
+        group by project_id) a inner join
+        projects c on c.project_id=a.project_id
+        inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+        where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
+        and type_of_effort in ('1','2')
+        and pv!='0'
+        and b.BU_CODE !='PROUDS'
+        and b.BU_code !='GTS'
+        and b.BU_code !='NSM'
+        group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+        order by case when b.bu_code = 'SMS' then 1
+        when b.bu_code = 'SSI' then 2
+        when b.bu_code = 'SGP' then 3
+        else 5
+         end DESC) where bu_code in ($allwoed_bu)");
+    }
     $result["r_monthly"] = $query->result();
     $known = array();
     $knownz = array();

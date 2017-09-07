@@ -134,7 +134,7 @@ class Project extends CI_Controller
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
                                 }
                                 elseif ($url_dest == 'project/addproject_view'){
-                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_codete']."'")->row()->BU_ID;
                                 }
                                 break;
                             case '3':
