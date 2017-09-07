@@ -12,7 +12,7 @@ class Home extends CI_Controller {
                                         'bu_invite_member'=>false,
                                         'report_overview'=>false,
                                         'report_bu_directorat'=>false,
-                                        'report_bu_teammember'=>false,
+                                        'report_bu_teammember'=>true,
                                         'report_find_project'=>false,
                                         'edit_project'=>false,
                                         'timesheet_approval'=>false,
