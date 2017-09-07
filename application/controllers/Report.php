@@ -71,21 +71,21 @@ class Report extends CI_Controller {
         else{
             $this->M_session->update_session($this->datajson['token']);
         }
-        //newest
+
+        /*================================================================================*/
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
         $url_dest = strtolower($this->uri->segment(1)."/".$this->uri->segment(2));
         $privilege = $this->db->query("select al.access_id,al.type,au.access_url,pal.privilege
-            from access_list al
-            join access_url au
-            on al.access_id = au.access_id
-            join profile_access_list pal
-            on
-            pal.access_id = au.access_id
-            where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
-            order by al.type asc
-            ")->result_array();
+                                    from access_list al
+                                    join access_url au
+                                    on al.access_id = au.access_id
+                                    join profile_access_list pal
+                                    on
+                                    pal.access_id = au.access_id
+                                    where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
+                                    order by al.type asc")->result_array();
         $profile_id = $this->datajson['userdata']['PROF_ID'];
         foreach($privilege as $priv){
             $will_die = 0;
@@ -121,33 +121,41 @@ class Report extends CI_Controller {
                         }
                         switch ($priv['ACCESS_ID']){
                             case '1':
-                            if($this->datajson['userdata']['PROF_ID'] == 7){
-                                $bu_id = 'masuk';
-                            }
-                            else{
-                                $bu_id = 'cant';
-                            }
-                            break;
+                                if($this->datajson['userdata']['PROF_ID'] == 7){
+                                    $bu_id = 'masuk';
+                                }
+                                else{
+                                    $bu_id = 'cant';
+                                }
+                                break;
                             case '2':
-                            $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
-                            break;
+                                if($url_dest == 'project/addproject_acion'){
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                }
+                                elseif ($url_dest == 'project/addproject_view'){
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_codete']."'")->row()->BU_ID;
+                                }
+                                break;
                             case '3':
-                            $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
-                            break;
+                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
+                                break;
+                            case '4':
+                                $bu_id = $this->input->post('BU_ID');
+                                break;
                             case '5':
                                 $bu_id = "masuk";
                                 break;
                             case '6':
-                            $bu_id = $_POST['bu'];
-                            break;
+                                $bu_id = $_POST['bu'];
+                                break;
                             case '7':
-                            $bu_id = $_POST['BU_ID'];
-                            break;
+                                $bu_id = $_POST['BU_ID'];
+                                break;
                             case '8' :
-                            if($this->datajson['userdata']['PROF_ID'] == 3 || $this->datajson['userdata']['PROF_ID'] == 7 ){
-                                $bu_id = 'masuk';
-                            }
-                            break;
+                                if($this->datajson['userdata']['PROF_ID'] == 3 || $this->datajson['userdata']['PROF_ID'] == 7 ){
+                                    $bu_id = 'masuk';
+                                }
+                                break;
                         }
                         if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
                             $will_die = 1;
@@ -165,20 +173,20 @@ class Report extends CI_Controller {
                 elseif($priv['TYPE'] == 'PROJECT'){
                     //fetching granted project list
                     $granted_project = $this->db->query("SELECT   distinct project_id
-                       FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
-                       c.project_complete, c.project_status, c.project_desc,
-                       c.created_by
-                       FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
-                       INNER JOIN projects c ON b.project_id = c.project_id
-                       INNER JOIN p_bu z on c.bu_code = z.bu_code
-                       UNION
-                       SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
-                       b.project_complete, b.project_status, b.project_desc,
-                       b.created_by
-                       FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
-                       INNER JOIN p_bu z on b.bu_code = z.bu_code
-                       )
-                       where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
+                                                           FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
+                                                                        c.project_complete, c.project_status, c.project_desc,
+                                                                        c.created_by
+                                                                   FROM USERS a INNER JOIN resource_pool b ON a.user_id = b.user_id
+                                                                        INNER JOIN projects c ON b.project_id = c.project_id
+                                                                        INNER JOIN p_bu z on c.bu_code = z.bu_code
+                                                                 UNION
+                                                                 SELECT a.user_id, a.user_name, b.project_id, b.project_name, b.bu_code, z.bu_name,
+                                                                        b.project_complete, b.project_status, b.project_desc,
+                                                                        b.created_by
+                                                                   FROM USERS a INNER JOIN projects b ON a.user_id = b.created_by
+                                                                   INNER JOIN p_bu z on b.bu_code = z.bu_code
+                                                                        )
+                                                                        where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
                     $granted_project_list = [];
                     $granted_project_list[] = null;
 
@@ -191,49 +199,49 @@ class Report extends CI_Controller {
                         //get project id
                         switch ($priv['ACCESS_ID']){
                             case '9':
-                            $project_id_req = $_POST['PROJECT_ID'];
-                            break;
+                                $project_id_req = $_POST['PROJECT_ID'];
+                                break;
                             case '10':
-                            $project_id_req = $_POST['project_id'];
-                            break;
-                            case '11':
-                            switch ($url_dest){
-                                case 'task/upload_wbs':
                                 $project_id_req = $_POST['project_id'];
                                 break;
-                                case 'task/assigntaskmemberproject':
-                                $project_id = explode(".",$_POST['WBS_ID']);
-                                $project_id_req = $project_id[0];
+                            case '11':
+                                switch ($url_dest){
+                                    case 'task/upload_wbs':
+                                        $project_id_req = $_POST['project_id'];
+                                        break;
+                                    case 'task/assigntaskmemberproject':
+                                        $project_id = explode(".",$_POST['WBS_ID']);
+                                        $project_id_req = $project_id[0];
+                                        break;
+                                    case 'task/removetaskmemberproject':
+                                        $project_id = explode(".",$_POST['WBS_ID']);
+                                        $project_id_req = $project_id[0];
+                                        break;
+                                    case 'task/createtask':
+                                        $project_id_req   = $this->input->post("PROJECT_ID");
+                                        break;
+                                    case 'task/edittaskpercent':
+                                        $project_id_req=$this->input->post("PROJECT_ID");
+                                        break;
+                                    case 'task/edittask_action':
+                                        $project_id_req= $this->input->post("project_id");
+                                        break;
+                                    case 'task/deletetask':
+                                        $id = $_POST['wbs_id'];
+                                        $project_id_req = $this->M_detail_project->getProjectTask($id);
+                                        break;
+                                }
                                 break;
-                                case 'task/removetaskmemberproject':
-                                $project_id = explode(".",$_POST['WBS_ID']);
-                                $project_id_req = $project_id[0];
-                                break;
-                                case 'task/createtask':
-                                $project_id_req   = $this->input->post("PROJECT_ID");
-                                break;
-                                case 'task/edittaskpercent':
-                                $project_id_req=$this->input->post("PROJECT_ID");
-                                break;
-                                case 'task/edittask_action':
-                                $project_id_req= $this->input->post("project_id");
-                                break;
-                                case 'task/deletetask':
-                                $id = $_POST['wbs_id'];
-                                $project_id_req = $this->M_detail_project->getProjectTask($id);
-                                break;
-                            }
-                            break;
                             case '12':
-                            $id = $_POST['MEMBER'];
-                            $project_id_req = $this->M_detail_project->getRPProject($id);
-                            break;
+                                $id = $_POST['MEMBER'];
+                                $project_id_req = $this->M_detail_project->getRPProject($id);
+                                break;
                             case '13':
-                            $project_id_req = $this->uri->segment(3);
-                            break;
+                                $project_id_req = $this->uri->segment(3);
+                                break;
                             case '14':
-                            $project_id_req =$this->input->post("PROJECT_ID");
-                            break;
+                                $project_id_req =$this->input->post("PROJECT_ID");
+                                break;
                         }
 
                         if(!in_array($project_id_req,$granted_project_list)){
@@ -247,6 +255,7 @@ class Report extends CI_Controller {
                 else{
                     $will_die = 1;
                 }
+
                 if($will_die ==1){
                     $this->output->set_status_header(403);
                     $returndata['status'] = 'failed';

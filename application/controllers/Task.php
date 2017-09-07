@@ -55,7 +55,7 @@ class Task extends CI_Controller
             die();
         }
 
-        //newest
+        /*================================================================================*/
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
@@ -68,8 +68,7 @@ class Task extends CI_Controller
                                     on
                                     pal.access_id = au.access_id
                                     where pal.profile_id = ".$this->datajson['userdata']['PROF_ID']."
-                                    order by al.type asc
-                                    ")->result_array();
+                                    order by al.type asc")->result_array();
         $profile_id = $this->datajson['userdata']['PROF_ID'];
         foreach($privilege as $priv){
             $will_die = 0;
@@ -113,10 +112,21 @@ class Task extends CI_Controller
                                 }
                                 break;
                             case '2':
-                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                if($url_dest == 'project/addproject_acion'){
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                }
+                                elseif ($url_dest == 'project/addproject_view'){
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_codete']."'")->row()->BU_ID;
+                                }
                                 break;
                             case '3':
                                 $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
+                                break;
+                            case '4':
+                                $bu_id = $this->input->post('BU_ID');
+                                break;
+                            case '5':
+                                $bu_id = "masuk";
                                 break;
                             case '6':
                                 $bu_id = $_POST['bu'];

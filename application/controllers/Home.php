@@ -132,9 +132,6 @@ class Home extends CI_Controller {
 
 
         /*================================================================================*/
-
-
-        //newest
         /*FOR PRIVILEGE*/
         /*===============================================================================*/
         //PRIVILEGE CHECKER
@@ -153,80 +150,88 @@ class Home extends CI_Controller {
             $will_die = 0;
             //jika akses url ada di dalam db
             if($priv['ACCESS_URL'] == $url_dest){
-                    //jika akses tipe nya business
-                    if($priv['TYPE'] == 'BUSINESS'){
-                        if($priv['PRIVILEGE'] == 'all_bu'){
-                            $will_die = 0;
-                        }
-                        elseif($priv['PRIVILEGE'] == 'only_bu'){
-                            //fetching busines unit
-                            $user_bu = $this->datajson['userdata']['BU_ID'];
-                            $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
+                //jika akses tipe nya business
+                if($priv['TYPE'] == 'BUSINESS'){
+                    if($priv['PRIVILEGE'] == 'all_bu'){
+                        $will_die = 0;
+                    }
+                    elseif($priv['PRIVILEGE'] == 'only_bu'){
+                        //fetching busines unit
+                        $user_bu = $this->datajson['userdata']['BU_ID'];
+                        $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
 
-                            $directorat_bu = [];
-                            //for if tolerant array_search
-                            $directorat_bu[] = null;
-                            //if company
-                            if($user_bu == 0){
-                                $access = 'masuk';
-                            }
-                            //if directorat
-                            elseif ($user_bu_parent == 0){
-                                $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = '$user_bu'")->result_array();
-                                foreach ($bu_id_all as $buid){
-                                    $directorat_bu[] = $buid['BU_ID'];
-                                }
-                            }
-                            //if bu
-                            else{
-                                $directorat_bu[]  = $this->datajson['userdata']['BU_ID'];
-                            }
-                            switch ($priv['ACCESS_ID']){
-                                case '1':
-                                    if($this->datajson['userdata']['PROF_ID'] == 7){
-                                        $bu_id = 'masuk';
-                                    }
-                                    else{
-                                        $bu_id = 'cant';
-                                    }
-                                    break;
-                                case '2':
-                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
-                                    break;
-                                case '3':
-                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
-                                    break;
-                                case '4':
-                                    $bu_id = $this->input->post('BU_ID');
-                                    break;
-                                case '6':
-                                    $bu_id = $_POST['bu'];
-                                    break;
-                                case '7':
-                                    $bu_id = $_POST['BU_ID'];
-                                    break;
-                                case '8' :
-                                    if($this->datajson['userdata']['PROF_ID'] == 3 || $this->datajson['userdata']['PROF_ID'] == 7 ){
-                                        $bu_id = 'masuk';
-                                    }
-                                    break;
-                            }
-                            if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
-                                $will_die = 1;
-                            }
-                            else{
-                                $will_die = 0;
+                        $directorat_bu = [];
+                        //for if tolerant array_search
+                        $directorat_bu[] = null;
+                        //if company
+                        if($user_bu == 0){
+                            $access = 'masuk';
+                        }
+                        //if directorat
+                        elseif ($user_bu_parent == 0){
+                            $bu_id_all= $this->db->query("select bu_id from p_bu where bu_parent_id = '$user_bu'")->result_array();
+                            foreach ($bu_id_all as $buid){
+                                $directorat_bu[] = $buid['BU_ID'];
                             }
                         }
+                        //if bu
                         else{
+                            $directorat_bu[]  = $this->datajson['userdata']['BU_ID'];
+                        }
+                        switch ($priv['ACCESS_ID']){
+                            case '1':
+                                if($this->datajson['userdata']['PROF_ID'] == 7){
+                                    $bu_id = 'masuk';
+                                }
+                                else{
+                                    $bu_id = 'cant';
+                                }
+                                break;
+                            case '2':
+                                if($url_dest == 'project/addproject_acion'){
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
+                                }
+                                elseif ($url_dest == 'project/addproject_view'){
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_codete']."'")->row()->BU_ID;
+                                }
+                                break;
+                            case '3':
+                                $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
+                                break;
+                            case '4':
+                                $bu_id = $this->input->post('BU_ID');
+                                break;
+                            case '5':
+                                $bu_id = "masuk";
+                                break;
+                            case '6':
+                                $bu_id = $_POST['bu'];
+                                break;
+                            case '7':
+                                $bu_id = $_POST['BU_ID'];
+                                break;
+                            case '8' :
+                                if($this->datajson['userdata']['PROF_ID'] == 3 || $this->datajson['userdata']['PROF_ID'] == 7 ){
+                                    $bu_id = 'masuk';
+                                }
+                                break;
+                        }
+                        if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
                             $will_die = 1;
                         }
-
+                        else{
+                            $will_die = 0;
+                        }
                     }
-                    //jika akses tipe nya project
-                    elseif($priv['TYPE'] == 'PROJECT'){
-                        //fetching granted project list
-                        $granted_project = $this->db->query("SELECT   distinct project_id
+                    else{
+                        $will_die = 1;
+                    }
+
+                }
+                //jika akses tipe nya project
+                elseif($priv['TYPE'] == 'PROJECT'){
+                    //fetching granted project list
+                    $granted_project = $this->db->query("SELECT   distinct project_id
                                                            FROM (SELECT a.user_id, a.user_name, c.project_id, c.project_name, c.bu_code, z.bu_name,
                                                                         c.project_complete, c.project_status, c.project_desc,
                                                                         c.created_by
@@ -241,83 +246,83 @@ class Home extends CI_Controller {
                                                                    INNER JOIN p_bu z on b.bu_code = z.bu_code
                                                                         )
                                                                         where user_id='" . $this->datajson['userdata']['USER_ID'] . "' or created_by='" . $this->datajson['userdata']['USER_ID'] . "'")->result_array();
-                        $granted_project_list = [];
-                        $granted_project_list[] = null;
+                    $granted_project_list = [];
+                    $granted_project_list[] = null;
 
-                        //rearrange project list so it can readable to array search
-                        foreach ($granted_project as $gp){
-                            $granted_project_list[] = $gp['PROJECT_ID'];
+                    //rearrange project list so it can readable to array search
+                    foreach ($granted_project as $gp){
+                        $granted_project_list[] = $gp['PROJECT_ID'];
+                    }
+
+                    if($priv['PRIVILEGE'] == 'can'){
+                        //get project id
+                        switch ($priv['ACCESS_ID']){
+                            case '9':
+                                $project_id_req = $_POST['PROJECT_ID'];
+                                break;
+                            case '10':
+                                $project_id_req = $_POST['project_id'];
+                                break;
+                            case '11':
+                                switch ($url_dest){
+                                    case 'task/upload_wbs':
+                                        $project_id_req = $_POST['project_id'];
+                                        break;
+                                    case 'task/assigntaskmemberproject':
+                                        $project_id = explode(".",$_POST['WBS_ID']);
+                                        $project_id_req = $project_id[0];
+                                        break;
+                                    case 'task/removetaskmemberproject':
+                                        $project_id = explode(".",$_POST['WBS_ID']);
+                                        $project_id_req = $project_id[0];
+                                        break;
+                                    case 'task/createtask':
+                                        $project_id_req   = $this->input->post("PROJECT_ID");
+                                        break;
+                                    case 'task/edittaskpercent':
+                                        $project_id_req=$this->input->post("PROJECT_ID");
+                                        break;
+                                    case 'task/edittask_action':
+                                        $project_id_req= $this->input->post("project_id");
+                                        break;
+                                    case 'task/deletetask':
+                                        $id = $_POST['wbs_id'];
+                                        $project_id_req = $this->M_detail_project->getProjectTask($id);
+                                        break;
+                                }
+                                break;
+                            case '12':
+                                $id = $_POST['MEMBER'];
+                                $project_id_req = $this->M_detail_project->getRPProject($id);
+                                break;
+                            case '13':
+                                $project_id_req = $this->uri->segment(3);
+                                break;
+                            case '14':
+                                $project_id_req =$this->input->post("PROJECT_ID");
+                                break;
                         }
 
-                        if($priv['PRIVILEGE'] == 'can'){
-                            //get project id
-                            switch ($priv['ACCESS_ID']){
-                                case '9':
-                                    $project_id_req = $_POST['PROJECT_ID'];
-                                    break;
-                                case '10':
-                                    $project_id_req = $_POST['project_id'];
-                                    break;
-                                case '11':
-                                    switch ($url_dest){
-                                        case 'task/upload_wbs':
-                                            $project_id_req = $_POST['project_id'];
-                                            break;
-                                        case 'task/assigntaskmemberproject':
-                                            $project_id = explode(".",$_POST['WBS_ID']);
-                                            $project_id_req = $project_id[0];
-                                            break;
-                                        case 'task/removetaskmemberproject':
-                                            $project_id = explode(".",$_POST['WBS_ID']);
-                                            $project_id_req = $project_id[0];
-                                            break;
-                                        case 'task/createtask':
-                                            $project_id_req   = $this->input->post("PROJECT_ID");
-                                            break;
-                                        case 'task/edittaskpercent':
-                                            $project_id_req=$this->input->post("PROJECT_ID");
-                                            break;
-                                        case 'task/edittask_action':
-                                            $project_id_req= $this->input->post("project_id");
-                                            break;
-                                        case 'task/deletetask':
-                                            $id = $_POST['wbs_id'];
-                                            $project_id_req = $this->M_detail_project->getProjectTask($id);
-                                            break;
-                                    }
-                                    break;
-                                case '12':
-                                    $id = $_POST['MEMBER'];
-                                    $project_id_req = $this->M_detail_project->getRPProject($id);
-                                    break;
-                                case '13':
-                                    $project_id_req = $this->uri->segment(3);
-                                    break;
-                                case '14':
-                                    $project_id_req =$this->input->post("PROJECT_ID");
-                                    break;
-                            }
-
-                            if(!in_array($project_id_req,$granted_project_list)){
-                                $will_die = 1;
-                            }
-                        }
-                        else{
+                        if(!in_array($project_id_req,$granted_project_list)){
                             $will_die = 1;
                         }
                     }
                     else{
                         $will_die = 1;
                     }
-
-                    if($will_die ==1){
-                        $this->output->set_status_header(403);
-                        $returndata['status'] = 'failed';
-                        $returndata['message'] = 'Anda tidak bisa mengakses feature yang ada di business unit ini';
-                        echo json_encode($returndata);
-                        die;
-                    }
                 }
+                else{
+                    $will_die = 1;
+                }
+
+                if($will_die ==1){
+                    $this->output->set_status_header(403);
+                    $returndata['status'] = 'failed';
+                    $returndata['message'] = 'Anda tidak bisa mengakses feature yang ada di business unit ini';
+                    echo json_encode($returndata);
+                    die;
+                }
+            }
         }
         /*===============================================================================*/
 
@@ -341,6 +346,7 @@ class Home extends CI_Controller {
         $data["userdata"]=array_change_key_case($this->datajson['userdata'],CASE_LOWER);
         echo json_encode($data);
     }
+
     public function edit_user(){
         $nohp = $this->input->post('no_hp');
         $address = $this->input->post('address');
