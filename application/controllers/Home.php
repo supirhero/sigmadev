@@ -36,7 +36,6 @@ class Home extends CI_Controller {
         $this->load->model('M_session');
 
         $datauser = $this->M_session->GetDataUser();
-        $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
         //    print_r($decoded_user_data);
         $this->datajson['token'] = $datauser["token"];
 
@@ -46,6 +45,8 @@ class Home extends CI_Controller {
             echo json_encode($datauser);
             die();
         }
+        $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
+
         //if login success
         if(!isset($decoded_user_data[0])){
             //get user data from token
