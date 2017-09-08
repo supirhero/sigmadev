@@ -114,17 +114,9 @@ class Project extends CI_Controller
                             case '2':
                                 if($url_dest == 'project/addproject_acion'){
                                     $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['BU']."'")->row()->BU_ID;
-                                if($bu_id!=$this->datajson['userdata']['bu_id'])
-                                {
-                                    $bu_id = 'cant';
-                                }
                                 }
                                 elseif ($url_dest == 'project/addproject_view'){
-                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_codete']."'")->row()->BU_ID;
-                                    if($bu_id!=$this->datajson['userdata']['bu_id'])
-                                    {
-                                        $bu_id = 'cant';
-                                    }
+                                    $bu_id = $this->db->query("select bu_id from p_bu where bu_code = '".$_POST['bu_code']."'")->row()->BU_ID;
                                 }
                                 break;
                             case '3':
@@ -157,6 +149,15 @@ class Project extends CI_Controller
                     }
                     else{
                         $will_die = 1;
+                    }
+                    if($will_die ==1){
+                        $user_bu_name = $this->db->query("select bu_name from p_bu where bu_id = '".$this->datajson['userdata']['BU_ID']."'")->row()->BU_NAME;
+                        $acces_bu_name = $this->db->query("select bu_name from p_bu where bu_id = '".$bu_id."'")->row()->BU_NAME;
+                        $this->output->set_status_header(403);
+                        $returndata['status'] = 'failed';
+                        $returndata['message'] = "Anda tidak bisa mengakses feature yang ada di business unit ini. Business unit anda : '$user_bu_name' dan business unit yang anda akan akses : '$acces_bu_name'";
+                        echo json_encode($returndata);
+                        die;
                     }
 
                 }
@@ -242,15 +243,21 @@ class Project extends CI_Controller
                     else{
                         $will_die = 1;
                     }
+                    if($will_die ==1){
+                        $this->output->set_status_header(403);
+                        $returndata['status'] = 'failed';
+                        $returndata['message'] = 'Anda tidak bisa mengakses feature ini';
+                        echo json_encode($returndata);
+                        die;
+                    }
                 }
                 else{
                     $will_die = 1;
                 }
-
                 if($will_die ==1){
                     $this->output->set_status_header(403);
                     $returndata['status'] = 'failed';
-                    $returndata['message'] = 'Anda tidak bisa mengakses feature yang ada di business unit ini';
+                    $returndata['message'] = 'Anda tidak bisa mengakses feature ini';
                     echo json_encode($returndata);
                     die;
                 }
