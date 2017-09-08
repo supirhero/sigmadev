@@ -10,10 +10,10 @@ Class M_session extends CI_Model{
             $result["status"]= 401;
         }
         else{
-            $result=array();
 
         $sql="SELECT * FROM USER_SESSION INNER JOIN USERS ON USER_SESSION.USER_ID = USERS.USER_ID WHERE USER_SESSION.SESSION_TOKEN='$token'";
         $q = $this->db->query($sql);
+            $result["data"] = $q->row_array();
 
         if($q->num_rows() > 0){
             if($result["data"]["SESSION_EXPIRED"] <= time())
@@ -25,7 +25,6 @@ Class M_session extends CI_Model{
             else{
                 $this->update_session($token);
                 $result["status"]= 200;
-                $result["data"] = $q->row_array();
             }
         }
         else{
