@@ -830,7 +830,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             $data['SUBMIT_DATE']= date('Y-m-d h:i:s');
             $data['REASON'] = $this->input->post("reason");
             $data['EVIDENCE'] = null;
-            $data['REQUEST_BY'] = $this->datajson['userdata']['USER_ID'];
+            $data['REQUEST_BY'] = $user_id;
 
             //insert rebaseline history
             $this->M_baseline->insertRebaseline($data);
@@ -849,7 +849,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             $data['SUBMIT_DATE']= date('Y-m-d h:i:s');
             $data['REASON'] = $this->input->post("reason");
             $data['EVIDENCE'] = $this->upload->data()['file_name'];
-            $data['REQUEST_BY'] = $this->datajson['userdata']['USER_ID'];
+            $data['REQUEST_BY'] = $user_id;
 
             $this->M_baseline->insertRebaseline($data);
 
