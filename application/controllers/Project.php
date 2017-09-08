@@ -53,16 +53,7 @@ class Project extends CI_Controller
             die();
         }
 
-        if($datauser["data"]["SESSION_EXPIRED"] <= time())
-        {
-            $this->output->set_status_header(401);
-            $error['error']="session is expired";
-            echo json_encode($error);
-            die();
-        }
-        else{
-            $this->M_session->update_session($this->datajson['token']);
-        }
+
 
         /*================================================================================*/
         /*FOR PRIVILEGE*/

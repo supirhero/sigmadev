@@ -51,15 +51,6 @@ class Timesheet extends CI_Controller {
             die();
         }
 
-        if($datauser["data"]["SESSION_EXPIRED"] <= time())
-        {
-            $error['error']="session is expired";
-            echo json_encode($error);
-            die();
-        }
-        else{
-            $this->M_session->update_session($this->datajson['token']);
-        }
 
 
         /*================================================================================*/
