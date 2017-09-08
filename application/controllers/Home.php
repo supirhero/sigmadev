@@ -1019,7 +1019,7 @@ $data["error_upload"] = $this->upload->display_errors();
     }
     /*For Project Doc*/
     public function deleteprojectdoc(){
-        if($this->input->post('doc_id'))
+        if(isset($this->input->post('doc_id')))
         {
         if($this->input->post('doc_id') != 0)
         {
