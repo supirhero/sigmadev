@@ -1006,7 +1006,7 @@ $data["error_upload"] = $this->upload->display_errors();
         $this->datajson['project_doc_list'] = $this->db->query("select a.*,b.user_name from (
                                                                   select project_id,doc_id,doc_name,url,date_upload,upload_by,doc_desc,'document' as jenis from project_doc
                                                                   UNION 
-                                                                  select project_id,'none' as doc_id, evidence as doc_name,evidence as url,submit_date as date_upload ,request_by as upload_by,reason as doc_desc,'rebaseline' as jenis from rebaseline_history
+                                                                  select project_id,null as doc_id, evidence as doc_name,evidence as url,submit_date as date_upload ,request_by as upload_by,reason as doc_desc,'rebaseline' as jenis from rebaseline_history
                                                                 ) a
                                                                 join users b
                                                                 on a.upload_by = b.user_id where project_id = $projectid")->result_array();
