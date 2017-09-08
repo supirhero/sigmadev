@@ -907,7 +907,7 @@ $data["error_upload"] = $this->upload->display_errors();
 //echo($data['AllProject']);
 //$iwo=$this->M_detail_project->getProjectIWO($id);
         */
-        $data['project_detail']=$this->db->query("select iwo_no as iwo, category as effort_type, project_type, project_name,bu_name as bu_owner, project_desc as description, project_status,pm_id,user_id 
+        $data['project_detail']=$this->db->query("select iwo_no as iwo, category as effort_type, project_type, project_name,bu_name as bu_owner, project_desc as description, project_status,pm_id,user_name as pm_name 
         from projects join p_bu on projects.bu_code = p_bu.bu_code 
         join p_project_category ppc on projects.type_of_effort=ppc.id
         left join users pm on pm.user_id=projects.pm_id
