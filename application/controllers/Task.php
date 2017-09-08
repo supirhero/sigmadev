@@ -297,10 +297,7 @@ class Task extends CI_Controller
 
         $index_rebaseline = 0;
         foreach ($findIndex as $index){
-            $index_workplan = array_search($workplan[$index]['WBS_ID'],$workplan_wp);
-            if($index_workplan == null){
-                $index = 0;
-            }
+
             $workplan[$index]['status'] =  $rebaseline[$index_rebaseline]['ACTION'];
             $workplan[$index]['index_rebaseline'] =  $index_rebaseline;
 
