@@ -56,6 +56,7 @@ Class M_baseline extends CI_Model{
         $this->db->set('PROJECT_ID',$data['PROJECT_ID']);
         $this->db->set('REASON',$data['REASON']);
         $this->db->set('EVIDENCE',$data['EVIDENCE']);
+        $this->db->set('REQUEST_BY',$data['REQUEST_BY']);
         $this->db->set('SUBMIT_DATE',"to_timestamp('$delivDate','YYYY-MM-DD HH24:MI:SS')",false);
         //$data['PROJECT_ID'] 		= $this->input->post("PROJECT_ID");
 
