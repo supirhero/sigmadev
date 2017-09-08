@@ -278,25 +278,33 @@ class Task extends CI_Controller
         $rebaseline_wp = [];
         $findIndex = [];
 
+        //store task id in workplan
         foreach($workplan as &$wp){
             $workplan_wp[] = $wp['WBS_ID'];
             $wp['status']='none';
+            $wp['index_rebaseline'] = 'none';
         }
 
+        //store task id inside rebaseline
         foreach ($rebaseline as $rwp){
             $rebaseline_wp[] = $rwp['WBS_ID'];
         }
 
+        //find index task that need rebaseline
         foreach ($rebaseline_wp as $r){
             $findIndex[] = array_search($r,$workplan_wp);
         }
 
+        $index_rebaseline = 0;
         foreach ($findIndex as $index){
-            $index_rebaseline = array_search($workplan[$index]['WBS_ID'],$rebaseline_wp);
-            if($index_rebaseline == null){
+            $index_workplan = array_search($workplan[$index]['WBS_ID'],$workplan_wp);
+            if($index_workplan == null){
                 $index = 0;
             }
             $workplan[$index]['status'] =  $rebaseline[$index_rebaseline]['ACTION'];
+            $workplan[$index]['index_rebaseline'] =  $index_rebaseline;
+
+            $index_rebaseline ++;
         }
 
         foreach ($workplan as &$wp){
