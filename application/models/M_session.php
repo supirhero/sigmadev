@@ -16,7 +16,6 @@ Class M_session extends CI_Model{
         $q = $this->db->query($sql);
 
         if($q->num_rows() > 0){
-            $result["token"] = $token;
             if($result["data"]["SESSION_EXPIRED"] <= time())
             {
                 $result["error"]= "Your token is expired";
@@ -44,7 +43,7 @@ $new_session = md5(time().rand(1,999999));
         $this->db->set('SESSION_ID',1);
         $this->db->set('SESSION_TOKEN',$new_session);
         $this->db->set('USER_ID',$user_id);
-        $this->db->set('SESSION_EXPIRED',time()+30*60);
+        $this->db->set('SESSION_EXPIRED',time()+5*30*60);
         $this->db->insert("USER_SESSION");
 return $new_session;
     }
