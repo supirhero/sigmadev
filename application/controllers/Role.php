@@ -22,23 +22,14 @@ class Role extends CI_Controller
         $this->load->model('M_session');
 
         //TOKEN LOGIN CHECKER
-        if(isset($_GET['token'])){
-            $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
-            $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
-            //    print_r($decoded_user_data);
-            $this->datajson['token'] = $_GET['token'];
+        $datauser = $this->M_session->GetDataUser();
+        //    print_r($decoded_user_data);
+        $this->datajson['token'] = $datauser["token"];
 
-        }
-        elseif(isset($_SERVER['HTTP_TOKEN'])){
-            $datauser["data"] = $this->M_session->GetDataUser($_SERVER['HTTP_TOKEN']);
-
-            $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
-            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
-        }
-        else{
-            print_r($_GET);
-            $error['error']="Login First!";
-            echo json_encode($error);
+        if(isset($datauser["error"]))
+        {
+            $this->output->set_status_header($datauser["status"]);
+            echo json_encode($datauser);
             die();
         }
         //if login success

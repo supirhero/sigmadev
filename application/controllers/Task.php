@@ -24,20 +24,14 @@ class Task extends CI_Controller
         $this->load->helper('file');
 
         //TOKEN LOGIN CHECKER
-        if(isset($_GET['token'])){
-            $datauser["data"] = $this->M_session->GetDataUser($_GET['token']);
+        $datauser = $this->M_session->GetDataUser();
+        //    print_r($decoded_user_data);
+        $this->datajson['token'] = $datauser["token"];
 
-            $decoded_user_data =$datauser['data'];
-            //    print_r($decoded_user_data);
-            $this->datajson['token'] = $_GET['token'];
-        }
-        elseif(isset($_SERVER['HTTP_TOKEN'])){
-            $decoded_user_data = $this->M_session->GetDataUser($_SERVER['HTTP_TOKEN']);
-            $this->datajson['token'] = $_SERVER['HTTP_TOKEN'];
-        }
-        else{
-            $error['error']="Login First!";
-            echo json_encode($error);
+        if(isset($datauser["error"]))
+        {
+            $this->output->set_status_header($datauser["status"]);
+            echo json_encode($datauser);
             die();
         }
         //if login success
