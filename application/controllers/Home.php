@@ -1020,16 +1020,15 @@ $data["error_upload"] = $this->upload->display_errors();
     /*For Project Doc*/
     public function deleteprojectdoc(){
         //echo $project_id;
-        if(isset($_POST['doc_id']) || isset($_POST['DOC_ID']))
+        if($this->input->post('doc_id') != null)
         {
-
-            $this->M_detail_project->deleteDoc($_POST['doc_id']);
+            $this->M_detail_project->deleteDoc($this->input->post('doc_id'));
             $result["status"] = "success";
         }
         else{
             $this->output->set_status_header(402);
             $result["status"] = "failed";
-            $result["message"] = "Doc ID can not be empty";
+            $result["message"] = "Document rebaseline tidak bisa di delete";
         }
 
 
