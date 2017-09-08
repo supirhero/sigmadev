@@ -432,8 +432,8 @@ $data["error_upload"] = $this->upload->display_errors();
         isset($_POST['EFFORT_TYPE'])?$effort=$_POST['EFFORT_TYPE']:$effort=null;
         // end check
         $data['project']= $this->M_project->getUsersProjectBasedBU($this->datajson['userdata']['USER_ID'],$_POST['bu_code'],$keyword,$status,$type,$effort);
-        $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code'")->result_array();
-        $data['nonmember'] = $this->db->query("select user_id, user_name from users where bu_id != '$code'")->result_array();
+        $data['member'] = $this->db->query("select user_id, user_name from users where bu_id = '$code' order by user_name ")->result_array();
+        $data['nonmember'] = $this->db->query("select user_id, user_name from users where bu_id != '$code'  order by user_name ")->result_array();
         $data['bu_id'] = $code;
         $data['bu_spi']=$this->M_home->buspicpi($code)[0]->SPI;
         $data['bu_cpi']=$this->M_home->buspicpi($code)[0]->CPI;
