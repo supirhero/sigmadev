@@ -835,7 +835,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             //insert rebaseline history
             $this->M_baseline->insertRebaseline($data);
 
-            $data['message_evidence'] = 'no file or file failed uploaded';
+            $datareturn['message_evidence'] = 'no file or file failed uploaded';
             //edit table project
             //$this->M_baseline->editProject2($update,$id2);
 
@@ -853,7 +853,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 
             $this->M_baseline->insertRebaseline($data);
 
-            $data['message_evidence'] = 'file success uploaded';
+            $datareturn['message_evidence'] = 'file success uploaded';
         }
         //set project status to onhold
         $this->db->query("Update projects set PROJECT_STATUS='On Hold',RH_ID = $rh_id where project_id='$project'");
@@ -1004,7 +1004,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             foreach ($allTemporaryWbsPool as $wbsPool){
                 /*ADD MEMBER TO TASK*/
                 if($wbsPool['ACTION'] == 'create'){
-                    $checkWbsPool = $this->db->query("select count(*) as jumlah from wbs_pool where wp_id = '".$wbsPool['WP_ID']."")->row()->JUMLAH;
+                    $checkWbsPool = $this->db->query("select count(*) as jumlah from wbs_pool where wp_id = '".$wbsPool['WP_ID']."'")->row()->JUMLAH;
                     if($checkWbsPool == 0 || $checkWbsPool == null){
                         $wbs=$wbsPool['WBS_ID'];
                         $member=$wbsPool['RP_ID'];
