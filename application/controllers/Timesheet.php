@@ -75,6 +75,7 @@ class Timesheet extends CI_Controller {
                 //jika akses tipe nya business
                 if($priv['TYPE'] == 'BUSINESS'){
                     if($priv['PRIVILEGE'] == 'all_bu'){
+                        $this->allowed_bu ="'BAS','TSC','TMS','FNB','CIB','INS','MSS','CIA','SGP','SSI','SMS'";
                         $will_die = 0;
                     }
                     elseif($priv['PRIVILEGE'] == 'only_bu'){
@@ -87,7 +88,10 @@ class Timesheet extends CI_Controller {
                         $directorat_bu[] = null;
                         //if company
                         if($user_bu == 0){
-                            $access = 'masuk';
+                            $bu_id_all= $this->db->query("select bu_id from p_bu")->result_array();
+                            foreach ($bu_id_all as $buid){
+                                $directorat_bu[] = $buid['BU_ID'];
+                            }
                         }
                         //if directorat
                         elseif ($user_bu_parent == 0){
@@ -124,7 +128,8 @@ class Timesheet extends CI_Controller {
                                 $bu_id = $this->input->post('BU_ID');
                                 break;
                             case '5':
-                                $bu_id = "masuk";
+                                $this->allowed_bu ="'".$this->db->query("select bu_code from p_bu where bu_id = '$user_bu'")->row()->BU_CODE."'";
+                                $bu_id = 'masuk';
                                 break;
                             case '6':
                                 $bu_id = $_POST['bu'];

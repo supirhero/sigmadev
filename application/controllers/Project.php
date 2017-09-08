@@ -77,6 +77,7 @@ class Project extends CI_Controller
                 //jika akses tipe nya business
                 if($priv['TYPE'] == 'BUSINESS'){
                     if($priv['PRIVILEGE'] == 'all_bu'){
+                        $this->allowed_bu ="'BAS','TSC','TMS','FNB','CIB','INS','MSS','CIA','SGP','SSI','SMS'";
                         $will_die = 0;
                     }
                     elseif($priv['PRIVILEGE'] == 'only_bu'){
@@ -89,7 +90,10 @@ class Project extends CI_Controller
                         $directorat_bu[] = null;
                         //if company
                         if($user_bu == 0){
-                            $access = 'masuk';
+                            $bu_id_all= $this->db->query("select bu_id from p_bu")->result_array();
+                            foreach ($bu_id_all as $buid){
+                                $directorat_bu[] = $buid['BU_ID'];
+                            }
                         }
                         //if directorat
                         elseif ($user_bu_parent == 0){
@@ -126,7 +130,8 @@ class Project extends CI_Controller
                                 $bu_id = $this->input->post('BU_ID');
                                 break;
                             case '5':
-                                $bu_id = "masuk";
+                                $this->allowed_bu ="'".$this->db->query("select bu_code from p_bu where bu_id = '$user_bu'")->row()->BU_CODE."'";
+                                $bu_id = 'masuk';
                                 break;
                             case '6':
                                 $bu_id = $_POST['bu'];
@@ -859,6 +864,9 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         $this->db->query("Update projects set PROJECT_STATUS='On Hold',RH_ID = $rh_id where project_id='$project'");
         $datareturn['status_project'] = 'success';
 
+
+        /*===========================================================*/
+        //batch modification task
         /*===========================================================*/
         //add modified task to temporary table
         if(count($array_data['modified_task']) != 0){
@@ -875,8 +883,6 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             }
             $datareturn['status_edit_task'] = "success";
         }
-
-        /*===========================================================*/
         //add new task to temporary table
         if(count($array_data['new_task']) != 0){
             foreach ($array_data['new_task'] as $newtask){
@@ -896,7 +902,24 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             }
             $datareturn['status_add_new_task'] = "success";
         }
+        //add delete task to temporary table
+        if(count($array_data['delete_task']) != 0){
+            foreach ($array_data['delete_task'] as $deletetask){
+                $project_id   = $deletetask['project_id'];
 
+                //wbs id same with project id
+                $data['RH_ID'] = $rh_id;
+                $data['WBS_ID'] = $project_id;
+
+                // list delete task to temporary table
+                $this->M_detail_project->updateProgressDeleteTaskTemp($data['WBS_ID'],$data['RH_ID']);
+
+            }
+            $datareturn['status_add_new_task'] = "success";
+        }
+
+
+        /*===========================================================*/
 
         echo json_encode($datareturn);
     }
