@@ -1021,7 +1021,11 @@ $data["error_upload"] = $this->upload->display_errors();
     public function deleteprojectdoc(){
         if(isset($_POST["doc_id"]))
         {
-        if($this->input->post('doc_id') != 0)
+            $this->output->set_status_header(402);
+            $result["status"] = "failed";
+            $result["message"] = "Doc ID kosong";  
+        }
+        else if($this->input->post('doc_id') != 0)
         {
             $this->M_detail_project->deleteDoc($this->input->post('doc_id'));
             $result["status"] = "success";
@@ -1031,13 +1035,8 @@ $data["error_upload"] = $this->upload->display_errors();
             $result["status"] = "failed";
             $result["message"] = "Document rebaseline tidak bisa di delete";
         }
-       }
-       else
-            {
-                          $this->output->set_status_header(402);
-            $result["status"] = "failed";
-            $result["message"] = "Doc ID kosong";  
-            }
+       
+           
 
         print_r(json_encode($result));
     }
