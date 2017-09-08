@@ -902,122 +902,146 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     }
 
     public function accept_rebaseline(){
-
         $project_id = $this->input->post('project_id');
         //rebaseline history id
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
 
+        //if status is in on hold
+        if($rh_id != null || $rh_id != 0){
+            /*===================BATCH WBS=================*/
+            $allTemporaryWbs = $this->db->query("select * from temporary_wbs where rh_id = '$rh_id' order by WBS_PARENT_ID")->result_array();
+            if(count($allTemporaryWbs) != 0){
+                foreach ($allTemporaryWbs as $wbsData){
+                    /*CREATE WBS*/
+                    if($wbsData['ACTION'] == 'create'){
+                        //for duplicate data handler
+                        $checkwbs = $this->db->query("select count(*) as jumlah from wbs where wbs_id = '".$wbsData['WBS_ID']."'")->row()->JUMLAH;
+                        if($checkwbs == 0 || $checkwbs == null){
+                            $insertwbs = [
+                                'WBS_ID'=>$wbsData['WBS_ID'],
+                                'WBS_PARENT_ID'=>$wbsData['WBS_PARENT_ID'],
+                                'PROJECT_ID'=>$wbsData['PROJECT_ID'],
+                                'WBS_NAME'=>$wbsData['WBS_NAME'],
+                                'START_DATE'=>$wbsData['START_DATE'],
+                                'FINISH_DATE'=>$wbsData['FINISH_DATE'],
+                                'DURATION'=>$wbsData['DURATION'],
 
-        /*===================BATCH WBS=================*/
-        $allTemporaryWbs = $this->db->query("select * from temporary_wbs where rh_id = '$rh_id' order by WBS_PARENT_ID")->result_array();
-        if(count($allTemporaryWbs) != 0){
-            foreach ($allTemporaryWbs as $wbsData){
-                /*CREATE WBS*/
-                if($wbsData['ACTION'] == 'create'){
-                    //for duplicate data handler
-                    $checkwbs = $this->db->query("select count(*) as jumlah from wbs where wbs_id = '".$wbsData['WBS_ID']."'")->row()->JUMLAH;
-                    if($checkwbs == 0 || $checkwbs == null){
-                        $insertwbs = [
-                            'WBS_ID'=>$wbsData['WBS_ID'],
-                            'WBS_PARENT_ID'=>$wbsData['WBS_PARENT_ID'],
-                            'PROJECT_ID'=>$wbsData['PROJECT_ID'],
-                            'WBS_NAME'=>$wbsData['WBS_NAME'],
-                            'START_DATE'=>$wbsData['START_DATE'],
-                            'FINISH_DATE'=>$wbsData['FINISH_DATE'],
-                            'DURATION'=>$wbsData['DURATION'],
+                            ];
+                            $this->db->insert('WBS',$insertwbs);
+
+                            //update some value,idk what it will be ,but it come from old code , trust the old one boy..
+                            $WP_ID= $this->M_detail_project->getMaxWPID();
+                            $RP_ID= $this->M_detail_project->getMaxRPID();
+
+                            //get all wbs data from new wbs
+                            $selWBS=$this->M_detail_project->getWBSselected($wbsData['WBS_ID']);
+                            $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
+
+                            $dateStartWBS= new DateTime($selWBS->START_DATE);
+                            $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+                            foreach ($allParent as $ap) {
+                                $dateStartParent=new DateTime($ap->START_DATE);
+                                $dateEndParent=new DateTime($ap->FINISH_DATE);
+                                if ($dateStartWBS<$dateStartParent) {
+                                    $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
+                                }
+                                if ($dateEndWBS>$dateStartParent) {
+                                    $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
+                                }
+                                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+                            }
+
+                        }
+                    }
+                    /*EDIT WBS*/
+                    if($wbsData['ACTION'] == 'update') {
+                        $updatewbs = [
+                            'WBS_ID' => $wbsData['WBS_ID'],
+                            'WBS_PARENT_ID' => $wbsData['WBS_PARENT_ID'],
+                            'PROJECT_ID' => $wbsData['PROJECT_ID'],
+                            'WBS_NAME' => $wbsData['WBS_NAME'],
+                            'START_DATE' => $wbsData['START_DATE'],
+                            'FINISH_DATE' => $wbsData['FINISH_DATE'],
+                            'DURATION' => $wbsData['DURATION'],
 
                         ];
-                        $this->db->insert('WBS',$insertwbs);
+                        $this->db->where('WBS_ID', $wbsData['WBS_ID']);
+                        $this->db->update('WBS', $updatewbs);
 
                         //update some value,idk what it will be ,but it come from old code , trust the old one boy..
-                        $WP_ID= $this->M_detail_project->getMaxWPID();
-                        $RP_ID= $this->M_detail_project->getMaxRPID();
-
-                        //get all wbs data from new wbs
-                        $selWBS=$this->M_detail_project->getWBSselected($wbsData['WBS_ID']);
-                        $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
-
-                        $dateStartWBS= new DateTime($selWBS->START_DATE);
-                        $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+                        $selWBS = $this->getSelectedWBS($wbsData['WBS_ID']);
+                        $allParent = $this->getAllParent($selWBS->WBS_ID);
+                        $dateStartWBS = new DateTime($selWBS->START_DATE);
+                        $dateEndWBS = new DateTime($selWBS->FINISH_DATE);
                         foreach ($allParent as $ap) {
-                            $dateStartParent=new DateTime($ap->START_DATE);
-                            $dateEndParent=new DateTime($ap->FINISH_DATE);
-                            if ($dateStartWBS<$dateStartParent) {
-                                $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
+                            $dateStartParent = new DateTime($ap->START_DATE);
+                            $dateEndParent = new DateTime($ap->FINISH_DATE);
+                            if ($dateStartWBS < $dateStartParent) {
+                                $this->M_detail_project->updateParentDate('start', $ap->WBS_ID, $dateStartWBS->format('Y-m-d'));
                             }
-                            if ($dateEndWBS>$dateStartParent) {
-                                $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
+                            if ($dateEndWBS > $dateStartParent) {
+                                $this->M_detail_project->updateParentDate('end', $ap->WBS_ID, $dateEndWBS->format('Y-m-d'));
                             }
                             $this->M_detail_project->updateNewDuration($ap->WBS_ID);
                         }
-
                     }
-                }
-                /*EDIT WBS*/
-                if($wbsData['ACTION'] == 'update') {
-                    $updatewbs = [
-                        'WBS_ID' => $wbsData['WBS_ID'],
-                        'WBS_PARENT_ID' => $wbsData['WBS_PARENT_ID'],
-                        'PROJECT_ID' => $wbsData['PROJECT_ID'],
-                        'WBS_NAME' => $wbsData['WBS_NAME'],
-                        'START_DATE' => $wbsData['START_DATE'],
-                        'FINISH_DATE' => $wbsData['FINISH_DATE'],
-                        'DURATION' => $wbsData['DURATION'],
-
-                    ];
-                    $this->db->where('WBS_ID', $wbsData['WBS_ID']);
-                    $this->db->update('WBS', $updatewbs);
-
-                    //update some value,idk what it will be ,but it come from old code , trust the old one boy..
-                    $selWBS = $this->getSelectedWBS($wbsData['WBS_ID']);
-                    $allParent = $this->getAllParent($selWBS->WBS_ID);
-                    $dateStartWBS = new DateTime($selWBS->START_DATE);
-                    $dateEndWBS = new DateTime($selWBS->FINISH_DATE);
-                    foreach ($allParent as $ap) {
-                        $dateStartParent = new DateTime($ap->START_DATE);
-                        $dateEndParent = new DateTime($ap->FINISH_DATE);
-                        if ($dateStartWBS < $dateStartParent) {
-                            $this->M_detail_project->updateParentDate('start', $ap->WBS_ID, $dateStartWBS->format('Y-m-d'));
-                        }
-                        if ($dateEndWBS > $dateStartParent) {
-                            $this->M_detail_project->updateParentDate('end', $ap->WBS_ID, $dateEndWBS->format('Y-m-d'));
-                        }
-                        $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+                    /*DELETE WBS*/
+                    if($wbsData['ACTION'] == 'delete'){
+                        //$this->M_detail_project->deleteWBSID($id);
+                        //$this->M_detail_project->deleteWBSPoolID($id);
+                        $this->M_detail_project->updateProgressDeleteTask($wbsData['WBS_ID']);
                     }
-                }
-                /*DELETE WBS*/
-                if($wbsData['ACTION'] == 'delete'){
-                    //$this->M_detail_project->deleteWBSID($id);
-                    //$this->M_detail_project->deleteWBSPoolID($id);
-                    $this->M_detail_project->updateProgressDeleteTask($wbsData['WBS_ID']);
                 }
             }
-        }
 
-        /*===================BATCH WBS POOL==============*/
-        $allTemporaryWbsPool = $this->db->query("select *
+            /*===================BATCH WBS POOL==============*/
+            $allTemporaryWbsPool = $this->db->query("select *
                                                  from temporary_wbs_pool a join wbs b
                                                  on a.wbs_id = b.wbs_id
                                                  where b.project_id = '$project_id'
                                                  and a.rh_id = '$rh_id'")->result_array();
-        if(count($allTemporaryWbsPool) != 0){
-            foreach ($allTemporaryWbsPool as $wbsPool){
-                /*ADD MEMBER TO TASK*/
-                if($wbsPool['ACTION'] == 'create'){
-                    $checkWbsPool = $this->db->query("select count(*) as jumlah from wbs_pool where wp_id = '".$wbsPool['WP_ID']."'")->row()->JUMLAH;
-                    if($checkWbsPool == 0 || $checkWbsPool == null){
+            if(count($allTemporaryWbsPool) != 0){
+                foreach ($allTemporaryWbsPool as $wbsPool){
+                    /*ADD MEMBER TO TASK*/
+                    if($wbsPool['ACTION'] == 'create'){
+                        $checkWbsPool = $this->db->query("select count(*) as jumlah from wbs_pool where wp_id = '".$wbsPool['WP_ID']."'")->row()->JUMLAH;
+                        if($checkWbsPool == 0 || $checkWbsPool == null){
+                            $wbs=$wbsPool['WBS_ID'];
+                            $member=$wbsPool['RP_ID'];
+
+                            $id = $wbsPool['WP_ID'];
+                            $this->db->set('RP_ID', $member);
+                            $this->db->set('WP_ID', $id);
+                            $this->db->set('WBS_ID', $wbs);
+                            $this->db->insert("WBS_POOL");
+
+                            $res=$this->db->query("select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'")->row()->RES;
+                            $dur=$this->db->query("select DURATION as DUR from wbs where wbs_id='$wbs'")->row()->DUR;
+                            $this->db->query("update wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'");
+                            $allParent=$this->getAllParentWBS($wbs);
+                            foreach ($allParent as $ap) {
+                                $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
+                                $wc=0;
+                                $allChild=$this->getAllChildWBS($ap->WBS_ID);
+                                foreach ($allChild as $ac) {
+                                    $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
+                                    $wc=$wc+$works;
+                                }
+                                $this->db->query("update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'");
+                            }
+                        }
+                    }
+                    /*DELETE MEMBER FROM TASK*/
+                    if($wbsPool['ACTION'] == 'delete'){
                         $wbs=$wbsPool['WBS_ID'];
                         $member=$wbsPool['RP_ID'];
 
-                        $id = $wbsPool['WP_ID'];
-                        $this->db->set('RP_ID', $member);
-                        $this->db->set('WP_ID', $id);
-                        $this->db->set('WBS_ID', $wbs);
-                        $this->db->insert("WBS_POOL");
+                        $this->db->where('RP_ID', $member);
+                        $this->db->where('WBS_ID', $wbs);
+                        $this->db->delete("WBS_POOL");
 
                         $res=$this->db->query("select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'")->row()->RES;
-                        $dur=$this->db->query("select DURATION as DUR from wbs where wbs_id='$wbs'")->row()->DUR;
-                        $this->db->query("update wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'");
+                        $this->db->query("update wbs set resource_wbs=$res where wbs_id='$wbs'");
                         $allParent=$this->getAllParentWBS($wbs);
                         foreach ($allParent as $ap) {
                             $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
@@ -1031,180 +1055,162 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                         }
                     }
                 }
-                /*DELETE MEMBER FROM TASK*/
-                if($wbsPool['ACTION'] == 'delete'){
-                    $wbs=$wbsPool['WBS_ID'];
-                    $member=$wbsPool['RP_ID'];
-
-                    $this->db->where('RP_ID', $member);
-                    $this->db->where('WBS_ID', $wbs);
-                    $this->db->delete("WBS_POOL");
-
-                    $res=$this->db->query("select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'")->row()->RES;
-                    $this->db->query("update wbs set resource_wbs=$res where wbs_id='$wbs'");
-                    $allParent=$this->getAllParentWBS($wbs);
-                    foreach ($allParent as $ap) {
-                        $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
-                        $wc=0;
-                        $allChild=$this->getAllChildWBS($ap->WBS_ID);
-                        foreach ($allChild as $ac) {
-                            $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
-                            $wc=$wc+$works;
-                        }
-                        $this->db->query("update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'");
-                    }
-                }
             }
-        }
 
-        /*===================BATCH TIMESHEET=============*/
-        $allTemporayTimesheet = $this->db->query("select * from temporary_timesheet a join wbs_pool b
+            /*===================BATCH TIMESHEET=============*/
+            $allTemporayTimesheet = $this->db->query("select * from temporary_timesheet a join wbs_pool b
                                                   on a.wp_id =  b.wp_id
                                                   join wbs c
                                                   on b.wbs_id = c.wbs_id
                                                   where c.project_id = '$project_id'
                                                   and a.rh_id = '$rh_id'
                                                   ")->result_array();
-        if(count($allTemporayTimesheet) != 0){
-            foreach ($allTemporayTimesheet as $timesheet){
+            if(count($allTemporayTimesheet) != 0){
+                foreach ($allTemporayTimesheet as $timesheet){
 
-                //change date input for readable to sql
-                $tgl=date_format(date_create($timesheet['TS_DATE']),'Ymd');
+                    //change date input for readable to sql
+                    $tgl=date_format(date_create($timesheet['TS_DATE']),'Ymd');
 
-                //check timesheet data for this date ,
-                //0 = no data
-                //-1 = have an old data (Only one data)
-                //1 = have a new data
-                $jumlahts=$this->checkTSData($timesheet['WP_ID'],$tgl);
+                    //check timesheet data for this date ,
+                    //0 = no data
+                    //-1 = have an old data (Only one data)
+                    //1 = have a new data
+                    $jumlahts=$this->checkTSData($timesheet['WP_ID'],$tgl);
 
-                //insert new data
-                if($jumlahts == 0){
+                    //insert new data
+                    if($jumlahts == 0){
 
-                    $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
+                        $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
 
-                    //if there is no duplicate primay key
-                    $checkTimeSheet = $this->db->query("select count(*) as jumlah from timesheet where ts_id = '".$timesheet['TS_ID']."'")->row()->JUMLAH;
-                    if($checkTimeSheet == 0 || $checkTimeSheet == null){
-                        //data for insert
-                        $TS_ID = $timesheet['TS_ID'];
-                        $SUBJECT = $timesheet['SUBJECT'];
-                        $MESSAGE = $timesheet['MESSAGE'];
-                        $HOUR_TOTAL = $timesheet['HOUR_TOTAL'];
-                        $TS_DATE = "to_date('$tgl','yyyymmdd')";
-                        $WP_ID = $timesheet['WP_ID'];
-                        $LATITUDE = $timesheet['LATITUDE'];
-                        $LONGITUDE = $timesheet['LONGITUDE'];
-                        $SUMBIT_DATE =$timesheet['SUBMIT_DATE'];
-                        $IS_APPROVED = $timesheet['IS_APPROVED'];
-                        $APPROVAL_DATE = $timesheet['APPROVAL_DATE'];
-                        $REJECTED_MESSAGE = $timesheet['REJECTED_MESSAGE'];
-                        $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
+                        //if there is no duplicate primay key
+                        $checkTimeSheet = $this->db->query("select count(*) as jumlah from timesheet where ts_id = '".$timesheet['TS_ID']."'")->row()->JUMLAH;
+                        if($checkTimeSheet == 0 || $checkTimeSheet == null){
+                            //data for insert
+                            $TS_ID = $timesheet['TS_ID'];
+                            $SUBJECT = $timesheet['SUBJECT'];
+                            $MESSAGE = $timesheet['MESSAGE'];
+                            $HOUR_TOTAL = $timesheet['HOUR_TOTAL'];
+                            $TS_DATE = "to_date('$tgl','yyyymmdd')";
+                            $WP_ID = $timesheet['WP_ID'];
+                            $LATITUDE = $timesheet['LATITUDE'];
+                            $LONGITUDE = $timesheet['LONGITUDE'];
+                            $SUMBIT_DATE =$timesheet['SUBMIT_DATE'];
+                            $IS_APPROVED = $timesheet['IS_APPROVED'];
+                            $APPROVAL_DATE = $timesheet['APPROVAL_DATE'];
+                            $REJECTED_MESSAGE = $timesheet['REJECTED_MESSAGE'];
+                            $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
 
 
-                        $this->db->query("INSERT INTO TIMESHEET
+                            $this->db->query("INSERT INTO TIMESHEET
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,
                               IS_APPROVED,APPROVAL_DATE,REJECTED_MESSAGE,CONFIRMED_BY)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE','$SUMBIT_DATE',
                               $IS_APPROVED,'$APPROVAL_DATE','$REJECTED_MESSAGE','$CONFIRMED_BY')");
 
-                        if($timesheet['IS_APPROVED'] == 1){
-                            $this->M_timesheet->updateProgress($timesheet['TS_ID']);
+                            if($timesheet['IS_APPROVED'] == 1){
+                                $this->M_timesheet->updateProgress($timesheet['TS_ID']);
+                            }
                         }
+
+
                     }
+                    //insert new data with add prefix number at primary key
+                    elseif($jumlahts == 1){
+                        //get timesheet total this day
+                        $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
 
+                        //if there is no duplicate primay key
+                        $checkTimeSheet = $this->db->query("select count(*) as jumlah from timesheet where ts_id = '".$timesheet['TS_ID']."'")->row()->JUMLAH;
+                        if($checkTimeSheet == 0 || $checkTimeSheet == null){
+                            //data for insert
+                            $TS_ID = $timesheet['TS_ID'];
+                            $SUBJECT = $timesheet['SUBJECT'];
+                            $MESSAGE = $timesheet['MESSAGE'];
+                            $HOUR_TOTAL = $timesheet['HOUR_TOTAL'];
+                            $TS_DATE = "to_date('$tgl','yyyymmdd')";
+                            $WP_ID = $timesheet['WP_ID'];
+                            $LATITUDE = $timesheet['LATITUDE'];
+                            $LONGITUDE = $timesheet['LONGITUDE'];
+                            $SUMBIT_DATE =$timesheet['SUBMIT_DATE'];
+                            $IS_APPROVED = $timesheet['IS_APPROVED'];
+                            $APPROVAL_DATE = $timesheet['APPROVAL_DATE'];
+                            $REJECTED_MESSAGE = $timesheet['REJECTED_MESSAGE'];
+                            $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
 
-                }
-                //insert new data with add prefix number at primary key
-                elseif($jumlahts == 1){
-                    //get timesheet total this day
-                    $getCountTimesheet = $this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from TIMESHEET where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array()[0]['TS_ID'];
-
-                    //if there is no duplicate primay key
-                    $checkTimeSheet = $this->db->query("select count(*) as jumlah from timesheet where ts_id = '".$timesheet['TS_ID']."'")->row()->JUMLAH;
-                    if($checkTimeSheet == 0 || $checkTimeSheet == null){
-                        //data for insert
-                        $TS_ID = $timesheet['TS_ID'];
-                        $SUBJECT = $timesheet['SUBJECT'];
-                        $MESSAGE = $timesheet['MESSAGE'];
-                        $HOUR_TOTAL = $timesheet['HOUR_TOTAL'];
-                        $TS_DATE = "to_date('$tgl','yyyymmdd')";
-                        $WP_ID = $timesheet['WP_ID'];
-                        $LATITUDE = $timesheet['LATITUDE'];
-                        $LONGITUDE = $timesheet['LONGITUDE'];
-                        $SUMBIT_DATE =$timesheet['SUBMIT_DATE'];
-                        $IS_APPROVED = $timesheet['IS_APPROVED'];
-                        $APPROVAL_DATE = $timesheet['APPROVAL_DATE'];
-                        $REJECTED_MESSAGE = $timesheet['REJECTED_MESSAGE'];
-                        $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
-
-                        $this->db->query("INSERT INTO TIMESHEET
+                            $this->db->query("INSERT INTO TIMESHEET
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,
                               IS_APPROVED,APPROVAL_DATE,REJECTED_MESSAGE,CONFIRMED_BY)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE','$SUMBIT_DATE',
                               $IS_APPROVED,'$APPROVAL_DATE','$REJECTED_MESSAGE','$CONFIRMED_BY')");
 
-                        if($timesheet['IS_APPROVED'] == 1){
-                            $this->M_timesheet->updateProgress($timesheet['TS_ID']);
+                            if($timesheet['IS_APPROVED'] == 1){
+                                $this->M_timesheet->updateProgress($timesheet['TS_ID']);
+                            }
                         }
+
+
                     }
+                    //change old primary key style first if data detected as old data
+                    elseif($jumlahts == -1){
 
+                        //update query
+                        $getOldData = $this->db->query("select * from timesheet where TS_DATE = to_date('$tgl','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array();
+                        $this->db->set('TS_ID',$getOldData[0]['TS_ID'].".".str_pad(1,2,"0",STR_PAD_LEFT));
+                        $this->db->where("TS_DATE = to_date('$tgl','yyyymmdd')");
+                        $this->db->like('TS_ID', $data['WP_ID'].'.','after');
 
-                }
-                //change old primary key style first if data detected as old data
-                elseif($jumlahts == -1){
-
-                    //update query
-                    $getOldData = $this->db->query("select * from timesheet where TS_DATE = to_date('$tgl','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array();
-                    $this->db->set('TS_ID',$getOldData[0]['TS_ID'].".".str_pad(1,2,"0",STR_PAD_LEFT));
-                    $this->db->where("TS_DATE = to_date('$tgl','yyyymmdd')");
-                    $this->db->like('TS_ID', $data['WP_ID'].'.','after');
-
-                    $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01'
+                        $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01'
                               where TS_DATE = to_date('$tgl','yyyymmdd')
                               and TS_ID LIKE '".$data['WP_ID'].".%'";
-                    $this->db->query($queryupdate);
+                        $this->db->query($queryupdate);
 
-                    //if there is no duplicate primay key
-                    $checkTimeSheet = $this->db->query("select count(*) as jumlah from timesheet where ts_id = '".$timesheet['TS_ID']."'")->row()->JUMLAH;
-                    if($checkTimeSheet == 0 || $checkTimeSheet == null){
-                        //data for insert
-                        $TS_ID = $timesheet['TS_ID'];
-                        $SUBJECT = $timesheet['SUBJECT'];
-                        $MESSAGE = $timesheet['MESSAGE'];
-                        $HOUR_TOTAL = $timesheet['HOUR_TOTAL'];
-                        $TS_DATE = "to_date('$tgl','yyyymmdd')";
-                        $WP_ID = $timesheet['WP_ID'];
-                        $LATITUDE = $timesheet['LATITUDE'];
-                        $LONGITUDE = $timesheet['LONGITUDE'];
-                        $SUMBIT_DATE =$timesheet['SUBMIT_DATE'];
-                        $IS_APPROVED = $timesheet['IS_APPROVED'];
-                        $APPROVAL_DATE = $timesheet['APPROVAL_DATE'];
-                        $REJECTED_MESSAGE = $timesheet['REJECTED_MESSAGE'];
-                        $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
+                        //if there is no duplicate primay key
+                        $checkTimeSheet = $this->db->query("select count(*) as jumlah from timesheet where ts_id = '".$timesheet['TS_ID']."'")->row()->JUMLAH;
+                        if($checkTimeSheet == 0 || $checkTimeSheet == null){
+                            //data for insert
+                            $TS_ID = $timesheet['TS_ID'];
+                            $SUBJECT = $timesheet['SUBJECT'];
+                            $MESSAGE = $timesheet['MESSAGE'];
+                            $HOUR_TOTAL = $timesheet['HOUR_TOTAL'];
+                            $TS_DATE = "to_date('$tgl','yyyymmdd')";
+                            $WP_ID = $timesheet['WP_ID'];
+                            $LATITUDE = $timesheet['LATITUDE'];
+                            $LONGITUDE = $timesheet['LONGITUDE'];
+                            $SUMBIT_DATE =$timesheet['SUBMIT_DATE'];
+                            $IS_APPROVED = $timesheet['IS_APPROVED'];
+                            $APPROVAL_DATE = $timesheet['APPROVAL_DATE'];
+                            $REJECTED_MESSAGE = $timesheet['REJECTED_MESSAGE'];
+                            $CONFIRMED_BY = $timesheet['CONFIRMED_BY'];
 
-                        $this->db->query("INSERT INTO TIMESHEET
+                            $this->db->query("INSERT INTO TIMESHEET
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,
                               IS_APPROVED,APPROVAL_DATE,REJECTED_MESSAGE,CONFIRMED_BY)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE','$SUMBIT_DATE',
                               $IS_APPROVED,'$APPROVAL_DATE','$REJECTED_MESSAGE','$CONFIRMED_BY')");
 
-                        if($timesheet['IS_APPROVED'] == 1){
-                            $this->M_timesheet->updateProgress($timesheet['TS_ID']);
+                            if($timesheet['IS_APPROVED'] == 1){
+                                $this->M_timesheet->updateProgress($timesheet['TS_ID']);
+                            }
                         }
                     }
                 }
             }
+
+            /*===================CHANGE PROJECT STATUS=============*/
+            $this->db->query("update projects set project_status = 'In Progress',rh_id = null where project_id = '$project_id'");
+
+
+            $return['status'] = 'success';
+            echo json_encode($return);
         }
-
-        /*===================CHANGE PROJECT STATUS=============*/
-        $this->db->query("update projects set project_status = 'In Progress',rh_id = null where project_id = '$project_id'");
-
-
-        $return['status'] = 'success';
-        echo json_encode($return);
+        else{
+            $this->outpu->set_status_header(400);
+            $returndata['status'] = 'failed';
+            $returndata['message'] = 'Projects status already in progress';
+        }
     }
 
     public function deny_rebaseline(){
