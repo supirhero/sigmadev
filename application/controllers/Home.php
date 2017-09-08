@@ -1006,7 +1006,7 @@ $data["error_upload"] = $this->upload->display_errors();
         $this->datajson['project_doc_list'] = $this->db->query("select a.*,b.user_name from (
                                                                   select project_id,doc_id,doc_name,url,date_upload,upload_by,doc_desc,'document' as jenis from project_doc
                                                                   UNION 
-                                                                  select project_id,null as doc_id, evidence as doc_name,evidence as url,submit_date as date_upload ,request_by as upload_by,reason as doc_desc,'rebaseline' as jenis from rebaseline_history
+                                                                  select project_id,0 as doc_id, evidence as doc_name,evidence as url,submit_date as date_upload ,request_by as upload_by,reason as doc_desc,'rebaseline' as jenis from rebaseline_history
                                                                 ) a
                                                                 join users b
                                                                 on a.upload_by = b.user_id where project_id = $projectid")->result_array();
@@ -1019,8 +1019,9 @@ $data["error_upload"] = $this->upload->display_errors();
     }
     /*For Project Doc*/
     public function deleteprojectdoc(){
-        //echo $project_id;
-        if($this->input->post('doc_id') != null)
+        if($this->input->post('doc_id'))
+        {
+        if($this->input->post('doc_id') != 0)
         {
             $this->M_detail_project->deleteDoc($this->input->post('doc_id'));
             $result["status"] = "success";
@@ -1030,7 +1031,13 @@ $data["error_upload"] = $this->upload->display_errors();
             $result["status"] = "failed";
             $result["message"] = "Document rebaseline tidak bisa di delete";
         }
-
+       }
+       else
+            {
+                          $this->output->set_status_header(402);
+            $result["status"] = "failed";
+            $result["message"] = "Doc ID kosong";  
+            }
 
         print_r(json_encode($result));
     }
