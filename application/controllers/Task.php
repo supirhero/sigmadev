@@ -34,6 +34,7 @@ class Task extends CI_Controller
             echo json_encode($datauser);
             die();
         }
+        $decoded_user_data = array_change_key_case($datauser["data"], CASE_UPPER);
         //if login success
         if(count($decoded_user_data) > 0){
             //get user data from token
