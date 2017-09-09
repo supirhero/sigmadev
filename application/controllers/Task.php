@@ -555,6 +555,7 @@ class Task extends CI_Controller
             $returndata['message'] = "Task delete success";
         }
         else{
+            $this->output->set_status_header(400);
             $returndata['status'] = "failed";
             $returndata['message'] = "Project still on progress";
         }
@@ -571,7 +572,7 @@ class Task extends CI_Controller
 
         if($this->input->post("WORK_PERCENT_COMPLETE") == 0 || $this->input->post("WORK_PERCENT_COMPLETE") == null){
             $this->output->set_status_header(400);
-            $returndata['status'] = "success";
+            $returndata['status'] = "failed";
             $returndata['message'] = 'percent must more than 0%';
             die;
         }
@@ -631,7 +632,7 @@ class Task extends CI_Controller
             $data['message'] = 'Task member berhasil di hapus';
         }
         else{
-
+            $this->output->set_status_header(400);
             $data['status'] = 'failed';
             $data['message'] = 'Project status masih on progress';
         }
@@ -663,6 +664,7 @@ class Task extends CI_Controller
             $data['message'] = 'member di tambah';
         }
         else{
+            $this->output->set_status_header(400);
             $data['status'] = 'failed';
             $data['message'] = 'Project status masih on progress';
         }
