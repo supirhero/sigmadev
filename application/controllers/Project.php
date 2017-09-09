@@ -526,8 +526,7 @@ class Project extends CI_Controller
             });
         }
         $project_id = $this->uri->segment(3);
-        echo $project_id;
-        die;
+
         $bu_id=$this->M_project->getProjectID($this->uri->segment(3));
         $data['project_business_unit_detail'] = $this->M_business->getData($bu_id);
         //$data['pm'] = $this->M_project->getPM($bu_id);
@@ -557,7 +556,7 @@ class Project extends CI_Controller
             array_push($data['project_type'],$type['PROJECT_TYPE']);
         }
 
-        $usediwo = $this->db->query("select distinct iwo_no from projects")->result_array();
+        $usediwo = $this->db->query("select distinct iwo_no from projects where project_id != $project_id")->result_array();
 
         //get iwo
         @$json = file_get_contents('http://180.250.18.227/api/index.php/mis/iwo/');
