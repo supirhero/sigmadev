@@ -1011,7 +1011,7 @@ $data["error_upload"] = $this->upload->display_errors();
         $projectid = $this->uri->segment(3);
 
         $this->datajson['project_doc_list'] = $this->db->query("select a.*,b.user_name from (
-                                                                  select project_id,doc_id,doc_name,url,to_char(date_upload,'DD-MON-YYYY HH:MI AM') as date_upload,upload_by,doc_desc,'document' as jenis from project_doc
+                                                                  select project_id,doc_id,doc_name,url,,upload_by,doc_desc,'document' as jenis from project_doc
                                                                   UNION 
                                                                   select project_id,0 as doc_id, evidence as doc_name,evidence as url,to_char(submit_date,'DD-MON-YYYY HH:MI AM') as date_upload ,request_by as upload_by,reason as doc_desc,'rebaseline' as jenis from rebaseline_history
                                                                 ) a

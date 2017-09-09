@@ -232,7 +232,7 @@ Class M_home extends CI_Model{
         a.PROJECT_ID,
         b.project_name,
         a.note,
-        a.DATE_ISSUE,
+        to_char(a.DATE_ISSUE,'DD-MON-YYYY HH:MI AM') as DATE_ISSUE,
         a.EVIDENCE,
         a.STATUS,
         a.PRIORITY,
