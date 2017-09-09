@@ -525,6 +525,9 @@ class Project extends CI_Controller
                 }
             });
         }
+        $project_id = $this->uri->segment(3);
+        echo $project_id;
+        die;
         $bu_id=$this->M_project->getProjectID($this->uri->segment(3));
         $data['project_business_unit_detail'] = $this->M_business->getData($bu_id);
         //$data['pm'] = $this->M_project->getPM($bu_id);
@@ -581,6 +584,8 @@ class Project extends CI_Controller
         {
             $hasil['iwo'][]= $IWO[$key];
         }
+        $hasil['iwo'][]= $IWO[$key];
+
         //echo json_encode($result_iwo);
 
         $data["iwolist"]=$hasil['iwo'];
