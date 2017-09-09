@@ -85,12 +85,31 @@ class Login extends CI_Controller {
                     }
 
                 }
+                elseif($cek=='err3'){
+
+                    set_status_header(400,'Login Failed');
+                    $codeerror['status'] = 'Failed';
+                    $codeerror['message'] = 'Username tidak aktif';
+                    echo json_encode($codeerror);
+                    die;
+                }
+                elseif($cek=='err2'){
+
+                    set_status_header(400,'Login Failed');
+                    $codeerror['status'] = 'Failed';
+                    $codeerror['message'] = 'Username Atau Password salah';
+                    echo json_encode($codeerror);
+                    die;
+                }
+                elseif($cek=='err1'){
+
+                    set_status_header(400,'Login Failed');
+                    $codeerror['status'] = 'Failed';
+                    $codeerror['message'] = 'Username tidak ditemukan';
+                    echo json_encode($codeerror);
+                    die;
+                }
             }
-            //redirect to error page
-            set_status_header(400,'Login Failed');
-            $codeerror['status'] = 'Failed';
-            $codeerror['message'] = 'Username Atau Password salah';
-            echo json_encode($codeerror);
         }
         else{
             $data['title']= 'error';
