@@ -1205,10 +1205,11 @@ $data["error_upload"] = $this->upload->display_errors();
                 'PROJECT_ID' => $projectid,
                 'DOC_NAME' => $data['upload_data']['file_name'],
                 'URL' => $data['upload_data']['file_name'],
-                'DATE_UPLOAD' => "To_date ('".date("d-m-Y H:i:s")."', 'DD-MM-YYYY HH24:MI:SS')",
+                'DATE_UPLOAD' => "To_date('".date("d-m-Y H:i:s")."', 'DD-MM-YYYY HH24:MI:SS')",
                 'UPLOAD_BY' => $this->datajson['userdata']['USER_ID'],
                 'DOC_DESC' => $this->input->post('desc')
             );
+            $this->db->set('DATE_UPLOAD',"to_timestamp('".date("d-m-Y H:i:s")."','DD-MM-YYYY HH24:MI:SS')",false);
 
             $this->db->insert('PROJECT_DOC', $insert);
 
