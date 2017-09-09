@@ -153,7 +153,7 @@ public function insertIssue($data){
   //$this->db->set('EVIDENCE',$data['EVIDENCE']);
   $this->db->set('PRIORITY', $data['PRIORITY']);
   $this->db->set('STATUS',$data['STATUS']);
-  $this->db->set('DATE_ISSUE',"to_date('$date','MM/DD/YYYY')",false);
+    $this->db->set('DATE_ISSUE',"to_timestamp('".date("d-m-Y H:i:s")."','DD-MM-YYYY HH24:MI:SS')",false);
 
   $this->db->insert("MANAGE_ISSUE");
 
@@ -188,7 +188,7 @@ public function insertIssue2($data){
   $this->db->set('EVIDENCE',$data['EVIDENCE']);
   $this->db->set('PRIORITY', $data['PRIORITY']);
   $this->db->set('STATUS',$data['STATUS']);
-  $this->db->set('DATE_ISSUE',"to_date('$date','MM/DD/YYYY HH24:MI:SS')",false);
+    $this->db->set('DATE_ISSUE',"to_timestamp('".date("d-m-Y H:i:s")."','DD-MM-YYYY HH24:MI:SS')",false);
 
   //$data['PROJECT_ID']   = $this->input->post("PROJECT_ID");
 
