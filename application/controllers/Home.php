@@ -70,8 +70,6 @@ class Home extends CI_Controller {
                                             from access_list a join profile_access_list b
                                             on a.access_id = b.access_id
                                             where b.profile_id = '".$this->datajson['userdata']['PROF_ID']."' order by a.access_id asc ")->result_array();
-        print_r($user_privilege);
-        die;
         if($user_privilege[0]['PRIVILEGE'] == 'all_bu'){
             $this->datajson['privilege']['master_data_access']=true;
             $this->datajson['privilege']['manage_role_access']=true;
