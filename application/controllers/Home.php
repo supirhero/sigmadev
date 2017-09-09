@@ -1205,7 +1205,7 @@ $data["error_upload"] = $this->upload->display_errors();
                 'PROJECT_ID' => $projectid,
                 'DOC_NAME' => $data['upload_data']['file_name'],
                 'URL' => $data['upload_data']['file_name'],
-                'DATE_UPLOAD' => date("d-M-Y H:i:s"),
+                'DATE_UPLOAD' => "To_date ('".date("d-m-Y H:i:s")."', 'DD-MM-YYYY HH24:MI:SS')",
                 'UPLOAD_BY' => $this->datajson['userdata']['USER_ID'],
                 'DOC_DESC' => $this->input->post('desc')
             );
