@@ -216,7 +216,7 @@ class M_project extends CI_Model {
             $_POST = array_change_key_case($_POST,CASE_UPPER);
         }
         $PROJECT_NAME = $this->input->post('PROJECT_NAME');
-        $PM_ID = $this->input->post('PM_ID');
+        $PM_ID = $this->input->post('PM');
         $IWO_NO = $this->input->post('IWO_NO');
         $BU_CODE = $this->input->post('BU');
         $SCHEDULE_START = $this->input->post('START');
