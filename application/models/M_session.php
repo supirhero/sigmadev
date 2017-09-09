@@ -42,7 +42,7 @@ $new_session = md5(time().rand(1,999999));
         $this->db->set('SESSION_ID',1);
         $this->db->set('SESSION_TOKEN',$new_session);
         $this->db->set('USER_ID',$user_id);
-        $this->db->set('SESSION_EXPIRED',time()+5*30*60);
+        $this->db->set('SESSION_EXPIRED',time()+30*60);
         $this->db->insert("USER_SESSION");
 return $new_session;
     }
