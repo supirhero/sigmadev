@@ -545,25 +545,7 @@ class Project extends CI_Controller
         $data['account_manager_list'] = $am;
 
         $data['type_of_expense'] = ['Capital Expense','Current Expense','Dedctible Expense'];
-        $data['type_of_effort'] =[[
-            value=>1,
-            name=>'CR'
-        ],[
-            value=>2,
-            name=>'project'
-        ],[
-            value=>3,
-            name=>'Manage Operation'
-        ],[
-            value=>4,
-            name=>'Maintenance'
-        ],[
-            value=>7,
-            name=>'Manage Service'
-        ],[
-            value=>8,
-            name=>'Non Project'
-        ]];
+        $data['type_of_effort'] =$this->db->query("select category as name, id as value from p_project_category")->result_array();
         $data['project_status'] = ['Not Started','In Progress','On Hold','Completed','Cancelled'];
         $data['project_type'] = [];
         $project_type = $this->db->query('select project_type from p_project_type')->result_array();

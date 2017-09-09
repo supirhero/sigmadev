@@ -953,9 +953,10 @@ Class M_detail_project extends CI_Model{
     }
     public function gethistorydetail($cap_id){
       return $this->db->query("select date_cap as updated_on, wbs_name, dc.work_percent_complete as percentage, user_name as update_by from detail_capture dc
-join users us on dc.user_id=us.user_id
-join wbs w on w.wbs_id=dc.wbs_id
-where cap_id='".$cap_id."' ORDER BY DETAIL_CAP_ID")->result_array();
+                                join users us on dc.user_id=us.user_id
+                                join wbs w on w.wbs_id=dc.wbs_id
+                                where cap_id='".$cap_id."' ORDER BY DETAIL_CAP_ID"
+      )->result_array();
     }
 
 }

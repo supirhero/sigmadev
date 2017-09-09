@@ -8,6 +8,7 @@ class Home extends CI_Controller {
         parent::__construct();
         $this->datajson['privilege'] = ['master_data_access'=>false,
                                         'manage_role_access'=>false,
+                                        'create_project'=>false,
                                         'bu_access' => false,
                                         'bu_invite_member'=>false,
                                         'report_overview'=>false,
@@ -68,10 +69,13 @@ class Home extends CI_Controller {
         $user_privilege = $this->db->query("select a.access_name,b.access_id,b.privilege
                                             from access_list a join profile_access_list b
                                             on a.access_id = b.access_id
-                                            where b.profile_id = '".$this->datajson['userdata']['PROF_ID']."'")->result_array();
+                                            where b.profile_id = '".$this->datajson['userdata']['PROF_ID']."' order by a.access_id asc ")->result_array();
         if($user_privilege[0]['PRIVILEGE'] == 'all_bu'){
             $this->datajson['privilege']['master_data_access']=true;
             $this->datajson['privilege']['manage_role_access']=true;
+        }
+        if($user_privilege[1]['PRIVILEGE'] == 'all_bu' || $user_privilege[2]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['create_project']=true;
         }
         if($user_privilege[2]['PRIVILEGE'] == 'all_bu' || $user_privilege[2]['PRIVILEGE'] == 'only_bu'){
             $this->datajson['privilege']['bu_access']=true;
@@ -84,6 +88,9 @@ class Home extends CI_Controller {
         }
         if($user_privilege[5]['PRIVILEGE'] == 'all_bu' || $user_privilege[5]['PRIVILEGE'] == 'only_bu'){
             $this->datajson['privilege']['report_bu_directorat']=true;
+        }
+        if($user_privilege[6]['PRIVILEGE'] == 'all_bu' || $user_privilege[5]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['report_bu_teammember']=true;
         }
         if($user_privilege[7]['PRIVILEGE'] == 'all_bu' || $user_privilege[7]['PRIVILEGE'] == 'only_bu'){
             $this->datajson['privilege']['report_find_project']=true;
