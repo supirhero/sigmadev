@@ -1019,7 +1019,7 @@ $data["error_upload"] = $this->upload->display_errors();
     }
     /*For Project Doc*/
     public function deleteprojectdoc(){
-        if(isset($_POST["doc_id"]))
+        if(!isset($_POST["doc_id"]))
         {
             $this->output->set_status_header(402);
             $result["status"] = "failed";
