@@ -400,6 +400,19 @@ GROUP BY TS_DATE")->result_array();
 
     function inputTimesheet($data){
 
+        $sql = "select u.user_name,pm.email,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
+join projects p on p.project_id = wbs.project_id 
+join users pm on p.pm_id = pm.user_id
+join resource_pool rp on wp.rp_id=rp.rp_id
+join users u on rp.user_id = u.user_id
+where wp_id = $data[WP_ID]";
+        $q = $this->db->query($sql);
+        if($q->num_rows() > 0){
+            $info=$q->row_array();
+        }
+        $this->confirmationTimesheetEmailtoPM($data,$info);
+        print_r($info);
+        die;
         //change date input for readable to sql
         $tgl=date_format(date_create($data['DATE']),'Ymd');
 
@@ -487,17 +500,6 @@ GROUP BY TS_DATE")->result_array();
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
         }
-        $sql = "select u.user_name,pm.email,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
-join projects p on p.project_id = wbs.project_id 
-join users pm on p.pm_id = pm.user_id
-join resource_pool rp on wp.rp_id=rp.rp_id
-join users u on rp.user_id = u.user_id
-where wp_id = $data[WP_ID]";
-        $q = $this->db->query($sql);
-        if($q->num_rows() > 0){
-            $info=$q->row_array();
-        }
-        $this->confirmationTimesheetEmailtoPM($data,$info);
 
     }
     function editTimesheet($data){
