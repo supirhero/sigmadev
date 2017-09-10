@@ -949,14 +949,11 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                             ];
                             $this->db->insert('WBS',$insertwbs);
 
-                            //update some value,idk what it will be ,but it come from old code , trust the old one boy..
-                            $WP_ID= $this->M_detail_project->getMaxWPID();
-                            $RP_ID= $this->M_detail_project->getMaxRPID();
 
-                            //get all wbs data from new wbs
-                            $selWBS=$this->M_detail_project->getWBSselected($wbsData['WBS_ID']);
-                            $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
-
+                            // insert into wbs and get new ID
+                            $newid = $wbsData['WBS_ID'];
+                            $selWBS=$this->getSelectedWBS($newid);
+                            $allParent=$this->getAllParent($selWBS->WBS_ID);
                             $dateStartWBS= new DateTime($selWBS->START_DATE);
                             $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
                             foreach ($allParent as $ap) {
@@ -968,9 +965,21 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                                 if ($dateEndWBS>$dateStartParent) {
                                     $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
                                 }
-                                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
-                            }
+                                $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
+                                $wc=0;
+                                $dur = 0;
+                                $allChild=$this->getAllChildWBS($ap->WBS_ID);
+                                foreach ($allChild as $ac) {
+                                    //child total hour
+                                    $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
+                                    $duration = $this->db->query("select duration from wbs where wbs_id = '$ac->WBS_ID'")->row()->DURATION;
+                                    $wc=$wc+$works;
+                                    $dur=$dur+$duration;
+                                }
+                                $this->db->query("update wbs set resource_wbs=$resAp,duration='$dur',WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'");
+                                //$this->M_detail_project->updateNewDuration($ap->WBS_ID);
 
+                            }
                         }
                     }
                     /*EDIT WBS*/
