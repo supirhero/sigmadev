@@ -625,13 +625,13 @@ class Datamaster extends CI_Controller{
                       $this->db->query("update users set password = '$password' where user_id = '$user_id'");
 
                       if($this->db->affected_rows() == 1){
-                        $return['status'] = 'success';
-                        $return['message'] = 'Password updated';
+                          $c['status'] = 'success';
+                          $c['message'] = 'Password updated';
                     }
                     else{
                         $this->output->set_status_header(400);
-                        $return['status'] = 'failed';
-                        $return['message'] = 'Password not updated';
+                        $c['status'] = 'failed';
+                        $c['message'] = 'Password not updated';
                     }
                     break;
                     default:
