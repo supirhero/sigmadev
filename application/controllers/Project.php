@@ -976,20 +976,53 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                     /*EDIT WBS*/
                     if($wbsData['ACTION'] == 'update') {
                         $updatewbs = [
-                            'WBS_ID' => $wbsData['WBS_ID'],
                             'WBS_PARENT_ID' => $wbsData['WBS_PARENT_ID'],
                             'WORK_COMPLETE'=>$wbsData['WORK_COMPLETE'],
                             'PROJECT_ID' => $wbsData['PROJECT_ID'],
                             'WBS_NAME' => $wbsData['WBS_NAME'],
                             'START_DATE' => $wbsData['START_DATE'],
                             'FINISH_DATE' => $wbsData['FINISH_DATE'],
-                            'DURATION' => $wbsData['DURATION'],
-
+                            'DURATION' => $wbsData['DURATION']
                         ];
                         $this->db->where('WBS_ID', $wbsData['WBS_ID']);
                         $this->db->update('WBS', $updatewbs);
 
                         //update some value,idk what it will be ,but it come from old code , trust the old one boy..
+                        $allParent=$this->getAllParentWBS($wbsData['WBS_ID']);
+                        foreach ($allParent as $ap) {
+                            $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
+                            $wc=0;
+                            $wp=0;
+                            $allChild=$this->M_detail_project->getAllChildWBS($ap->WBS_ID);
+                            foreach ($allChild as $ac) {
+                                $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
+                                $wc=$wc+$works;
+                                $works_p=$this->db->query("select case
+              when (WORK_COMPLETE=0 OR WORK_COMPLETE is null) then 0 when (WORK_PERCENT_COMPLETE=0 or WORK_PERCENT_COMPLETE is null) then round(WORK*100/WORK_COMPLETE,2)  else WORK_PERCENT_COMPLETE END as WP from wbs where wbs_id='$ac->WBS_ID'")->row()->WP;
+                                if ($works_p>100) {
+                                    $works_p=100;
+                                }
+                                $wp=$wp+$works_p;
+                            }
+                            $count = count($allChild);
+                            $wp_total=$wp/$count;
+                            //echo "alert('".$wp."')";
+                            if ($wp_total>100) {
+                                $wp_total=100;
+                            }
+                            $this->db->query("update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc', WORK_PERCENT_COMPLETE='$wp_total' where wbs_id='$ap->WBS_ID'");
+                            if($this->M_detail_project->endsWith($ap->WBS_ID,'.0')==true){
+                                $pc=$this->db->query("select WORK_PERCENT_COMPLETE, PROJECT_ID from wbs where wbs_id='$ap->WBS_ID' ")->row();
+                                if ($pc->WORK_PERCENT_COMPLETE>100) {
+                                    $this->db->query("update projects set project_complete='100' where project_id='$pc->PROJECT_ID' ");
+                                }else{
+                                    $this->db->query("update projects set project_complete='$pc->WORK_PERCENT_COMPLETE' where project_id='$pc->PROJECT_ID' ");
+                                }
+
+                            }
+                        }
+
+
                         $selWBS = $this->getSelectedWBS($wbsData['WBS_ID']);
                         $allParent = $this->getAllParent($selWBS->WBS_ID);
                         $dateStartWBS = new DateTime($selWBS->START_DATE);
