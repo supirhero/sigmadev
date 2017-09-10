@@ -333,6 +333,11 @@ Class M_detail_project extends CI_Model{
           WHERE WBS_ID='".$WBS_ID."'
           ";
           $q = $this->db->query($sql);
+          $dur=$this->db->query("select COUNT_DURATION from v_countduration_wbs where wbs_id='$WBS_ID")->row()->COUNT_DURATION;
+          ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+          $hour_total = $dur * 8 ;
+          $this->db->query("update wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='$WBS_ID");
+
           $allParent=$this->getAllParentWBS($WBS_ID);
           foreach ($allParent as $ap) {
             $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
