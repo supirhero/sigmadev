@@ -4,6 +4,7 @@ class M_wbs extends CI_Model {
     function _construct() {
         parent::_construct();
         $this->load->database();
+        $this->load->model('M_detail_project');
     }
 
     function tambahwbs($dataarray)
