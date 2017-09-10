@@ -1401,10 +1401,8 @@ where wp_id = $data[WP_ID]";
       </html>");
 
         if($this->email->send()){
-            return true;
-        }else{
-            return false;
-        }
+echo "sukses";        }else{
+echo "gagal";        }
 
     }
 
