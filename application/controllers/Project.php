@@ -975,15 +975,34 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                     }
                     /*EDIT WBS*/
                     if($wbsData['ACTION'] == 'update') {
+                        $dur=$this->db->query("select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
+                                               FROM TEMPORARY_WBS a,
+                                                    (SELECT     LEVEL - 1 AS delta
+                                                           FROM DUAL
+                                                     CONNECT BY LEVEL - 1 <= (SELECT MAX (finish_date - start_date)
+                                                                                FROM wbs))
+                                              WHERE TRUNC (a.start_date + delta) <= TRUNC (a.finish_date)
+                                              and a.rh_id = '$rh_id'
+                                                AND TO_CHAR (TRUNC (start_date + delta),
+                                                             'DY',
+                                                             'NLS_DATE_LANGUAGE=AMERICAN'
+                                                            ) NOT IN ('SAT', 'SUN')
+                                                AND TRUNC (a.start_date + delta) NOT IN (SELECT dt
+                                                                                           FROM v_holiday_excl_weekend)
+                                           GROUP BY wbs_id
+                                           ORDER BY wbs_id) where wbs_id='".$wbsData['WBS_ID']."'")->row()->COUNT_DURATION;
+                        ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+                        $hour_total = $dur * 8 ;
                         $updatewbs = [
                             'WBS_PARENT_ID' => $wbsData['WBS_PARENT_ID'],
-                            'WORK_COMPLETE'=>$wbsData['WORK_COMPLETE'],
+                            'WORK_COMPLETE'=>$hour_total,
                             'PROJECT_ID' => $wbsData['PROJECT_ID'],
                             'WBS_NAME' => $wbsData['WBS_NAME'],
                             'START_DATE' => $wbsData['START_DATE'],
                             'FINISH_DATE' => $wbsData['FINISH_DATE'],
-                            'DURATION' => $wbsData['DURATION']
+                            'DURATION' => $dur
                         ];
+
                         $this->db->where('WBS_ID', $wbsData['WBS_ID']);
                         $this->db->update('WBS', $updatewbs);
 
@@ -998,7 +1017,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                                 $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
                                 $wc=$wc+$works;
                                 $works_p=$this->db->query("select case
-              when (WORK_COMPLETE=0 OR WORK_COMPLETE is null) then 0 when (WORK_PERCENT_COMPLETE=0 or WORK_PERCENT_COMPLETE is null) then round(WORK*100/WORK_COMPLETE,2)  else WORK_PERCENT_COMPLETE END as WP from wbs where wbs_id='$ac->WBS_ID'")->row()->WP;
+                                when (WORK_COMPLETE=0 OR WORK_COMPLETE is null) then 0 when (WORK_PERCENT_COMPLETE=0 or WORK_PERCENT_COMPLETE is null) then round(WORK*100/WORK_COMPLETE,2)  else WORK_PERCENT_COMPLETE END as WP from wbs where wbs_id='$ac->WBS_ID'")->row()->WP;
                                 if ($works_p>100) {
                                     $works_p=100;
                                 }
