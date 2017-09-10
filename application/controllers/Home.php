@@ -114,6 +114,9 @@ class Home extends CI_Controller {
         if($user_privilege[13]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['upload_issue']=true;
         }
+        if($user_privilege[15]['PRIVILEGE'] == 'all_bu' || $user_privilege[15]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['upload_issue']=true;
+        }
         if($this->datajson['userdata']['PROF_ID'] == 4){
             $this->datajson['privilege']['approve_rebaseline'] = true;
         }

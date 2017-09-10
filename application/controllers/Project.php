@@ -229,7 +229,8 @@ class Project extends CI_Controller
                                         break;
                                     case ($url_dest == 'project/rebaseline') || ( $url_dest == 'project/baseline'):
                                         $user_id = $this->datajson['userdata']['USER_ID'];
-                                        $gpl = $this->db->query("select project_id from projects where pm_id ='$user_id'");
+                                        $gpl = $this->db->query("select project_id from projects where pm_id ='$user_id'")->result_array();
+
                                         $granted_project_list = null;
                                         $granted_project_list = [];
                                         foreach ($gpl as $gg){
