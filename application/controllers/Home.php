@@ -1294,9 +1294,9 @@ a.rebaseline as timesheet_rebaseline
         $config['mailtype'] = 'html';
         $config['validation'] = TRUE;
         $this->email->initialize($config);
-        $this->email->from('salma.ulhaq@sigma.co.id', 'Project & Resources Development System');
+        $this->email->from($email_vp, 'Project & Resources Development System');
         //  $this->email->to($email_vp);
-        $this->email->cc('salma.ulhaq@sigma.co.id');
+        $this->email->cc($email_vp);
         //$this->email->bcc('pmo@sigma.co.id');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
