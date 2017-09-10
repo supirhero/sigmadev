@@ -613,25 +613,28 @@ class Datamaster extends CI_Controller{
                       break;
                       case 'changepassword':
                       $user_id = $this->input->post('user_id');
+                      $user_status = $this->input->post('is_active');
+                      $user_status = $user_status != ""?$user_status:1;
                       if($this->input->post('password')!="") {
                           $password = md5($this->input->post('password'));
+                          $this->db->query("update users set password = '$password',is_active=$user_status where user_id = '$user_id'");
+
                       }
                       else
                       {
-                          $c['status'] = 'failed';
-                          $c['message'] = 'tidak ada yang dirubah';
+                          $this->db->query("update users is_active=$user_status where user_id = '$user_id'");
+
                       }
 
-                      $this->db->query("update users set password = '$password' where user_id = '$user_id'");
 
                       if($this->db->affected_rows() == 1){
-                        $return['status'] = 'success';
-                        $return['message'] = 'Password updated';
+                          $c['status'] = 'success';
+                          $c['message'] = 'Password dan user status updated';
                     }
                     else{
                         $this->output->set_status_header(400);
-                        $return['status'] = 'failed';
-                        $return['message'] = 'Password not updated';
+                        $c['status'] = 'failed';
+                        $c['message'] = 'Password not updated';
                     }
                     break;
                     default:
