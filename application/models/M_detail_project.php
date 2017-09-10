@@ -214,7 +214,7 @@ Class M_detail_project extends CI_Model{
           on temporary_wbs_pool.rp_id=resource_pool.rp_id
           where wbs_id='$wbs_id')
         group by RESOURCE_POOL.RP_ID, users.user_name,users.email
-        ")->result();
+        ")->result_array();
       }
       function getWBSselectedUser($project,$wbs_id,$rh_id){
         return $this->db->query("SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
@@ -229,7 +229,7 @@ Class M_detail_project extends CI_Model{
           join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
           WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
           (select user_id from temporary_wbs_pool inner join resource_pool on temporary_wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id' and temporary_wbs_pool.rh_id = '$rh_id')
-          group by RESOURCE_POOL.RP_ID, users.user_name,users.email")->result();
+          group by RESOURCE_POOL.RP_ID, users.user_name,users.email")->result_array();
         }
         //Get Project Detail
         function getProjectDetail($id){
@@ -272,7 +272,9 @@ Class M_detail_project extends CI_Model{
                 )";
                 $q = $this->db->query($sql);
               $dur=$this->db->query("select COUNT_DURATION from v_countduration_wbs where wbs_id='".$data['WBS_ID'].".$id'")->row()->COUNT_DURATION;
-              $this->db->query("update wbs set duration='$dur' where wbs_id='".$data['WBS_ID'].".$id'");
+              ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+              $hour_total = $dur * 8 ;
+              $this->db->query("update wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='".$data['WBS_ID'].".$id'");
                 return $data['WBS_ID'].".".$id;
               }
       function updateNewDuration($wbs){
@@ -284,6 +286,7 @@ Class M_detail_project extends CI_Model{
           $wc=0;
           $allChild=$this->getAllChildWBS($ap->WBS_ID);
           foreach ($allChild as $ac) {
+              //child total hour
             $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
             $wc=$wc+$works;
           }
@@ -330,6 +333,11 @@ Class M_detail_project extends CI_Model{
           WHERE WBS_ID='".$WBS_ID."'
           ";
           $q = $this->db->query($sql);
+          $dur=$this->db->query("select COUNT_DURATION from v_countduration_wbs where wbs_id='$WBS_ID'")->row()->COUNT_DURATION;
+          ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+          $hour_total = $dur * 8 ;
+          $this->db->query("update wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='$WBS_ID'");
+
           $allParent=$this->getAllParentWBS($WBS_ID);
           foreach ($allParent as $ap) {
             $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
@@ -455,7 +463,7 @@ Class M_detail_project extends CI_Model{
           }
           function removeAssignement(){
             $wbs=$this->input->post('WBS_ID');
-            $member=$this->input->post('MEMBER');
+            $member=$this->input->post('RP_ID');
 
             //delete member from wbs_pool
             $this->db->where('RP_ID', $member);
@@ -905,7 +913,9 @@ Class M_detail_project extends CI_Model{
                                                    FROM v_holiday_excl_weekend)
    GROUP BY wbs_id
    ORDER BY wbs_id) where wbs_id='".$data['WBS_ID'].".$id'")->row()->COUNT_DURATION;
-        $this->db->query("update temporary_wbs set duration='$dur' where wbs_id='".$data['WBS_ID'].".$id'");
+        ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+        $hour_total = $dur * 8 ;
+        $this->db->query("update temporary_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='".$data['WBS_ID'].".$id'");
         return $data['WBS_ID'].".".$id;
     }
 
@@ -946,7 +956,7 @@ Class M_detail_project extends CI_Model{
 
     //Assign primary key of wbs pool id to temporary with status delete ,so in the future
     //if rebaseline acc ,calucation will happen
-    $action = $this->db->query("insert into temporary_wbs_pool (WP_ID,RP_ID,WBS_ID,IS_VALID,ACTION ) values('$wp_id','$member','$wbs',1,'delete')");
+    $action = $this->db->query("insert into temporary_wbs_pool (RH_ID,WP_ID,RP_ID,WBS_ID,IS_VALID,ACTION ) values('$rh_id','$wp_id','$member','$wbs',1,'delete')");
 }
 
     function postAssignmentTemp($rh_id){

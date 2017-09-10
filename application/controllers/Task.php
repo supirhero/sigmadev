@@ -465,9 +465,11 @@ class Task extends CI_Controller
 
             $dateStartWBS= new DateTime($selWBS->START_DATE);
             $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+
             foreach ($allParent as $ap) {
                 $dateStartParent=new DateTime($ap->START_DATE);
                 $dateEndParent=new DateTime($ap->FINISH_DATE);
+
                 if ($dateStartWBS<$dateStartParent) {
                     $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
                 }
@@ -632,19 +634,50 @@ class Task extends CI_Controller
         $data['task_name'] = $this->M_detail_project->getWBSselected($wbs_id)->WBS_NAME;
         $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id);
         $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id,$rh_id);
+
+        if(count($data['currently_assigned'])){
+            foreach ($data['currently_assigned'] as &$curass){
+                $curass['status']= 'none';
+            }
+        }
+
+
+
+        if(count($data['available_to_assign'])){
+            foreach ($data['available_to_assign'] as &$curass){
+                $curass['status']= 'none';
+            }
+        }
+
         $data['rebaseline'] = $this->db->query("
             SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline,action FROM RESOURCE_POOL
             join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
             join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
             join TEMPORARY_WBS_POOL on TEMPORARY_WBS_POOL.RP_ID = RESOURCE_POOL.RP_ID
-            WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id in(
-            select user_id
-            from temporary_wbs_pool
-            inner join resource_pool
-            on temporary_wbs_pool.rp_id=resource_pool.rp_id
-            where wbs_id='$wbs_id'
-            and TEMPORARY_WBS_POOL.RH_ID = '$rh_id') and TEMPORARY_WBS_POOL.RH_ID = '$rh_id'
+            WHERE PROJECT_ID='$project' and TEMPORARY_WBS_POOL.RH_ID = '$rh_id'
             group by RESOURCE_POOL.RP_ID, users.user_name,users.email,action")->result_array();
+
+        $curass_id =[];
+        foreach ($data['currently_assigned'] as $dd){
+            $curass_id[] = $dd['RP_ID'];
+        }
+
+        $reb_id = [];
+        foreach ($data['rebaseline'] as $dd){
+            $reb_id[] = $dd['RP_ID'];
+        }
+
+        $find_index = [];
+        foreach ($reb_id as $ddd){
+            $find_index[] = array_search($ddd,$curass_id);
+        }
+
+        $index_rebaseline = 0;
+        foreach ($find_index as $add){
+            $data['currently_assigned'][$add]['status']= $data['rebaseline'][$index_rebaseline]['ACTION'];
+            $index_rebaseline++;
+        }
+
         echo json_encode($data);
     }
 
