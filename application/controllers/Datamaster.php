@@ -618,12 +618,10 @@ class Datamaster extends CI_Controller{
                       if($this->input->post('password')!="") {
                           $password = md5($this->input->post('password'));
                           $this->db->query("update users set password = '$password',is_active=$user_status where user_id = '$user_id'");
-
                       }
                       else
                       {
-                          $this->db->query("update users is_active=$user_status where user_id = '$user_id'");
-
+                          $this->db->query("update users set is_active=$user_status where user_id = '$user_id'");
                       }
 
 
