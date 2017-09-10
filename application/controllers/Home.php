@@ -1823,7 +1823,7 @@ a.rebaseline as timesheet_rebaseline
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to("salma.ulhaq@sigma.co.id");
+        $this->email->to($email);
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
