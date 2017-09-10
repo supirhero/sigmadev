@@ -487,6 +487,13 @@ class Project extends CI_Controller
         //echo $id;
 
         $project_id = $this->M_detail_project->getRPProject($id);
+        $sql = "select email from RESOURCE_POOL r
+ join USERS u on u.user_id=r.user_id
+ where RP_ID='".$id."'";
+        $q = $this->db->query($sql);
+        if($q->num_rows() > 0){
+            $email = $q->row()->email;
+        }
         //echo $project_id;
         if(isset($_POST['MEMBER']) || isset($_POST['member']))
         {
@@ -502,7 +509,7 @@ class Project extends CI_Controller
             $config['validation'] = TRUE;
             $this->email->initialize($config);
             $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-            $this->email->to('salma.ulhaq@sigma.co.id');
+            $this->email->to($email);
             $logo=base_url()."asset/image/logo_new_sigma1.png";
             $css=base_url()."asset/css/confirm.css";
             $this->email->attach($logo);
@@ -510,7 +517,6 @@ class Project extends CI_Controller
             $cid_logo = $this->email->attachment_cid($logo);
             $this->email->subject('[PROUDS] Project Kicked Off');
             $this->email->message("You kicked off from this project");
-
             $this->email->send();
             $this->M_detail_project->deleteRPmember($id);
             $result["status"] = "success";
