@@ -35,7 +35,62 @@ Class M_timesheet extends CI_Model{
                                   SELECT *
                                   FROM
                                   (SELECT *
-                                  FROM USER_TIMESHEET_NEW
+                                  FROM (
+                                  (SELECT *
+ FROM (
+ SELECT ts_id,
+ substr(
+ ts_id,
+ 1,
+ instr(
+ ts_id,
+ '.'
+ ) - 1
+ ) AS wp,
+ substr(
+ ts_id,
+ instr(
+ ts_id,
+ '.'
+ ) + 1
+ ) AS date_id,
+ e.wbs_id,
+ c.rp_id,
+ c.user_id,
+ f.user_name,
+ c.project_id,
+ d.project_name,
+ e.wbs_name,
+ subject,
+ message,
+ hour_total,
+ ts_date,
+ TO_CHAR(
+ ts_date,
+ 'mm'
+ ) AS bulan,
+ TO_CHAR(
+ ts_date,
+ 'month'
+ ) AS month,
+ TO_CHAR(
+ ts_date,
+ 'YYYY'
+ ) AS tahun,
+ longitude,
+ latitude,
+ submit_date,
+is_approved
+ FROM
+(select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID from timesheet union select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID from temporary_timesheet) a
+ LEFT JOIN (select wp_id,rp_id,wbs_id from wbs_pool union select wp_id,rp_id,wbs_id from temporary_wbs_pool) b ON a.wp_id = b.wp_id
+ LEFT JOIN resource_pool c ON b.rp_id = c.rp_id
+ LEFT JOIN projects d ON c.project_id = d.project_id
+ LEFT JOIN (select wbs_id,wbs_name from wbs union select wbs_id,wbs_name from temporary_wbs) e ON b.wbs_id = e.wbs_id
+ INNER JOIN users f ON c.user_id = f.user_id
+ )
+ ORDER BY SUBMIT_DATE DESC)
+                                  )
                                   ORDER BY SUBMIT_DATE DESC)
                                   WHERE user_id='".$user_id."'
                                   and  to_char(ts_date,'Mon-YYYY')='$month-$year'");
