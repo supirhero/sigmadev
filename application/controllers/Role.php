@@ -411,7 +411,8 @@ class Role extends CI_Controller
                             from users u 
                             join profile p
                             on u.PROF_ID = p.PROF_ID
-                            where lower(u.user_name) like '%".$keyword."%'
+                            where lower(u.user_name) like '%".$keyword."%' or
+                            lower(email) like '%".$keyword."%'
                             ")->result_array();
         else
             $user_access['user_list'] = $this->db->query("select u.user_id , u.user_name,u.email,u.prof_id,p.prof_name
