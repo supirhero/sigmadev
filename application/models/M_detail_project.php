@@ -271,6 +271,8 @@ Class M_detail_project extends CI_Model{
                 ".$data['FINISH_DATE']."
                 )";
                 $q = $this->db->query($sql);
+              $dur=$this->db->query("select COUNT_DURATION from v_countduration_wbs where wbs_id='".$data['WBS_ID'].".$id'")->row()->COUNT_DURATION;
+              $this->db->query("update wbs set duration='$dur' where wbs_id='".$data['WBS_ID'].".$id'");
                 return $data['WBS_ID'].".".$id;
               }
               function updateNewDuration($wbs){

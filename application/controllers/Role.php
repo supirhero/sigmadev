@@ -403,7 +403,7 @@ class Role extends CI_Controller
     }
 
     function userAccess_view(){
-        $user_access['user_list'] = $this->db->query("select u.user_id , u.user_name,u.email,p.prof_name
+        $user_access['user_list'] = $this->db->query("select u.user_id , u.user_name,u.email,u.prof_id,p.prof_name
                             from users u 
                             join profile p
                             on u.PROF_ID = p.PROF_ID")->result_array();
