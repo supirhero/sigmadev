@@ -354,6 +354,38 @@ class Task extends CI_Controller
         $id_project = $this->uri->segment(3);
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
         $workplan=$this->M_detail_project->selectWBS_mobile($id_project,$rh_id);
+        $workplan_wp = [];
+        $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
+        $rebaseline_wp = [];
+        $findIndex = [];
+
+
+        //store task id in workplan
+        foreach($workplan as &$wp){
+            $workplan_wp[] = $wp['WBS_ID'];
+            $wp['status']='none';
+            $wp['index_rebaseline'] = 'none';
+        }
+
+        //store task id inside rebaseline
+        foreach ($rebaseline as $rwp){
+            $rebaseline_wp[] = $rwp['WBS_ID'];
+        }
+
+        //find index task that need rebaseline
+        foreach ($rebaseline_wp as $r){
+            $findIndex[] = array_search($r,$workplan_wp);
+        }
+
+        $index_rebaseline = 0;
+        foreach ($findIndex as $index){
+
+            $workplan[$index]['status'] =  $rebaseline[$index_rebaseline]['ACTION'];
+            $workplan[$index]['index_rebaseline'] =  $index_rebaseline;
+
+            $index_rebaseline ++;
+        }
+
         foreach ($workplan as &$wp){
             if($wp['WORK_PERCENT_COMPLETE'] == null){
                 $wp['WORK_PERCENT_COMPLETE'] = 0;
@@ -362,6 +394,12 @@ class Task extends CI_Controller
                 $wp['WORK'] = 0;
             }
         }
+
+        //for null data tolerance
+        if($workplan == null){
+            $workplan = [];
+        }
+
 
         $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
 
