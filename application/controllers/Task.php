@@ -627,10 +627,11 @@ class Task extends CI_Controller
     //View Edit task member project
     public function assignTaskMember_view(){
         $project=$this->input->post('PROJECT_ID');
+        $rh_id = $this->db->query("select rh_id from projects where project_id = '$project'")->row()->RH_ID;
         $wbs_id=$this->input->post('WBS_ID');
         $data['task_name'] = $this->M_detail_project->getWBSselected($wbs_id)->WBS_NAME;
         $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id);
-        $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id);
+        $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id,$rh_id);
         $data['rebaseline'] = $this->db->query("
             SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline,action FROM RESOURCE_POOL
             join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
@@ -641,7 +642,8 @@ class Task extends CI_Controller
             from temporary_wbs_pool
             inner join resource_pool
             on temporary_wbs_pool.rp_id=resource_pool.rp_id
-            where wbs_id='$wbs_id')
+            where wbs_id='$wbs_id'
+            and TEMPORARY_WBS_POOL.RH_ID = '$rh_id') and TEMPORARY_WBS_POOL.RH_ID = '$rh_id'
             group by RESOURCE_POOL.RP_ID, users.user_name,users.email,action")->result_array();
         echo json_encode($data);
     }
@@ -652,7 +654,6 @@ class Task extends CI_Controller
         $project_id = explode(".",$_POST['WBS_ID']);
         $project_id = $project_id[0];
         $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
-
         if($statusProject == 'on hold'){
             $this->M_detail_project->removeAssignementTemp();
             $data['status'] = 'success';
