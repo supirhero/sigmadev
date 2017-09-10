@@ -905,7 +905,7 @@ Class M_detail_project extends CI_Model{
                                                    FROM v_holiday_excl_weekend)
    GROUP BY wbs_id
    ORDER BY wbs_id) where wbs_id='".$data['WBS_ID'].".$id'")->row()->COUNT_DURATION;
-        $this->db->query("update wbs set duration='$dur' where wbs_id='".$data['WBS_ID'].".$id'");
+        $this->db->query("update temporary_wbs set duration='$dur' where wbs_id='".$data['WBS_ID'].".$id'");
         return $data['WBS_ID'].".".$id;
     }
 
