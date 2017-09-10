@@ -400,7 +400,7 @@ GROUP BY TS_DATE")->result_array();
 
     function inputTimesheet($data){
 
-        $sql = "select u.user_name,pm.user_name as pm_name,pm.email,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
+        $sql = "select u.user_name,pm.user_name as pm_name,pm.email as email,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
 join projects p on p.project_id = wbs.project_id 
 join users pm on p.pm_id = pm.user_id
 join resource_pool rp on wp.rp_id=rp.rp_id
