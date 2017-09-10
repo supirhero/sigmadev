@@ -196,7 +196,7 @@ Class M_detail_project extends CI_Model{
     }
 
 
-    function getWBSAvailableUser($project,$wbs_id){
+    function getWBSAvailableUser($project,$wbs_id,$rh_id){
       return $this->db->query("
         SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
         join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
@@ -212,7 +212,7 @@ Class M_detail_project extends CI_Model{
           from temporary_wbs_pool
           inner join resource_pool
           on temporary_wbs_pool.rp_id=resource_pool.rp_id
-          where wbs_id='$wbs_id')
+          where wbs_id='$wbs_id' and rh_id = '$rh_id')
         group by RESOURCE_POOL.RP_ID, users.user_name,users.email
         ")->result_array();
       }

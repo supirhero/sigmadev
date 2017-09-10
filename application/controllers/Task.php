@@ -632,7 +632,8 @@ class Task extends CI_Controller
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$project'")->row()->RH_ID;
         $wbs_id=$this->input->post('WBS_ID');
         $data['task_name'] = $this->M_detail_project->getWBSselected($wbs_id)->WBS_NAME;
-        $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id);
+        $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id,$rh_id);
+
         $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id,$rh_id);
 
         if(count($data['currently_assigned'])){
@@ -640,7 +641,6 @@ class Task extends CI_Controller
                 $curass['status']= 'none';
             }
         }
-
 
 
         if(count($data['available_to_assign'])){
