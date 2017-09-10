@@ -214,7 +214,7 @@ Class M_detail_project extends CI_Model{
           on temporary_wbs_pool.rp_id=resource_pool.rp_id
           where wbs_id='$wbs_id')
         group by RESOURCE_POOL.RP_ID, users.user_name,users.email
-        ")->result();
+        ")->result_array();
       }
       function getWBSselectedUser($project,$wbs_id,$rh_id){
         return $this->db->query("SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
@@ -229,7 +229,7 @@ Class M_detail_project extends CI_Model{
           join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
           WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
           (select user_id from temporary_wbs_pool inner join resource_pool on temporary_wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id' and temporary_wbs_pool.rh_id = '$rh_id')
-          group by RESOURCE_POOL.RP_ID, users.user_name,users.email")->result();
+          group by RESOURCE_POOL.RP_ID, users.user_name,users.email")->result_array();
         }
         //Get Project Detail
         function getProjectDetail($id){
@@ -463,7 +463,7 @@ Class M_detail_project extends CI_Model{
           }
           function removeAssignement(){
             $wbs=$this->input->post('WBS_ID');
-            $member=$this->input->post('MEMBER');
+            $member=$this->input->post('RP_ID');
 
             //delete member from wbs_pool
             $this->db->where('RP_ID', $member);
@@ -956,7 +956,7 @@ Class M_detail_project extends CI_Model{
 
     //Assign primary key of wbs pool id to temporary with status delete ,so in the future
     //if rebaseline acc ,calucation will happen
-    $action = $this->db->query("insert into temporary_wbs_pool (WP_ID,RP_ID,WBS_ID,IS_VALID,ACTION ) values('$wp_id','$member','$wbs',1,'delete')");
+    $action = $this->db->query("insert into temporary_wbs_pool (RH_ID,WP_ID,RP_ID,WBS_ID,IS_VALID,ACTION ) values('$rh_id','$wp_id','$member','$wbs',1,'delete')");
 }
 
     function postAssignmentTemp($rh_id){
