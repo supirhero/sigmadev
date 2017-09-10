@@ -939,6 +939,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                             $insertwbs = [
                                 'WBS_ID'=>$wbsData['WBS_ID'],
                                 'WBS_PARENT_ID'=>$wbsData['WBS_PARENT_ID'],
+                                'WORK_COMPLETE'=>$wbsData['WORK_COMPLETE'],
                                 'PROJECT_ID'=>$wbsData['PROJECT_ID'],
                                 'WBS_NAME'=>$wbsData['WBS_NAME'],
                                 'START_DATE'=>$wbsData['START_DATE'],
