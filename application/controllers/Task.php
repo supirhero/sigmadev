@@ -619,7 +619,7 @@ class Task extends CI_Controller
             $data['status'] = 'success';
             $data['message'] = 'Task member berhasil di hapus temporary';
         }
-        elseif($statusProject['not started']){
+        elseif($statusProject == 'not started'){
             $this->M_detail_project->removeAssignement();
 
             //send email
