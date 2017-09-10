@@ -622,7 +622,7 @@ class Datamaster extends CI_Controller{
                       }
                       else
                       {
-                          $this->db->query("update users is_active=$user_status where user_id = '$user_id'");
+                          $this->db->query("update users set is_active=$user_status where user_id = '$user_id'");
 
                       }
 
