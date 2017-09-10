@@ -267,7 +267,10 @@ class Role extends CI_Controller
 
     }
 
-    function getProfile(){
+    function getProfile($keyword=null){
+        if($keyword != null)
+        $data['profile'] = $this->db->query("select * from profile where lower(PROF_NAME) like '%".$keyword."%' order by prof_id asc")->result_array();
+        else
         $data['profile'] = $this->db->query("select * from profile order by prof_id asc")->result_array();
 
         echo json_encode($data);
