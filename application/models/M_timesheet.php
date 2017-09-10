@@ -400,7 +400,7 @@ GROUP BY TS_DATE")->result_array();
 
     function inputTimesheet($data){
 
-        $sql = "select u.user_name,pm.email,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
+        $sql = "select u.user_name,pm.user_name as pm_name,pm.email,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
 join projects p on p.project_id = wbs.project_id 
 join users pm on p.pm_id = pm.user_id
 join resource_pool rp on wp.rp_id=rp.rp_id
@@ -1350,11 +1350,11 @@ print_r($info);
       <td>
       <br/>
       <img src='cid:".$cid_logo."' height='173' width='581' alt='logo Telkomsigma' />
-      <h2>Hi ".$info["pm_name"].",</h3>
+      <h2>Hi ".$info["PM_NAME"].",</h3>
       <br/>
-      <h4>User $info[user_name] telah mengisi timesheet sebagai berikut :</h4>
-      <h4>Project : $info[project_name]</h4>
-      <h4>WBS : $info[wbs_name]</h4>
+      <h4>User $info[USER_NAME] telah mengisi timesheet sebagai berikut :</h4>
+      <h4>Project : $info[PROJECT_NAME]</h4>
+      <h4>WBS : $info[WBS_NAME]</h4>
       <h4>Tanggal : $TS_DATE</h4>
       <h4>Jumlah Jam : $HOUR_TOTAL</h4>
       <h4>Subject : $SUBJECT</h4>
