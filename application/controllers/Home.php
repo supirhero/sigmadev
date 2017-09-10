@@ -795,11 +795,73 @@ $data["error_upload"] = $this->upload->display_errors();
 
     public function projectactivities(){
         $project_id = $this->uri->segment(3);
+        $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
 
         $data['project_activities'] =  $this->db->query("SELECT *
-                                FROM USER_TIMESHEET_NEW
+                                FROM (
+                                SELECT ts_id,
+        substr(
+            ts_id,
+            1,
+            instr(
+                ts_id,
+                '.'
+            ) - 1
+        ) AS wp,
+        substr(
+            ts_id,
+            instr(
+                ts_id,
+                '.'
+            ) + 1
+        ) AS date_id,
+        e.wbs_id,
+        c.rp_id,
+        c.user_id,
+        f.user_name,
+        c.project_id,
+        d.project_name,
+        e.wbs_name,
+        subject,
+        message,
+        hour_total,
+        ts_date,
+        TO_CHAR(
+            ts_date,
+            'mm'
+        ) AS bulan,
+        TO_CHAR(
+            ts_date,
+            'month'
+        ) AS month,
+        TO_CHAR(
+            ts_date,
+            'YYYY'
+        ) AS tahun,
+        longitude,
+        latitude,
+        submit_date,
+is_approved,
+      b.rebaseline as task_member_rebaseline,
+      e.rebaseline as task_rebaseline,
+a.rebaseline as timesheet_rebaseline
+    FROM
+(select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'no' as rebaseline from timesheet union select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'yes' as rebaseline from temporary_timesheet where rh_id = '$rh_id') a
+        LEFT JOIN (select wp_id,rp_id,wbs_id,'no' as rebaseline from wbs_pool union select wp_id,rp_id,wbs_id,'yes' as rebaseline from temporary_wbs_pool where rh_id = '$rh_id') b ON a.wp_id = b.wp_id
+        LEFT JOIN resource_pool c ON b.rp_id = c.rp_id
+        LEFT JOIN projects d ON c.project_id = d.project_id
+        LEFT JOIN (select wbs_id,wbs_name,'no' as rebaseline from wbs 
+        where wbs_id not in(
+        select wbs_id
+        from temporary_wbs where rh_id = '$rh_id'
+        and project_id = '$project_id'
+        )
+        union select wbs_id,wbs_name,'yes' as rebaseline from temporary_wbs where rh_id = '$rh_id') e ON b.wbs_id = e.wbs_id
+        INNER JOIN users f ON c.user_id = f.user_id
+                                )
                                 WHERE project_id = '".$project_id."'
                                 ORDER BY ts_date DESC")->result_array();
+
         $this->transformKeys($data);
         print_r(json_encode($data));
     }
