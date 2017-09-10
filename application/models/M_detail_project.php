@@ -272,7 +272,9 @@ Class M_detail_project extends CI_Model{
                 )";
                 $q = $this->db->query($sql);
               $dur=$this->db->query("select COUNT_DURATION from v_countduration_wbs where wbs_id='".$data['WBS_ID'].".$id'")->row()->COUNT_DURATION;
-              $this->db->query("update wbs set duration='$dur' where wbs_id='".$data['WBS_ID'].".$id'");
+              ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+              $hour_total = $dur * 8 ;
+              $this->db->query("update wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='".$data['WBS_ID'].".$id'");
                 return $data['WBS_ID'].".".$id;
               }
       function updateNewDuration($wbs){
@@ -905,7 +907,9 @@ Class M_detail_project extends CI_Model{
                                                    FROM v_holiday_excl_weekend)
    GROUP BY wbs_id
    ORDER BY wbs_id) where wbs_id='".$data['WBS_ID'].".$id'")->row()->COUNT_DURATION;
-        $this->db->query("update temporary_wbs set duration='$dur' where wbs_id='".$data['WBS_ID'].".$id'");
+        ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+        $hour_total = $dur * 8 ;
+        $this->db->query("update temporary_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='".$data['WBS_ID'].".$id'");
         return $data['WBS_ID'].".".$id;
     }
 
