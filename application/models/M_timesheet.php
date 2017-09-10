@@ -411,7 +411,8 @@ where wp_id = $data[WP_ID]";
             $info=$q->row_array();
         }
         $this->confirmationTimesheetEmailtoPM($data,$info);
-
+print_r($info);
+die;
         //change date input for readable to sql
         $tgl=date_format(date_create($data['DATE']),'Ymd');
 
