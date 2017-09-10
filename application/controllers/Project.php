@@ -227,7 +227,7 @@ class Project extends CI_Controller
                                         $id = $_POST['wbs_id'];
                                         $project_id_req = $this->M_detail_project->getProjectTask($id);
                                         break;
-                                    case 'project/rebaseline':
+                                    case ($url_dest == 'project/rebaseline') || ( $url_dest == 'project/baseline'):
                                         $user_id = $this->datajson['userdata']['USER_ID'];
                                         $gpl = $this->db->query("select project_id from projects where pm_id ='$user_id'");
                                         $granted_project_list = null;
