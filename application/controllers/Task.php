@@ -455,28 +455,32 @@ class Task extends CI_Controller
 
             // insert into wbs and get new ID
             $newid = $this->M_detail_project->insertWBS($data,$project_id);
-
-            $WP_ID= $this->M_detail_project->getMaxWPID();
-            $RP_ID= $this->M_detail_project->getMaxRPID();
-
-            //get all wbs data from new wbs
-            $selWBS=$this->M_detail_project->getWBSselected($newid);
-            $allParent = $this->M_detail_project->getAllParentWBS($selWBS->WBS_ID);
-
+            $selWBS=$this->getSelectedWBS($newid);
+            $allParent=$this->getAllParent($selWBS->WBS_ID);
             $dateStartWBS= new DateTime($selWBS->START_DATE);
             $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
-
             foreach ($allParent as $ap) {
                 $dateStartParent=new DateTime($ap->START_DATE);
                 $dateEndParent=new DateTime($ap->FINISH_DATE);
-
                 if ($dateStartWBS<$dateStartParent) {
                     $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
                 }
                 if ($dateEndWBS>$dateStartParent) {
                     $this->M_detail_project->updateParentDate('end',$ap->WBS_ID,$dateEndWBS->format('Y-m-d'));
                 }
-                $this->M_detail_project->updateNewDuration($ap->WBS_ID);
+                $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
+                $wc=0;
+                $dur = 0;
+                $allChild=$this->getAllChildWBS($ap->WBS_ID);
+                foreach ($allChild as $ac) {
+                    //child total hour
+                    $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
+                    $duration = $this->db->query("select duration from wbs where wbs_id = '$ac->WBS_ID'")->row()->DURATION;
+                    $wc=$wc+$works;
+                    $dur=$dur+$duration;
+                }
+                $this->db->query("update wbs set resource_wbs=$resAp,duration='$dur',WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'");
+                //$this->M_detail_project->updateNewDuration($ap->WBS_ID);
             }
 
             $status['status'] = 'success';
@@ -1624,6 +1628,11 @@ if($this->email->send()){
       $c['PROJECT_ID']=$data['PROJECT_ID'];
       $c['WORK_PERCENT_COMPLETE']=$data['WORK_PERCENT_COMPLETE'];
       echo json_encode($c, JSON_NUMERIC_CHECK);
+    }
+    function getAllChildWBS($wbs){
+        return $this->db->query("SELECT CONNECT_BY_ISLEAF AS LEAF, WBS.*, LEVEL
+              FROM WBS where WBS_ID NOT IN ('$wbs') and CONNECT_BY_ISLEAF=1  CONNECT BY  WBS_PARENT_ID= PRIOR WBS_ID
+              START WITH WBS_ID='$wbs' ORDER SIBLINGS BY WBS_PARENT_ID ")->result();
     }
 
 

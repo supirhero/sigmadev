@@ -290,6 +290,7 @@ Class M_detail_project extends CI_Model{
         $dur=$this->db->query("select COUNT_DURATION from v_countduration_wbs where wbs_id='$wbs'")->row()->COUNT_DURATION;
         $this->db->query("update wbs set duration='$dur' where wbs_id='$wbs'");
         $allParent=$this->getAllParentWBS($wbs);
+
         foreach ($allParent as $ap) {
           $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
           $wc=0;
