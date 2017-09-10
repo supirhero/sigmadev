@@ -1280,7 +1280,6 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             echo json_encode($return);
         }
         else{
-            $this->outpu->set_status_header(400);
             $returndata['status'] = 'failed';
             $returndata['message'] = 'Projects status already in progress';
         }
