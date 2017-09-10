@@ -31,10 +31,12 @@ Class M_timesheet extends CI_Model{
         //ada perubahan
         $now = date('Y-m-d');
         $past = date('Y-m-d', strtotime('this month'));
-        $query = $this->db->query("select distinct TS_ID,WP,USER_ID,USER_NAME,TS.PROJECT_ID,MESSAGE,SUBJECT,TS_DATE,latitude,longitude,is_approved,subject,message,month,project_name,submit_date,tahun,TS.WBS_ID,WB.WBS_NAME 
+        $query = $this->db->query("select distinct TS_ID,WP,USER_ID,USER_NAME,TS.PROJECT_ID,MESSAGE,SUBJECT,TS_DATE,latitude,longitude,is_approved,month,project_name,submit_date,tahun,TS.WBS_ID,WB.WBS_NAME 
 from (select * from USER_TIMESHEET_NEW  WHERE user_id='".$user_id."'
-                                  and  to_char(ts_date,'Mon-YYYY')='$month-$year' ORDER BY SUBMIT_DATE DESC) TS
- JOIN WBS WB ON TS.WBS_ID=WB.WBS_ID");
+                                  and  to_char(ts_date,'Mon-YYYY')='$month-$year' ) TS
+ JOIN WBS WB ON TS.WBS_ID=WB.WBS_ID
+ ORDER BY SUBMIT_DATE DESC
+ ");
 /*        $query = $this->db->query("
                                   SELECT *
                                   FROM
