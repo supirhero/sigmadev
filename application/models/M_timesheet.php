@@ -1063,7 +1063,7 @@ where wp_id = $data[WP_ID]";
     }
     function confirmationTimesheetEmailtoPM($data,$info){
         $tgl=date_format(date_create($data['DATE']),'Ymd');
-
+print_r($data);
         $SUBJECT = $data['SUBJECT'];
         $MESSAGE = $data['MESSAGE'];
         $HOUR_TOTAL = $data['WORK_HOUR'];
@@ -1401,8 +1401,10 @@ where wp_id = $data[WP_ID]";
       </html>");
 
         if($this->email->send()){
-echo "sukses";        }else{
-echo "gagal";        }
+            return true;
+        }else{
+            return false;
+        }
 
     }
 
