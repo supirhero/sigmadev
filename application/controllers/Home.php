@@ -1055,7 +1055,7 @@ $data["error_upload"] = $this->upload->display_errors();
 
         /*$this->datajson['project_issue_list'] = $this->M_home->projectissuelist($projectid);*/
         $this->datajson['project_issue_list'] = $this->db->query("select issue_id,users.user_id as reported_by,
-                            user_name,to_char(a.DATE_ISSUE,'DD-MON-YYYY HH:MI AM') as date_issue,note,evidence,priority,status
+                            user_name,to_char(DATE_ISSUE,'DD-MON-YYYY HH:MI AM') as date_issue,note,evidence,priority,status
                             from manage_issue
                             join users on users.user_id = manage_issue.user_id
                             where project_id = '$projectid'")->result_array();
