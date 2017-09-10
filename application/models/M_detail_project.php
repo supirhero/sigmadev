@@ -222,6 +222,15 @@ Class M_detail_project extends CI_Model{
           join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
           WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
           (select user_id from wbs_pool inner join resource_pool on wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
+          and rp_id not in 
+          (
+              SELECT RESOURCE_POOL.RP_ID FROM RESOURCE_POOL
+              join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+              join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+              WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
+              (select user_id from temporary_wbs_pool inner join resource_pool on temporary_wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id' and temporary_wbs_pool.rh_id = '$rh_id')
+              group by RESOURCE_POOL.RP_ID, users.user_name,users.email
+          )
           group by RESOURCE_POOL.RP_ID, users.user_name,users.email
           UNION
           SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline FROM RESOURCE_POOL

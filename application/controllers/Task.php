@@ -635,7 +635,6 @@ class Task extends CI_Controller
         $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id,$rh_id);
 
         $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id,$rh_id);
-
         if(count($data['currently_assigned'])){
             foreach ($data['currently_assigned'] as &$curass){
                 $curass['status']= 'none';
