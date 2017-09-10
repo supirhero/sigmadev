@@ -452,22 +452,32 @@ class Project extends CI_Controller
     //for god sake, please inform me on +62 81230012673 if u dare to change this
     public function projectmemberadd($project){
       // prepare data from post
-      $user=$_POST['USER_ID'];
-      // check jika user sudah ada di dalam project atau tidak
-      $check=$this->M_project->checkifinproject($project,$user);
-      if ($check) {
-        //jika true, maka tampilkan pesan error, menandakan user sudah pernah diinvite ke dalam project
-        $c['status']="Error";
-        $c['msg']="User sudah ada di dalam project";
-      }else{
-        //jika false, tambahkan user ke dalam resource_pool
-        $this->M_project->addprojectmember($project,$user);
-        $c['status']="Success";
-        $c['msg']="User berhasil diinvite ke dalam project";
-        //kirim email ke user bersangkutan
-        $email				= $this->M_detail_project->selectemail($user);
-        $project_name = $this->M_detail_project->selectProjectName($project);
-        $this->sendVerificationinviteMember($email,$project_name,$project);
+      $user=$this->input->post('USER_ID');
+
+      if($user == null || $project == null){
+          $this->output->set_status_header(400);
+          $c['status'] = "Error";
+          $c['message'] = "User dan project tidak terdefinisi";
+
+      }
+      else{
+          // check jika user sudah ada di dalam project atau tidak
+          $check=$this->M_project->checkifinproject($project,$user);
+          if ($check) {
+              //jika true, maka tampilkan pesan error, menandakan user sudah pernah diinvite ke dalam project
+              $this->output->set_status_header(400);
+              $c['status']="Error";
+              $c['message']="User sudah ada di dalam project";
+          }else{
+              //jika false, tambahkan user ke dalam resource_pool
+              $this->M_project->addprojectmember($project,$user);
+              $c['status']="Success";
+              $c['message']="User berhasil diinvite ke dalam project";
+              //kirim email ke user bersangkutan
+              $email				= $this->M_detail_project->selectemail($user);
+              $project_name = $this->M_detail_project->selectProjectName($project);
+              $this->sendVerificationinviteMember($email,$project_name,$project);
+          }
       }
       echo json_encode($c);
     }
