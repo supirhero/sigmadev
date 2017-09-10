@@ -465,9 +465,11 @@ class Task extends CI_Controller
 
             $dateStartWBS= new DateTime($selWBS->START_DATE);
             $dateEndWBS= new DateTime($selWBS->FINISH_DATE);
+
             foreach ($allParent as $ap) {
                 $dateStartParent=new DateTime($ap->START_DATE);
                 $dateEndParent=new DateTime($ap->FINISH_DATE);
+
                 if ($dateStartWBS<$dateStartParent) {
                     $this->M_detail_project->updateParentDate('start',$ap->WBS_ID,$dateStartWBS->format('Y-m-d'));
                 }

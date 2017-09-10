@@ -286,6 +286,7 @@ Class M_detail_project extends CI_Model{
           $wc=0;
           $allChild=$this->getAllChildWBS($ap->WBS_ID);
           foreach ($allChild as $ac) {
+              //child total hour
             $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
             $wc=$wc+$works;
           }
