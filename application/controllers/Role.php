@@ -405,11 +405,20 @@ class Role extends CI_Controller
         echo json_encode($data);
     }
 
-    function userAccess_view(){
-        $user_access['user_list'] = $this->db->query("select u.user_id , u.user_name,u.email,u.prof_id,p.prof_name
+    function userAccess_view($keyword=null){
+        if($keyword != null)
+            $user_access['user_list'] = $this->db->query("select u.user_id , u.user_name,u.email,u.prof_id,p.prof_name
                             from users u 
                             join profile p
-                            on u.PROF_ID = p.PROF_ID")->result_array();
+                            on u.PROF_ID = p.PROF_ID
+                            where lower(u.user_name) like '%".$keyword."%'
+                            ")->result_array();
+        else
+            $user_access['user_list'] = $this->db->query("select u.user_id , u.user_name,u.email,u.prof_id,p.prof_name
+                            from users u 
+                            join profile p
+                            on u.PROF_ID = p.PROF_ID
+                            ")->result_array();
 
         $user_access['profile_list'] = $this->db->query("select prof_id,prof_name from profile")->result_array();
 
