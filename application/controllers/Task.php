@@ -699,7 +699,7 @@ class Task extends CI_Controller
             $email=$this->input->post('EMAIL');
             $user_name=$this->input->post('NAME');
             $wbs_name=$this->input->post('WBS_NAME');
-            //$this->sendVerificationremoveMember($email,$user_name,$wbs_name);
+            $this->sendVerificationremoveMember($email,$user_name,$wbs_name);
             $data['status'] = 'success';
             $data['message'] = 'Task member berhasil di hapus';
         }
@@ -731,7 +731,7 @@ class Task extends CI_Controller
             $user_name=$this->input->post('NAME');
             $wbs_name=$this->input->post('WBS_NAME');
             $projectid = $this->M_detail_project->getProject_Id($wbs);
-            //$this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);$data['status'] = 'success';
+            $this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);$data['status'] = 'success';
             $data['status'] = 'success';
             $data['message'] = 'member di tambah';
         }
@@ -1323,7 +1323,7 @@ if($this->email->send()){
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-            //$this->email->to($email);
+            $this->email->to($email);
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
