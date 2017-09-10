@@ -21,6 +21,7 @@ class Home extends CI_Controller {
                                         'project_member'=>false,
                                         'upload_doc'=>false,
                                         'upload_issue'=>false,
+                                        'approve_rebaseline'=>false
                                         ];
         error_reporting(E_ALL  & ~E_NOTICE);
 
@@ -112,6 +113,9 @@ class Home extends CI_Controller {
         }
         if($user_privilege[13]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['upload_issue']=true;
+        }
+        if($this->datajson['userdata']['PROF_ID'] == 4){
+            $this->datajson['privilege']['approve_rebaseline'] = true;
         }
 
 
