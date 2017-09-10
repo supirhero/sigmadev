@@ -31,7 +31,11 @@ Class M_timesheet extends CI_Model{
         //ada perubahan
         $now = date('Y-m-d');
         $past = date('Y-m-d', strtotime('this month'));
-        $query = $this->db->query("
+        $query = $this->db->query("select distinct TS_ID,WP,USER_ID,USER_NAME,TS.PROJECT_ID,MESSAGE,SUBJECT,TS_DATE,latitude,longitude,is_approved,subject,message,month,project_name,submit_date,tahun,TS.WBS_ID,WB.WBS_NAME 
+from (select * from USER_TIMESHEET_NEW  WHERE user_id='".$user_id."'
+                                  and  to_char(ts_date,'Mon-YYYY')='$month-$year') TS
+ JOIN WBS WB ON TS.WBS_ID=WB.WBS_ID");
+/*        $query = $this->db->query("
                                   SELECT *
                                   FROM
                                   (SELECT *
@@ -93,7 +97,7 @@ is_approved
                                   )
                                   ORDER BY SUBMIT_DATE DESC)
                                   WHERE user_id='".$user_id."'
-                                  and  to_char(ts_date,'Mon-YYYY')='$month-$year'");
+                                  and  to_char(ts_date,'Mon-YYYY')='$month-$year'");*/
         $hasil = $query->result_array();
         return $hasil;
 
