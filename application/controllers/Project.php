@@ -853,7 +853,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             //insert rebaseline history
             $this->M_baseline->insertRebaseline($data);
 
-            $datareturn['message_evidence'] = 'no file or file failed uploaded';
+            $datareturn['message_evidence'] = $this->upload->display_errors();
             //edit table project
             //$this->M_baseline->editProject2($update,$id2);
 
