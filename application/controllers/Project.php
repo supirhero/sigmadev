@@ -967,16 +967,13 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                                 }
                                 $resAp=$this->db->query("select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'")->row()->RES;
                                 $wc=0;
-                                $dur = 0;
                                 $allChild=$this->getAllChildWBS($ap->WBS_ID);
                                 foreach ($allChild as $ac) {
                                     //child total hour
                                     $works=$this->db->query("select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'")->row()->WC;
-                                    $duration = $this->db->query("select duration from wbs where wbs_id = '$ac->WBS_ID'")->row()->DURATION;
                                     $wc=$wc+$works;
-                                    $dur=$dur+$duration;
                                 }
-                                $this->db->query("update wbs set resource_wbs=$resAp,duration='$dur',WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'");
+                                $this->db->query("update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'");
                                 //$this->M_detail_project->updateNewDuration($ap->WBS_ID);
 
                             }
