@@ -400,7 +400,7 @@ GROUP BY TS_DATE")->result_array();
 
     function inputTimesheet($data){
 
-        $sql = "select u.user_name,pm.user_name as pm_name,pm.email,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
+        $sql = "select u.user_name,pm.user_name as pm_name,pm.email,wbs.project_id,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
 join projects p on p.project_id = wbs.project_id 
 join users pm on p.pm_id = pm.user_id
 join resource_pool rp on wp.rp_id=rp.rp_id
@@ -1065,7 +1065,7 @@ where wp_id = $data[WP_ID]";
         $SUBJECT = $data['SUBJECT'];
         $MESSAGE = $data['MESSAGE'];
         $HOUR_TOTAL = $data['WORK_HOUR'];
-        $TS_DATE = "to_date('$tgl','yyyymmdd')";
+        $TS_DATE = date_format(date_create($data['DATE']),'d-M-Y');
         $WP_ID = $data['WP_ID'];
         $LATITUDE = $data['LATITUDE'];
         $LONGITUDE = $data['LONGITUDE'];
@@ -1351,13 +1351,14 @@ where wp_id = $data[WP_ID]";
       <h2>Hi ".$info["PM_NAME"].",</h3>
       <br/>
       <h4>User $info[USER_NAME] telah mengisi timesheet sebagai berikut :</h4>
-      <h4>Project : $info[PROJECT_NAME]</h4>
+      <h4>Project : <a href='http://prouds.telkomsigma.co.id/project/$info[PROJECT_ID]/activities'>$info[PROJECT_NAME]</a></h4>
       <h4>WBS : $info[WBS_NAME]</h4>
       <h4>Tanggal : $TS_DATE</h4>
       <h4>Jumlah Jam : $HOUR_TOTAL</h4>
       <h4>Subject : $SUBJECT</h4>
       <br>
       <br/>
+      <a href='http://prouds.telkomsigma.co.id/project/$info[PROJECT_ID]/activities'>klik disini</a> untuk melakukan approval
       <p style='text-align: left'>Trouble with timesheet ? Contact us at <a href='mailto:prouds.support@sigma.co.id?Subject=Need%20help' target='_top'>prouds.support@sigma.co.id</a></p>
       </td>
       </tr>
