@@ -468,7 +468,7 @@ class Project extends CI_Controller
       if($user == null || $project == null){
           $this->output->set_status_header(400);
           $c['status'] = "Error";
-          $c['message'] = "User dan project tidak terdefinisi";
+          $c['message'] = "Harap input data member yang valid";
 
       }
       else{
