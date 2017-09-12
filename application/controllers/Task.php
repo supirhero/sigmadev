@@ -727,7 +727,7 @@ class Task extends CI_Controller
             if($q->num_rows() > 0){
                 $user = $q->row_array();
             }
-            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],,$user["WBS_NAME"],$project_id);
+            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
 
             $this->M_detail_project->postAssignmentTemp($rh_id);
             $data['status'] = 'success';
@@ -745,7 +745,7 @@ class Task extends CI_Controller
             if($q->num_rows() > 0){
                 $user = $q->row_array();
             }
-            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],,$user["WBS_NAME"],$project_id);
+            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
             $data['status'] = 'success';
             $data['message'] = 'member di tambah';
         }

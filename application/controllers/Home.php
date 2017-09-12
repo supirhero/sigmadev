@@ -325,6 +325,9 @@ class Home extends CI_Controller {
                             case '14':
                                 $project_id_req =$this->input->post("PROJECT_ID");
                                 break;
+                            case '15':
+
+                                break;
                         }
 
                         if(!in_array($project_id_req,$granted_project_list)){
