@@ -1571,6 +1571,7 @@ class Report extends CI_Controller {
             'Create Date',
             'Project Name',
             'Project Status',
+            'Type Of Effort',
             'Project Amount',
             'Customer Name',
             'Project Percent',
@@ -1584,7 +1585,7 @@ class Report extends CI_Controller {
             'CPI'
         ];
 
-        $query ="select bu_alias,iwo_no,date_created,project_name,project_status,amount as project_amount,customer_name,project_complete as percent,amount,
+        $query ="select bu_alias,iwo_no,date_created,project_name,project_status,type_of_effort,amount as project_amount,customer_name,project_complete as percent,amount,
         customer_name,pm,schedule_status,budget_status,ev,pv,ac,spi,cpi from v_find_project
         where 1=1";
         $i = 0;
@@ -1721,17 +1722,18 @@ class Report extends CI_Controller {
             $this->excel->getActiveSheet()->setCellValueByColumnAndRow(2,$row,$data['DATE_CREATED']);
             $this->excel->getActiveSheet()->setCellValueByColumnAndRow(3,$row,$data['PROJECT_NAME']);
             $this->excel->getActiveSheet()->setCellValueByColumnAndRow(4,$row,$data['PROJECT_STATUS']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(5,$row,$data['PROJECT_AMOUNT']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(6,$row,$data['CUSTOMER_NAME']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(7,$row,$data['PERCENT']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(8,$row,$data['PM']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(9,$row,$data['SCHEDULE_STATUS']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(10,$row,$data['BUDGET_STATUS']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(11,$row,$data['EV']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(12,$row,$data['PV']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(13,$row,$data['AC']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(14,$row,$data['SPI']);
-            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(15,$row,$data['CPI']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(5,$row,$data['TYPE_OF_EFFORT']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(6,$row,$data['PROJECT_AMOUNT']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(7,$row,$data['CUSTOMER_NAME']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(8,$row,$data['PERCENT']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(9,$row,$data['PM']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(10,$row,$data['SCHEDULE_STATUS']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(11,$row,$data['BUDGET_STATUS']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(12,$row,$data['EV']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(13,$row,$data['PV']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(14,$row,$data['AC']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(15,$row,$data['SPI']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(16,$row,$data['CPI']);
             $row++;
         }
 
