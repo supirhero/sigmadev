@@ -326,7 +326,7 @@ class Home extends CI_Controller {
                                 $project_id_req =$this->input->post("PROJECT_ID");
                                 break;
                             case '15':
-
+                                $project_id_req=$this->input->post("PROJECT_ID");
                                 break;
                         }
 
