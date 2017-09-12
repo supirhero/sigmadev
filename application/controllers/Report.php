@@ -1373,7 +1373,7 @@ class Report extends CI_Controller {
         echo json_encode($filtered);
     }
             //report yearly overview
-    public function r_yearly($year=false){
+    public function r_yearly($tahun=false){
         $user_bu = $this->datajson['userdata']['BU_ID'];
         $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
         if(!$year)
