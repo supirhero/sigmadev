@@ -583,7 +583,7 @@ class Timesheet extends CI_Controller {
                     }
 
                 }
-            elseif($statusProject == 'in progress'){
+            elseif($statusProject == 'in progress' || $statusProject == 'not started'){
                     $this->M_timesheet->inputTimesheet($data);
                     $returndata['status'] = "success";
                     $returndata['message'] = "add timesheet succcess ";
@@ -596,7 +596,7 @@ class Timesheet extends CI_Controller {
             else{
                     $this->output->set_status_header(400);
                     $returndata['status'] = "failed";
-                    $returndata['message'] = "Status project harus in-progress atau on-hold";
+                    $returndata['message'] = "Status project harus in-progress, not started ,dan on hold";
         }
 
         }
