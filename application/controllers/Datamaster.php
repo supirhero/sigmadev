@@ -615,25 +615,62 @@ class Datamaster extends CI_Controller{
                       $user_id = $this->input->post('user_id');
                       $user_status = $this->input->post('is_active');
                       $user_status = $user_status != ""?$user_status:1;
-                      if($this->input->post('password')!="") {
+                      $user = $this->M_user->GetDataUser($user_id)[0];
                           $password = md5($this->input->post('password'));
-                          $this->db->query("update users set password = '$password',is_active=$user_status where user_id = '$user_id'");
+
+                          if($user->IS_ACTIVE == $user_status && $this->input->post('password') == $password) {
+
+                              $c['status'] = 'success';
+                              $c['message'] = 'Tidak berubah karena password maupun status sama seperti sebelumnya.';
+                      }
+                      elseif($user->IS_ACTIVE == $user_status)
+                      {
+                          if ($this->input->post('password') != "") {
+                              $this->db->query("update users set password = '$password' where user_id = '$user_id'");
+                              $c['status'] = 'success';
+                              $c['message'] = 'Password berhasil dirubah';
+                          }
+                          else{
+                              $c['status'] = 'success';
+                              $c['message'] = 'tidak ada perubahan';
+                          }
+
+
                       }
                       else
                       {
-                          $this->db->query("update users set is_active=$user_status where user_id = '$user_id'");
+                          if ($this->input->post('password') != "") {
+                              $this->db->query("update users set password = '$password',is_active=$user_status where user_id = '$user_id'");
+                          } else {
+                              $this->db->query("update users set is_active=$user_status where user_id = '$user_id'");
+                          }
+
+                          if($this->db->affected_rows() == 1){
+                              $c['status'] = 'success';
+                              $c['message'] = 'Password dan user status updated';
+                          }
+                          else{
+                              $this->output->set_status_header(400);
+                              $c['status'] = 'failed';
+                              $c['message'] = 'Password not updated';
+                          }
+
+                          if($user_status == 0)
+                          {
+                              $c['email_status'] = 'Email gagal dikirim';
+                              if($this->M_user->sendDeactivateInfo($user->EMAIL,$user->USER_NAME))
+                                  $c['email_status'] = 'Email dikirim';
+
+                          }
+                          else{
+
+                              $c['email_status'] = 'Email gagal dikirim';
+                              if($this->M_user->sendActivateInfo($user->EMAIL,$user->USER_NAME))
+                                  $c['email_status'] = 'Email dikirim';
+                          }
                       }
 
 
-                      if($this->db->affected_rows() == 1){
-                          $c['status'] = 'success';
-                          $c['message'] = 'Password dan user status updated';
-                    }
-                    else{
-                        $this->output->set_status_header(400);
-                        $c['status'] = 'failed';
-                        $c['message'] = 'Password not updated';
-                    }
                     break;
                     default:
                     # code...

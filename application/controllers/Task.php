@@ -718,6 +718,17 @@ class Task extends CI_Controller
         $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
         if($statusProject == 'on hold'){
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+
+            $wbs=$this->input->post('WBS_ID');
+            $member=$this->input->post('MEMBER');
+            $project_id = $this->M_detail_project->getRPProject($member);
+            $sql = "select * from TEMPORARY_WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
+            $q = $this->db->query($sql);
+            if($q->num_rows() > 0){
+                $user = $q->row_array();
+            }
+            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],,$user["WBS_NAME"],$project_id);
+
             $this->M_detail_project->postAssignmentTemp($rh_id);
             $data['status'] = 'success';
             $data['message'] = 'member di tambah temporary';
@@ -727,11 +738,14 @@ class Task extends CI_Controller
             $this->M_detail_project->postAssignment();
             //send email
             $wbs=$this->input->post('WBS_ID');
-            $email=$this->input->post('EMAIL');
-            $user_name=$this->input->post('NAME');
-            $wbs_name=$this->input->post('WBS_NAME');
-            $projectid = $this->M_detail_project->getProject_Id($wbs);
-            $this->sendVerificationassignMember($email,$user_name,$wbs_name,$projectid);$data['status'] = 'success';
+            $member=$this->input->post('MEMBER');
+            $project_id = $this->M_detail_project->getRPProject($member);
+            $sql = "select * from WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
+            $q = $this->db->query($sql);
+            if($q->num_rows() > 0){
+                $user = $q->row_array();
+            }
+            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],,$user["WBS_NAME"],$project_id);
             $data['status'] = 'success';
             $data['message'] = 'member di tambah';
         }

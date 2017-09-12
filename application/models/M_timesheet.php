@@ -726,6 +726,7 @@ where wp_id = $data[WP_ID]";
     function confirmationTimesheetEmail($email,$name,$timesheetdata,$approval_code){
         //subject,message,hour_total,ts_date,approval_date
         extract($timesheetdata);
+        $APPROVAL_DATE = date("d-M-Y H:i");
         $confirmstring = ($approval_code == 1 ? "DITERIMA" : "DITOLAK");
         $this->load->library('email');
         $config['protocol']='smtp';
