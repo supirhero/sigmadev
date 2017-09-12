@@ -17,11 +17,12 @@ class Home extends CI_Controller {
                                         'report_find_project'=>false,
                                         'edit_project'=>false,
                                         'timesheet_approval'=>false,
-                                        'creat_edit_upload_percent_member_task'=>false,
+                                        'workplan_modification'=>false,
                                         'project_member'=>false,
                                         'upload_doc'=>false,
                                         'upload_issue'=>false,
-                                        'approve_rebaseline'=>false
+                                        'approve_rebaseline'=>false,
+                                        'edit_task_percent'=>false
                                         ];
         error_reporting(E_ALL  & ~E_NOTICE);
 
@@ -103,7 +104,7 @@ class Home extends CI_Controller {
             $this->datajson['privilege']['timesheet_approval']=true;
         }
         if($user_privilege[10]['PRIVILEGE'] == 'can'){
-            $this->datajson['privilege']['creat_edit_upload_percent_member_task']=true;
+            $this->datajson['privilege']['workplan_modification']=true;
         }
         if($user_privilege[11]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['project_member']=true;
@@ -114,11 +115,11 @@ class Home extends CI_Controller {
         if($user_privilege[13]['PRIVILEGE'] == 'can'){
             $this->datajson['privilege']['upload_issue']=true;
         }
-        if($user_privilege[15]['PRIVILEGE'] == 'all_bu' || $user_privilege[15]['PRIVILEGE'] == 'only_bu'){
-            $this->datajson['privilege']['upload_issue']=true;
+        if($user_privilege[14]['PRIVILEGE'] == 'can'){
+            $this->datajson['privilege']['edit_task_percent']=true;
         }
-        if($this->datajson['userdata']['PROF_ID'] == 4 || $this->datajson['userdata']['PROF_ID'] == 7){
-            $this->datajson['privilege']['approve_rebaseline'] = true;
+        if($user_privilege[15]['PRIVILEGE'] == 'all_bu' || $user_privilege[15]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['approve_rebaseline']=true;
         }
 
 
@@ -211,6 +212,13 @@ class Home extends CI_Controller {
                                     $bu_id = 'masuk';
                                 }
                                 break;
+                            case '16':
+                                $bu_id = $this->db->query("select pbu.bu_id from projects p 
+                                                           join p_bu pbu
+                                                           on pbu.bu_code = p.bu_code
+                                                           where p.project_id = '".$this->input->post('project_id')."'
+                                                           ")->row()->BU_ID;
+                                break;
                         }
                         if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
                             $will_die = 1;
@@ -293,6 +301,17 @@ class Home extends CI_Controller {
                                     case 'task/deletetask':
                                         $id = $_POST['wbs_id'];
                                         $project_id_req = $this->M_detail_project->getProjectTask($id);
+                                        break;
+                                    case ($url_dest == 'project/rebaseline') || ( $url_dest == 'project/baseline'):
+                                        $user_id = $this->datajson['userdata']['USER_ID'];
+                                        $gpl = $this->db->query("select project_id from projects where pm_id ='$user_id'")->result_array();
+
+                                        $granted_project_list = null;
+                                        $granted_project_list = [];
+                                        foreach ($gpl as $gg){
+                                            $granted_project_list[] = $gg['PROJECT_ID'];
+                                        }
+                                        $project_id_req = $this->input->post("project_id");
                                         break;
                                 }
                                 break;
