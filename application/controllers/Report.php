@@ -1369,7 +1369,7 @@ class Report extends CI_Controller {
         {
             $object->$key = $value;
         }
-        $filtered["r_monthly"] = array($object);
+        $filteredz["r_monthly"] = array($object);
         echo json_encode($filtered);
     }
             //report yearly overview
