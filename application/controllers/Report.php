@@ -146,7 +146,7 @@ class Report extends CI_Controller {
                                 }
                                 break;
                             case '16':
-                                $bu_id = $this->db->query("select pbu.bu_id from projects p 
+                                $bu_id = $this->db->query("select pbu.bu_id from projects p
                                                            join p_bu pbu
                                                            on pbu.bu_code = p.bu_code
                                                            where p.project_id = '".$this->input->post('project_id')."'
@@ -777,7 +777,9 @@ class Report extends CI_Controller {
 
         $datareport=$this->M_report->get_user_bu($bu_id);
 
-
+        if ($bulan<10) {
+          $bulan="0".$bulan;
+        }
 
         for($i = 0 ; $i <count($datareport);$i++){
 
@@ -843,7 +845,9 @@ class Report extends CI_Controller {
         $m=(int)date("m");
 
         $datareport=$this->M_report->get_user_bu($bu_id);
-
+        if ($bulan<10) {
+          $bulan="0".$bulan;
+        }
 
 
         for($i = 0 ; $i <count($datareport);$i++){
