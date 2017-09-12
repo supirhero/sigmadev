@@ -1298,6 +1298,7 @@ class Report extends CI_Controller {
         from (select (avg(ev)) as ev,(avg(pv)) as pv,case when (avg(pv))=0 then 0 else (avg(ac)) end as ac,
         case when avg(pv)=0 then 0 else round(avg(ev)/avg(pv),2) end as spi,
         case when avg(ac)=0 then 1 when round(avg(ev)/avg(ac),2)>1 then 1 else round(avg(ev)/avg(ac),2) end as cpi,
+        project_id
                 from tb_rekap_project
                 where  to_char(tanggal,'Mon-YYYY')='$month-$year'
                 group by project_id) a inner join
