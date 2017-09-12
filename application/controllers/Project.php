@@ -144,6 +144,13 @@ class Project extends CI_Controller
                                     $bu_id = 'masuk';
                                 }
                                 break;
+                            case '16':
+                                $bu_id = $this->db->query("select pbu.bu_id from projects p 
+                                                           join p_bu pbu
+                                                           on pbu.bu_code = p.bu_code
+                                                           where p.project_id = '".$this->input->post('project_id')."'
+                                                           ")->row()->BU_ID;
+                                break;
                         }
                         if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
                             $will_die = 1;
@@ -249,6 +256,9 @@ class Project extends CI_Controller
                                 break;
                             case '14':
                                 $project_id_req =$this->input->post("PROJECT_ID");
+                                break;
+                            case '15':
+                                $project_id_req=$this->input->post("PROJECT_ID");
                                 break;
                         }
 

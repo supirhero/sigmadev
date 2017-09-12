@@ -145,6 +145,13 @@ class Report extends CI_Controller {
                                     $bu_id = 'masuk';
                                 }
                                 break;
+                            case '16':
+                                $bu_id = $this->db->query("select pbu.bu_id from projects p 
+                                                           join p_bu pbu
+                                                           on pbu.bu_code = p.bu_code
+                                                           where p.project_id = '".$this->input->post('project_id')."'
+                                                           ")->row()->BU_ID;
+                                break;
                         }
                         if(!((array_search($bu_id,$directorat_bu) != null|| $bu_id == 'masuk') && $bu_id != null)){
                             $will_die = 1;
@@ -228,6 +235,17 @@ class Report extends CI_Controller {
                                         $id = $_POST['wbs_id'];
                                         $project_id_req = $this->M_detail_project->getProjectTask($id);
                                         break;
+                                    case ($url_dest == 'project/rebaseline') || ( $url_dest == 'project/baseline'):
+                                        $user_id = $this->datajson['userdata']['USER_ID'];
+                                        $gpl = $this->db->query("select project_id from projects where pm_id ='$user_id'")->result_array();
+
+                                        $granted_project_list = null;
+                                        $granted_project_list = [];
+                                        foreach ($gpl as $gg){
+                                            $granted_project_list[] = $gg['PROJECT_ID'];
+                                        }
+                                        $project_id_req = $this->input->post("project_id");
+                                        break;
                                 }
                                 break;
                             case '12':
@@ -239,6 +257,9 @@ class Report extends CI_Controller {
                                 break;
                             case '14':
                                 $project_id_req =$this->input->post("PROJECT_ID");
+                                break;
+                            case '15':
+                                $project_id_req=$this->input->post("PROJECT_ID");
                                 break;
                         }
 
