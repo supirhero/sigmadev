@@ -907,7 +907,7 @@ class Report extends CI_Controller {
         //echo json_encode($wrap);
         header('Content-Type: application/vnd.ms-excel'); //mime type
 
-        header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
+        header('Content-Disposition: attachment;filename="report people.xls"'); //tell browser what's the file name
 
         header('Cache-Control: max-age=0'); //no cache
         $this->load->library('excel');
@@ -918,20 +918,37 @@ class Report extends CI_Controller {
         //     //set cell A1 content with some text
         // $this->excel->getActiveSheet()->setCellValue('A1', 'This is just some text value');
 
+        $header_people = ['Nama','Utilisasi','Status Utilisasi','Entry','Status Entry'];
 
-        $this->excel->getActiveSheet()->fromArray($wrap);
+        //set header
+        $col = 0;
+        foreach($header_people as $head){
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow($col,1,$head);
+            $col++;
+        }
 
-            $filename='Timesheet Report.xls'; //save our workbook as this file name
+        $row = 2;
+        foreach ($wrap as $people){
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(0,$row,$people['USER_NAME']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(1,$row,$people['utilisasi']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(2,$row,$people['status_utilisasi']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(3,$row,$people['entry']);
+            $this->excel->getActiveSheet()->setCellValueByColumnAndRow(4,$row,$people['status_entry']);
+            $row++;
+        }
 
+//auto size
+        for($i = 'A' ;$i !== 'R';$i++ ){
+            $this->excel->getActiveSheet()->getColumnDimension("$i")->setAutoSize(true);
+        }
 
+        //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
+        //if you want to save it as .XLSX Excel 2007 format
 
-            //save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
-            //if you want to save it as .XLSX Excel 2007 format
+        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
 
-            $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
-
-            //force user to download the Excel file without writing it to server's HD
-            $objWriter->save('php://output');
+        //force user to download the Excel file without writing it to server's HD
+        $objWriter->save('php://output');
 
     }
         //resource per bu

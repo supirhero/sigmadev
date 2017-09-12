@@ -392,6 +392,7 @@ class Role extends CI_Controller
                     "PRIVILEGE"=>$priv
                 ];
                 $this->db->where('PROFILE_ID',$prof_id);
+
                 $this->db->where('ACCESS_ID',$i+1);
                 $this->db->update('PROFILE_ACCESS_LIST',$change);
             }
