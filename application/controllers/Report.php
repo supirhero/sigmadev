@@ -1342,7 +1342,7 @@ class Report extends CI_Controller {
             group by project_id) a inner join
             projects c on c.project_id=a.project_id
             inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-            where project_status='In Progress' and c.PROJECT_TYPE_ID='Project'
+            where project_status='IN PROGRESS' and c.PROJECT_TYPE_ID='Project'
             and type_of_effort in ('1','2')
             and pv!='0'
             and b.BU_CODE !='PROUDS'
