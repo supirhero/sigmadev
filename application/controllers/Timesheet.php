@@ -304,7 +304,7 @@ class Timesheet extends CI_Controller {
         $project_list = $this->db->query("SELECT DISTINCT project_id
           FROM
           (SELECT *
-          FROM USER_TIMESHEET_NEW where ts_date= to_date('$date','yyyy-mm-dd')
+          FROM USER_TIMESHEET where ts_date= to_date('$date','yyyy-mm-dd')
           ORDER BY ts_date DESC)
           WHERE user_id ='".$this->datajson['userdata']['USER_ID']."'")->result_array();
         foreach($project_list as $pl){
@@ -409,18 +409,18 @@ class Timesheet extends CI_Controller {
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$id'")->row()->RH_ID;
 
         $user_id = $this->datajson['userdata']['USER_ID'];
-        $query = $this->db->query("SELECT WP_ID,PROJECT_ID,WBS_NAME,TASK_MEMBER_REBASELINE,TASK_REBASELINE 
+        $query = $this->db->query("SELECT WP_ID,PROJECT_ID,WBS_NAME 
                                   FROM
-                                  (SELECT a.USER_ID, a.USER_NAME, b.RP_ID, c.PROJECT_ID, c.PROJECT_NAME, d.WP_ID, e.wbs_name, c.PROJECT_STATUS,d.rebaseline as task_member_rebaseline,e.rebaseline as task_rebaseline
+                                  (SELECT a.USER_ID, a.USER_NAME, b.RP_ID, c.PROJECT_ID, c.PROJECT_NAME, d.WP_ID, e.wbs_name, c.PROJECT_STATUS
                                     FROM
                                     USERS a INNER JOIN
                                     RESOURCE_POOL b ON a.USER_ID=b.USER_ID 
                                     INNER JOIN
                                     PROJECTS c ON b.PROJECT_ID=c.PROJECT_ID 
                                     inner JOIN
-                                    (select wbs_id,rp_id,wp_id,'no' as rebaseline from wbs_pool union select wbs_id,rp_id,wp_id,'yes' as rebaseline from temporary_wbs_pool where rh_id = '$rh_id') d ON d.rp_id=b.rp_id
+                                    wbs_pool d ON d.rp_id=b.rp_id
                                     inner JOIN
-                                    (select wbs_id,wbs_name,'no' as rebaseline from wbs union select wbs_id,wbs_name,'yes' as rebaseline from temporary_wbs where rh_id = '$rh_id') e ON d.wbs_id=e.wbs_id)
+                                    wbs e ON d.wbs_id=e.wbs_id)
                                   WHERE PROJECT_ID='".$id."' and USER_ID='".$user_id."'");
         //$query = $this->db->query("SELECT * FROM CARI_TASK WHERE PROJECT_ID='900418' and USER_ID='S201506017'");
 
@@ -504,7 +504,6 @@ class Timesheet extends CI_Controller {
             $_POST = array_change_key_case($_POST,CASE_UPPER);
         }
 
-        $userid=$this->datajson['userdata']['USER_ID'];
         $data['WORK_HOUR'] = $this->input->post("HOUR");
         $data['DATE'] = $this->input->post("TS_DATE");
         $data['SUBJECT'] = $this->input->post("TS_SUBJECT");
@@ -516,110 +515,13 @@ class Timesheet extends CI_Controller {
         $data['SUBMIT_DATE']= date('Y-m-d H:i:s');
         $project_id   = $_POST['PROJECT_ID'];
 
-        //check hour total
-
-
-
-        //check bu_id
-        $wp_id = $_POST['WP_ID'];
         if($data['WP_ID'] != "" && $project_id != "")
         {
             $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
             //check rebaseline status for task
-
-            $statusProject = strtolower($statusProject);
-
-            if($statusProject == 'on hold'){
-
-                    $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
-                    //check member wbs_pool status if it need rebaseline approval
-                    $checkmember = $this->db->query("
-                                                select 'yes' as rebaseline
-                                                from temporary_wbs_pool
-                                                where wp_id = '".$_POST['WP_ID']."'
-                                                and rh_id = '$rh_id'
-                                                union
-                                                select 'no' as rebaseline 
-                                                from wbs_pool
-                                                where wp_id = '".$_POST['WP_ID']."'")->row()->REBASELINE;
-
-                    //check task status if it need rebaseline approval
-                    if($checkmember == 'yes'){
-                        $checktask = $this->db->query("
-                                                        select rebaseline from (
-                                                          select 'yes' as rebaseline 
-                                                          from temporary_wbs
-                                                          join temporary_wbs_pool
-                                                          on temporary_wbs.wbs_id = temporary_wbs_pool.wbs_id
-                                                          where temporary_wbs_pool.wp_id = '$wp_id'
-                                                          and temporary_wbs.rh_id = '$rh_id'
-                                                          and temporary_wbs_pool.rh_id = '$rh_id'
-                                                          UNION 
-                                                          select 'no' as rebaseline 
-                                                          from wbs a
-                                                          join temporary_wbs_pool b
-                                                          on a.wbs_id = b.wbs_id
-                                                          where b.wp_id = '$wp_id'
-                                                          and b.rh_id = '$rh_id'
-                                                        )
-                                                        ")->row()->REBASELINE;
-                    }
-                    elseif($checkmember == 'no'){
-                        $checktask = $this->db->query("
-                                                        select rebaseline from (
-                                                          select 'yes' as rebaseline 
-                                                          from temporary_wbs a
-                                                          join wbs_pool b
-                                                          on a.wbs_id = b.wbs_id
-                                                          where b.wp_id = '$wp_id'
-                                                          and a.rh_id = '$rh_id'
-                                                          UNION 
-                                                          select 'no' as rebaseline 
-                                                          from wbs a
-                                                          join wbs_pool b
-                                                          on a.wbs_id = b.wbs_id
-                                                          where b.wp_id = '$wp_id'
-                                                        )
-                                                        ")->row()->REBASELINE;
-                    }
-
-                    //insert timesheet to temporary timesheet if member task need rebaseline approval
-                    if($checkmember == 'yes'){
-                        $this->M_timesheet->inputTimesheetTemp($data,$rh_id);
-                        $returndata['status'] = "success";
-                        $returndata['message'] = "add timesheet temporary succcess ";
-                    }
-                    //insert timesheet to temporary timesheet if member not need rebaseline but task need rebaseline approval
-                    elseif ($checktask == 'yes'){
-                        $this->M_timesheet->inputTimesheetTemp($data,$rh_id);
-
-                        $returndata['status'] = "success";
-                        $returndata['message'] = "add timesheet temporary succcess ";
-                    }
-                    //insert timesheet to original timesheet table because his member status and task status not need rebaseline approval
-                    else{
-                        $this->M_timesheet->inputTimesheet($data);
-                        $returndata['status'] = "success";
-                        $returndata['message'] = "add timesheet succcess ";
-                    }
-
-                }
-            elseif($statusProject == 'in progress' || $statusProject == 'not started'){
-                    $this->M_timesheet->inputTimesheet($data);
-                    $returndata['status'] = "success";
-                    $returndata['message'] = "add timesheet succcess ";
-                }
-            elseif ($statusProject == null || $statusProject == ""){
-                    $this->output->set_status_header(400);
-                    $returndata['status'] = "failed";
-                    $returndata['message'] = "Harus memilih project terlebih dahuu";
-                }
-            else{
-                    $this->output->set_status_header(400);
-                    $returndata['status'] = "failed";
-                    $returndata['message'] = "Status project harus in-progress, not started ,dan on hold";
-        }
-
+            $this->M_timesheet->inputTimesheet($data);
+            $returndata['status'] = "success";
+            $returndata['message'] = "add timesheet succcess ";
         }
         else{
                 $this->output->set_status_header(400);

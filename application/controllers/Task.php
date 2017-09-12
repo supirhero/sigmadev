@@ -234,10 +234,18 @@ class Task extends CI_Controller
 
                                         $granted_project_list = null;
                                         $granted_project_list = [];
+                                        $granted_project_list[]= null ;
                                         foreach ($gpl as $gg){
                                             $granted_project_list[] = $gg['PROJECT_ID'];
                                         }
                                         $project_id_req = $this->input->post("project_id");
+                                        if(!in_array($project_id_req,$granted_project_list)){
+                                            $this->output->set_status_header(403);
+                                            $returndata['status'] = 'failed';
+                                            $returndata['message'] = 'Hanya Project Manager dari project yang bersangkutan yang berhak meminta request rebaseline';
+                                            echo json_encode($returndata);
+                                            die;
+                                        }
                                         break;
                                 }
                                 break;
