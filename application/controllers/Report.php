@@ -1252,15 +1252,15 @@ class Report extends CI_Controller {
 
         $date=date("M-Y");
         $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-            round(sum(ev)/count(c.project_id),2) as EV,
-            round(sum(pv)/count(c.project_id),2) as PV,
-            round(sum(AC)/count(c.project_id),2) as AC,
-            case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-            case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-            from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-            case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-            case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-            project_id
+        round(sum(ev)/count(c.project_id),2) as EV,
+          round(sum(pv)/count(c.project_id),2) as PV,
+          round(sum(AC)/count(c.project_id),2) as AC,
+          case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+          case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+          from (select (avg(ev)) as ev,(avg(pv)) as pv,case when (avg(pv))=0 then 0 else (avg(ac)) end as ac,
+          case when avg(pv)=0 then 0 else round(avg(ev)/avg(pv),2) end as spi,
+          case when avg(ac)=0 then 1 when round(avg(ev)/avg(ac),2)>1 then 1 else round(avg(ev)/avg(ac),2) end as cpi,
+          project_id
             from tb_rekap_project
             where  to_char(tanggal,'Mon-YYYY')='$date'
             group by project_id) a inner join
@@ -1290,15 +1290,15 @@ class Report extends CI_Controller {
         {
             $month = date("M", mktime(0, 0, 0, $i, 10));
             $query = $this->db->query("select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-                round(sum(ev)/count(c.project_id),2) as EV,
-                round(sum(pv)/count(c.project_id),2) as PV,
-                round(sum(AC)/count(c.project_id),2) as AC,
-                case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-                case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-                from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-                case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-                case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-                project_id
+            round(sum(ev)/count(c.project_id),2) as EV,
+        round(sum(pv)/count(c.project_id),2) as PV,
+        round(sum(AC)/count(c.project_id),2) as AC,
+        case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+        case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+        from (select (avg(ev)) as ev,(avg(pv)) as pv,case when (avg(pv))=0 then 0 else (avg(ac)) end as ac,
+        case when avg(pv)=0 then 0 else round(avg(ev)/avg(pv),2) end as spi,
+        case when avg(ac)=0 then 1 when round(avg(ev)/avg(ac),2)>1 then 1 else round(avg(ev)/avg(ac),2) end as cpi,
+        project_id
                 from tb_rekap_project
                 where  to_char(tanggal,'Mon-YYYY')='$month-$year'
                 group by project_id) a inner join
@@ -1333,9 +1333,9 @@ class Report extends CI_Controller {
             round(sum(AC)/count(c.project_id),2) as AC,
             case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
             case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-            from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-            case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-            case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
+            from (select (avg(ev)) as ev,(avg(pv)) as pv,case when (avg(pv))=0 then 0 else (avg(ac)) end as ac,
+            case when avg(pv)=0 then 0 else round(avg(ev)/avg(pv),2) end as spi,
+            case when avg(ac)=0 then 1 when round(avg(ev)/avg(ac),2)>1 then 1 else round(avg(ev)/avg(ac),2) end as cpi,
             project_id
             from tb_rekap_project
             where  to_char(tanggal,'Mon-YYYY')='$month-$tahun'
@@ -1369,11 +1369,11 @@ class Report extends CI_Controller {
         {
             $object->$key = $value;
         }
-        $filtered["r_monthly"] = array($object);
+        $filteredz["r_monthly"] = array($object);
         echo json_encode($filtered);
     }
             //report yearly overview
-    public function r_yearly($year=false){
+    public function r_yearly($tahun=false){
         $user_bu = $this->datajson['userdata']['BU_ID'];
         $user_bu_parent = $this->db->query("select bu_parent_id from p_bu where bu_id = '$user_bu'")->row()->BU_PARENT_ID;
         if(!$year)
@@ -1390,33 +1390,33 @@ class Report extends CI_Controller {
         {
             $month = date("M", mktime(0, 0, 0, $i, 10));
 
-            $query = $this->db->query("select * from (select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
-                round(sum(ev)/count(c.project_id),2) as EV,
-                round(sum(pv)/count(c.project_id),2) as PV,
-                round(sum(AC)/count(c.project_id),2) as AC,
-                case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
-                case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
-                from (select (max(ev)-min(ev)) as ev,(max(pv)-min(pv)) as pv,case when (max(ev)-min(ev))=0 then 0 else (max(ac)-min(ac)) end as ac,
-                case when (max(pv)-min(pv))=0 then 0 else round((max(ev)-min(ev))/(max(pv)-min(pv)),2) end as spi,
-                case when (max(ac)-min(ac))=0 then 1 when round((max(ev)-min(ev))/(max(ac)-min(ac)),2)>1 then 1 else round((max(ev)-min(ev))/(max(ac)-min(ac)),2) end as cpi,
-                project_id
-                from tb_rekap_project
-                where  to_char(tanggal,'Mon-YYYY')='$month-$year'
-                group by project_id) a inner join
-                projects c on c.project_id=a.project_id
-                inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
-                where project_status='IN PROGRESS' and c.PROJECT_TYPE_ID='project'
-                and type_of_effort in ('1','2')
-                and pv!='0'
-                and b.BU_CODE !='PROUDS'
-                and b.BU_code !='GTS'
-                and b.BU_code !='NSM'
-                group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
-                order by case when b.bu_code = 'SMS' then 1
-                when b.bu_code = 'SSI' then 2
-                when b.bu_code = 'SGP' then 3
-                else 5
-                   end DESC) where bu_code in (".$this->allowed_bu.")");
+            $query = $this->db->query("select * from(select b.bu_name,b.bu_code, b.bu_alias,b.bu_id,count(c.project_id) as jml_project_cr,
+            round(sum(ev)/count(c.project_id),2) as EV,
+            round(sum(pv)/count(c.project_id),2) as PV,
+            round(sum(AC)/count(c.project_id),2) as AC,
+            case when round(sum(ev)/sum(pv),2)<1 and round(sum(ev)/sum(pv),2) not in (0) then '0'||round(sum(ev)/sum(pv),2) else to_char(round(sum(ev)/sum(pv),2)) end as SPI,
+            case when sum(ac)=0 then '0' when round(sum(ev)/sum(ac),2)<1 and round(sum(ev)/sum(ac),2)>0 then '0'||round(sum(ev)/sum(ac),2) else to_char(round(sum(ev)/sum(ac),2)) end as CPI
+            from (select (avg(ev)) as ev,(avg(pv)) as pv,case when (avg(pv))=0 then 0 else (avg(ac)) end as ac,
+            case when avg(pv)=0 then 0 else round(avg(ev)/avg(pv),2) end as spi,
+            case when avg(ac)=0 then 1 when round(avg(ev)/avg(ac),2)>1 then 1 else round(avg(ev)/avg(ac),2) end as cpi,
+            project_id
+            from tb_rekap_project
+            where  to_char(tanggal,'Mon-YYYY')='$month-$tahun'
+            group by project_id) a inner join
+            projects c on c.project_id=a.project_id
+            inner join p_bu b on (b.bu_code=c.bu_code OR b.bu_alias=c.bu_code)
+            where project_status='IN PROGRESS' and c.PROJECT_TYPE_ID='project'
+            and type_of_effort in ('1','2')
+            and pv!='0'
+            and b.BU_CODE !='PROUDS'
+            and b.BU_code !='GTS'
+            and b.BU_code !='NSM'
+            group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
+            order by case when b.bu_code = 'SMS' then 1
+            when b.bu_code = 'SSI' then 2
+            when b.bu_code = 'SGP' then 3
+            else 5
+             end DESC) where bu_code in (".$this->allowed_bu.")");
 
 
             $hasil =$query->result();

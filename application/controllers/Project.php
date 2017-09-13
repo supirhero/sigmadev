@@ -145,7 +145,7 @@ class Project extends CI_Controller
                                 }
                                 break;
                             case '16':
-                                $bu_id = $this->db->query("select pbu.bu_id from projects p 
+                                $bu_id = $this->db->query("select pbu.bu_id from projects p
                                                            join p_bu pbu
                                                            on pbu.bu_code = p.bu_code
                                                            where p.project_id = '".$this->input->post('project_id')."'
@@ -698,7 +698,7 @@ WITH date_range AS (
 SELECT  t2.\"Week\" as week,t2.\"startdate\" as startdate,t2.\"enddate\" as enddate,
             (select max(t1.pv) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_pv,
             (select max(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_ev
-            
+
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
@@ -725,7 +725,7 @@ from max_rekap
 SELECT  t2.\"Week\" as week,t2.\"startdate\" as startdate,t2.\"enddate\" as enddate,
             (select max(t1.ac) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_ac,
             (select max(t1.ev) from tb_rekap_project t1 where project_id='$project_id' and t1.tanggal between t2.\"startdate\" and t2.\"enddate\" ) as max_ev
-            
+
             FROM   (SELECT  LEVEL \"Week\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') \"startdate\"
        ,TRUNC(start_date + (7 * (LEVEL - 1)),'IW') + 6 \"enddate\"
@@ -1634,7 +1634,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
   <h4 align='center'> You are invited on project member ".$project_name."</h4>
 
   <a class='btn' style='background-color: #1da1db; border-radius: 3px;
-  box-shadow: 3px 3px 10px 3px #B7B7B7;' href='".base_url()."Detail_Project/view/".$project_id."'> You are invited on project member ".$project_name." &raquo;</a>
+  box-shadow: 3px 3px 10px 3px #B7B7B7;'> You are invited on project member ".$project_name." &raquo;</a>
 
 
   <br/>
