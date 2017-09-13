@@ -31,8 +31,64 @@ Class M_timesheet extends CI_Model{
         //ada perubahan
         $now = date('Y-m-d');
         $past = date('Y-m-d', strtotime('this month'));
-        $query = $this->db->query("select distinct TS_ID,WP,USER_ID,USER_NAME,TS.PROJECT_ID,MESSAGE,SUBJECT,TS_DATE,HOUR_TOTAL,latitude,longitude,is_approved,month,project_name,submit_date,tahun,TS.WBS_ID,WB.WBS_NAME
-from (select * from USER_TIMESHEET_NEW  WHERE user_id='".$user_id."'
+        $query = $this->db->query("select distinct TS_ID,WP,USER_ID,USER_NAME,USER_ROLE,TS.PROJECT_ID,MESSAGE,SUBJECT,TS_DATE,HOUR_TOTAL,latitude,longitude,is_approved,month,project_name,submit_date,tahun,TS.WBS_ID,WB.WBS_NAME
+from (select * from (
+
+SELECT ts_id,
+        substr(
+            ts_id,
+            1,
+            instr(
+                ts_id,
+                '.'
+            ) - 1
+        ) AS wp,
+        substr(
+            ts_id,
+            instr(
+                ts_id,
+                '.'
+            ) + 1
+        ) AS date_id,
+        e.wbs_id,
+        c.rp_id,
+        c.user_id,
+        g.prof_name as user_role,
+        f.user_name,
+        c.project_id,
+        d.project_name,
+        e.wbs_name,
+        subject,
+        message,
+        hour_total,
+        ts_date,
+        TO_CHAR(
+            ts_date,
+            'mm'
+        ) AS bulan,
+        TO_CHAR(
+            ts_date,
+            'month'
+        ) AS month,
+        TO_CHAR(
+            ts_date,
+            'YYYY'
+        ) AS tahun,
+        longitude,
+        latitude,
+        submit_date,
+is_approved
+    FROM
+        timesheet a
+        LEFT JOIN wbs_pool b ON a.wp_id = b.wp_id
+        LEFT JOIN resource_pool c ON b.rp_id = c.rp_id
+        LEFT JOIN projects d ON c.project_id = d.project_id
+        LEFT JOIN wbs e ON b.wbs_id = e.wbs_id
+        INNER JOIN users f ON c.user_id = f.user_id
+        INNER JOIN profile g on f.prof_id = g.prof_id
+                                
+
+)  WHERE user_id='".$user_id."'
                                   and  to_char(ts_date,'Mon-YYYY')='$month-$year' ) TS
  JOIN WBS WB ON TS.WBS_ID=WB.WBS_ID
  ORDER BY SUBMIT_DATE DESC
