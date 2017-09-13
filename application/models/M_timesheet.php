@@ -31,7 +31,7 @@ Class M_timesheet extends CI_Model{
         //ada perubahan
         $now = date('Y-m-d');
         $past = date('Y-m-d', strtotime('this month'));
-        $query = $this->db->query("select distinct TS_ID,WP,USER_ID,USER_NAME,TS.PROJECT_ID,MESSAGE,SUBJECT,TS_DATE,HOUR_TOTAL,latitude,longitude,is_approved,month,project_name,submit_date,tahun,TS.WBS_ID,WB.WBS_NAME 
+        $query = $this->db->query("select distinct TS_ID,WP,USER_ID,USER_NAME,TS.PROJECT_ID,MESSAGE,SUBJECT,TS_DATE,HOUR_TOTAL,latitude,longitude,is_approved,month,project_name,submit_date,tahun,TS.WBS_ID,WB.WBS_NAME
 from (select * from USER_TIMESHEET_NEW  WHERE user_id='".$user_id."'
                                   and  to_char(ts_date,'Mon-YYYY')='$month-$year' ) TS
  JOIN WBS WB ON TS.WBS_ID=WB.WBS_ID
@@ -109,7 +109,7 @@ is_approved
 
         //echo "date : $date<br>";
         $query = $this->db->query("
-          SELECT sum(HOUR_TOTAL) as HOUR_TOTAL FROM TIMESHEET 
+          SELECT sum(HOUR_TOTAL) as HOUR_TOTAL FROM TIMESHEET
 JOIN WBS_POOL ON  WBS_POOL.WP_ID=TIMESHEET.WP_ID
 JOIN RESOURCE_POOL ON  RESOURCE_POOL.RP_ID=WBS_POOL.RP_ID
 where TS_DATE=to_date('$date','yyyy-mm-dd') AND RESOURCE_POOL.USER_ID = '".$user_id."' and TIMESHEET.IS_APPROVED = 1");
@@ -401,7 +401,7 @@ GROUP BY TS_DATE")->result_array();
     function inputTimesheet($data){
 
         $sql = "select u.user_name,pm.user_name as pm_name,pm.email,wbs.project_id,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
-join projects p on p.project_id = wbs.project_id 
+join projects p on p.project_id = wbs.project_id
 join users pm on p.pm_id = pm.user_id
 join resource_pool rp on wp.rp_id=rp.rp_id
 join users u on rp.user_id = u.user_id
@@ -410,7 +410,7 @@ where wp_id = $data[WP_ID]";
         if($q->num_rows() > 0){
             $info=$q->row_array();
         }
-        $this->confirmationTimesheetEmailtoPM($data,$info);
+        //$this->confirmationTimesheetEmailtoPM($data,$info);
 
         //change date input for readable to sql
         $tgl=date_format(date_create($data['DATE']),'Ymd');
@@ -437,8 +437,8 @@ where wp_id = $data[WP_ID]";
             $LONGITUDE = $data['LONGITUDE'];
             $SUBMITDATE = $data['SUBMIT_DATE'];
 
-            $this->db->query("INSERT INTO TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE) 
+            $this->db->query("INSERT INTO TIMESHEET
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'))");
 
@@ -459,8 +459,8 @@ where wp_id = $data[WP_ID]";
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
 
-            $this->db->query("INSERT INTO TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE) 
+            $this->db->query("INSERT INTO TIMESHEET
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'))");
 
@@ -475,8 +475,8 @@ where wp_id = $data[WP_ID]";
             $this->db->where("TS_DATE = to_date('$tgl','yyyymmdd')");
             $this->db->like('TS_ID', $data['WP_ID'].'.','after');
 
-            $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01' 
-                              where TS_DATE = to_date('$tgl','yyyymmdd') 
+            $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01'
+                              where TS_DATE = to_date('$tgl','yyyymmdd')
                               and TS_ID LIKE '".$data['WP_ID'].".%'";
             $this->db->query($queryupdate);
 
@@ -494,12 +494,12 @@ where wp_id = $data[WP_ID]";
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
 
-            $this->db->query("INSERT INTO TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE) 
+            $this->db->query("INSERT INTO TIMESHEET
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
         }
-
+        $this->submitTimesheet($TS_ID);
     }
     function editTimesheet($data){
 
@@ -525,7 +525,7 @@ where wp_id = $data[WP_ID]";
 
 
          $this->db->query("update timesheet
-                             set IS_APPROVED = -1,TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE =$TS_DATE, WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS') 
+                             set IS_APPROVED = -1,TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE =$TS_DATE, WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS')
                            where TS_ID = '$TS_ID'");
     }
 
@@ -565,7 +565,7 @@ where wp_id = $data[WP_ID]";
                                    join resource_pool rp  on rp.rp_id = wp.rp_id
                                    join users u on u.user_id = rp.user_id
                                    where ts.ts_id = '$timesheet_id'")->row();
-        $query = "update timesheet 
+        $query = "update timesheet
                   set IS_APPROVED = $confirm_code, CONFIRMED_BY = '$approver' , APPROVAL_DATE = to_date('$date','yyyy-mm-dd')
                   where TS_ID = '$timesheet_id'";
         $exec = $this->db->query($query);
@@ -592,7 +592,7 @@ where wp_id = $data[WP_ID]";
         //insert new data
 
         if($jumlahts == 0){
-            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from 
+            $getCountTimesheet = ($this->db->query("select max(substr(TS_ID,-2,2)) as TS_ID from
                                                     ( select TS_ID,TS_DATE from timesheet union select TS_ID,TS_DATE from temporary_timesheet)
                                                     where TS_DATE = to_date('".$tgl."','yyyymmdd') and TS_ID LIKE '".$data['WP_ID'].".%'")->result_array())[0]['TS_ID'];
 
@@ -607,8 +607,8 @@ where wp_id = $data[WP_ID]";
             $LONGITUDE = $data['LONGITUDE'];
             $SUBMITDATE = $data['SUBMIT_DATE'];
 
-            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,SUBMIT_DATE,ACTION,RH_ID) 
+            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,SUBMIT_DATE,ACTION,RH_ID)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),'create','$rh_id')");
 
@@ -633,8 +633,8 @@ where wp_id = $data[WP_ID]";
             $SUBMITDATE = $data['SUBMIT_DATE'];
 
 
-            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,SUBMIT_DATE,ACTION,RH_ID) 
+            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,SUBMIT_DATE,ACTION,RH_ID)
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),'create','$rh_id')");
 
@@ -649,8 +649,8 @@ where wp_id = $data[WP_ID]";
             $this->db->where("TS_DATE = to_date('$tgl','yyyymmdd')");
             $this->db->like('TS_ID', $data['WP_ID'].'.','after');
 
-            $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01' 
-                              where TS_DATE = to_date('$tgl','yyyymmdd') 
+            $queryupdate = "update TIMESHEET set TS_ID = '".$getOldData[0]['TS_ID'].".01'
+                              where TS_DATE = to_date('$tgl','yyyymmdd')
                               and TS_ID LIKE '".$data['WP_ID'].".%'";
             $this->db->query($queryupdate);
 
@@ -670,8 +670,8 @@ where wp_id = $data[WP_ID]";
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
 
-            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET 
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION,RH_ID)) 
+            $this->db->query("INSERT INTO TEMPORARY_TIMESHEET
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,IS_VALID,ACTION,RH_ID))
                               VALUES
                               ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',1,'create','$rh_id')");
         }
@@ -697,15 +697,15 @@ where wp_id = $data[WP_ID]";
             $LONGITUDE = $data['LONGITUDE'];
             $SUBMITDATE = $data['SUBMIT_DATE'];
 
-            $this->db->query("UPDATE TEMPORARY_TIMESHEET 
-                             set IS_APPROVED = -1,TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE =$TS_DATE, WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS') 
+            $this->db->query("UPDATE TEMPORARY_TIMESHEET
+                             set IS_APPROVED = -1,TS_ID = '$TS_ID' , SUBJECT='$SUBJECT', MESSAGE = '$MESSAGE', HOUR_TOTAL = '$HOUR_TOTAL', TS_DATE =$TS_DATE, WP_ID='$WP_ID', LATITUDE='$LATITUDE', LONGITUDE='$LONGITUDE',SUBMIT_DATE = to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS')
                            where TS_ID = '$TS_ID'");
 
     }
 
     function confirmTimesheetTemp($timesheet_id,$approver,$confirm_code){
         $date = date('Y-m-d');
-        $query = "update temporary_timesheet 
+        $query = "update temporary_timesheet
                   set IS_APPROVED = $confirm_code, CONFIRMED_BY = '$approver' , APPROVAL_DATE = to_date('$date','yyyy-mm-dd')
                   where TS_ID = '$timesheet_id'";
         $exec = $this->db->query($query);
@@ -1407,7 +1407,12 @@ where wp_id = $data[WP_ID]";
         }
 
     }
+    // simpan data notif ke table
+    public function submitTimesheet($ts_id){
+    $sql = "insert into mailer_temp(mailer_id, reff_id, update_date, mailer_status, mailer_type)
+      values(seq_mailer.nextval, '".$ts_id."', sysdate, 0, 'TIMESHEET')";
+    $rs = $this->db->query($sql);
+    }
+
 
 }
-
-
