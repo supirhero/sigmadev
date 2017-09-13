@@ -847,7 +847,7 @@ $data["error_upload"] = $this->upload->display_errors();
         e.wbs_id,
         c.rp_id,
         c.user_id,
-        g.prof_name,
+        g.prof_name as user_role,
         f.user_name,
         c.project_id,
         d.project_name,
