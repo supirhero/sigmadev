@@ -201,8 +201,7 @@ class Project extends CI_Controller
 
                     if($priv['PRIVILEGE'] == 'can'){
                         //get project id
-                        switch ($priv['ACCESS_ID']){
-                            case '9':
+                        switch ($priv['ACCESS_ID']){                             case '9':
                                 $project_id_req = $_POST['PROJECT_ID'];
                                 break;
                             case '10':

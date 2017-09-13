@@ -847,6 +847,7 @@ $data["error_upload"] = $this->upload->display_errors();
         e.wbs_id,
         c.rp_id,
         c.user_id,
+        g.prof_name,
         f.user_name,
         c.project_id,
         d.project_name,
@@ -870,23 +871,15 @@ $data["error_upload"] = $this->upload->display_errors();
         longitude,
         latitude,
         submit_date,
-is_approved,
-      b.rebaseline as task_member_rebaseline,
-      e.rebaseline as task_rebaseline,
-a.rebaseline as timesheet_rebaseline
+is_approved
     FROM
-(select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'no' as rebaseline from timesheet union select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'yes' as rebaseline from temporary_timesheet where rh_id = '$rh_id') a
-        LEFT JOIN (select wp_id,rp_id,wbs_id,'no' as rebaseline from wbs_pool union select wp_id,rp_id,wbs_id,'yes' as rebaseline from temporary_wbs_pool where rh_id = '$rh_id') b ON a.wp_id = b.wp_id
+        timesheet a
+        LEFT JOIN wbs_pool b ON a.wp_id = b.wp_id
         LEFT JOIN resource_pool c ON b.rp_id = c.rp_id
         LEFT JOIN projects d ON c.project_id = d.project_id
-        LEFT JOIN (select wbs_id,wbs_name,'no' as rebaseline from wbs 
-        where wbs_id not in(
-        select wbs_id
-        from temporary_wbs where rh_id = '$rh_id'
-        and project_id = '$project_id'
-        )
-        union select wbs_id,wbs_name,'yes' as rebaseline from temporary_wbs where rh_id = '$rh_id') e ON b.wbs_id = e.wbs_id
+        LEFT JOIN wbs e ON b.wbs_id = e.wbs_id
         INNER JOIN users f ON c.user_id = f.user_id
+        INNER JOIN profile g on f.prof_id = g.prof_id
                                 )
                                 WHERE project_id = '".$project_id."'
                                 ORDER BY ts_date DESC")->result_array();
