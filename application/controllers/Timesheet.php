@@ -397,9 +397,9 @@ class Timesheet extends CI_Controller {
         }
 
         echo json_encode($data);
-        if(date("Hi") > 1301 && date("Hi") < 1499) {
-          $this->M_timesheet->sendApprovalRequestTimesheet();
-        }
+        // if(date("Hi") > 1301 && date("Hi") < 1499) {
+        //   $this->M_timesheet->sendApprovalRequestTimesheet();
+        // }
     }
 
     //get task from project
