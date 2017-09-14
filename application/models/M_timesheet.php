@@ -1546,10 +1546,10 @@ where wp_id = $data[WP_ID]";
     $sql = "select * from (
         select t.project_id, t.project_name, t.pm_id, t.pm_name, t.pm_email, count(*) jml
         from vtimesheet_pending t, mailer_temp m
-        where t.TS_ID=m.REFF_ID and mailer_status=0
+        where t.TS_ID=m.REFF_ID and m.mailer_status=0
         group by t.project_id, t.project_name, t.pm_id, t.pm_name, t.pm_email
         order by jml desc
-        ) where rownum <= 5";
+        ) where jml >= 3 and rownum <= 5";
     $rs = $this->db->query($sql);
     $result = $rs->result_array();
     return $result;
