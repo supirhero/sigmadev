@@ -1487,19 +1487,20 @@ where wp_id = $data[WP_ID]";
     $from_alias = "PRouDS Support";
 
     $notification_batch = $this->getTimesheetProjectPending();
+    $logo=base_url()."asset/image/logo_new_sigma1.png";
+        $css =base_url()."asset/css/confirm.css";
+
+    $this->email->initialize($config);
+    $this->email->from($from_email, $from_alias);
+    $this->email->subject($subject);
+    //$this->email->attach($logo);
+        //$this->email->attach($css);
+    //$cid_logo = $this->email->attachment_cid($logo);
 
     // One email
     foreach($notification_batch as $batch) {
-      $this->email->initialize($config);
-          $this->email->from($from_email, $from_alias);
-      $logo=base_url()."asset/image/logo_new_sigma1.png";
-          $css =base_url()."asset/css/confirm.css";
-      $this->email->attach($logo);
-          $this->email->attach($css);
-      $cid_logo = $this->email->attachment_cid($logo);
       $this->email->to($batch["PM_EMAIL"]);
       $this->email->bcc("yohanes.rianto@sigma.co.id");
-          $this->email->subject($subject);
 
       $ts_set = "";
       $sql = "select project_id, project_name, wbs_id, wbs_name,
@@ -1512,9 +1513,12 @@ where wp_id = $data[WP_ID]";
 
       // TO DO: eksekusi create content email
       $content = "";
-      $content .= "<p>Dear ".$batch["PM_NAME"].", </p><br><br>".
+      $content .= "<p>Dear ".$batch["PM_NAME"].", </p><br>".
         "<p>Your team members on project <b>".$batch["PROJECT_NAME"]."</b> just send their timesheet. <br>".
-        "Please send your <b>APPROVAL</b> or give your advice to them. See detail below.</p><br>";
+        "Please, send your <b>APPROVAL</b> or give your advice to them and see detail below.</p>
+        <p><table>
+        <tr style='background-color:#DFDFDF'><td><b>Team Member</b></td><td><b>Workplan</b></td>
+        <td><b>Working Date</b></td><td><b>Workhour</b></td><td><b>Activities</b></td></tr>";
 
 
       foreach($req as $r) {
@@ -1523,15 +1527,11 @@ where wp_id = $data[WP_ID]";
         $ts_set .= "'".$r["TS_ID"]."'";
 
         // Arrange content
-        $content .= "<p><table>
-          <tr style='background-color:#DFDFDF'><td><b>Team Member</b></td><td><b>Workplan</b></td>
-          <td><b>Working Date</b></td><td><b>Workhour</b></td><td><b>Activities</b></td></tr>
-          <tr><td>".$r["USER_NAME"]."</td><td>".$r["WBS_NAME"]."</td><td>".$r["TS_DATE"]."</td>
-          <td>".$r["HOUR_TOTAL"]."</td><td><b>".$r["SUBJECT"]."<b><br>".$r["MESSAGE"]."</td></tr>
-          </table></p>";
+        $content .= "<tr><td>".$r["USER_NAME"]."</td><td>".$r["WBS_NAME"]."</td><td>".$r["TS_DATE"]."</td>
+          <td>".$r["HOUR_TOTAL"]."</td><td><b>".$r["SUBJECT"]."</b><br>".$r["MESSAGE"]."</td></tr>";
       }
 
-      $content .= "<br><br><p>Warm Regards,<br>PROUDS Support</p>";
+      $content .= "</table></p> <br><br><p>Warm Regards,<br>PROUDS Support</p>";
 
       $this->email->message($content);
       $this->email->send();
@@ -1546,12 +1546,12 @@ where wp_id = $data[WP_ID]";
     $sql = "select * from (
         select t.project_id, t.project_name, t.pm_id, t.pm_name, t.pm_email, count(*) jml
         from vtimesheet_pending t, mailer_temp m
-        where t.TS_ID=m.REFF_ID
+        where t.TS_ID=m.REFF_ID and mailer_status=0
         group by t.project_id, t.project_name, t.pm_id, t.pm_name, t.pm_email
         order by jml desc
         ) where rownum <= 5";
     $rs = $this->db->query($sql);
     $result = $rs->result_array();
     return $result;
-    } 
+    }
 }
