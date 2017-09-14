@@ -86,7 +86,7 @@ is_approved
         LEFT JOIN wbs e ON b.wbs_id = e.wbs_id
         INNER JOIN users f ON c.user_id = f.user_id
         INNER JOIN profile g on f.prof_id = g.prof_id
-                                
+
 
 )  WHERE user_id='".$user_id."'
                                   and  to_char(ts_date,'Mon-YYYY')='$month-$year' ) TS
@@ -1470,5 +1470,76 @@ where wp_id = $data[WP_ID]";
     $rs = $this->db->query($sql);
     }
 
+    public function sendApprovalRequestTimesheet() {   // all project
+    $this->load->library('email');
+    $config['protocol']='smtp';
+        $config['smtp_host']='smtp.sigma.co.id';
+        $config['smtp_user']=SMTP_AUTH_USR;
+        $config['smtp_pass']=SMTP_AUTH_PWD;
+        $config['smtp_port']='587';
+        $config['smtp_timeout']='100';
+        $config['charset']    = 'utf-8';
+        $config['newline']    = "\r\n";
+        $config['mailtype'] = 'html';
+        $config['validation'] = TRUE;
+    $subject = "[PRouDS Notification] Timesheets Approval Request";
+    $from_email = "prouds.support@sigma.co.id";
+    $from_alias = "PRouDS Support";
 
+    $notification_batch = $this->getTimesheetProjectPending();
+
+    // One email
+    foreach($notification_batch as $batch) {
+      $this->email->initialize($config);
+          $this->email->from($from_email, $from_alias);
+      $logo=base_url()."asset/image/logo_new_sigma1.png";
+          $css =base_url()."asset/css/confirm.css";
+      $this->email->attach($logo);
+          $this->email->attach($css);
+      $cid_logo = $this->email->attachment_cid($logo);
+      $this->email->to($batch["PM_EMAIL"]);
+      $this->email->bcc("yohanes.rianto@sigma.co.id");
+          $this->email->subject($subject);
+
+      $ts_set = "";
+      $sql = "select project_id, project_name, wbs_id, wbs_name,
+        to_char(ts_date, 'Mon DD, YYYY') ts_date, to_char(ts_date, 'Day') ts_day,
+        ts_id, hour_total, subject, message, user_id, user_name
+        from vtimesheet_pending where pm_email is not null and project_id='".$batch["PROJECT_ID"]."'
+        order by project_id, user_id, ts_date";
+      $rs = $this->db->query($sql);
+      $req = $rs->result_array();
+
+      // TO DO: eksekusi create content email
+      $content = "";
+      $content .= "<p>Dear ".$batch["PM_NAME"].", </p><br><br>".
+        "<p>Your team members on project <b>".$batch["PROJECT_NAME"]."</b> just send their timesheet. <br>".
+        "Please send your <b>APPROVAL</b> or give your advice to them. See detail below.</p><br>";
+
+
+      foreach($req as $r) {
+        if($ts_set != "")
+          $ts_set .= ",";
+        $ts_set .= "'".$r["TS_ID"]."'";
+
+        // Arrange content
+        $content .= "<p><table>
+          <tr style='background-color:#DFDFDF'><td><b>Team Member</b></td><td><b>Workplan</b></td>
+          <td><b>Working Date</b></td><td><b>Workhour</b></td><td><b>Activities</b></td></tr>
+          <tr><td>".$r["USER_NAME"]."</td><td>".$r["WBS_NAME"]."</td><td>".$r["TS_DATE"]."</td>
+          <td>".$r["HOUR_TOTAL"]."</td><td><b>".$r["SUBJECT"]."<b><br>".$r["MESSAGE"]."</td></tr>
+          </table></p>";
+      }
+
+      $content .= "<br><br><p>Warm Regards,<br>PROUDS Support</p>";
+
+      $this->email->message($content);
+      $this->email->send();
+
+      $sqlu = "update mailer_temp set submit_date=sysdate, mailer_status=1, batch_id=seq_mailer_batch.nextval
+          where reff_id in (".$ts_set.")";
+      $rsu = $this->db->query($sqlu);
+    }
+
+  }
 }
