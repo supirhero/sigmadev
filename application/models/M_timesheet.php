@@ -1505,9 +1505,10 @@ where wp_id = $data[WP_ID]";
       $ts_set = "";
       $sql = "select project_id, project_name, wbs_id, wbs_name,
         to_char(ts_date, 'Mon DD, YYYY') ts_date, to_char(ts_date, 'Day') ts_day,
+        to_char(submit_date, 'DD-MM-YYYY HH24:MI:SS') submit_date,
         ts_id, hour_total, subject, message, user_id, user_name
         from vtimesheet_pending where pm_email is not null and project_id='".$batch["PROJECT_ID"]."'
-        order by project_id, user_id, ts_date";
+        order by project_id, ts_date desc, user_id";
       $rs = $this->db->query($sql);
       $req = $rs->result_array();
 
@@ -1515,11 +1516,12 @@ where wp_id = $data[WP_ID]";
       $content = "";
       $content .= "<p>Dear ".$batch["PM_NAME"].", </p><br>".
         "<p>Your team members on project <b>".$batch["PROJECT_NAME"]."</b> just send their timesheet. <br>".
-        "Please, send your <b>APPROVAL</b> or give your advice to them and see detail below.</p>
-        <p><table>
-        <tr style='background-color:#DFDFDF'><td><b>Team Member</b></td><td><b>Workplan</b></td>
-        <td><b>Working Date</b></td><td><b>Workhour</b></td><td><b>Activities</b></td></tr>";
-
+        "Please, send your <b>APPROVAL</b> or give your advice to them could see detail below.</p>
+        <p><table cellspacing=0 cellpadding=0 border=1>
+        <tr style='background-color:#DFDFDF'>
+        <td align='center' nowrap><b>Working Date</b></td><td align='center' nowrap><b>Team Member</b></td>
+        <td align='center' nowrap><b>Workplan</b></td><td align='center' nowrap><b>Workhour</b></td>
+        <td align='center' nowrap><b>Activities</b></td></tr>";
 
       foreach($req as $r) {
         if($ts_set != "")
@@ -1527,11 +1529,15 @@ where wp_id = $data[WP_ID]";
         $ts_set .= "'".$r["TS_ID"]."'";
 
         // Arrange content
-        $content .= "<tr><td>".$r["USER_NAME"]."</td><td>".$r["WBS_NAME"]."</td><td>".$r["TS_DATE"]."</td>
-          <td>".$r["HOUR_TOTAL"]."</td><td><b>".$r["SUBJECT"]."</b><br>".$r["MESSAGE"]."</td></tr>";
+        $content .= "<tr><td>".$r["TS_DATE"]."<br><font size=4>submitted on ".$r["SUBMIT_DATE"]."</font></td>
+          <td>".$r["USER_ID"]."<br>".$r["USER_NAME"]."</td>
+          <td>".$r["WBS_NAME"]."</td><td align='center'><b>".$r["HOUR_TOTAL"]."</b></td>
+          <td><b>".$r["SUBJECT"]."</b><br>".$r["MESSAGE"]."</td></tr>";
       }
 
-      $content .= "</table></p> <br><br><p>Warm Regards,<br>PROUDS Support</p>";
+      $content .= "</table></p> ";
+      $content .= "Visit http://prouds.telkomsigma.co.id for more detail. Thank you.";
+      $content .= "<br><br><p>Warm Regards,<br>PROUDS Support</p>";
 
       $this->email->message($content);
       $this->email->send();
