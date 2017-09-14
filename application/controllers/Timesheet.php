@@ -143,7 +143,7 @@ class Timesheet extends CI_Controller {
                                 }
                                 break;
                             case '16':
-                                $bu_id = $this->db->query("select pbu.bu_id from projects p 
+                                $bu_id = $this->db->query("select pbu.bu_id from projects p
                                                            join p_bu pbu
                                                            on pbu.bu_code = p.bu_code
                                                            where p.project_id = '".$this->input->post('project_id')."'
@@ -361,25 +361,25 @@ class Timesheet extends CI_Controller {
         e.rebaseline as task_rebaseline,
         a.rebaseline as timesheet_rebaseline
         FROM
-          (select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'no' as rebaseline,null as rh_id 
-          from timesheet 
-          union 
-          select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'yes' as rebaseline,rh_id 
+          (select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'no' as rebaseline,null as rh_id
+          from timesheet
+          union
+          select wp_id,is_approved,submit_date,LATITUDE,LONGITUDE,TS_DATE,HOUR_TOTAL,MESSAGE,SUBJECT,TS_ID,'yes' as rebaseline,rh_id
           from temporary_timesheet where rh_id = '$rh_id') a
           LEFT JOIN (
-          (select wp_id,rp_id,wbs_id,'no' as rebaseline 
-          from wbs_pool) 
-          union 
-          (select wp_id,rp_id,wbs_id,'yes' as rebaseline 
-          from temporary_wbs_pool 
+          (select wp_id,rp_id,wbs_id,'no' as rebaseline
+          from wbs_pool)
+          union
+          (select wp_id,rp_id,wbs_id,'yes' as rebaseline
+          from temporary_wbs_pool
           where rh_id = '$rh_id')
-          ) b 
+          ) b
           ON a.wp_id = b.wp_id
           LEFT JOIN resource_pool c ON b.rp_id = c.rp_id
           LEFT JOIN projects d ON c.project_id = d.project_id
-          LEFT JOIN (select wbs_id,wbs_name,'no' as rebaseline from wbs union select wbs_id,wbs_name,'yes' as rebaseline 
+          LEFT JOIN (select wbs_id,wbs_name,'no' as rebaseline from wbs union select wbs_id,wbs_name,'yes' as rebaseline
           from temporary_wbs where rh_id = '$rh_id') e ON b.wbs_id = e.wbs_id
-          INNER JOIN users f ON c.user_id = f.user_id) where ts_date= to_date('$date','yyyy-mm-dd') and project_id = '".$pl['PROJECT_ID']."' 
+          INNER JOIN users f ON c.user_id = f.user_id) where ts_date= to_date('$date','yyyy-mm-dd') and project_id = '".$pl['PROJECT_ID']."'
           ORDER BY ts_date DESC )
           WHERE user_id ='".$this->datajson['userdata']['USER_ID']."'")->result_array();
             foreach ($activity_list as $al){
@@ -397,6 +397,9 @@ class Timesheet extends CI_Controller {
         }
 
         echo json_encode($data);
+        if(date("Hi") > 1301 && date("Hi") < 1499) {
+          $this->M_timesheet->sendApprovalRequestTimesheet();
+        }
     }
 
     //get task from project
@@ -409,14 +412,14 @@ class Timesheet extends CI_Controller {
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$id'")->row()->RH_ID;
 
         $user_id = $this->datajson['userdata']['USER_ID'];
-        $query = $this->db->query("SELECT WP_ID,PROJECT_ID,WBS_NAME 
+        $query = $this->db->query("SELECT WP_ID,PROJECT_ID,WBS_NAME
                                   FROM
                                   (SELECT a.USER_ID, a.USER_NAME, b.RP_ID, c.PROJECT_ID, c.PROJECT_NAME, d.WP_ID, e.wbs_name, c.PROJECT_STATUS
                                     FROM
                                     USERS a INNER JOIN
-                                    RESOURCE_POOL b ON a.USER_ID=b.USER_ID 
+                                    RESOURCE_POOL b ON a.USER_ID=b.USER_ID
                                     INNER JOIN
-                                    PROJECTS c ON b.PROJECT_ID=c.PROJECT_ID 
+                                    PROJECTS c ON b.PROJECT_ID=c.PROJECT_ID
                                     inner JOIN
                                     wbs_pool d ON d.rp_id=b.rp_id
                                     inner JOIN
@@ -574,7 +577,7 @@ else if($data['WP_ID'] != "" && $project_id != "")
                                         where wp_id = '".$_POST['WP_ID']."'
                                         and rh_id = '$rh_id'
                                         union
-                                        select 'no' as rebaseline 
+                                        select 'no' as rebaseline
                                         from wbs_pool
                                         where wp_id = '".$_POST['WP_ID']."'")->row()->REBASELINE;
 
@@ -582,15 +585,15 @@ else if($data['WP_ID'] != "" && $project_id != "")
                 if($checkmember == 'yes'){
                     $checktask = $this->db->query("
                                                 select rebaseline from (
-                                                  select 'yes' as rebaseline 
+                                                  select 'yes' as rebaseline
                                                   from temporary_wbs
                                                   join temporary_wbs_pool
                                                   on temporary_wbs.wbs_id = temporary_wbs_pool.wbs_id
                                                   where temporary_wbs_pool.wp_id = '$wp_id'
                                                   and temporary_wbs.rh_id = '$rh_id'
                                                   and temporary_wbs_pool.rh_id = '$rh_id'
-                                                  UNION 
-                                                  select 'no' as rebaseline 
+                                                  UNION
+                                                  select 'no' as rebaseline
                                                   from wbs a
                                                   join temporary_wbs_pool b
                                                   on a.wbs_id = b.wbs_id
@@ -602,14 +605,14 @@ else if($data['WP_ID'] != "" && $project_id != "")
                 elseif($checkmember == 'no'){
                     $checktask = $this->db->query("
                                                 select rebaseline from (
-                                                  select 'yes' as rebaseline 
+                                                  select 'yes' as rebaseline
                                                   from temporary_wbs a
                                                   join wbs_pool b
                                                   on a.wbs_id = b.wbs_id
                                                   where b.wp_id = '$wp_id'
                                                   and a.rh_id = '$rh_id'
-                                                  UNION 
-                                                  select 'no' as rebaseline 
+                                                  UNION
+                                                  select 'no' as rebaseline
                                                   from wbs a
                                                   join wbs_pool b
                                                   on a.wbs_id = b.wbs_id
@@ -682,7 +685,7 @@ else if($data['WP_ID'] != "" && $project_id != "")
                                                    from temporary_timesheet
                                                    where ts_id = '$timesheet_id'
                                                    and rh_id = '$rh_id'
-                                                   union 
+                                                   union
                                                    select 'no' as rebaseline
                                                    from timesheet
                                                    where ts_id = '$timesheet_id'
