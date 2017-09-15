@@ -1108,13 +1108,11 @@ class Task extends CI_Controller
             $project_id = explode(".",$_POST['WBS_ID']);
             $project_id = $project_id[0];
 
-            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
-
-            $wp_id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool where rh_id = '$rh_id') where wbs_id = '$wbs'")->row()->NEW_ID;
+            $wp_id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_edit_wbs_pool) where wbs_id = '$wbs'")->row()->NEW_ID;
 
             //Assign primary key of wbs pool id to temporary with status delete ,so in the future
             //if rebaseline acc ,calucation will happen
-            $action = $this->db->query("insert into temporary_wbs_pool (RH_ID,WP_ID,RP_ID,WBS_ID,IS_VALID,ACTION ) values('$rh_id','$wp_id','$member','$wbs',1,'delete')");
+            $this->db->query("insert into temporary_edit_wbs_pool (WP_ID,RP_ID,WBS_ID,ACTION ) values('$wp_id','$member','$wbs','delete')");
             $data['status'] = 'success';
             $data['message'] = 'Task member berhasil di hapus temporary';
         }
