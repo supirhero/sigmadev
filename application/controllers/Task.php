@@ -614,14 +614,19 @@ class Task extends CI_Controller
             $status['message'] = 'Task berhasil di tambah';
         }
         else{
-            $this->output->set_status_header(400);
-            $status['status'] = 'failed';
-            $status['message'] = "Status Project anda $statusProject";
+            $data['WBS_NAME'] = $this->input->post("WBS_NAME");
+            $data['WBS_ID'] = $project_id;
+            $data['WBS_PARENT_ID'] = $this->input->post("WBS_PARENT_ID");
+            $data['START_DATE']   = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
+            $data['FINISH_DATE']  ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
+
+            $newid = $this->M_detail_project->insertWBSTemp($data,$project_id);
         }
         echo json_encode($status);
     }
 
     //EDIT TASK
+    //duplicate parent if parent edited
     function editTask_view($wbs_id)
     {
         $project_id = explode(".",$wbs_id);
@@ -708,7 +713,83 @@ class Task extends CI_Controller
             $status['status']= 'success';
             $status['message'] = 'Task berhasil di edit';
         }
+        //if in progress
         else{
+            $WBS_ID = $this->input->post('wbs_id');
+            $WBS_PARENT_ID = $this->input->post('wbs_parent_id');
+            $PROJECT_ID = $this->input->post('project_id');
+            $WBS_NAME = $this->input->post('wbs_name');
+            $START_DATE = $this->input->post('start_date');
+            $FINISH_DATE = $this->input->post('finish_date');
+
+            $check_wbs = $this->db->query("select count(*) as hasil from TEMPORARY_EDIT_WBS where wbs_id = '$WBS_ID'")->row()->HASIL;
+
+            //if temporary_edit_wbs have a data that associate with this wbs id
+            if($check_wbs){
+              $sql =   "UPDATE TEMPORARY_EDIT_WBS SET
+                  WBS_PARENT_ID='".$WBS_PARENT_ID."',
+                  PROJECT_ID='".$PROJECT_ID."',
+                  WBS_NAME='".$WBS_NAME."',
+                  "."START_DATE=to_date('".$START_DATE."','yyyy-mm-dd'),
+                  FINISH_DATE=to_date('".$FINISH_DATE."','yyyy-mm-dd')
+                  WHERE WBS_ID='".$WBS_ID."'
+                  ";
+                $dur=$this->db->query("select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
+       FROM TEMPORARY_EDIT_WBS a,
+            (SELECT     LEVEL - 1 AS delta
+                   FROM DUAL
+             CONNECT BY LEVEL - 1 <= (SELECT MAX (finish_date - start_date)
+                                        FROM wbs))
+      WHERE TRUNC (a.start_date + delta) <= TRUNC (a.finish_date)
+        AND TO_CHAR (TRUNC (start_date + delta),
+                     'DY',
+                     'NLS_DATE_LANGUAGE=AMERICAN'
+                    ) NOT IN ('SAT', 'SUN')
+        AND TRUNC (a.start_date + delta) NOT IN (SELECT dt
+                                                   FROM v_holiday_excl_weekend)
+   GROUP BY wbs_id
+   ORDER BY wbs_id) where wbs_id='$WBS_ID'")->row()->COUNT_DURATION;
+                ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+                $hour_total = $dur * 8 ;
+                $this->db->query("update temporary_edit_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='$WBS_ID'");
+              $q = $this->db->query($sql);
+            }
+            else{
+                $sql = [
+                    'WBS_ID'=> $WBS_ID,
+                    'WBS_PARENT_ID' => $WBS_PARENT_ID,
+                    'PROJECT_ID' => $PROJECT_ID,
+                    'WBS_NAME'=> $WBS_NAME,
+                    'START_DATE' => "to_date('$START_DATE')",
+                    'FINISH_DATE' => "to_date('$FINISH_DATE')",
+                    'ACTION' => 'EDIT'
+                ];
+                $this->db->insert('TEMPORARY_EDIT_WBS',$sql);
+
+                $dur=$this->db->query("select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
+       FROM TEMPORARY_EDIT_WBS a,
+            (SELECT     LEVEL - 1 AS delta
+                   FROM DUAL
+             CONNECT BY LEVEL - 1 <= (SELECT MAX (finish_date - start_date)
+                                        FROM wbs))
+      WHERE TRUNC (a.start_date + delta) <= TRUNC (a.finish_date)
+        AND TO_CHAR (TRUNC (start_date + delta),
+                     'DY',
+                     'NLS_DATE_LANGUAGE=AMERICAN'
+                    ) NOT IN ('SAT', 'SUN')
+        AND TRUNC (a.start_date + delta) NOT IN (SELECT dt
+                                                   FROM v_holiday_excl_weekend)
+   GROUP BY wbs_id
+   ORDER BY wbs_id) where wbs_id='$WBS_ID'")->row()->COUNT_DURATION;
+                ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+                $hour_total = $dur * 8 ;
+                $this->db->query("update temporary_edit_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='$WBS_ID'");
+
+            }
+
+
+
+            /*EDIT WBS NAME ONLY
             $name = $this->input->post('wbs_name');
             $wbs_id = $this->input->post('wbs_id');
             $this->db->query("update wbs set wbs_name = '$name' where wbs_id = '$wbs_id'");
@@ -720,7 +801,7 @@ class Task extends CI_Controller
                 $this->output->set_status_header(500);
                 $status['status']= 'failed';
                 $status['message'] = 'Task name not updated';
-            }
+            }*/
 
         }
         echo json_encode($status);
@@ -733,7 +814,7 @@ class Task extends CI_Controller
 
         $id = $_POST['wbs_id'];
         $wbs_id = $_POST['wbs_id'];
-        $project_id = $this->M_detail_project->getProjectTask($id);
+        $project_id = (explode(".",$id))[0];
         $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
         if($statusProject == 'on hold'){
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
@@ -748,10 +829,11 @@ class Task extends CI_Controller
             $returndata['status'] = "success";
             $returndata['message'] = "Task delete success";
         }
+        //if project status in progress
         else{
-            $this->output->set_status_header(400);
-            $returndata['status'] = "failed";
-            $returndata['message'] = "Project still on progress";
+            $this->db->query("insert into temporary_edit_wbs(wbs_id,project_id,action) values('$wbs_id','$project_id','delete')");
+            $returndata['status'] = "success";
+            $returndata['message'] = "task temporary deleted success";
         }
 
 

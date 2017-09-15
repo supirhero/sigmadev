@@ -929,6 +929,53 @@ Class M_detail_project extends CI_Model{
         return $data['WBS_ID'].".".$id;
     }
 
+    public function insertWBSEditTemp($data, $project_id){
+
+        $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from
+                                (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from wbs
+                                UNION
+                                SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from temporary_edit_wbs) where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
+        $sql = "INSERT INTO TEMPORARY_WBS
+            (
+              WBS_ID,
+              WBS_PARENT_ID,
+              PROJECT_ID,
+              WBS_NAME,
+              START_DATE,
+              FINISH_DATE,
+              ACTION)
+              VALUES
+              (
+                '".$data['WBS_ID'].".".$id."',
+                '".$data['WBS_PARENT_ID']."',
+                '".$data['WBS_ID']."',
+                '".$data['WBS_NAME']."',
+                ".$data['START_DATE'].",
+                ".$data['FINISH_DATE'].",
+                'create'
+                )";
+        $q = $this->db->query($sql);
+        $dur=$this->db->query("select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
+       FROM TEMPORARY_EDIT_WBS a,
+            (SELECT     LEVEL - 1 AS delta
+                   FROM DUAL
+             CONNECT BY LEVEL - 1 <= (SELECT MAX (finish_date - start_date)
+                                        FROM wbs))
+      WHERE TRUNC (a.start_date + delta) <= TRUNC (a.finish_date)
+        AND TO_CHAR (TRUNC (start_date + delta),
+                     'DY',
+                     'NLS_DATE_LANGUAGE=AMERICAN'
+                    ) NOT IN ('SAT', 'SUN')
+        AND TRUNC (a.start_date + delta) NOT IN (SELECT dt
+                                                   FROM v_holiday_excl_weekend)
+   GROUP BY wbs_id
+   ORDER BY wbs_id) where wbs_id='".$data['WBS_ID'].".$id'")->row()->COUNT_DURATION;
+        ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+        $hour_total = $dur * 8 ;
+        $this->db->query("update temporary_edit_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='".$data['WBS_ID'].".$id'");
+        return $data['WBS_ID'].".".$id;
+    }
+
     public function Edit_WBSTemp($WBS_ID,$WBS_PARENT_ID,$PROJECT_ID,$WBS_NAME,$START_DATE,$FINISH_DATE,$RH_ID){
         /*NOT USED QUERY BECAUSE WE USE TEMPORARY TABLE*/
         /*
