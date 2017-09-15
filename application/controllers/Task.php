@@ -391,7 +391,7 @@ class Task extends CI_Controller
             $workplan_wp = [];
             $rebaseline = $this->db->query("select wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
                     finish_date as end_date, duration,work,work_complete as work_total,
-                    work_percent_complete, 'yes' as rebaseline, action from temporary_action_wbs
+                    work_percent_complete, 'yes' as rebaseline, action from temporary_edit_wbs
                     where project_id = '$id_project'");
             $rebaseline_wp = [];
             $findIndex = [];
