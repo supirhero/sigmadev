@@ -1103,7 +1103,7 @@ class Task extends CI_Controller
             $data['status'] = 'success';
             $data['message'] = 'Task member berhasil di hapus';
         }
-        else{
+        elseif($statusProject == 'in progress' && $this->wp_modif){
             $this->output->set_status_header(400);
             $data['status'] = 'failed';
             $data['message'] = 'Project status masih on progress';
