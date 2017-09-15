@@ -4,19 +4,28 @@ class Task extends CI_Controller
 {
 
     private $datajson = [];
+    private $wp_modif = false;
     function __construct()
     {
         parent::__construct();
         $this->datajson['privilege'] = ['master_data_access'=>false,
             'manage_role_access'=>false,
-            'create_edit_delete_task_updatepercent'=>false,
-            'req_rebaseline'=>false,
-            'acc_deny_rebaseline'=> false,
-            'assign_project_member'=>false,
-            'project_report'=>true,
-            'project_activities'=>false,
-            'acc_deny_timesheet'=>false,
-            'report_overview'=>false];
+            'create_project'=>false,
+            'bu_access' => false,
+            'bu_invite_member'=>false,
+            'report_overview'=>false,
+            'report_bu_directorat'=>false,
+            'report_bu_teammember'=>true,
+            'report_find_project'=>false,
+            'edit_project'=>false,
+            'timesheet_approval'=>false,
+            'workplan_modification'=>false,
+            'project_member'=>false,
+            'upload_doc'=>false,
+            'upload_issue'=>false,
+            'approve_rebaseline'=>false,
+            'edit_task_percent'=>false
+        ];
         error_reporting(E_ALL & ~E_NOTICE);
 
         $this->load->model('M_detail_project');
@@ -293,6 +302,63 @@ class Task extends CI_Controller
         }
         /*===============================================================================*/
 
+        /*==============================================================================*/
+        /* FOR PRIVILEGE INTEGRATION */
+        $user_privilege = $this->db->query("select a.access_name,b.access_id,b.privilege
+                                            from access_list a join profile_access_list b
+                                            on a.access_id = b.access_id
+                                            where b.profile_id = '".$this->datajson['userdata']['PROF_ID']."' order by a.access_id asc ")->result_array();
+        if($user_privilege[0]['PRIVILEGE'] == 'all_bu'){
+            $this->datajson['privilege']['master_data_access']=true;
+            $this->datajson['privilege']['manage_role_access']=true;
+        }
+        if($user_privilege[1]['PRIVILEGE'] == 'all_bu' || $user_privilege[2]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['create_project']=true;
+        }
+        if($user_privilege[2]['PRIVILEGE'] == 'all_bu' || $user_privilege[2]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['bu_access']=true;
+        }
+        if($user_privilege[3]['PRIVILEGE'] == 'all_bu' || $user_privilege[3]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['bu_invite_member']=true;
+        }
+        if($user_privilege[4]['PRIVILEGE'] == 'all_bu' || $user_privilege[4]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['report_overview']=true;
+        }
+        if($user_privilege[5]['PRIVILEGE'] == 'all_bu' || $user_privilege[5]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['report_bu_directorat']=true;
+        }
+        if($user_privilege[6]['PRIVILEGE'] == 'all_bu' || $user_privilege[5]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['report_bu_teammember']=true;
+        }
+        if($user_privilege[7]['PRIVILEGE'] == 'all_bu' || $user_privilege[7]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['report_find_project']=true;
+        }
+        if($user_privilege[8]['PRIVILEGE'] == 'can'){
+            $this->datajson['privilege']['edit_project']=true;
+        }
+        if($user_privilege[9]['PRIVILEGE'] == 'can'){
+            $this->datajson['privilege']['timesheet_approval']=true;
+        }
+        if($user_privilege[10]['PRIVILEGE'] == 'can'){
+            $this->datajson['privilege']['workplan_modification']=true;
+            $this->wp_modif = true;
+        }
+        if($user_privilege[11]['PRIVILEGE'] == 'can'){
+            $this->datajson['privilege']['project_member']=true;
+        }
+        if($user_privilege[12]['PRIVILEGE'] == 'can'){
+            $this->datajson['privilege']['upload_doc']=true;
+        }
+        if($user_privilege[13]['PRIVILEGE'] == 'can'){
+            $this->datajson['privilege']['upload_issue']=true;
+        }
+        if($user_privilege[14]['PRIVILEGE'] == 'can'){
+            $this->datajson['privilege']['edit_task_percent']=true;
+        }
+        if($user_privilege[15]['PRIVILEGE'] == 'all_bu' || $user_privilege[15]['PRIVILEGE'] == 'only_bu'){
+            $this->datajson['privilege']['approve_rebaseline']=true;
+        }
+
     }
 
     /*START TASK MANAJEMENT*/
@@ -301,7 +367,7 @@ class Task extends CI_Controller
         $id_project = $this->uri->segment(3);
         $status_project = $this->db->query("select lower(project_status) as project_status from projects where project_id = '$id_project'")->row()->PROJECT_STATUS;
 
-        if($status_project == 'in progress'){
+        if($status_project == 'in progress' && $this->wp_modif){
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
             $workplan=$this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
                                           WBS_ID,WBS_PARENT_ID,PROJECT_ID,
@@ -613,7 +679,7 @@ class Task extends CI_Controller
             $status['status'] = 'success';
             $status['message'] = 'Task berhasil di tambah';
         }
-        else{
+        elseif($statusProject == 'in progress' && $this->wp_modif){
             $data['WBS_NAME'] = $this->input->post("WBS_NAME");
             $data['WBS_ID'] = $project_id;
             $data['WBS_PARENT_ID'] = $this->input->post("WBS_PARENT_ID");
@@ -621,6 +687,13 @@ class Task extends CI_Controller
             $data['FINISH_DATE']  ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
 
             $newid = $this->M_detail_project->insertWBSEditTemp($data,$project_id);
+            $status['status'] = 'success';
+            $status['message'] = 'Task berhasil di tambah temporary';
+        }
+        else{
+            $this->output->set_status_header(400);
+            $status['status'] = 'failed';
+            $status['message'] = 'Task gagal di tambah';
         }
         echo json_encode($status);
     }
@@ -633,7 +706,7 @@ class Task extends CI_Controller
         $rh_id = $this->db->query("select rh_id from project where project_id")->row()->RH_ID;
         $status_project= $this->db->query("select lower(project_status) as project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
 
-        if($status_project == 'in progress'){
+        if($status_project == 'in progress' && $this->wp_modif){
             $query = $this->db->query("select * from wbs where WBS_ID='".$wbs_id."'");
             $data['detail_task'] = $query->result_array();
             $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline from 
@@ -714,7 +787,7 @@ class Task extends CI_Controller
             $status['message'] = 'Task berhasil di edit';
         }
         //if in progress
-        else{
+        elseif($statusProject == 'in progress' && $this->wp_modif){
             $WBS_ID = $this->input->post('wbs_id');
             $WBS_PARENT_ID = $this->input->post('wbs_parent_id');
             $PROJECT_ID = $this->input->post('project_id');
@@ -830,7 +903,7 @@ class Task extends CI_Controller
             $returndata['message'] = "Task delete success";
         }
         //if project status in progress
-        else{
+        elseif($statusProject == 'in progress' && $this->wp_modif){
             $this->db->query("insert into temporary_edit_wbs(wbs_id,project_id,action) values('$wbs_id','$project_id','delete')");
             $returndata['status'] = "success";
             $returndata['message'] = "task temporary deleted success";
@@ -867,8 +940,7 @@ class Task extends CI_Controller
         $project=$this->input->post('PROJECT_ID');
         $status_project = $this->db->query("select lower(project_status) as project_status from projects where project_id = '$project'")->row()->PROJECT_STATUS;
 
-        if($status_project == 'in progress'){
-            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project'")->row()->RH_ID;
+        if($status_project == 'in progress' && $this->wp_modif){
             $wbs_id=$this->input->post('WBS_ID');
             $data['task_name'] = $this->db->query("SELECT * FROM (select wbs_id, wbs_name from wbs union select wbs_id, wbs_name from temporary_edit_wbs ) WHERE WBS_ID='".$wbs_id."'")->row()->WBS_NAME;
             $data['available_to_assign'] =  $this->db->query("
@@ -1077,11 +1149,33 @@ class Task extends CI_Controller
             $data['status'] = 'success';
             $data['message'] = 'member di tambah';
         }
-        else{
-            $this->output->set_status_header(400);
-            $data['status'] = 'failed';
-            $data['message'] = 'Project status masih on progress';
-        }
+        elseif($statusProject == 'in progress' && $this->wp_modif){
+            $wbs=$this->input->post('WBS_ID');
+            $member=$this->input->post('MEMBER');
+            $project_id = $this->M_detail_project->getRPProject($member);
+            $sql = "select * from TEMPORARY_EDIT_WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
+            $q = $this->db->query($sql);
+            if($q->num_rows() > 0){
+                $user = $q->row_array();
+            }
+            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
+
+            $wbs=$this->input->post('WBS_ID');
+            $member=$this->input->post('MEMBER');
+
+            $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+                                select WP_ID from WBS_POOL
+                                UNION
+                                select WP_ID from TEMPORARY_EDIT_WBS_POOL)")->row()->NEW_ID;
+            $this->db->set('RP_ID', $member);
+            $this->db->set('WP_ID', $id);
+            $this->db->set('WBS_ID', $wbs);
+            $this->db->set('ACTION', 'create');
+            $this->db->insert("TEMPORARY_EDIT_WBS_POOL");
+
+            $data['status'] = 'success';
+            $data['message'] = 'member di tambah temporary';
+            }
         //return
         echo json_encode($data);
 
