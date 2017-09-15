@@ -824,7 +824,7 @@ class Task extends CI_Controller
                 ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
                 $hour_total = $dur * 8 ;
                 $this->db->query("update temporary_edit_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='$WBS_ID'");
-              $q = $this->db->query($sql);
+                $this->db->query($sql);
             }
             else{
                 $sql = [
@@ -834,7 +834,7 @@ class Task extends CI_Controller
                     'WBS_NAME'=> $WBS_NAME,
                     'START_DATE' => "to_date('$START_DATE')",
                     'FINISH_DATE' => "to_date('$FINISH_DATE')",
-                    'ACTION' => 'EDIT'
+                    'ACTION' => 'update'
                 ];
                 $this->db->insert('TEMPORARY_EDIT_WBS',$sql);
 

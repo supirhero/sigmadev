@@ -811,11 +811,15 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     //rebaseline
     public function rebaseline() {
 
-        $array_data = json_decode($_POST['array'],true);
+
 
         //setting variable
         $user_id = $this->datajson['userdata']['USER_ID'];
         $project=$this->input->post("project_id");
+
+        $array_data['new_task'] = $this->db->query("select * from temporary_edit_wbs where project_id = '$project' and action = 'create'")->result_array();
+        $array_data['new_task'] = $this->db->query("select * from temporary_edit_wbs where project_id = '$project' and action = 'create'");
+
         $rh_id = null;
 
         //setting for upload libary
