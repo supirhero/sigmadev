@@ -1116,6 +1116,11 @@ class Task extends CI_Controller
             $data['status'] = 'success';
             $data['message'] = 'Task member berhasil di hapus temporary';
         }
+        else{
+            $this->output->set_status_header(400);
+            $data['status'] = 'failed';
+            $data['message'] = 'gagal remove task member';
+        }
         echo json_encode($data);
     }
 
