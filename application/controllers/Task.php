@@ -614,14 +614,19 @@ class Task extends CI_Controller
             $status['message'] = 'Task berhasil di tambah';
         }
         else{
-            $this->output->set_status_header(400);
-            $status['status'] = 'failed';
-            $status['message'] = "Status Project anda $statusProject";
+            $data['WBS_NAME'] = $this->input->post("WBS_NAME");
+            $data['WBS_ID'] = $project_id;
+            $data['WBS_PARENT_ID'] = $this->input->post("WBS_PARENT_ID");
+            $data['START_DATE']   = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
+            $data['FINISH_DATE']  ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
+
+            $newid = $this->M_detail_project->insertWBSEditTemp($data,$project_id);
         }
         echo json_encode($status);
     }
 
     //EDIT TASK
+    //duplicate parent if parent edited
     function editTask_view($wbs_id)
     {
         $project_id = explode(".",$wbs_id);
@@ -708,7 +713,83 @@ class Task extends CI_Controller
             $status['status']= 'success';
             $status['message'] = 'Task berhasil di edit';
         }
+        //if in progress
         else{
+            $WBS_ID = $this->input->post('wbs_id');
+            $WBS_PARENT_ID = $this->input->post('wbs_parent_id');
+            $PROJECT_ID = $this->input->post('project_id');
+            $WBS_NAME = $this->input->post('wbs_name');
+            $START_DATE = $this->input->post('start_date');
+            $FINISH_DATE = $this->input->post('finish_date');
+
+            $check_wbs = $this->db->query("select count(*) as hasil from TEMPORARY_EDIT_WBS where wbs_id = '$WBS_ID'")->row()->HASIL;
+
+            //if temporary_edit_wbs have a data that associate with this wbs id
+            if($check_wbs){
+              $sql =   "UPDATE TEMPORARY_EDIT_WBS SET
+                  WBS_PARENT_ID='".$WBS_PARENT_ID."',
+                  PROJECT_ID='".$PROJECT_ID."',
+                  WBS_NAME='".$WBS_NAME."',
+                  "."START_DATE=to_date('".$START_DATE."','yyyy-mm-dd'),
+                  FINISH_DATE=to_date('".$FINISH_DATE."','yyyy-mm-dd')
+                  WHERE WBS_ID='".$WBS_ID."'
+                  ";
+                $dur=$this->db->query("select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
+       FROM TEMPORARY_EDIT_WBS a,
+            (SELECT     LEVEL - 1 AS delta
+                   FROM DUAL
+             CONNECT BY LEVEL - 1 <= (SELECT MAX (finish_date - start_date)
+                                        FROM wbs))
+      WHERE TRUNC (a.start_date + delta) <= TRUNC (a.finish_date)
+        AND TO_CHAR (TRUNC (start_date + delta),
+                     'DY',
+                     'NLS_DATE_LANGUAGE=AMERICAN'
+                    ) NOT IN ('SAT', 'SUN')
+        AND TRUNC (a.start_date + delta) NOT IN (SELECT dt
+                                                   FROM v_holiday_excl_weekend)
+   GROUP BY wbs_id
+   ORDER BY wbs_id) where wbs_id='$WBS_ID'")->row()->COUNT_DURATION;
+                ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+                $hour_total = $dur * 8 ;
+                $this->db->query("update temporary_edit_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='$WBS_ID'");
+              $q = $this->db->query($sql);
+            }
+            else{
+                $sql = [
+                    'WBS_ID'=> $WBS_ID,
+                    'WBS_PARENT_ID' => $WBS_PARENT_ID,
+                    'PROJECT_ID' => $PROJECT_ID,
+                    'WBS_NAME'=> $WBS_NAME,
+                    'START_DATE' => "to_date('$START_DATE')",
+                    'FINISH_DATE' => "to_date('$FINISH_DATE')",
+                    'ACTION' => 'EDIT'
+                ];
+                $this->db->insert('TEMPORARY_EDIT_WBS',$sql);
+
+                $dur=$this->db->query("select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
+       FROM TEMPORARY_EDIT_WBS a,
+            (SELECT     LEVEL - 1 AS delta
+                   FROM DUAL
+             CONNECT BY LEVEL - 1 <= (SELECT MAX (finish_date - start_date)
+                                        FROM wbs))
+      WHERE TRUNC (a.start_date + delta) <= TRUNC (a.finish_date)
+        AND TO_CHAR (TRUNC (start_date + delta),
+                     'DY',
+                     'NLS_DATE_LANGUAGE=AMERICAN'
+                    ) NOT IN ('SAT', 'SUN')
+        AND TRUNC (a.start_date + delta) NOT IN (SELECT dt
+                                                   FROM v_holiday_excl_weekend)
+   GROUP BY wbs_id
+   ORDER BY wbs_id) where wbs_id='$WBS_ID'")->row()->COUNT_DURATION;
+                ($dur == 0 || $dur == null ?$dur = 1 : $dur = $dur );
+                $hour_total = $dur * 8 ;
+                $this->db->query("update temporary_edit_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='$WBS_ID'");
+
+            }
+
+
+
+            /*EDIT WBS NAME ONLY
             $name = $this->input->post('wbs_name');
             $wbs_id = $this->input->post('wbs_id');
             $this->db->query("update wbs set wbs_name = '$name' where wbs_id = '$wbs_id'");
@@ -720,7 +801,7 @@ class Task extends CI_Controller
                 $this->output->set_status_header(500);
                 $status['status']= 'failed';
                 $status['message'] = 'Task name not updated';
-            }
+            }*/
 
         }
         echo json_encode($status);
@@ -733,7 +814,7 @@ class Task extends CI_Controller
 
         $id = $_POST['wbs_id'];
         $wbs_id = $_POST['wbs_id'];
-        $project_id = $this->M_detail_project->getProjectTask($id);
+        $project_id = (explode(".",$id))[0];
         $statusProject = strtolower($this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS);
         if($statusProject == 'on hold'){
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
@@ -748,10 +829,11 @@ class Task extends CI_Controller
             $returndata['status'] = "success";
             $returndata['message'] = "Task delete success";
         }
+        //if project status in progress
         else{
-            $this->output->set_status_header(400);
-            $returndata['status'] = "failed";
-            $returndata['message'] = "Project still on progress";
+            $this->db->query("insert into temporary_edit_wbs(wbs_id,project_id,action) values('$wbs_id','$project_id','delete')");
+            $returndata['status'] = "success";
+            $returndata['message'] = "task temporary deleted success";
         }
 
 
@@ -783,26 +865,118 @@ class Task extends CI_Controller
     //View Edit task member project
     public function assignTaskMember_view(){
         $project=$this->input->post('PROJECT_ID');
-        $rh_id = $this->db->query("select rh_id from projects where project_id = '$project'")->row()->RH_ID;
-        $wbs_id=$this->input->post('WBS_ID');
-        $data['task_name'] = $this->M_detail_project->getWBSselected($wbs_id)->WBS_NAME;
-        $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id,$rh_id);
+        $status_project = $this->db->query("select lower(project_status) as project_status from projects where project_id = '$project'")->row()->PROJECT_STATUS;
 
-        $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id,$rh_id);
-        if(count($data['currently_assigned'])){
-            foreach ($data['currently_assigned'] as &$curass){
-                $curass['status']= 'none';
+        if($status_project == 'in progress'){
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project'")->row()->RH_ID;
+            $wbs_id=$this->input->post('WBS_ID');
+            $data['task_name'] = $this->db->query("SELECT * FROM (select wbs_id, wbs_name from wbs union select wbs_id, wbs_name from temporary_edit_wbs ) WHERE WBS_ID='".$wbs_id."'")->row()->WBS_NAME;
+            $data['available_to_assign'] =  $this->db->query("
+                                                            SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
+                                                            join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+                                                            join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+                                                            WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id not in(
+                                                              select user_id
+                                                              from wbs_pool
+                                                              inner join resource_pool
+                                                              on wbs_pool.rp_id=resource_pool.rp_id
+                                                              where wbs_id='$wbs_id'
+                                                              UNION
+                                                              select user_id
+                                                              from temporary_edit_wbs_pool
+                                                              inner join resource_pool
+                                                              on temporary_edit_wbs_pool.rp_id=resource_pool.rp_id
+                                                              where wbs_id='$wbs_id')
+                                                            group by RESOURCE_POOL.RP_ID, users.user_name,users.email
+                                                            ")->result_array();
+
+            $data['currently_assigned']=$this->db->query("SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'no' as rebaseline FROM RESOURCE_POOL
+                                                          join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+                                                          join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+                                                          WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
+                                                          (select user_id from (select user_id,rp_id,wbs_id from wbs_pool union select user_id,rp_id,wbs_id from temporary_edit_wbs_pool) as wbs_pool inner join resource_pool on wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
+                                                          and rp_id not in 
+                                                          (
+                                                              SELECT RESOURCE_POOL.RP_ID FROM RESOURCE_POOL
+                                                              join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+                                                              join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+                                                              WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
+                                                              (select user_id from temporary_edit_wbs_pool inner join resource_pool on temporary_edit_wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
+                                                              group by RESOURCE_POOL.RP_ID, users.user_name,users.email
+                                                          )
+                                                          group by RESOURCE_POOL.RP_ID, users.user_name,users.email
+                                                          UNION
+                                                          SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline FROM RESOURCE_POOL
+                                                          join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+                                                          join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+                                                          WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
+                                                          (select user_id from temporary_edit_wbs_pool inner join resource_pool on temporary_edit_wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
+                                                          group by RESOURCE_POOL.RP_ID, users.user_name,users.email")->result_array();
+            if(count($data['currently_assigned'])){
+                foreach ($data['currently_assigned'] as &$curass){
+                    $curass['status']= 'none';
+                }
             }
-        }
 
 
-        if(count($data['available_to_assign'])){
-            foreach ($data['available_to_assign'] as &$curass){
-                $curass['status']= 'none';
+            if(count($data['available_to_assign'])){
+                foreach ($data['available_to_assign'] as &$curass){
+                    $curass['status']= 'none';
+                }
             }
-        }
 
-        $data['rebaseline'] = $this->db->query("
+            $data['rebaseline'] = $this->db->query("
+            SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline,action FROM RESOURCE_POOL
+            join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
+            join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
+            join TEMPORARY_EDIT_WBS_POOL on TEMPORARY_EDIT_WBS_POOL.RP_ID = RESOURCE_POOL.RP_ID
+            WHERE PROJECT_ID='$project'
+            group by RESOURCE_POOL.RP_ID, users.user_name,users.email,action")->result_array();
+
+            $curass_id =[];
+            foreach ($data['currently_assigned'] as $dd){
+                $curass_id[] = $dd['RP_ID'];
+            }
+
+            $reb_id = [];
+            foreach ($data['rebaseline'] as $dd){
+                $reb_id[] = $dd['RP_ID'];
+            }
+
+            $find_index = [];
+            foreach ($reb_id as $ddd){
+                $find_index[] = array_search($ddd,$curass_id);
+            }
+
+            $index_rebaseline = 0;
+            foreach ($find_index as $add){
+                $data['currently_assigned'][$add]['status']= $data['rebaseline'][$index_rebaseline]['ACTION'];
+                $index_rebaseline++;
+            }
+
+            echo json_encode($data);
+        }
+        else{
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$project'")->row()->RH_ID;
+            $wbs_id=$this->input->post('WBS_ID');
+            $data['task_name'] = $data['task_name'] = $this->db->query("SELECT * FROM (select wbs_id, wbs_name from wbs union select wbs_id, wbs_name from temporary_wbs where rh_id = '$rh_id') WHERE WBS_ID='".$wbs_id."'")->row()->WBS_NAME;
+            $data['available_to_assign'] = $this->M_detail_project->getWBSAvailableUser($project,$wbs_id,$rh_id);
+
+            $data['currently_assigned']=$this->M_detail_project->getWBSselectedUser($project,$wbs_id,$rh_id);
+            if(count($data['currently_assigned'])){
+                foreach ($data['currently_assigned'] as &$curass){
+                    $curass['status']= 'none';
+                }
+            }
+
+
+            if(count($data['available_to_assign'])){
+                foreach ($data['available_to_assign'] as &$curass){
+                    $curass['status']= 'none';
+                }
+            }
+
+            $data['rebaseline'] = $this->db->query("
             SELECT RESOURCE_POOL.RP_ID, users.user_name,users.email,'yes' as rebaseline,action FROM RESOURCE_POOL
             join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
             join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
@@ -810,28 +984,29 @@ class Task extends CI_Controller
             WHERE PROJECT_ID='$project' and TEMPORARY_WBS_POOL.RH_ID = '$rh_id'
             group by RESOURCE_POOL.RP_ID, users.user_name,users.email,action")->result_array();
 
-        $curass_id =[];
-        foreach ($data['currently_assigned'] as $dd){
-            $curass_id[] = $dd['RP_ID'];
-        }
+            $curass_id =[];
+            foreach ($data['currently_assigned'] as $dd){
+                $curass_id[] = $dd['RP_ID'];
+            }
 
-        $reb_id = [];
-        foreach ($data['rebaseline'] as $dd){
-            $reb_id[] = $dd['RP_ID'];
-        }
+            $reb_id = [];
+            foreach ($data['rebaseline'] as $dd){
+                $reb_id[] = $dd['RP_ID'];
+            }
 
-        $find_index = [];
-        foreach ($reb_id as $ddd){
-            $find_index[] = array_search($ddd,$curass_id);
-        }
+            $find_index = [];
+            foreach ($reb_id as $ddd){
+                $find_index[] = array_search($ddd,$curass_id);
+            }
 
-        $index_rebaseline = 0;
-        foreach ($find_index as $add){
-            $data['currently_assigned'][$add]['status']= $data['rebaseline'][$index_rebaseline]['ACTION'];
-            $index_rebaseline++;
-        }
+            $index_rebaseline = 0;
+            foreach ($find_index as $add){
+                $data['currently_assigned'][$add]['status']= $data['rebaseline'][$index_rebaseline]['ACTION'];
+                $index_rebaseline++;
+            }
 
-        echo json_encode($data);
+            echo json_encode($data);
+        }
     }
 
     //Remove task from task member
