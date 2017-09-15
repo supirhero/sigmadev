@@ -818,7 +818,26 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         $project=$this->input->post("project_id");
 
         $array_data['new_task'] = $this->db->query("select * from temporary_edit_wbs where project_id = '$project' and action = 'create'")->result_array();
-        $array_data['new_task'] = $this->db->query("select * from temporary_edit_wbs where project_id = '$project' and action = 'create'");
+        $array_data['modified_task'] = $this->db->query("select * from temporary_edit_wbs where project_id = '$project' and action = 'update'")->result_array();
+        $array_data['delete_task'] = $this->db->query("select * from temporary_edit_wbs where project_id = '$project' and action = 'delete'")->result_array();
+        $array_data['assign_task'] = $this->db->query("select * from temporary_edit_wbs_pool tewp inner join (
+                                                      select wbs_id,project_id from wbs 
+                                                      union 
+                                                      select wbs_id,project_id from temporary_edit_wbs
+                                                      ) wbs
+                                                      on tewp.wbs_id = wbs.wbs_id
+                                                      where project_id = '$project' and action = 'create'")->result_array();
+        $array_data['unassign_task'] = $this->db->query("select * from temporary_edit_wbs_pool tewp inner join (
+                                                      select wbs_id,project_id from wbs 
+                                                      union 
+                                                      select wbs_id,project_id from temporary_edit_wbs
+                                                      ) wbs
+                                                      on tewp.wbs_id = wbs.wbs_id
+                                                      where project_id = '$project' and action = 'delete'")->result_array();
+
+        //detele data from temporary edit table
+        $this->db->query("delete from temporary_edit_wbs_pool where wbs_id in(select wbs_id from temporary_edit_wbs where project_id = '$project')");
+        $this->db->query("delete from temporary_edit_wbs where project_id = '$project'");
 
         $rh_id = null;
 
