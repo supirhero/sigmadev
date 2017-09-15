@@ -874,21 +874,6 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         /*===========================================================*/
         //batch modification task
         /*===========================================================*/
-        //add modified task to temporary table
-        if(count($array_data['modified_task']) != 0){
-            foreach ($array_data['modified_task'] as $modtask){
-                $this->M_detail_project->Edit_WBSTemp(
-                    $modtask["wbs_id"],
-                    $modtask["wbs_parent_id"],
-                    $modtask["project_id"],
-                    $modtask["wbs_name"],
-                    $modtask['start_date'],
-                    $modtask['finish_date'],
-                    $rh_id
-                );
-            }
-            $datareturn['status_edit_task'] = "success";
-        }
         //add new task to temporary table
         if(count($array_data['new_task']) != 0){
             foreach ($array_data['new_task'] as $newtask){
@@ -908,6 +893,21 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             }
             $datareturn['status_add_new_task'] = "success";
         }
+        //add modified task to temporary table
+        if(count($array_data['modified_task']) != 0){
+            foreach ($array_data['modified_task'] as $modtask){
+                $this->M_detail_project->Edit_WBSTemp(
+                    $modtask["wbs_id"],
+                    $modtask["wbs_parent_id"],
+                    $modtask["project_id"],
+                    $modtask["wbs_name"],
+                    $modtask['start_date'],
+                    $modtask['finish_date'],
+                    $rh_id
+                );
+            }
+            $datareturn['status_edit_task'] = "success";
+        }
         //add delete task to temporary table
         if(count($array_data['delete_task']) != 0){
             foreach ($array_data['delete_task'] as $deletetask){
@@ -923,8 +923,78 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
             }
             $datareturn['status_add_new_task'] = "success";
         }
+        //assign task member to temporary table
+        if(count($array_data['assign_task']) != 0){
+            foreach($array_data['assign_task'] as $assign){
+                //if local wbs id detected
+                if($assign['TEMPORARY_WBS_ID']){
+                    $wbs_id = $this->db->query("select wbs_id from temporary_wbs where temporary_wbs_id = '".$assign['TEMPORARY_WBS_ID']."' and rh_id = '$rh_id'")->row()->WBS_ID;
+                    $member=$this->input->post('MEMBER');
 
+                    $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+                                select WP_ID from WBS_POOL
+                                UNION
+                                select WP_ID from TEMPORARY_WBS_POOL)")->row()->NEW_ID;
+                    $this->db->set('RP_ID', $assign['MEMBER']);
+                    $this->db->set('WP_ID', $id);
+                    $this->db->set('WBS_ID', $wbs_id);
+                    $this->db->set('IS_VALID', 1);
+                    $this->db->set('ACTION', 'create');
+                    $this->db->set('RH_ID',$rh_id);
+                    $this->db->insert("TEMPORARY_WBS_POOL");
+                }
+                else{
+                    $wbs=$this->input->post('WBS_ID');
+                    $member=$this->input->post('MEMBER');
 
+                    $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+                                select WP_ID from WBS_POOL
+                                UNION
+                                select WP_ID from TEMPORARY_WBS_POOL)")->row()->NEW_ID;
+                    $this->db->set('RP_ID', $member);
+                    $this->db->set('WP_ID', $id);
+                    $this->db->set('WBS_ID', $wbs);
+                    $this->db->set('IS_VALID', 1);
+                    $this->db->set('ACTION', 'create');
+                    $this->db->set('RH_ID',$rh_id);
+                    $this->db->insert("TEMPORARY_WBS_POOL");
+                }
+            }
+        }
+        //register delete member task to temporary table
+        if(count($array_data['unassign_task']) != 0){
+            foreach ($array_data['unassign_task'] as $unassign){
+                if($unassign['TEMPORARY_WBS_ID']){
+                    $wbs = $this->db->query("select wbs_id from temporary_wbs where temporary_wbs_id = '".$unassign['TEMPORARY_WBS_ID']."' and rh_id = '$rh_id'")->row()->WBS_ID;
+                    $member=$unassign['RP_ID'];
+                    $project_id = explode(".",$wbs);
+                    $project_id = $project_id[0];
+
+                    $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+
+                    $wp_id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool where rh_id = '$rh_id') where wbs_id = '$wbs'")->row()->NEW_ID;
+
+                    //Assign primary key of wbs pool id to temporary with status delete ,so in the future
+                    //if rebaseline acc ,calucation will happen
+                    $action = $this->db->query("insert into temporary_wbs_pool (RH_ID,WP_ID,RP_ID,WBS_ID,IS_VALID,ACTION ) values('$rh_id','$wp_id','$member','$wbs',1,'delete')");
+                }
+                else{
+                    $wbs=$unassign['WBS_ID'];
+                    $member=$unassign['RP_ID'];
+                    $project_id = explode(".",$wbs);
+                    $project_id = $project_id[0];
+
+                    $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
+
+                    $wp_id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (select wp_id,wbs_id from wbs_pool union select wp_id,wbs_id from temporary_wbs_pool where rh_id = '$rh_id') where wbs_id = '$wbs'")->row()->NEW_ID;
+
+                    //Assign primary key of wbs pool id to temporary with status delete ,so in the future
+                    //if rebaseline acc ,calucation will happen
+                    $action = $this->db->query("insert into temporary_wbs_pool (RH_ID,WP_ID,RP_ID,WBS_ID,IS_VALID,ACTION ) values('$rh_id','$wp_id','$member','$wbs',1,'delete')");
+                }
+
+            }
+        }
         /*===========================================================*/
 
         echo json_encode($datareturn);
