@@ -382,9 +382,8 @@ class Task extends CI_Controller
                                             select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
                                                   WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
                                                   DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'yes' as rebaseline
-                                             from temporary_actions_wbs
+                                             from temporary_edit_wbs
                                               where action = 'create'
-                                              and rh_id = '$rh_id'
                                           ) connect by  wbs_parent_id = prior wbs_id
                                           start with wbs_id='$id_project.0'
                                           order siblings by regexp_substr(orde, '^\D*') nulls first,
