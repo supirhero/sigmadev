@@ -299,82 +299,184 @@ class Task extends CI_Controller
     //Task View
     function workplan_view(){
         $id_project = $this->uri->segment(3);
-        $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
-        $workplan=$this->M_detail_project->selectWBS($id_project,$rh_id);
-        $workplan_wp = [];
-        $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
-        $rebaseline_wp = [];
-        $findIndex = [];
+        $status_project = $this->db->query("select lower(project_status) as project_status from projects where project_id = '$id_project'")->row()->PROJECT_STATUS;
 
-        //store task id in workplan
-        foreach($workplan as &$wp){
-            $workplan_wp[] = $wp['WBS_ID'];
-            $wp['status']='none';
-            $wp['index_rebaseline'] = 'none';
-        }
+        if($status_project == 'in progress'){
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
+            $workplan=$this->db->query("select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as orde,
+                                          WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                          WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                          DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,rebaseline,
+                                          connect_by_isleaf as LEAF,LEVEL from (
+                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                                  DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'no' as rebaseline
+                                            from wbs
+                                            union
+                                            select WBS_ID,WBS_PARENT_ID,PROJECT_ID,
+                                                  WBS_NAME,WBS_DESC,PRIORITY,CALCULATION_TYPE,START_DATE,FINISH_DATE,
+                                                  DURATION,WORK,WORK_COMPLETE,WORK_PERCENT_COMPLETE,PROGRESS_WBS,RESOURCE_WBS,'yes' as rebaseline
+                                             from temporary_actions_wbs
+                                              where action = 'create'
+                                              and rh_id = '$rh_id'
+                                          ) connect by  wbs_parent_id = prior wbs_id
+                                          start with wbs_id='$id_project.0'
+                                          order siblings by regexp_substr(orde, '^\D*') nulls first,
+                                          to_number(regexp_substr(orde, '\d+'))");
+            $workplan_wp = [];
+            $rebaseline = $this->db->query("select wbs_id,wbs_parent_id,project_id,wbs_name,start_date,
+                    finish_date as end_date, duration,work,work_complete as work_total,
+                    work_percent_complete, 'yes' as rebaseline, action from temporary_action_wbs
+                    where project_id = '$id_project'");
+            $rebaseline_wp = [];
+            $findIndex = [];
 
-        //store task id inside rebaseline
-        foreach ($rebaseline as $rwp){
-            $rebaseline_wp[] = $rwp['WBS_ID'];
-        }
-
-        //find index task that need rebaseline
-        foreach ($rebaseline_wp as $r){
-            $findIndex[] = array_search($r,$workplan_wp);
-        }
-
-        $index_rebaseline = 0;
-        foreach ($findIndex as $index){
-
-            $workplan[$index]['status'] =  $rebaseline[$index_rebaseline]['ACTION'];
-            $workplan[$index]['index_rebaseline'] =  $index_rebaseline;
-
-            $index_rebaseline ++;
-        }
-
-        foreach ($workplan as &$wp){
-            if($wp['WORK_PERCENT_COMPLETE'] == null){
-                $wp['WORK_PERCENT_COMPLETE'] = 0;
+            //store task id in workplan
+            foreach($workplan as &$wp){
+                $workplan_wp[] = $wp['WBS_ID'];
+                $wp['status']='none';
+                $wp['index_rebaseline'] = 'none';
             }
-            if($wp['WORK'] == null){
-                $wp['WORK'] = 0;
+
+            //store task id inside rebaseline
+            foreach ($rebaseline as $rwp){
+                $rebaseline_wp[] = $rwp['WBS_ID'];
             }
-        }
 
-        //$created_array = $this->buildTree($workplan);
+            //find index task that need rebaseline
+            foreach ($rebaseline_wp as $r){
+                $findIndex[] = array_search($r,$workplan_wp);
+            }
 
-        //built tree
-        foreach($workplan as $row) {
-            $row['children'] = array();
-            $vn = "row" . $row['WBS_ID'];
-            ${$vn} = $row;
-            if(!is_null($row['WBS_PARENT_ID'])) {
-                $vp = "parent" . $row['WBS_PARENT_ID'];
-                if(isset($data[$row['WBS_PARENT_ID']])) {
-                    ${$vp} = $data[$row['WBS_PARENT_ID']];
+            $index_rebaseline = 0;
+            foreach ($findIndex as $index){
+
+                $workplan[$index]['status'] =  $rebaseline[$index_rebaseline]['ACTION'];
+                $workplan[$index]['index_rebaseline'] =  $index_rebaseline;
+
+                $index_rebaseline ++;
+            }
+
+            foreach ($workplan as &$wp){
+                if($wp['WORK_PERCENT_COMPLETE'] == null){
+                    $wp['WORK_PERCENT_COMPLETE'] = 0;
                 }
-                else {
-                    ${$vp} = array('n_id' => $row['WBS_PARENT_ID'], 'WBS_PARENT_ID' => null, 'WBS_PARENT_ID' => array());
-                    $data[$row['WBS_PARENT_ID']] = &${$vp};
+                if($wp['WORK'] == null){
+                    $wp['WORK'] = 0;
                 }
-                ${$vp}['children'][] = &${$vn};
-                $data[$row['WBS_PARENT_ID']] = ${$vp};
             }
-            $data[$row['WBS_ID']] = &${$vn};
+
+            //$created_array = $this->buildTree($workplan);
+
+            //built tree
+            foreach($workplan as $row) {
+                $row['children'] = array();
+                $vn = "row" . $row['WBS_ID'];
+                ${$vn} = $row;
+                if(!is_null($row['WBS_PARENT_ID'])) {
+                    $vp = "parent" . $row['WBS_PARENT_ID'];
+                    if(isset($data[$row['WBS_PARENT_ID']])) {
+                        ${$vp} = $data[$row['WBS_PARENT_ID']];
+                    }
+                    else {
+                        ${$vp} = array('n_id' => $row['WBS_PARENT_ID'], 'WBS_PARENT_ID' => null, 'WBS_PARENT_ID' => array());
+                        $data[$row['WBS_PARENT_ID']] = &${$vp};
+                    }
+                    ${$vp}['children'][] = &${$vn};
+                    $data[$row['WBS_PARENT_ID']] = ${$vp};
+                }
+                $data[$row['WBS_ID']] = &${$vn};
+            }
+
+
+            //for null data tolerance
+            if($data == null){
+                $data = [];
+            }
+            $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
+            $result['workplan'] = $result[$id_project.'.0'];
+            $result['rebaseline_task'] = $rebaseline;
+            unset($result[$id_project.'.0']);
+            $result['project_status'] = $this->db->query("select project_status from projects where project_id = '$id_project'")->row()->PROJECT_STATUS;
+            echo json_encode($result);
         }
+        else{
+            $rh_id = $this->db->query("select rh_id from projects where project_id = '$id_project'")->row()->RH_ID;
+            $workplan=$this->M_detail_project->selectWBS($id_project,$rh_id);
+            $workplan_wp = [];
+            $rebaseline = $this->M_detail_project->getRebaselineTask($rh_id);
+            $rebaseline_wp = [];
+            $findIndex = [];
+
+            //store task id in workplan
+            foreach($workplan as &$wp){
+                $workplan_wp[] = $wp['WBS_ID'];
+                $wp['status']='none';
+                $wp['index_rebaseline'] = 'none';
+            }
+
+            //store task id inside rebaseline
+            foreach ($rebaseline as $rwp){
+                $rebaseline_wp[] = $rwp['WBS_ID'];
+            }
+
+            //find index task that need rebaseline
+            foreach ($rebaseline_wp as $r){
+                $findIndex[] = array_search($r,$workplan_wp);
+            }
+
+            $index_rebaseline = 0;
+            foreach ($findIndex as $index){
+
+                $workplan[$index]['status'] =  $rebaseline[$index_rebaseline]['ACTION'];
+                $workplan[$index]['index_rebaseline'] =  $index_rebaseline;
+
+                $index_rebaseline ++;
+            }
+
+            foreach ($workplan as &$wp){
+                if($wp['WORK_PERCENT_COMPLETE'] == null){
+                    $wp['WORK_PERCENT_COMPLETE'] = 0;
+                }
+                if($wp['WORK'] == null){
+                    $wp['WORK'] = 0;
+                }
+            }
+
+            //$created_array = $this->buildTree($workplan);
+
+            //built tree
+            foreach($workplan as $row) {
+                $row['children'] = array();
+                $vn = "row" . $row['WBS_ID'];
+                ${$vn} = $row;
+                if(!is_null($row['WBS_PARENT_ID'])) {
+                    $vp = "parent" . $row['WBS_PARENT_ID'];
+                    if(isset($data[$row['WBS_PARENT_ID']])) {
+                        ${$vp} = $data[$row['WBS_PARENT_ID']];
+                    }
+                    else {
+                        ${$vp} = array('n_id' => $row['WBS_PARENT_ID'], 'WBS_PARENT_ID' => null, 'WBS_PARENT_ID' => array());
+                        $data[$row['WBS_PARENT_ID']] = &${$vp};
+                    }
+                    ${$vp}['children'][] = &${$vn};
+                    $data[$row['WBS_PARENT_ID']] = ${$vp};
+                }
+                $data[$row['WBS_ID']] = &${$vn};
+            }
 
 
-        //for null data tolerance
-        if($data == null){
-            $data = [];
+            //for null data tolerance
+            if($data == null){
+                $data = [];
+            }
+            $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
+            $result['workplan'] = $result[$id_project.'.0'];
+            $result['rebaseline_task'] = $rebaseline;
+            unset($result[$id_project.'.0']);
+            $result['project_status'] = $this->db->query("select project_status from projects where project_id = '$id_project'")->row()->PROJECT_STATUS;
+            echo json_encode($result);
         }
-        $result = array_filter($data, function($elem) { return is_null($elem['WBS_PARENT_ID']); });
-        $result['workplan'] = $result[$id_project.'.0'];
-        $result['rebaseline_task'] = $rebaseline;
-        unset($result[$id_project.'.0']);
-        $result['project_status'] = $this->db->query("select project_status from projects where project_id = '$id_project'")->row()->PROJECT_STATUS;
-        echo json_encode($result);
-
 
         //echo var_dump($workplan);
     }
@@ -523,9 +625,32 @@ class Task extends CI_Controller
     function editTask_view($wbs_id)
     {
         $project_id = explode(".",$wbs_id);
-        $query = $this->db->query("select * from wbs where WBS_ID='".$wbs_id."'");
-        $data['detail_task'] = $query->result_array();
-        $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline from (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs union select wbs_id,wbs_name,project_id,wbs_parent_id,'yes' as rebaseline from temporary_wbs) where PROJECT_ID='".$project_id[0]."' connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id[0].".0' order siblings by wbs_parent_id")->result_array();
+        $rh_id = $this->db->query("select rh_id from project where project_id")->row()->RH_ID;
+        $status_project= $this->db->query("select lower(project_status) as project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
+
+        if($status_project == 'in progress'){
+            $query = $this->db->query("select * from wbs where WBS_ID='".$wbs_id."'");
+            $data['detail_task'] = $query->result_array();
+            $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline from 
+                                                                          (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs where wbs_id not in(select wbs_id from temporary_edit_wbs where project_id = '".$project_id[0]."')
+                                                                          union 
+                                                                          select wbs_id,wbs_name,project_id,wbs_parent_id,'yes' as rebaseline from temporary_edit_wbs) 
+                                              where PROJECT_ID='".$project_id[0]."' 
+                                              connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id[0].".0' 
+                                              order siblings by wbs_parent_id")->result_array();
+        }
+        else{
+            $query = $this->db->query("select * from wbs where WBS_ID='".$wbs_id."'");
+            $data['detail_task'] = $query->result_array();
+            $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline from 
+                                                                          (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs where wbs_id not in(select wbs_id from temporary_wbs where project_id = '".$project_id[0]."' and rh_id  = '$rh_id')
+                                                                          union 
+                                                                          select wbs_id,wbs_name,project_id,wbs_parent_id,'yes' as rebaseline from temporary_wbs where rh_id  = '$rh_id') 
+                                              where PROJECT_ID='".$project_id[0]."' 
+                                              connect by  wbs_parent_id= prior wbs_id start with wbs_id='".$project_id[0].".0' 
+                                              order siblings by wbs_parent_id")->result_array();
+        }
+
         echo json_encode($data);
     }
 
