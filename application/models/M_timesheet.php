@@ -1555,7 +1555,7 @@ where wp_id = $data[WP_ID]";
         where t.TS_ID=m.REFF_ID and m.mailer_status=0
         group by t.project_id, t.project_name, t.pm_id, t.pm_name, t.pm_email
         order by jml desc
-        ) where jml >= 25 and rownum <= 5";
+        ) where jml >= 15 and rownum <= 5";
     $rs = $this->db->query($sql);
     $result = $rs->result_array();
     return $result;
