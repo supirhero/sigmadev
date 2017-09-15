@@ -954,7 +954,7 @@ Class M_detail_project extends CI_Model{
                 ".$data['FINISH_DATE'].",
                 'create'
                 )";
-        $q = $this->db->query($sql);
+        $this->db->query($sql);
         $dur=$this->db->query("select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
        FROM TEMPORARY_EDIT_WBS a,
             (SELECT     LEVEL - 1 AS delta

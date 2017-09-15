@@ -620,7 +620,7 @@ class Task extends CI_Controller
             $data['START_DATE']   = "TO_DATE('".$this->input->post('START_DATE')."','yyyy-mm-dd')";
             $data['FINISH_DATE']  ="TO_DATE('".$this->input->post("FINISH_DATE")."','yyyy-mm-dd')";
 
-            $newid = $this->M_detail_project->insertWBSTemp($data,$project_id);
+            $newid = $this->M_detail_project->insertWBSEditTemp($data,$project_id);
         }
         echo json_encode($status);
     }
