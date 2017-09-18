@@ -412,7 +412,7 @@ class Role extends CI_Controller
         $user_id = $this->input->post('user_id');
         $assigned_profile = $this->input->post('assigned_prof_id');
 
-        $this->db->query("aupdate users set prof_id = '$assigned_profile' where user_id = '$user_id'");
+        $this->db->query("update users set prof_id = '$assigned_profile' where user_id = '$user_id'");
         if($this->db->affected_rows() == 1){
                 $data['status'] = 'success';
                 $data['message'] = 'success ganti profile';
