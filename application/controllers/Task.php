@@ -965,7 +965,7 @@ class Task extends CI_Controller
                                                           join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
                                                           join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
                                                           WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
-                                                          (select user_id from (select user_id,rp_id,wbs_id from wbs_pool union select user_id,rp_id,wbs_id from temporary_edit_wbs_pool) as wbs_pool inner join resource_pool on wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
+                                                          (select user_id from (select rp_id,wbs_id from wbs_pool union select rp_id,wbs_id from temporary_edit_wbs_pool) wbs_pool inner join resource_pool on wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
                                                           and rp_id not in 
                                                           (
                                                               SELECT RESOURCE_POOL.RP_ID FROM RESOURCE_POOL
