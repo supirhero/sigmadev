@@ -701,8 +701,8 @@ class Task extends CI_Controller
     //duplicate parent if parent edited
     function editTask_view($wbs_id)
     {
-        $project_id = explode(".",$wbs_id);
-        $rh_id = $this->db->query("select rh_id from project where project_id")->row()->RH_ID;
+        $project_id = explode(".",$wbs_id)[0];
+        $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
         $status_project= $this->db->query("select lower(project_status) as project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
 
         if($status_project == 'in progress' && $this->wp_modif){
