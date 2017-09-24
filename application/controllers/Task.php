@@ -703,10 +703,16 @@ class Task extends CI_Controller
     {
         $project_id = explode(".",$wbs_id);
         $rh_id = $this->db->query("select rh_id from projects where project_id = '".$project_id[0]."'")->row()->RH_ID;
-        $status_project= $this->db->query("select lower(project_status) as project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
-
+        $status_project= $this->db->query("select lower(project_status) as project_status from projects where project_id = '".$project_id[0]."'")->row()->PROJECT_STATUS;
         if($status_project == 'in progress' && $this->wp_modif){
-            $query = $this->db->query("select * from wbs where WBS_ID='".$wbs_id."'");
+            //check wbs table
+            $checktemp = $this->db->query("select count(*) as hasil from temporary_edit_wbs where wbs_id = '$wbs_id'")->row()->HASIL;
+            if($checktemp){
+                $query = $this->db->query("select * from temporary_edit_wbs where WBS_ID='".$wbs_id."'");
+            }
+            else{
+                $query = $this->db->query("select * from wbs where WBS_ID='".$wbs_id."'");
+            }
             $data['detail_task'] = $query->result_array();
             $data['parent']=$this->db->query("select wbs_id,wbs_name,rebaseline from 
                                                                           (select wbs_id,wbs_name,project_id,wbs_parent_id,'no' as rebaseline from wbs where wbs_id not in(select wbs_id from temporary_edit_wbs where project_id = '".$project_id[0]."')
