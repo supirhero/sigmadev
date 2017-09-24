@@ -904,7 +904,13 @@ class Task extends CI_Controller
         }
         //if project status in progress
         elseif($statusProject == 'in progress' && $this->wp_modif){
-            $this->db->query("insert into temporary_edit_wbs(wbs_id,project_id,action) values('$wbs_id','$project_id','delete')");
+            $checktemp = $this->db->query("select count(*) as hasil from temporary_edit_wbs where wbs_id = '$wbs_id'")->row()->HASIL;
+            if($checktemp){
+                $this->db->query("delete from temporary_edit_wbs where wbs_id = '$wbs_id'");
+            }
+            else{
+                $this->db->query("insert into temporary_edit_wbs(wbs_id,project_id,action) values('$wbs_id','$project_id','delete')");
+            }
             $returndata['status'] = "success";
             $returndata['message'] = "task temporary deleted success";
         }
