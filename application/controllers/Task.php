@@ -1008,7 +1008,7 @@ class Task extends CI_Controller
             join USERS on RESOURCE_POOL.USER_ID=USERS.USER_ID
             join PROFILE ON PROFILE.PROF_ID=USERS.PROF_ID
             join TEMPORARY_EDIT_WBS_POOL on TEMPORARY_EDIT_WBS_POOL.RP_ID = RESOURCE_POOL.RP_ID
-            WHERE PROJECT_ID='$project'
+            WHERE PROJECT_ID='$project' and TEMPORARY_EDIT_WBS_POOL.WBS_ID = '$wbs_id'
             group by RESOURCE_POOL.RP_ID, users.user_name,users.email,action")->result_array();
 
             $curass_id =[];
@@ -1171,14 +1171,22 @@ class Task extends CI_Controller
         }
         elseif($statusProject == 'in progress' && $this->wp_modif){
             $wbs=$this->input->post('WBS_ID');
+
+            $checktemp = $this->db->query("select count(*) as hasil from temporary_edit_wbs WHERE wbs_id = '$wbs'")->row()->HASIL;
+
             $member=$this->input->post('MEMBER');
-            $project_id = $this->M_detail_project->getRPProject($member);
-            $sql = "select * from TEMPORARY_EDIT_WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
+
+            if($checktemp){
+                $sql = "select * from TEMPORARY_EDIT_WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
+            }
+            else{
+                $sql = "select * from WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
+            }
             $q = $this->db->query($sql);
             if($q->num_rows() > 0){
                 $user = $q->row_array();
             }
-            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
+            //$this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
 
             $wbs=$this->input->post('WBS_ID');
             $member=$this->input->post('MEMBER');
