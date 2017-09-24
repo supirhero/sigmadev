@@ -793,6 +793,7 @@ class Task extends CI_Controller
         }
         //if in progress
         elseif($statusProject == 'in progress' && $this->wp_modif){
+
             $WBS_ID = $this->input->post('wbs_id');
             $WBS_PARENT_ID = $this->input->post('wbs_parent_id');
             $PROJECT_ID = $this->input->post('project_id');
@@ -833,17 +834,9 @@ class Task extends CI_Controller
                 $this->db->query($sql);
             }
             else{
-                $sql = [
-                    'WBS_ID'=> $WBS_ID,
-                    'WBS_PARENT_ID' => $WBS_PARENT_ID,
-                    'PROJECT_ID' => $PROJECT_ID,
-                    'WBS_NAME'=> $WBS_NAME,
-                    'START_DATE' => "to_date('$START_DATE')",
-                    'FINISH_DATE' => "to_date('$FINISH_DATE')",
-                    'ACTION' => 'update'
-                ];
-                $this->db->insert('TEMPORARY_EDIT_WBS',$sql);
-
+                $sql = "insert into temporary_edit_wbs (wbs_id,wbs_parent_id,project_id,wbs_name,start_date,finish_date,action) VALUES 
+                        ('$WBS_ID','$WBS_PARENT_ID','$PROJECT_ID','$WBS_NAME',to_date('$START_DATE','YYYY-MM-DD'),to_date('$FINISH_DATE','YYYY-MM-DD'),'update')";
+                $this->db->query($sql);
                 $dur=$this->db->query("select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
        FROM TEMPORARY_EDIT_WBS a,
             (SELECT     LEVEL - 1 AS delta
@@ -882,6 +875,8 @@ class Task extends CI_Controller
             }*/
 
         }
+        $status['status']= 'Succes';
+        $status['message'] = 'Task Updated';
         echo json_encode($status);
 
     }
