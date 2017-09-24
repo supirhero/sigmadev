@@ -492,11 +492,12 @@ where wp_id = $data[WP_ID]";
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
             $SUBMITDATE = $data['SUBMIT_DATE'];
+            $ADDRESS = $data['ADDRESS'];
 
             $this->db->query("INSERT INTO TIMESHEET
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE)
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,ADDRESS)
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'))");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),$ADDRESS)");
 
         }
         //insert new data with add prefix number at primary key
@@ -514,11 +515,12 @@ where wp_id = $data[WP_ID]";
             $WP_ID = $data['WP_ID'];
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
+            $ADDRESS = $data['ADDRESS'];
 
             $this->db->query("INSERT INTO TIMESHEET
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE)
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,ADDRESS)
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'))");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),$ADDRESS)");
 
 
         }
@@ -549,11 +551,12 @@ where wp_id = $data[WP_ID]";
             $WP_ID = $data['WP_ID'];
             $LATITUDE = $data['LATITUDE'];
             $LONGITUDE = $data['LONGITUDE'];
+            $ADDRESS = $data['ADDRESS'];
 
             $this->db->query("INSERT INTO TIMESHEET
-                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE)
+                              (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,ADDRESS)
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE')");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',$ADDRESS)");
         }
         $this->submitTimesheet($TS_ID);
     }

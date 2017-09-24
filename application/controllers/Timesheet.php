@@ -516,6 +516,7 @@ class Timesheet extends CI_Controller {
         $data['PROJECT_ID'] = $this->input->post("PROJECT_ID");
         $data['WP_ID'] = $this->input->post("WP_ID");
         $data['SUBMIT_DATE']= date('Y-m-d H:i:s');
+        $data['ADDRESS'] = $this->input->post('ADDRESS');
         $project_id   = $_POST['PROJECT_ID'];
 
         if($data['WP_ID'] != "" && $project_id != "")
