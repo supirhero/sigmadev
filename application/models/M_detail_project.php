@@ -884,7 +884,7 @@ Class M_detail_project extends CI_Model{
         $id = $this->db->query("select NVL(max(cast(ID as int))+1, 1)  as NEW_ID from
                                 (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from wbs
                                 UNION
-                                SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from temporary_wbs where rh_id = '$rh_id') where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
+                                SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from temporary_wbs where rh_id = '$rh_id') where PROJECT_ID='".$project_id."'")->row()->NEW_ID;
         $sql = "INSERT INTO TEMPORARY_WBS
             (
               WBS_ID,

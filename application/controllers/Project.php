@@ -245,6 +245,13 @@ class Project extends CI_Controller
                                         $project_id_req = $this->input->post("project_id");
                                         break;
                                 }
+                                if(!in_array($project_id_req,$granted_project_list)){
+                                    $this->output->set_status_header(403);
+                                    $returndata['status'] = 'failed';
+                                    $returndata['message'] = 'Hanya Project Manager dari project yang bersangkutan yang berhak Request Baseline atau Request Rebaseline';
+                                    echo json_encode($returndata);
+                                    die;
+                                }
                                 break;
                             case '12':
                                 $id = $_POST['MEMBER'];
@@ -836,8 +843,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                                                       where project_id = '$project' and action = 'delete'")->result_array();
 
         //detele data from temporary edit table
-        /*$this->db->query("delete from temporary_edit_wbs_pool where wbs_id in(select wbs_id from temporary_edit_wbs where project_id = '$project')");
-        $this->db->query("delete from temporary_edit_wbs where project_id = '$project'");*/
+        $this->db->query("delete from temporary_edit_wbs_pool where wbs_id in(select wbs_id from temporary_edit_wbs where project_id = '$project')");
+        $this->db->query("delete from temporary_edit_wbs where project_id = '$project'");
 
         $rh_id = null;
 
@@ -900,15 +907,15 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         //add new task to temporary table
         if(count($array_data['new_task']) != 0){
             foreach ($array_data['new_task'] as $newtask){
-                $project_id   = $newtask['project_id'];
+                $project_id   = $newtask['PROJECT_ID'];
 
                 //wbs id same with project id
                 $data['RH_ID'] = $rh_id;
-                $data['WBS_NAME'] = $newtask["wbs_name"];
+                $data['WBS_NAME'] = $newtask["WBS_NAME"];
                 $data['WBS_ID'] = $project_id;
-                $data['WBS_PARENT_ID'] = $newtask["wbs_parent_id"];
-                $data['START_DATE']   = "TO_DATE('".$newtask['start_date']."','yyyy-mm-dd')";
-                $data['FINISH_DATE']  ="TO_DATE('".$newtask["finish_date"]."','yyyy-mm-dd')";
+                $data['WBS_PARENT_ID'] = $newtask["WBS_PARENT_ID"];
+                $data['START_DATE']   = "TO_DATE('".$newtask['START_DATE']."','yyyy-mm-dd')";
+                $data['FINISH_DATE']  ="TO_DATE('".$newtask["FINISH_DATE"]."','yyyy-mm-dd')";
 
                 // insert into wbs temporary and get new ID
                 $newid = $this->M_detail_project->insertWBSTemp($data,$project_id,$rh_id);
@@ -920,12 +927,12 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         if(count($array_data['modified_task']) != 0){
             foreach ($array_data['modified_task'] as $modtask){
                 $this->M_detail_project->Edit_WBSTemp(
-                    $modtask["wbs_id"],
-                    $modtask["wbs_parent_id"],
-                    $modtask["project_id"],
-                    $modtask["wbs_name"],
-                    $modtask['start_date'],
-                    $modtask['finish_date'],
+                    $modtask["WBS_ID"],
+                    $modtask["WBS_PARENT_ID"],
+                    $modtask["PROJECT_ID"],
+                    $modtask["WBS_NAME"],
+                    $modtask['START_DATE'],
+                    $modtask['FINISH_DATE'],
                     $rh_id
                 );
             }
@@ -934,7 +941,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         //add delete task to temporary table
         if(count($array_data['delete_task']) != 0){
             foreach ($array_data['delete_task'] as $deletetask){
-                $project_id   = $deletetask['project_id'];
+                $project_id   = $deletetask['PROJECT_ID'];
 
                 //wbs id same with project id
                 $data['RH_ID'] = $rh_id;
