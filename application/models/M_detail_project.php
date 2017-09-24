@@ -935,7 +935,7 @@ Class M_detail_project extends CI_Model{
                                 (select SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from wbs
                                 UNION
                                 SELECT SUBSTR(WBS_ID, INSTR(wbs_id, '.')+1) as ID,PROJECT_ID from temporary_edit_wbs) where PROJECT_ID=".$project_id." ")->row()->NEW_ID;
-        $sql = "INSERT INTO TEMPORARY_WBS
+        $sql = "INSERT INTO TEMPORARY_EDIT_WBS
             (
               WBS_ID,
               WBS_PARENT_ID,
