@@ -268,7 +268,7 @@ class Project extends CI_Controller
                     else{
                         $will_die = 1;
                     }
-                    if($will_die ==1){
+                    if($will_die ==1 ){
                         $this->output->set_status_header(403);
                         $returndata['status'] = 'failed';
                         $returndata['message'] = 'Anda tidak bisa mengakses feature ini';
@@ -836,8 +836,8 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
                                                       where project_id = '$project' and action = 'delete'")->result_array();
 
         //detele data from temporary edit table
-        $this->db->query("delete from temporary_edit_wbs_pool where wbs_id in(select wbs_id from temporary_edit_wbs where project_id = '$project')");
-        $this->db->query("delete from temporary_edit_wbs where project_id = '$project'");
+        /*$this->db->query("delete from temporary_edit_wbs_pool where wbs_id in(select wbs_id from temporary_edit_wbs where project_id = '$project')");
+        $this->db->query("delete from temporary_edit_wbs where project_id = '$project'");*/
 
         $rh_id = null;
 
