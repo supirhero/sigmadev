@@ -945,10 +945,11 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 
                 //wbs id same with project id
                 $data['RH_ID'] = $rh_id;
-                $data['WBS_ID'] = $project_id;
+                $data['WBS_ID'] = $deletetask['WBS_ID'];
 
                 // list delete task to temporary table
                 $this->M_detail_project->updateProgressDeleteTaskTemp($data['WBS_ID'],$data['RH_ID']);
+
 
             }
             $datareturn['status_add_new_task'] = "success";
