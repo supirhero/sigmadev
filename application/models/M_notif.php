@@ -1,0 +1,52 @@
+<?php
+
+Class M_notif extends CI_Model{
+    function getNotif($user_id,$time = 0){
+        $unread = $this->unreadNotif($user_id);
+        if($time >= 1)
+        {
+	        $sql="select * from USER_NOTIF where user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC";
+        }
+        else{
+	        $sql="select * from USER_NOTIF where user_id='$user_id'   ORDER BY NOTIF_TIME DESC";
+        }
+
+        $query = $this->db->query($sql);
+        $hasil["data"] = $query->result_array();
+        $hasil["info"] = ["total_unread"=>$unread,"load_more"=>$hasil["data"][count($hasil["data"])-1]["NOTIF_TIME"]];
+        return $hasil;
+    }
+    function unreadNotif($user_id){
+
+	        $sql="select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read = 0";
+
+
+        $query = $this->db->query($sql);
+        $hasil = $query->row_array();
+        return $hasil["UNREAD"];
+
+    }
+
+    public function insertNotif($data){
+        //$this->db->insert("P_HOLIDAY", $data);
+        $time = time();
+        $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
+  '".$data['USER_ID']."',
+  'Project',
+  ".$data['FROM'].",
+  ".$data['TO'].",
+  '".$time."')";
+        $q=$this->db->query($sql);
+        $res=$this->db->query("select * from USER_NOTIF where USER_ID='".$data['USER_ID']."' AND NOTIF_TIME='$time'");
+        if ($q->num_rows()>0) {
+          return $q->row_array();
+        }else{
+          return false;
+        }
+    }
+
+}
+
+
+
+?>

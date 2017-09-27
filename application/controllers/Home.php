@@ -1810,20 +1810,6 @@ is_approved
         echo json_encode($this->datajson,JSON_NUMERIC_CHECK);
     }
 
-	public function getnotif(){
-		$user_id = $this->input->post("user_id");
-		$time = $this->input->post("time");
-		$list_notif = $this->M_notif->getNotif($user_id,$time);
-		$c['notif_list']=$list_notif["data"];
-		$c['notif_info']=$list_notif["info"];
-		echo json_encode($c,JSON_NUMERIC_CHECK);
-	}
-
-	public function checknotif(){
-		$user_id = $this->input->post("user_id");
-		$c['unread_notif']=$this->M_notif->unreadNotif($user_id,$time);
-		echo json_encode($c,JSON_NUMERIC_CHECK);
-	}
     public function inviteToBusiness(){
           $bu_id=$_POST['BU_ID'];
           $user_id=$_POST['USER_ID'];
