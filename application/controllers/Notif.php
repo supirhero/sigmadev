@@ -28,7 +28,7 @@ class Notif extends CI_Controller
         ];
         error_reporting(E_ALL & ~E_NOTICE);
 
-        $this->load->model('M_detail_project');
+        $this->load->model('M_notif');
         $this->load->model('M_session');
         $this->load->helper('file');
 
@@ -59,6 +59,7 @@ class Notif extends CI_Controller
             die();
         }
 
+    }
 
 	    public function get(){
 	    $user_id = $this->input->post("user_id");
@@ -75,7 +76,6 @@ class Notif extends CI_Controller
 	    echo json_encode($c,JSON_NUMERIC_CHECK);
     }
 
-    }
 
 
 
