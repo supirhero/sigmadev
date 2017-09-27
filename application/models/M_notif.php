@@ -12,9 +12,22 @@ Class M_notif extends CI_Model{
         }
 
         $query = $this->db->query($sql);
-        $hasil["data"] = $query->result_array();
-        $hasil["info"] = ["total_unread"=>$unread,"load_more"=>$hasil["data"][count($hasil["data"])-1]["NOTIF_TIME"]];
-        return $hasil;
+        $hasil = $query->result_array();
+        foreach($hasil as $notif)
+        {
+	        $query = $this->db->query("select * from USERS where user_id='$notif[NOTIF_FROM]'");
+	        $user = $query->row_array();
+
+	        $data["list"][]=[
+	            "project_id"=>$notif["NOTIF_TO"],
+                "user_name"=>$user["USER_NAME"],
+                "text"=>"has updated timesheet. \n you need approve it",
+                "unixtime"=>$notif["NOTIF_TIME"],
+                "datetime"=>date("Y-m-d h:i",$notif["NOTIF_TIME"]),
+            ];
+        }
+        $data["info"] = ["total_unread"=>$unread,"load_more"=>$notif["NOTIF_TIME"]];
+        return $data;
     }
     function unreadNotif($user_id){
 
@@ -28,7 +41,6 @@ Class M_notif extends CI_Model{
     }
 
     public function insertNotif($data){
-        //$this->db->insert("P_HOLIDAY", $data);
         $time = time();
         $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
   '".$data['USER_ID']."',
