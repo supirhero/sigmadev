@@ -46,8 +46,6 @@ where ROWNUM <= 10";
 
 	        $sql="select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read = 0";
 	    $query = $this->db->query("update USER_NOTIF set notif_read=1 where user_id='$user_id'");
-        $hasil = $query->row_array();
-        return $hasil["UNREAD"];
 
     }
     function unreadNotif($user_id){
