@@ -473,7 +473,9 @@ where wp_id = $data[WP_ID]";
   ".$info['FROM'].",
   ".$info['PROJECT_ID'].",
   '".$time."')";
-        //$this->confirmationTimesheetEmailtoPM($data,$info);
+	    $q=$this->db->query($sql);
+
+	    //$this->confirmationTimesheetEmailtoPM($data,$info);
 
         //change date input for readable to sql
         $tgl=date_format(date_create($data['DATE']),'Ymd');
