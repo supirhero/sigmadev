@@ -2086,6 +2086,19 @@ $this->email->send();
       $data['project_id']=$project_id;
       echo json_encode($data);
     }
+
+    public function availableMemberCross(){
+        $project_id = $this->input->post('project_id');
+        $email = $this->input->post('email');
+        $data['available'] = $this->db->query("select bu_name,email,user_id,user_name,user_type_id
+                                               from users join p_bu
+                                               on users.bu_id = p_bu.bu_id
+                                               where users.email = '$email'
+                                               and user_id not in (
+                                               select user_id from resource_pool where project_id = '$project_id'
+                                               )")->result_array();
+        echo json_encode($data);
+    }
     // history, buat ambil history update progress task yg dilakukan PM
   // created by faishol
   public function history($project){
