@@ -2090,7 +2090,7 @@ $this->email->send();
     public function availableMemberCross(){
         $project_id = $this->input->post('project_id');
         $email = $this->input->post('email');
-        $User = $this->db->query("select bu_name,email,user_id,user_name,user_type_id
+        $user = $this->db->query("select bu_name,email,user_id,user_name,user_type_id
                                                from users join p_bu
                                                on users.bu_id = p_bu.bu_id
                                                where users.email = '$email'
@@ -2098,8 +2098,23 @@ $this->email->send();
                                                select user_id from resource_pool where project_id = '$project_id'
                                                )")->result_array();
 
-        if(count($User == 1)){
-
+        if(count($user == 1)){
+            $check=$this->M_project->checkifinproject($project_id,$user[0]['USER_ID']);
+            if ($check) {
+                //jika true, maka tampilkan pesan error, menandakan user sudah pernah diinvite ke dalam project
+                $this->output->set_status_header(400);
+                $c['status']="Error";
+                $c['message']="User sudah ada di dalam project";
+            }else{
+                //jika false, tambahkan user ke dalam resource_pool
+                $this->M_project->addprojectmember($project_id,$user[0]['USER_ID']);
+                $c['status']="Success";
+                $c['message']="User berhasil diinvite ke dalam project";
+                //kirim email ke user bersangkutan
+                $email				= $this->M_detail_project->selectemail($user[0]['USER_ID']);
+                $project_name = $this->M_detail_project->selectProjectName($project_id);
+                $this->sendVerificationinviteMember($email,$project_name,$project_id);
+            }
         }
         else{
             $this->output->set_status_header(400);
