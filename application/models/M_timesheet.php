@@ -800,7 +800,7 @@ where wp_id = $data[WP_ID]";
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to($email);
+        $this->email->to("emil.gunawan.h@gmail.com");
       //  $this->email->to('salma.ulhaq@sigma.co.id');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
@@ -1144,7 +1144,7 @@ where wp_id = $data[WP_ID]";
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to($info["EMAIL"]);
+        $this->email->to("emil.gunawan.h@gmail.com");
       //  $this->email->to('salma.ulhaq@sigma.co.id');
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
@@ -1502,7 +1502,7 @@ where wp_id = $data[WP_ID]";
 
     // One email
     foreach($notification_batch as $batch) {
-      $this->email->to($batch["PM_EMAIL"]);
+      $this->email->to("emil.gunawan.h@gmail.com");
       $this->email->bcc("yohanes.rianto@sigma.co.id");
 
       $ts_set = "";

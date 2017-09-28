@@ -1441,7 +1441,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to($email);
+        $this->email->to("emil.gunawan.h@gmail.com");
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -1755,7 +1755,7 @@ $this->email->send();
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to($email);
+        $this->email->to("emil.gunawan.h@gmail.com");
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -2090,13 +2090,22 @@ $this->email->send();
     public function availableMemberCross(){
         $project_id = $this->input->post('project_id');
         $email = $this->input->post('email');
-        $data['available'] = $this->db->query("select bu_name,email,user_id,user_name,user_type_id
+        $User = $this->db->query("select bu_name,email,user_id,user_name,user_type_id
                                                from users join p_bu
                                                on users.bu_id = p_bu.bu_id
                                                where users.email = '$email'
                                                and user_id not in (
                                                select user_id from resource_pool where project_id = '$project_id'
                                                )")->result_array();
+
+        if(count($User == 1)){
+
+        }
+        else{
+            $this->output->set_status_header(400);
+            $data['status'] = "error";
+            $data['message'] = 'user dengan email tersebut tidak ada';
+        }
         echo json_encode($data);
     }
     // history, buat ambil history update progress task yg dilakukan PM
