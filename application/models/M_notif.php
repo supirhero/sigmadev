@@ -5,10 +5,22 @@ Class M_notif extends CI_Model{
         $unread = $this->unreadNotif($user_id);
         if($time >= 1)
         {
-	        $sql="select * from USER_NOTIF where user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC";
+	        $sql="
+select *
+from  
+( 
+select * from USER_NOTIF where user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC
+)
+where ROWNUM <= 10
+";
         }
         else{
-	        $sql="select * from USER_NOTIF where user_id='$user_id'   ORDER BY NOTIF_TIME DESC";
+	        $sql="
+select *
+from  
+( select * from USER_NOTIF where user_id='$user_id'   ORDER BY NOTIF_TIME DESC 
+) 
+where ROWNUM <= 10";
         }
 
         $query = $this->db->query($sql);
@@ -27,8 +39,14 @@ Class M_notif extends CI_Model{
                 "datetime"=>date("Y-m-d h:i",$notif["NOTIF_TIME"]),
             ];
         }
-        $data["info"] = ["current_user_id"=>$notif["NOTIF_FROM"],"total_unread"=>$unread,"load_more"=>$notif["NOTIF_TIME"]];
+        $data["info"] = ["current_user_id"=>$notif["USER_ID"],"total_unread"=>$unread,"load_more"=>$notif["NOTIF_TIME"]];
         return $data;
+    }
+    function setNotif($user_id){
+
+	        $sql="select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read = 0";
+	    $query = $this->db->query("update USER_NOTIF set notif_read=1 where user_id='$user_id'");
+
     }
     function unreadNotif($user_id){
 
