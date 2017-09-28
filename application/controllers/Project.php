@@ -2098,7 +2098,7 @@ $this->email->send();
                                                select user_id from resource_pool where project_id = '$project_id'
                                                )")->result_array();
 
-        if(count($user == 1)){
+        if(count($user)==1){
             $check=$this->M_project->checkifinproject($project_id,$user[0]['USER_ID']);
             if ($check) {
                 //jika true, maka tampilkan pesan error, menandakan user sudah pernah diinvite ke dalam project
@@ -2108,18 +2108,29 @@ $this->email->send();
             }else{
                 //jika false, tambahkan user ke dalam resource_pool
                 $this->M_project->addprojectmember($project_id,$user[0]['USER_ID']);
+                print_r($user);
+                die;
                 $c['status']="Success";
                 $c['message']="User berhasil diinvite ke dalam project";
                 //kirim email ke user bersangkutan
                 $email				= $this->M_detail_project->selectemail($user[0]['USER_ID']);
                 $project_name = $this->M_detail_project->selectProjectName($project_id);
                 $this->sendVerificationinviteMember($email,$project_name,$project_id);
+                $data['status'] = 'success';
+                $data['message'] = 'user berhasil di tambah';
             }
         }
         else{
-            $this->output->set_status_header(400);
-            $data['status'] = "error";
-            $data['message'] = 'user dengan email tersebut tidak ada';
+            if($this->db->query("select count(*) as hasil from users where email = '$email'")->row()->HASIL){
+                $this->output->set_status_header(400);
+                $data['status'] = "error";
+                $data['message'] = 'user sudah ada di dalam project member';
+            }
+            else{
+                $this->output->set_status_header(400);
+                $data['status'] = "error";
+                $data['message'] = 'user dengan email tersebut tidak ada';
+            }
         }
         echo json_encode($data);
     }
