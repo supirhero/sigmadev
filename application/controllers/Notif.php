@@ -68,7 +68,8 @@ class Notif extends CI_Controller
 	    $c['notif_list']=$list_notif["list"];
 	    $c['notif_info']=$list_notif["info"];
 	    echo json_encode($c,JSON_NUMERIC_CHECK);
-    }
+		$this->M_notif->setNotif($user_id);
+	    }
 
 	    public function check(){
 	    	$user_id = $this->datajson['userdata']["USER_ID"];
