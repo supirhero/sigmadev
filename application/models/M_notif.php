@@ -20,13 +20,14 @@ Class M_notif extends CI_Model{
 
 	        $data["list"][]=[
 	            "project_id"=>$notif["NOTIF_TO"],
+                "user_id"=>$user["USER_ID"],
                 "user_name"=>$user["USER_NAME"],
                 "text"=>"has updated timesheet. \n you need approve it",
                 "unixtime"=>$notif["NOTIF_TIME"],
                 "datetime"=>date("Y-m-d h:i",$notif["NOTIF_TIME"]),
             ];
         }
-        $data["info"] = ["total_unread"=>$unread,"load_more"=>$notif["NOTIF_TIME"]];
+        $data["info"] = ["current_user_id"=>$notif["NOTIF_FROM"],"total_unread"=>$unread,"load_more"=>$notif["NOTIF_TIME"]];
         return $data;
     }
     function unreadNotif($user_id){

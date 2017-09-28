@@ -62,7 +62,7 @@ class Notif extends CI_Controller
     }
 
 	    public function get(){
-	    $user_id = $this->input->post("user_id");
+	    $user_id = $this->datajson['userdata']["USER_ID"];
 	    $time = $this->input->post("time");
 	    $list_notif = $this->M_notif->getNotif($user_id,$time);
 	    $c['notif_list']=$list_notif["list"];
@@ -71,8 +71,8 @@ class Notif extends CI_Controller
     }
 
 	    public function check(){
-	    $user_id = $this->input->post("user_id");
-	    $c['unread_notif']=$this->M_notif->unreadNotif($user_id,$time);
+	    	$user_id = $this->datajson['userdata']["USER_ID"];
+	    $c['unread_notif']=$this->M_notif->unreadNotif($user_id);
 	    echo json_encode($c,JSON_NUMERIC_CHECK);
     }
 
