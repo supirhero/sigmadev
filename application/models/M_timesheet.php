@@ -456,7 +456,7 @@ GROUP BY TS_DATE")->result_array();
 
     function inputTimesheet($data){
 
-        $sql = "select u.user_name,pm.user_name as pm_name,pm.email,wbs.project_id,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
+        $sql = "select u.user_id as from,u.user_name,pm.user_id as pm_id,pm.user_name as pm_name,pm.email,wbs.project_id as project_id,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
 join projects p on p.project_id = wbs.project_id
 join users pm on p.pm_id = pm.user_id
 join resource_pool rp on wp.rp_id=rp.rp_id
@@ -466,6 +466,13 @@ where wp_id = $data[WP_ID]";
         if($q->num_rows() > 0){
             $info=$q->row_array();
         }
+	    $time = time();
+	    $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
+  '".$info['PM_ID']."',
+  'Project',
+  ".$info['FROM'].",
+  ".$info['PROJECT_ID'].",
+  '".$time."')";
         //$this->confirmationTimesheetEmailtoPM($data,$info);
 
         //change date input for readable to sql
