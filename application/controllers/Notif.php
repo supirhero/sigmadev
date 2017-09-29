@@ -61,6 +61,15 @@ class Notif extends CI_Controller
 
     }
 
+	    public function index(){
+	    $user_id = $this->datajson['userdata']["USER_ID"];
+	    $time = $this->input->post("time");
+	    $list_notif = $this->M_notif->getNotif($user_id,$time);
+	    $c['notif_list']=$list_notif["list"];
+	    $c['notif_info']=$list_notif["info"];
+	    echo json_encode($c,JSON_NUMERIC_CHECK);
+		$this->M_notif->setNotif($user_id);
+	    }
 	    public function get(){
 	    $user_id = $this->datajson['userdata']["USER_ID"];
 	    $time = $this->input->post("time");
