@@ -1441,7 +1441,7 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to($email);
+        $this->email->to("emil.gunawan.h@gmail.com");
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -1755,7 +1755,7 @@ $this->email->send();
         $config['validation'] = TRUE;
         $this->email->initialize($config);
         $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-        $this->email->to($email);
+        $this->email->to("emil.gunawan.h@gmail.com");
         $logo=base_url()."asset/image/logo_new_sigma1.png";
         $css=base_url()."asset/css/confirm.css";
         $this->email->attach($logo);
@@ -2090,13 +2090,48 @@ $this->email->send();
     public function availableMemberCross(){
         $project_id = $this->input->post('project_id');
         $email = $this->input->post('email');
-        $data['available'] = $this->db->query("select bu_name,email,user_id,user_name,user_type_id
+        $user = $this->db->query("select bu_name,email,user_id,user_name,user_type_id
                                                from users join p_bu
                                                on users.bu_id = p_bu.bu_id
                                                where users.email = '$email'
                                                and user_id not in (
                                                select user_id from resource_pool where project_id = '$project_id'
                                                )")->result_array();
+
+        if(count($user)==1){
+            $check=$this->M_project->checkifinproject($project_id,$user[0]['USER_ID']);
+            if ($check) {
+                //jika true, maka tampilkan pesan error, menandakan user sudah pernah diinvite ke dalam project
+                $this->output->set_status_header(400);
+                $c['status']="Error";
+                $c['message']="User sudah ada di dalam project";
+            }else{
+                //jika false, tambahkan user ke dalam resource_pool
+                $this->M_project->addprojectmember($project_id,$user[0]['USER_ID']);
+                print_r($user);
+                die;
+                $c['status']="Success";
+                $c['message']="User berhasil diinvite ke dalam project";
+                //kirim email ke user bersangkutan
+                $email				= $this->M_detail_project->selectemail($user[0]['USER_ID']);
+                $project_name = $this->M_detail_project->selectProjectName($project_id);
+                $this->sendVerificationinviteMember($email,$project_name,$project_id);
+                $data['status'] = 'success';
+                $data['message'] = 'user berhasil di tambah';
+            }
+        }
+        else{
+            if($this->db->query("select count(*) as hasil from users where email = '$email'")->row()->HASIL){
+                $this->output->set_status_header(400);
+                $data['status'] = "error";
+                $data['message'] = 'user sudah ada di dalam project member';
+            }
+            else{
+                $this->output->set_status_header(400);
+                $data['status'] = "error";
+                $data['message'] = 'user dengan email tersebut tidak ada';
+            }
+        }
         echo json_encode($data);
     }
     // history, buat ambil history update progress task yg dilakukan PM
