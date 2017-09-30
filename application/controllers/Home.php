@@ -367,6 +367,11 @@ class Home extends CI_Controller {
         $bagian_unit = $this->datajson['userdata']['BU_ID'];
         $this->datajson['userdata']['PROFILE_NAME'] = $this->db->query("select PROF_NAME from profile  where PROF_ID = ".$this->datajson['userdata']['PROF_ID'])->row()->PROF_NAME;
         $query = $this->db->query("select BU_NAME FROM P_BU WHERE BU_ID='".$bagian_unit."'")->row();
+
+        $user_id = $this->datajson['userdata']["USER_ID"];
+        $time = $this->input->post("time");
+        $list_notif = $this->M_notif->getNotif($user_id,$time);
+        $this->datajson['notif_info']=$list_notif["info"];
         //$this->datajson['bussines_unit'] = $query->BU_NAME;
         $this->project();
         $this->datatimesheet();
