@@ -455,26 +455,6 @@ GROUP BY TS_DATE")->result_array();
     }
 
     function inputTimesheet($data){
-
-        $sql = "select u.user_id as from,u.user_name,pm.user_id as pm_id,pm.user_name as pm_name,pm.email,wbs.project_id as project_id,project_name,wbs_name from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
-join projects p on p.project_id = wbs.project_id
-join users pm on p.pm_id = pm.user_id
-join resource_pool rp on wp.rp_id=rp.rp_id
-join users u on rp.user_id = u.user_id
-where wp_id = $data[WP_ID]";
-        $q = $this->db->query($sql);
-        if($q->num_rows() > 0){
-            $info=$q->row_array();
-        }
-	    $time = time();
-	    $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
-  '".$info['PM_ID']."',
-  'Project',
-  ".$info['FROM'].",
-  ".$info['PROJECT_ID'].",
-  '".$time."')";
-	    $q=$this->db->query($sql);
-
 	    //$this->confirmationTimesheetEmailtoPM($data,$info);
 
         //change date input for readable to sql
@@ -506,7 +486,7 @@ where wp_id = $data[WP_ID]";
             $this->db->query("INSERT INTO TIMESHEET
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,ADDRESS)
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),$ADDRESS)");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),'$ADDRESS')");
 
         }
         //insert new data with add prefix number at primary key
@@ -529,7 +509,7 @@ where wp_id = $data[WP_ID]";
             $this->db->query("INSERT INTO TIMESHEET
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,SUBMIT_DATE,ADDRESS)
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),$ADDRESS)");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',to_timestamp('$SUBMITDATE','YYYY-MM-DD HH24:MI:SS'),'$ADDRESS')");
 
 
         }
@@ -565,9 +545,31 @@ where wp_id = $data[WP_ID]";
             $this->db->query("INSERT INTO TIMESHEET
                               (TS_ID, SUBJECT, MESSAGE, HOUR_TOTAL, TS_DATE, WP_ID, LATITUDE, LONGITUDE,ADDRESS)
                               VALUES
-                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE',$ADDRESS)");
+                              ('$TS_ID','$SUBJECT','$MESSAGE','$HOUR_TOTAL',$TS_DATE,'$WP_ID','$LATITUDE','$LONGITUDE','$ADDRESS')");
         }
         $this->submitTimesheet($TS_ID);
+
+        /*AKU EDIT MAS .. BIAR SEMENTARA ERROR TIMESHEET KE SOLVE,TAPI NOTIF JADI GK JALAN KARNA QUERY SQL DI BAWAH SELALU RETURN NULL, GERY*/
+        //NOTIF
+        $sql = "select u.user_id ,u.user_name,pm.user_id as pm_id,pm.user_name as pm_name,pm.email,wbs.project_id as project_id,project_name,wbs_name
+                from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
+                join projects p on p.project_id = wbs.project_id
+                join users pm on p.pm_id = pm.user_id
+                join resource_pool rp on wp.rp_id=rp.rp_id
+                join users u on rp.user_id = u.user_id
+                where wp_id = $data[WP_ID]";
+        $q = $this->db->query($sql);
+        if($q->num_rows() > 0){
+            $info=$q->row_array();
+            $time = time();
+            $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
+              '".$info['PM_ID']."',
+              'Project',
+              ".$info['FROM'].",
+              ".$info['PROJECT_ID'].",
+              '".$time."')";
+            $q=$this->db->query($sql);
+        }
     }
     function editTimesheet($data){
 
