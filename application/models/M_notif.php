@@ -6,21 +6,25 @@ Class M_notif extends CI_Model{
         if($time >= 1)
         {
 	        $sql="
-select *
-from  
-( 
-select * from USER_NOTIF where user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC
-)
-where ROWNUM <= 10
-";
+            select *
+            from  
+            ( 
+            select * from USER_NOTIF where user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC
+            )
+            where ROWNUM <= 10
+            ";
         }
         else{
 	        $sql="
-select *
-from  
-( select * from USER_NOTIF where user_id='$user_id'   ORDER BY NOTIF_TIME DESC 
-) 
-where ROWNUM <= 10";
+                select *
+                from  
+                ( select USER_NOTIF.*,p.project_name,p.project_status,p.project_complete as project_percent 
+                  from USER_NOTIF
+                  left join projects p
+                  on user_notif.NOTIF_TO = p.project_id 
+                  where user_id='$user_id'   ORDER BY NOTIF_TIME DESC 
+                ) 
+                where ROWNUM <= 10";
         }
 
         $query = $this->db->query($sql);
@@ -29,9 +33,11 @@ where ROWNUM <= 10";
         {
 	        $query = $this->db->query("select * from USERS where user_id='$notif[NOTIF_FROM]'");
 	        $user = $query->row_array();
-
 	        $data["list"][]=[
 	            "project_id"=>$notif["NOTIF_TO"],
+                "project_name"=>$notif["PROJECT_NAME"],
+                "project_status"=>$notif["PROJECT_STATUS"],
+                "project_complete"=>$notif["PROJECT_COMPLETE"],
                 "user_id"=>$user["USER_ID"],
                 "user_name"=>$user["USER_NAME"],
                 "text"=>"has updated timesheet. \n you need approve it",
@@ -44,7 +50,7 @@ where ROWNUM <= 10";
     }
     function setNotif($user_id){
 
-	        $sql="select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read = 0";
+        $sql="select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read = 0";
 	    $query = $this->db->query("update USER_NOTIF set notif_read=1 where user_id='$user_id'");
 
     }
