@@ -233,7 +233,7 @@ class Project extends CI_Controller
                                         $id = $_POST['wbs_id'];
                                         $project_id_req = $this->M_detail_project->getProjectTask($id);
                                         break;
-                                    case ($url_dest == 'project/rebaseline') || ( $url_dest == 'project/baseline'):
+                                    case ($url_dest == 'project/rebaseline'):
                                         $user_id = $this->datajson['userdata']['USER_ID'];
                                         $gpl = $this->db->query("select project_id from projects where pm_id ='$user_id'")->result_array();
 
@@ -243,6 +243,17 @@ class Project extends CI_Controller
                                             $granted_project_list[] = $gg['PROJECT_ID'];
                                         }
                                         $project_id_req = $this->input->post("project_id");
+                                        break;
+                                    case ( $url_dest == 'project/baseline'):
+                                        $user_id = $this->datajson['userdata']['USER_ID'];
+                                        $gpl = $this->db->query("select project_id from projects where pm_id ='$user_id'")->result_array();
+
+                                        $granted_project_list = null;
+                                        $granted_project_list = [];
+                                        foreach ($gpl as $gg){
+                                            $granted_project_list[] = $gg['PROJECT_ID'];
+                                        }
+                                        $project_id_req = $this->uri->segment(3);
                                         break;
                                 }
                                 if(!in_array($project_id_req,$granted_project_list)){
@@ -807,7 +818,6 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
     /*Baseline*/
     function baseline(){
         $project=$this->uri->segment(3);
-
         $this->db->query("Update projects set PROJECT_STATUS='In Progress' where project_id='$project'");
         $data['status'] = "success";
         echo json_encode($data);
