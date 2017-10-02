@@ -1141,16 +1141,18 @@ class Task extends CI_Controller
             $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
 
             $wbs=$this->input->post('WBS_ID');
-            $member=$this->input->post('MEMBER');
-            $project_id = $this->M_detail_project->getRPProject($member);
-            $sql = "select * from TEMPORARY_WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
-            $q = $this->db->query($sql);
-            if($q->num_rows() > 0){
-                $user = $q->row_array();
-            }
-            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
+            $memberproject=$this->input->post('MEMBER');
+            foreach ($memberproject as $member){
+                $project_id = $this->M_detail_project->getRPProject($member);
+                $sql = "select * from TEMPORARY_WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
+                $q = $this->db->query($sql);
+                if($q->num_rows() > 0){
+                    $user = $q->row_array();
+                }
+                $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
 
-            $this->M_detail_project->postAssignmentTemp($rh_id);
+                $this->M_detail_project->postAssignmentTemp($rh_id);
+            }
             $data['status'] = 'success';
             $data['message'] = 'member di tambah temporary';
         }
@@ -1159,14 +1161,16 @@ class Task extends CI_Controller
             $this->M_detail_project->postAssignment();
             //send email
             $wbs=$this->input->post('WBS_ID');
-            $member=$this->input->post('MEMBER');
-            $project_id = $this->M_detail_project->getRPProject($member);
-            $sql = "select * from WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
-            $q = $this->db->query($sql);
-            if($q->num_rows() > 0){
-                $user = $q->row_array();
+            $memberproject=$this->input->post('MEMBER');
+            foreach ($memberproject as $member){
+                $project_id = $this->M_detail_project->getRPProject($member);
+                $sql = "select * from WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
+                $q = $this->db->query($sql);
+                if($q->num_rows() > 0){
+                    $user = $q->row_array();
+                }
+                $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
             }
-            $this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
             $data['status'] = 'success';
             $data['message'] = 'member di tambah';
         }
@@ -1190,17 +1194,19 @@ class Task extends CI_Controller
             //$this->sendVerificationassignMember($user["EMAIL"],$user["USER_NAME"],$user["WBS_NAME"],$project_id);
 
             $wbs=$this->input->post('WBS_ID');
-            $member=$this->input->post('MEMBER');
+            $memberproject=$this->input->post('MEMBER');
 
-            $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+            foreach($memberproject as $member){
+                $id = $this->db->query("select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
                                 select WP_ID from WBS_POOL
                                 UNION
                                 select WP_ID from TEMPORARY_EDIT_WBS_POOL)")->row()->NEW_ID;
-            $this->db->set('RP_ID', $member);
-            $this->db->set('WP_ID', $id);
-            $this->db->set('WBS_ID', $wbs);
-            $this->db->set('ACTION', 'create');
-            $this->db->insert("TEMPORARY_EDIT_WBS_POOL");
+                $this->db->set('RP_ID', $member);
+                $this->db->set('WP_ID', $id);
+                $this->db->set('WBS_ID', $wbs);
+                $this->db->set('ACTION', 'create');
+                $this->db->insert("TEMPORARY_EDIT_WBS_POOL");
+            }
 
             $data['status'] = 'success';
             $data['message'] = 'member di tambah temporary';
