@@ -565,8 +565,8 @@ GROUP BY TS_DATE")->result_array();
             $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
               '".$info['PM_ID']."',
               'Project',
-              '.$info['USER_ID'].',
-              '.$info['PROJECT_ID'].',
+              '".$info['USER_ID']."',
+              '".$info['PROJECT_ID']."',
               '".$time."')";
             $q=$this->db->query($sql);
         }
