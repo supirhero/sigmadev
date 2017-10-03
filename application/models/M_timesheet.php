@@ -551,7 +551,7 @@ GROUP BY TS_DATE")->result_array();
 
         /*AKU EDIT MAS .. BIAR SEMENTARA ERROR TIMESHEET KE SOLVE,TAPI NOTIF JADI GK JALAN KARNA QUERY SQL DI BAWAH SELALU RETURN NULL, GERY*/
         //NOTIF
-        $sql = "select u.user_id ,u.user_name,pm.user_id as pm_id,pm.user_name as pm_name,pm.email,wbs.project_id as project_id,project_name,wbs_name
+        $sql = "select u.user_id as USER_ID,u.user_name,pm.user_id as pm_id,pm.user_name as pm_name,pm.email,wbs.project_id as project_id,project_name,wbs_name
                 from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
                 join projects p on p.project_id = wbs.project_id
                 join users pm on p.pm_id = pm.user_id
@@ -565,7 +565,7 @@ GROUP BY TS_DATE")->result_array();
             $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
               '".$info['PM_ID']."',
               'Project',
-              ".$info['FROM'].",
+              ".$info['USER_ID'].",
               ".$info['PROJECT_ID'].",
               '".$time."')";
             $q=$this->db->query($sql);
