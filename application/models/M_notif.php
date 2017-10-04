@@ -18,11 +18,13 @@ Class M_notif extends CI_Model{
 	        $sql="
                 select *
                 from  
-                ( select USER_NOTIF.*,p.project_name,p.project_status,p.project_complete as project_percent 
-                  from USER_NOTIF
+                ( select n.*,u.USER_NAME,coalesce(p.project_name,'') as project_name,coalesce(p.project_status,'') as project_status,coalesce(p.project_complete,0) as project_percent 
+                  from USER_NOTIF n
                   left join projects p
-                  on user_notif.NOTIF_TO = p.project_id 
-                  where user_id='$user_id'   ORDER BY NOTIF_TIME DESC 
+                  on n.NOTIF_TO = p.project_id 
+                  left join USERS u
+                  on n.NOTIF_FROM = u.USER_ID 
+                  where n.user_id='$user_id'   ORDER BY n.NOTIF_TIME DESC 
                 ) 
                 where ROWNUM <= 10";
         }
@@ -37,9 +39,9 @@ Class M_notif extends CI_Model{
 	            "project_id"=>$notif["NOTIF_TO"],
                 "project_name"=>$notif["PROJECT_NAME"],
                 "project_status"=>$notif["PROJECT_STATUS"],
-                "project_complete"=>$notif["PROJECT_COMPLETE"],
-                "user_id"=>$user["USER_ID"],
-                "user_name"=>$user["USER_NAME"],
+                "project_complete"=>round($notif["PROJECT_PERCENT"], 2),
+                "user_id"=>$notif["NOTIF_FROM"],
+                "user_name"=>$notif["USER_NAME"],
                 "text"=>"has updated timesheet. \n you need approve it",
                 "unixtime"=>$notif["NOTIF_TIME"],
                 "datetime"=>date("Y-m-d h:i",$notif["NOTIF_TIME"]),
