@@ -31,10 +31,9 @@ Class M_notif extends CI_Model{
 
         $query = $this->db->query($sql);
         $hasil = $query->result_array();
+
         foreach($hasil as $notif)
         {
-	        $query = $this->db->query("select * from USERS where user_id='$notif[NOTIF_FROM]'");
-	        $user = $query->row_array();
 	        $anu = intval($notif["PROJECT_PERCENT"]);
 	        $percent = round($anu, 2);
 	        $data["list"][]=[
