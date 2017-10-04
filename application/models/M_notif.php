@@ -35,11 +35,13 @@ Class M_notif extends CI_Model{
         {
 	        $query = $this->db->query("select * from USERS where user_id='$notif[NOTIF_FROM]'");
 	        $user = $query->row_array();
+	        $anu = intval($notif["PROJECT_PERCENT"]);
+	        $percent = round($anu, 2);
 	        $data["list"][]=[
 	            "project_id"=>$notif["NOTIF_TO"],
                 "project_name"=>$notif["PROJECT_NAME"],
                 "project_status"=>$notif["PROJECT_STATUS"],
-                "project_complete"=>round($notif["PROJECT_PERCENT"], 2),
+                "project_complete"=>$percent,
                 "user_id"=>$notif["NOTIF_FROM"],
                 "user_name"=>$notif["USER_NAME"],
                 "text"=>"has updated timesheet. \n you need approve it",
