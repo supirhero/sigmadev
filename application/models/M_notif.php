@@ -48,6 +48,7 @@ Class M_notif extends CI_Model{
                 "datetime"=>date("Y-m-d h:i",$notif["NOTIF_TIME"]),
             ];
         }
+	    $notif["NOTIF_TIME"]=(intval($notif["NOTIF_TIME"]) >= 1)?$notif["NOTIF_TIME"]:0;
         $data["info"] = ["current_user_id"=>$notif["USER_ID"],"total_unread"=>$unread,"load_more"=>$notif["NOTIF_TIME"]];
         return $data;
     }

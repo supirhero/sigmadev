@@ -549,7 +549,6 @@ GROUP BY TS_DATE")->result_array();
         }
         $this->submitTimesheet($TS_ID);
 
-        /*AKU EDIT MAS .. BIAR SEMENTARA ERROR TIMESHEET KE SOLVE,TAPI NOTIF JADI GK JALAN KARNA QUERY SQL DI BAWAH SELALU RETURN NULL, GERY*/
         //NOTIF
         $sql = "select u.user_id as USER_ID,u.user_name,pm.user_id as pm_id,pm.user_name as pm_name,pm.email,wbs.project_id as project_id,project_name,wbs_name
                 from wbs_pool wp join wbs on wp.wbs_id=wbs.wbs_id
