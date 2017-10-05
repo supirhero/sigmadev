@@ -219,8 +219,8 @@ class M_project extends CI_Model {
         $PM_ID = $this->input->post('PM');
         $IWO_NO = $this->input->post('IWO_NO');
         $BU_CODE = $this->input->post('BU');
-        $SCHEDULE_START = $this->input->post('START');
-        $SCHEDULE_END = $this->input->post('END');
+        $SCHEDULE_START = date('Y-m-d',strtotime($this->input->post('START')));
+        $SCHEDULE_END = date('Y-m-d',strtotime($this->input->post('END')));
         //$AMOUNT = $this->input->post('AMOUNT');
         $PROJECT_TYPE_ID = $this->input->post('PROJECT_TYPE_ID');
         $AM_ID = $this->input->post('AM_ID');
