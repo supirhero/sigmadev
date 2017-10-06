@@ -454,7 +454,7 @@ GROUP BY TS_DATE")->result_array();
   and is_approved = 1")->row()->TOTAL_HOUR;
     }
 
-    function inputTimesheet($data){
+    function inputTimesheet($data,$prof_id=7){
 	    //$this->confirmationTimesheetEmailtoPM($data,$info);
 
         //change date input for readable to sql
@@ -560,6 +560,10 @@ GROUP BY TS_DATE")->result_array();
         $q = $this->db->query($sql);
         if($q->num_rows() > 0){
             $info=$q->row_array();
+		if($prof_id<=4)
+		{
+			$info['PM_ID'] =$info['USER_ID'];
+		}
             $time = time();
             $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
               '".$info['PM_ID']."',
