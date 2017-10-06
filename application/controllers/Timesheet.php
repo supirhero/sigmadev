@@ -523,7 +523,7 @@ class Timesheet extends CI_Controller {
         {
             $statusProject = $this->db->query("select project_status from projects where project_id = '$project_id'")->row()->PROJECT_STATUS;
             //check rebaseline status for task
-            $this->M_timesheet->inputTimesheet($data);
+            $this->M_timesheet->inputTimesheet($data,$this->datajson['userdata']['PROF_ID']);
             $returndata['status'] = "success";
             $returndata['message'] = "add timesheet succcess ";
         }
