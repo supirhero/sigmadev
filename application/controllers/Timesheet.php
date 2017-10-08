@@ -691,7 +691,7 @@ else if($data['WP_ID'] != "" && $project_id != "")
 		    $time = time();
 		    $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
               '".$info['USER_ID']."',
-              'Project',
+              'Approve',
               '".$approver."',
               '".$project_id."',
               '".$time."')";
