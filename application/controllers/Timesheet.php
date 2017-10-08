@@ -680,7 +680,7 @@ else if($data['WP_ID'] != "" && $project_id != "")
 	    //NOTIF
 	    $sql = "select user_id
                 from timesheet 
-                where ts_id = $timesheet_id";
+                where ts_id = '$timesheet_id'";
 	    $q = $this->db->query($sql);
 	    if($q->num_rows() > 0){
 		    $info=$q->row_array();
