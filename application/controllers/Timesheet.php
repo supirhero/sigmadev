@@ -677,7 +677,26 @@ else if($data['WP_ID'] != "" && $project_id != "")
         $confirm_code = $_POST['confirm'];
         $project_id = $_POST['project_id'];
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
-
+	    //NOTIF
+	    $sql = "select user_id
+                from timesheet 
+                where ts_id = $timesheet_id";
+	    $q = $this->db->query($sql);
+	    if($q->num_rows() > 0){
+		    $info=$q->row_array();
+		    if($prof_id<=4)
+		    {
+			    $info['PM_ID'] =$info['USER_ID'];
+		    }
+		    $time = time();
+		    $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
+              '".$info['USER_ID']."',
+              'Project',
+              '".$approver."',
+              '".$project_id."',
+              '".$time."')";
+		    $q=$this->db->query($sql);
+	    }
 
         if($confirm_code == 1 || $confirm_code  == 0){
 
