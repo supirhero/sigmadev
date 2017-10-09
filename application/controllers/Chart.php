@@ -1,36 +1,41 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined( 'BASEPATH' ) OR exit( 'No direct script access allowed' );
 
 use Dhtmlx\Connector\GanttConnector;
 
 class Chart extends CI_Controller {
-    function __construct()
-    {
-        parent::__construct();
-        $this->load->model('M_detail_project');
-        $this->load->model('M_project');
-        $this->load->model('M_invite');
-        $this->load->model('M_issue');
-        $this->load->model('M_Member_Activity');
-        $this->load->helper(array('form', 'url'));
-    }
-    function gantt()
-    {
-        $project_id = "8538862";
+	function __construct() {
+		parent::__construct();
+		$this->load->model( 'M_detail_project' );
+		$this->load->model( 'M_project' );
+		$this->load->model( 'M_invite' );
+		$this->load->model( 'M_issue' );
+		$this->load->model( 'M_Member_Activity' );
+		$this->load->helper( array( 'form', 'url' ) );
+	}
 
-        $list=$this->M_project->getWBS($project_id);
+	function gantt() {
+		$project_id = "8538862";
 
-        /// end here
-        foreach($list as $l){
-            $wbs[]=array('text'=>$l['TEXT'],'id'=>$l['ID'],'parent'=>$l['PARENT'],'start_date'=>date("Y-m-d",strtotime($l['START_DATE'])),'duration'=>$l['DURATION'],'progress'=>$l['PROGRESS']);
-        }
-        echo json_encode($wbs);
+		$list = $this->M_project->getWBS( $project_id );
 
-    }
-    function testzzz()
-    {
-       // $list=$this->M_project->v_ac_project();
-        $query = $this->db->query("
+		/// end here
+		foreach ( $list as $l ) {
+			$wbs[] = array( 'text'       => $l['TEXT'],
+			                'id'         => $l['ID'],
+			                'parent'     => $l['PARENT'],
+			                'start_date' => date( "Y-m-d", strtotime( $l['START_DATE'] ) ),
+			                'duration'   => $l['DURATION'],
+			                'progress'   => $l['PROGRESS']
+			);
+		}
+		echo json_encode( $wbs );
+
+	}
+
+	function testzzz() {
+		// $list=$this->M_project->v_ac_project();
+		$query = $this->db->query( "
         select case when ev= 0 AND project_status = 'Completed'
 then pv else ev end as ev, a.project_id from (
 SELECT  SUM (ev) AS ev, a.project_id, project_status
@@ -68,17 +73,17 @@ SELECT  SUM (ev) AS ev, a.project_id, project_status
    GROUP BY a.project_id,project_status) a
    JOIN
             v_pv_project b ON a.project_id = b.project_id
-");
-        print_r($query->result());
+" );
+		print_r( $query->result() );
 
-        //print_r($list);
+		//print_r($list);
 
-    }
-    function test_pv()
-    {
-        $start = "2016-12-01";
-        $end = "2016-12-30";
-        $query = $this->db->query("
+	}
+
+	function test_pv() {
+		$start = "2016-12-01";
+		$end   = "2016-12-30";
+		$query = $this->db->query( "
 select sum(pv) as pv, project_id, min(start_date) as aza, max(start_date) as anu, max(finish_date) as anjay from (
              select ( select current_duration * CASE
     WHEN (
@@ -117,16 +122,16 @@ select sum(pv) as pv, project_id, min(start_date) as aza, max(start_date) as anu
                   WHERE b.project_id=8538862 AND CONNECT_BY_ISLEAF = 1
              CONNECT BY b.wbs_parent_id = PRIOR b.wbs_id
              START WITH b.wbs_parent_id IS NULL) group by project_id 
-");
-        print_r($query->result());
+" );
+		print_r( $query->result() );
 
-    }
-    function test_pv2()
-    {
-        $project_id = "8538862";
-        $start = "2016-12-01";
-        $end = "2016-12-30";
-        $query = $this->db->query("
+	}
+
+	function test_pv2() {
+		$project_id = "8538862";
+		$start      = "2016-12-01";
+		$end        = "2016-12-30";
+		$query      = $this->db->query( "
 WITH date_range AS (
     SELECT  ACTUAL_START_DATE as start_date
            ,ACTUAL_END_DATE as end_date
@@ -154,16 +159,16 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
        ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
-");
-        print_r($query->result());
+" );
+		print_r( $query->result() );
 
-    }
-    function test_pv_total()
-    {
-        $project_id = "8538862";
-        $start = "2016-12-01";
-        $end = "2016-12-30";
-        $query = $this->db->query("
+	}
+
+	function test_pv_total() {
+		$project_id = "8538862";
+		$start      = "2016-12-01";
+		$end        = "2016-12-30";
+		$query      = $this->db->query( "
 (SELECT CASE
     WHEN (
       sum(RESOURCE_WBS) > 0
@@ -175,13 +180,13 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 
       END from wbs  WHERE project_id='$project_id'
       GROUP BY project_id 
-     )");
-        print_r($query->result());
+     )" );
+		print_r( $query->result() );
 
-    }
-    function test_wbs()
-    {
-        $query = $this->db->query("
+	}
+
+	function test_wbs() {
+		$query = $this->db->query( "
 SELECT d.wbs_id, d.start_date, d.finish_date,
           NVL (e.n_holiday, 0) n_holiday,
           (d.n_duration - NVL (e.n_holiday, 0)) count_duration,
@@ -210,34 +215,34 @@ SELECT d.wbs_id, d.start_date, d.finish_date,
     WHERE d.wbs_id = e.wbs_id(+) AND d.wbs_id = f.wbs_id(+) 
     AND d.project_id=8538862  AND ROWNUM <= 30
      
-");
-        print_r($query->result());
+" );
+		print_r( $query->result() );
 
-    }
-    function anu()
-    {
+	}
 
-        $query = $this->db->query("
+	function anu() {
+
+		$query = $this->db->query( "
 SELECT * from resource_pool WHERE project_id='8532760' AND   ROWNUM <= 99
      
-");
-       // print_r($query->result());
-        $query = $this->db->query("
+" );
+		// print_r($query->result());
+		$query = $this->db->query( "
 SELECT * from v_holiday_excl_weekend WHERE  ROWNUM <= 99
      
-");
-        //print_r($query->result());
-        $query = $this->db->query("
+" );
+		//print_r($query->result());
+		$query = $this->db->query( "
 SELECT * from detail_capture WHERE  project_id='8538862' AND ROWNUM <= 99
      
-");
-     //  print_r($query->result());
-        $query = $this->db->query("
+" );
+		//  print_r($query->result());
+		$query = $this->db->query( "
 SELECT * from wbs WHERE  project_id='7778226'  AND  ROWNUM <= 99
      
-");
-       // print_r($query->result());
-        $query = $this->db->query("
+" );
+		// print_r($query->result());
+		$query = $this->db->query( "
 with sample_data as ( SELECT 1 AS rate FROM dual
 UNION ALL SELECT 2 FROM dual
 UNION ALL SELECT 3 FROM dual
@@ -248,50 +253,50 @@ UNION ALL SELECT 7 FROM dual)
 select 
        rate, rate - lag(rate, 1, rate) over ( order by rate) issue
 from   sample_data 
-");
-        print_r($query->result());
-        $query = $this->db->query("
+" );
+		print_r( $query->result() );
+		$query = $this->db->query( "
 SELECT    COUNT (b1.dt) n_holiday_today
                FROM wbs a1, v_holiday_excl_weekend b1
               WHERE a1.project_id='8538862' AND b1.dt BETWEEN a1.start_date AND a1.finish_date
            GROUP BY a1.wbs_id     
-");
-      //  print_r($query->result());
-        $query = $this->db->query("
+" );
+		//  print_r($query->result());
+		$query = $this->db->query( "
 select * from all_source where name = 'DAILY_UPDATE'
      
-");
-     //   print_r($query->result());
+" );
+		//   print_r($query->result());
 
-    }
-    function test()
-    {
-        //  print_r($query->result());
-        /*
-        $query = $this->db->query("
+	}
+
+	function test() {
+		//  print_r($query->result());
+		/*
+		$query = $this->db->query("
 CREATE TABLE tb_rekap_project
 ( project_id number(10) NOT NULL,
   tanggal date default sysdate not null,
   pv number(10) NOT NULL,
   ev number(10) NOT NULL,
   ac number(10) NOT NULL
-)    
+)
 ");
-     */     // print_r($query->result());
-/*
-        $query = $this->db->query("
-SELECT *
-FROM tb_pv_project pv
- JOIN tb_ev_project ev
-  ON ev.project_id = pv.project_id
- JOIN  tb_ac_project ac
-  ON ac.project_id = pv.project_id
-WHERE ROWNUM <= 99    
-");
-*/
-       //   print_r($query->result());
+	 */     // print_r($query->result());
+		/*
+				$query = $this->db->query("
+		SELECT *
+		FROM tb_pv_project pv
+		 JOIN tb_ev_project ev
+		  ON ev.project_id = pv.project_id
+		 JOIN  tb_ac_project ac
+		  ON ac.project_id = pv.project_id
+		WHERE ROWNUM <= 99
+		");
+		*/
+		//   print_r($query->result());
 
-        $query = $this->db->query("
+		$query = $this->db->query( "
 WITH date_range AS (
 select trunc(TS_DATE) as tanggal, count(HOUR_TOTAL) as hour_total
   from TIMESHEET
@@ -305,21 +310,21 @@ SELECT  LEVEL \"Week\"
 
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(tanggal,'IW') - TRUNC(tanggal,'IW')) / 7 + 1
-");
+" );
 
-        //  print_r($query->result());
-$project_id = "8538862";
-        $query = $this->db->query("
+		//  print_r($query->result());
+		$project_id = "8538862";
+		$query      = $this->db->query( "
 insert into tb_rekap_project 
 select tb_pv_project.project_id as project_id,SYSDATE as tanggal,tb_pv_project.pv as pv, tb_ev_project.ev as ev, nvl(tb_ac_project.ac, 0) as ac from tb_pv_project
 left join tb_ev_project
 on tb_ev_project.project_id=tb_pv_project.project_id
 left join tb_ac_project
 on tb_ac_project.project_id=tb_pv_project.project_id
-");
-          print_r($query->result());
+" );
+		print_r( $query->result() );
 
-          $sql = "CREATE OR REPLACE PROCEDURE PROUDS.insert_tb_rekap_project as
+		$sql = "CREATE OR REPLACE PROCEDURE PROUDS.insert_tb_rekap_project as
 begin
 commit;
 insert into tb_rekap_project 
@@ -331,11 +336,11 @@ on tb_ac_project.project_id=tb_pv_project.project_id
 commit;
 end;
 ";
-    }
-    function spi()
-    {
-        $project_id = "8538862";
-        $query = $this->db->query("
+	}
+
+	function spi() {
+		$project_id = "8538862";
+		$query      = $this->db->query( "
 WITH date_range AS (
     SELECT  ACTUAL_START_DATE as start_date
            ,ACTUAL_END_DATE as end_date
@@ -352,15 +357,15 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
        ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
-");
-        $result = $query->result();
-        echo print_r($result);
-    }
-    function cpi()
-    {
-        $project_id = "8538862";
+" );
+		$result     = $query->result();
+		echo print_r( $result );
+	}
 
-        $query = $this->db->query("
+	function cpi() {
+		$project_id = "8538862";
+
+		$query  = $this->db->query( "
 WITH date_range AS (
     SELECT  ACTUAL_START_DATE as start_date
            ,ACTUAL_END_DATE as end_date
@@ -377,14 +382,14 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
        ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
-");
-        $result = $query->result();
-        echo print_r($result);
-    }
-    function s_curve()
-    {
-        $project_id = "8538862";
-        $query = $this->db->query("
+" );
+		$result = $query->result();
+		echo print_r( $result );
+	}
+
+	function s_curve() {
+		$project_id = "8538862";
+		$query      = $this->db->query( "
 (SELECT CASE
     WHEN (
       sum(RESOURCE_WBS) > 0
@@ -396,9 +401,9 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 
       END as total from wbs  WHERE project_id='$project_id'
       GROUP BY project_id 
-     )");
-        $total_pv = $query->row()->TOTAL;
-        $query = $this->db->query("
+     )" );
+		$total_pv   = $query->row()->TOTAL;
+		$query      = $this->db->query( "
 WITH date_range AS (
     SELECT  ACTUAL_START_DATE as start_date
            ,ACTUAL_END_DATE as end_date
@@ -416,25 +421,23 @@ SELECT  t2.\"Week\",t2.\"startdate\",t2.\"enddate\",
        ,TO_CHAR(start_date + (7 * (LEVEL - 1)),'IW') \"Iso Week\"
 FROM   date_range t2
 CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
-");
-        $result = $query->result();
-$results = [];
-        foreach ($result as $key => $val)
-        {
-            foreach ($val as $week => $valz)
-            {
-                $results[$key][$week]= $valz;
-            }
-            $results[$key]["pv_percent"]=round($val->PV/$total_pv*100);
-            $results[$key]["ev_percent"]=round($val->EV/$total_pv*100);
-        }
+" );
+		$result     = $query->result();
+		$results    = [];
+		foreach ( $result as $key => $val ) {
+			foreach ( $val as $week => $valz ) {
+				$results[ $key ][ $week ] = $valz;
+			}
+			$results[ $key ]["pv_percent"] = round( $val->PV / $total_pv * 100 );
+			$results[ $key ]["ev_percent"] = round( $val->EV / $total_pv * 100 );
+		}
 //aaa
-print_r($results);
-    }
-    function monthly()
-    {
-        $project_id = "8538862";
-        $sql="select b.bu_name,b.bu_code, b.bu_alias,b.bu_id, round(sum(ev)/count(c.project_id),2) as EV, round(sum(pv)/count(c.project_id),2) as PV,
+		print_r( $results );
+	}
+
+	function monthly() {
+		$project_id = "8538862";
+		$sql        = "select b.bu_name,b.bu_code, b.bu_alias,b.bu_id, round(sum(ev)/count(c.project_id),2) as EV, round(sum(pv)/count(c.project_id),2) as PV,
                 round(sum(AC)/count(c.project_id),2) as AC,
                 case when round((sum(ev)/count(c.project_id))/(sum(pv)/count(c.project_id)),2) between 0 and 1 then '0'||round((sum(ev)/count(c.project_id))/(sum(pv)/count(c.project_id)),2) else to_char(round((sum(ev)/count(c.project_id))/(sum(pv)/count(c.project_id)),2)) end as SPI,
                 round((sum(ev)/count(c.project_id))/case when sum(ac)/count(c.project_id)=0 then 1 else sum(ac)/count(c.project_id) end,2) as CPI
@@ -450,10 +453,10 @@ print_r($results);
                 where project_status='In Progress'
                 group by b.bu_code, b.bu_alias, b.bu_name, b.bu_id
                 order by b.bu_name";
-        $query = $this->db->query($sql);
-        $hasil = $query->result_array();
-        print_r($hasil);
-    }
+		$query      = $this->db->query( $sql );
+		$hasil      = $query->result_array();
+		print_r( $hasil );
+	}
 
 
 }
