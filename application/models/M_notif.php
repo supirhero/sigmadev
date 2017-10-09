@@ -43,6 +43,7 @@ Class M_notif extends CI_Model {
 					"user_name"        => $notif["USER_NAME"],
 					"text"             => "Your timesheet is approved",
 					"type"             => $notif["NOTIF_TYPE"],
+					"readed"             => $notif["NOTIF_READ"],
 					"unixtime"         => $notif["NOTIF_TIME"],
 					"datetime"         => date( "Y-m-d h:i", $notif["NOTIF_TIME"] ),
 				];
@@ -58,6 +59,7 @@ Class M_notif extends CI_Model {
 					"user_name"        => $notif["USER_NAME"],
 					"text"             => "has updated timesheet. \n you need approve it",
 					"type"             => $notif["NOTIF_TYPE"],
+					"readed"             => $notif["NOTIF_READ"],
 					"unixtime"         => $notif["NOTIF_TIME"],
 					"datetime"         => date( "Y-m-d h:i", $notif["NOTIF_TIME"] ),
 				];
