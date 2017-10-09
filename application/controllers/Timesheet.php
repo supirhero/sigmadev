@@ -678,16 +678,14 @@ else if($data['WP_ID'] != "" && $project_id != "")
         $project_id = $_POST['project_id'];
         $rh_id = $this->db->query("select rh_id from projects where project_id = '$project_id'")->row()->RH_ID;
 	    //NOTIF
-	    $sql = "select user_id
-                from timesheet 
+	    $sql = "select USER_ID
+                from timesheet ts
+                inner join wbs_pool wp on ts.wp_id=wp.wp_id
+                inner join RESOURCE_POOL rp on wp.rp_id=rp.rp_id
                 where ts_id = '$timesheet_id'";
 	    $q = $this->db->query($sql);
 	    if($q->num_rows() > 0){
 		    $info=$q->row_array();
-		    if($prof_id<=4)
-		    {
-			    $info['PM_ID'] =$info['USER_ID'];
-		    }
 		    $time = time();
 		    $sql="INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
               '".$info['USER_ID']."',

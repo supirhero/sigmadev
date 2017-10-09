@@ -34,19 +34,37 @@ Class M_notif extends CI_Model{
 
         foreach($hasil as $notif)
         {
-	        $anu = intval($notif["PROJECT_PERCENT"]);
-	        $percent = round($anu, 2);
-	        $data["list"][]=[
-	            "project_id"=>$notif["NOTIF_TO"],
-                "project_name"=>$notif["PROJECT_NAME"],
-                "project_status"=>$notif["PROJECT_STATUS"],
-                "project_complete"=>$percent,
-                "user_id"=>$notif["NOTIF_FROM"],
-                "user_name"=>$notif["USER_NAME"],
-                "text"=>"has updated timesheet. \n you need approve it",
-                "unixtime"=>$notif["NOTIF_TIME"],
-                "datetime"=>date("Y-m-d h:i",$notif["NOTIF_TIME"]),
-            ];
+        	if(strlower($notif["NOTIF_TYPE"]) == "approve")
+	        {
+		        $anu = intval($notif["PROJECT_PERCENT"]);
+		        $percent = round($anu, 2);
+		        $data["list"][]=[
+			        "project_id"=>$notif["NOTIF_TO"],
+			        "project_name"=>$notif["PROJECT_NAME"],
+			        "project_status"=>$notif["PROJECT_STATUS"],
+			        "project_complete"=>$percent,
+			        "user_id"=>$notif["NOTIF_FROM"],
+			        "user_name"=>$notif["USER_NAME"],
+			        "text"=>"Your timesheet is approved",
+			        "unixtime"=>$notif["NOTIF_TIME"],
+			        "datetime"=>date("Y-m-d h:i",$notif["NOTIF_TIME"]),
+		        ];
+	        }
+	        else{
+		        $anu = intval($notif["PROJECT_PERCENT"]);
+		        $percent = round($anu, 2);
+		        $data["list"][]=[
+			        "project_id"=>$notif["NOTIF_TO"],
+			        "project_name"=>$notif["PROJECT_NAME"],
+			        "project_status"=>$notif["PROJECT_STATUS"],
+			        "project_complete"=>$percent,
+			        "user_id"=>$notif["NOTIF_FROM"],
+			        "user_name"=>$notif["USER_NAME"],
+			        "text"=>"has updated timesheet. \n you need approve it",
+			        "unixtime"=>$notif["NOTIF_TIME"],
+			        "datetime"=>date("Y-m-d h:i",$notif["NOTIF_TIME"]),
+		        ];
+	        }
         }
 	    $notif["NOTIF_TIME"]=(intval($notif["NOTIF_TIME"]) >= 1)?$notif["NOTIF_TIME"]:0;
         $data["info"] = ["current_user_id"=>$user_id,"total_unread"=>$unread,"load_more"=>$notif["NOTIF_TIME"]];
