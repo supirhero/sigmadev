@@ -1,213 +1,229 @@
 <?php
-Class M_user extends CI_Model{
-    public function ViewDataUser()
-    {
-        $data['USERS'] = $this->m_data->tampil_data()->result();
-        $this->load->view('v_tampil',$data);
-    }
 
-    function GetDataUser($user_id){
-        //return $this->db->get_where($table,$where);
-        $result=array();
-        $sql="select * from USERS where USER_ID='".$user_id."'";
-        $q = $this->db->query($sql);
+Class M_user extends CI_Model {
+	public function ViewDataUser() {
+		$data['USERS'] = $this->m_data->tampil_data()->result();
+		$this->load->view( 'v_tampil', $data );
+	}
 
-        if($q->num_rows() > 0){
-            $result = $q->result();
-        }
-        return $result;
-    }
-    function GetProfile($profile_id){
-        //return $this->db->get_where($table,$where);
-        $result=array();
-        $sql="select * from profile where PROF_ID='".$profile_id."'";
-        $q = $this->db->query($sql);
-$result = $q->result_array();
-        return $result["PROF_NAME"];
-    }
+	function GetDataUser( $user_id ) {
+		//return $this->db->get_where($table,$where);
+		$result = array();
+		$sql    = "select * from USERS where USER_ID='" . $user_id . "'";
+		$q      = $this->db->query( $sql );
 
-    function GetOldPass($password){
-        $this->db->where("PASSWORD",$password);
-        $query=$this->db->get('USERS');
-    }
+		if ( $q->num_rows() > 0 ) {
+			$result = $q->result();
+		}
 
+		return $result;
+	}
 
-    public function UpdateDataImage($user_id,$image){
-        $sql="update USERS set IMAGE='".$image."' where USER_ID='".$user_id."'";
-        $q = $this->db->query($sql);
-    }
+	function GetProfile( $profile_id ) {
+		//return $this->db->get_where($table,$where);
+		$result = array();
+		$sql    = "select * from profile where PROF_ID='" . $profile_id . "'";
+		$q      = $this->db->query( $sql );
+		$result = $q->result_array();
 
-    public function UpdateDataUser($user_id,$user_name,$address,$email,$phone_no){
-        $sql="update USERS set USER_NAME='".$user_name."', ADDRESS='".$address."', EMAIL='".$email."', PHONE_NO='".$phone_no."' where USER_ID='".$user_id."'";
-        $q = $this->db->query($sql);
-        //$pesan = "";
-        //if($q){
-        //	redirect('/User/berhasil');
-        //}else{
-        //	redirect('/User/gagal');
-        //}
-        //$response = array('pesan'=>$pesan, 'data'=>$_POST);
-        //echo json_encode($response);
-        //exit;
-    }
+		return $result["PROF_NAME"];
+	}
 
-    public function setPassword($user_id, $password) {
-        $sql = "update USERS set PASSWORD='".(md5($password))."' WHERE USER_ID='".$user_id."'";
-        $q = $this->db->query($sql);
-    }
-
-    function lastLogin($user_id){
-        $delivDate = date('d-m-Y h:i:s');
-        $sql="UPDATE USERS SET LAST_LOGIN=to_date('".$delivDate."','dd-mm-yy hh:mi:ss') WHERE USER_ID='".$user_id."'";
-        $q = $this->db->query($sql);
-    }
-
-    public function DeleteDataUser($user_id,$email){
-        $sql = "delete from USERS where USER_ID='".$user_id."'" ;
-        $sql2 = "delete from VERIFICATION where EMAIL='".$email."' ";
-        $q = $this->db->query($sql);
-        $q2 = $this->db->query($sql2);
+	function GetOldPass( $password ) {
+		$this->db->where( "PASSWORD", $password );
+		$query = $this->db->get( 'USERS' );
+	}
 
 
-    }
+	public function UpdateDataImage( $user_id, $image ) {
+		$sql = "update USERS set IMAGE='" . $image . "' where USER_ID='" . $user_id . "'";
+		$q   = $this->db->query( $sql );
+	}
+
+	public function UpdateDataUser( $user_id, $user_name, $address, $email, $phone_no ) {
+		$sql = "update USERS set USER_NAME='" . $user_name . "', ADDRESS='" . $address . "', EMAIL='" . $email . "', PHONE_NO='" . $phone_no . "' where USER_ID='" . $user_id . "'";
+		$q   = $this->db->query( $sql );
+		//$pesan = "";
+		//if($q){
+		//	redirect('/User/berhasil');
+		//}else{
+		//	redirect('/User/gagal');
+		//}
+		//$response = array('pesan'=>$pesan, 'data'=>$_POST);
+		//echo json_encode($response);
+		//exit;
+	}
+
+	public function setPassword( $user_id, $password ) {
+		$sql = "update USERS set PASSWORD='" . ( md5( $password ) ) . "' WHERE USER_ID='" . $user_id . "'";
+		$q   = $this->db->query( $sql );
+	}
+
+	function lastLogin( $user_id ) {
+		$delivDate = date( 'd-m-Y h:i:s' );
+		$sql       = "UPDATE USERS SET LAST_LOGIN=to_date('" . $delivDate . "','dd-mm-yy hh:mi:ss') WHERE USER_ID='" . $user_id . "'";
+		$q         = $this->db->query( $sql );
+	}
+
+	public function DeleteDataUser( $user_id, $email ) {
+		$sql  = "delete from USERS where USER_ID='" . $user_id . "'";
+		$sql2 = "delete from VERIFICATION where EMAIL='" . $email . "' ";
+		$q    = $this->db->query( $sql );
+		$q2   = $this->db->query( $sql2 );
 
 
-    function createIdentifier($email){
-
-        $data=array(
-            'EMAIL'=>$email,
-            'IDENTIFIER'=>md5($email),
-            'IS_VALID'=>'1'
-        );
-        $this->db->insert('VERIFICATION',$data);
-    }
-    function getName($email){
-        $sql="select USER_NAME from USERS where EMAIL='".$email."' and ROWNUM <=1 ";
-        $q = $this->db->query($sql);
-        if($q->num_rows() > 0){
-            $result=$q->row()->USER_NAME;
-            return $result;
-        }
-    }
-
-    function getNameVendor($emailv){
-        $sql="select USER_NAME from USERS where EMAIL='".$emailv."' and ROWNUM <=1 ";
-        $q = $this->db->query($sql);
-        if($q->num_rows() > 0){
-            $result=$q->row()->USER_NAME;
-            return $result;
-        }
-    }
-    function getCurrPassword($user_id){
-        $sql="select PASSWORD from USERS where USER_ID='".$user_id."' and ROWNUM <=1 ";
-        $q = $this->db->query($sql);
-        if($q->num_rows() > 0){
-            $result=$q->row()->PASSWORD;
-            return $result;
-        }
-    }
-
-    function getEmail($user_id){
-        $sql="select EMAIL from USERS where USER_ID='".$user_id."' and ROWNUM <=1 ";
-        $q = $this->db->query($sql);
-        if($q->num_rows() > 0){
-            $result=$q->row()->EMAIL;
-            return $result;
-        }
-    }
+	}
 
 
-    function getSupID($user_id){
-        $sql="select SUP_ID from USERS where USER_ID='".$user_id."' and ROWNUM <=1 ";
-        $q = $this->db->query($sql);
-        if($q->num_rows() > 0){
-            $result=$q->row()->SUP_ID;
-            return $result;
-        }
-    }
+	function createIdentifier( $email ) {
+
+		$data = array(
+			'EMAIL'      => $email,
+			'IDENTIFIER' => md5( $email ),
+			'IS_VALID'   => '1'
+		);
+		$this->db->insert( 'VERIFICATION', $data );
+	}
+
+	function getName( $email ) {
+		$sql = "select USER_NAME from USERS where EMAIL='" . $email . "' and ROWNUM <=1 ";
+		$q   = $this->db->query( $sql );
+		if ( $q->num_rows() > 0 ) {
+			$result = $q->row()->USER_NAME;
+
+			return $result;
+		}
+	}
+
+	function getNameVendor( $emailv ) {
+		$sql = "select USER_NAME from USERS where EMAIL='" . $emailv . "' and ROWNUM <=1 ";
+		$q   = $this->db->query( $sql );
+		if ( $q->num_rows() > 0 ) {
+			$result = $q->row()->USER_NAME;
+
+			return $result;
+		}
+	}
+
+	function getCurrPassword( $user_id ) {
+		$sql = "select PASSWORD from USERS where USER_ID='" . $user_id . "' and ROWNUM <=1 ";
+		$q   = $this->db->query( $sql );
+		if ( $q->num_rows() > 0 ) {
+			$result = $q->row()->PASSWORD;
+
+			return $result;
+		}
+	}
+
+	function getEmail( $user_id ) {
+		$sql = "select EMAIL from USERS where USER_ID='" . $user_id . "' and ROWNUM <=1 ";
+		$q   = $this->db->query( $sql );
+		if ( $q->num_rows() > 0 ) {
+			$result = $q->row()->EMAIL;
+
+			return $result;
+		}
+	}
 
 
-    function getEmailSupID($sup_id){
-        $sql="select EMAIL from USERS where USER_ID='".$sup_id."' and ROWNUM <=1 ";
-        $q = $this->db->query($sql);
-        if($q->num_rows() > 0){
-            $result=$q->row()->EMAIL;
-            return $result;
-        }
-    }
+	function getSupID( $user_id ) {
+		$sql = "select SUP_ID from USERS where USER_ID='" . $user_id . "' and ROWNUM <=1 ";
+		$q   = $this->db->query( $sql );
+		if ( $q->num_rows() > 0 ) {
+			$result = $q->row()->SUP_ID;
+
+			return $result;
+		}
+	}
 
 
-    function deactivateUser($email){
-        $sql="update USERS set IS_ACTIVE='0' where EMAIL='".$email."'";
-        $q = $this->db->query($sql);
-    }
+	function getEmailSupID( $sup_id ) {
+		$sql = "select EMAIL from USERS where USER_ID='" . $sup_id . "' and ROWNUM <=1 ";
+		$q   = $this->db->query( $sql );
+		if ( $q->num_rows() > 0 ) {
+			$result = $q->row()->EMAIL;
 
-    function statusActive($user_id){
-        $sql="UPDATE USERS SET IS_ACTIVE='1' WHERE USER_ID='".$user_id."'";
-        $q = $this->db->query($sql);
-    }
+			return $result;
+		}
+	}
 
-    function deleteIdentifier($email){
-        $this->db->where('EMAIL',$email);
-        $this->db->delete('VERIFICATION');
-    }
-    public function userList($start=0,$end=20,$keyword=null){
-      $sql ="SELECT * FROM
+
+	function deactivateUser( $email ) {
+		$sql = "update USERS set IS_ACTIVE='0' where EMAIL='" . $email . "'";
+		$q   = $this->db->query( $sql );
+	}
+
+	function statusActive( $user_id ) {
+		$sql = "UPDATE USERS SET IS_ACTIVE='1' WHERE USER_ID='" . $user_id . "'";
+		$q   = $this->db->query( $sql );
+	}
+
+	function deleteIdentifier( $email ) {
+		$this->db->where( 'EMAIL', $email );
+		$this->db->delete( 'VERIFICATION' );
+	}
+
+	public function userList( $start = 0, $end = 20, $keyword = null ) {
+		$sql = "SELECT * FROM
 (select u.*,b.bu_name,
 ROW_NUMBER() OVER (ORDER BY b.bu_name) Row_Num
  from users u
 join p_bu b on u.bu_id=b.bu_id ";
-      if ($keyword!=null) {
-        $keyword=strtolower($keyword);
-        $sql.=" where ";
-        $sql.=" lower(user_name) like '%".$keyword."%' or";
-        $sql.=" lower(user_id) like '%".$keyword."%' or";
-        $sql.=" lower(email) like '%".$keyword."%' or";
-        $sql.=" lower(bu_name) like '%".$keyword."%'";
-      }
-      $sql .=") WHERE Row_Num BETWEEN $start and $end";
-      $res=$this->db->query($sql);
-      return $res->result_array();
-    }
-    public function user_List($keyword=null){
-      $sql ="SELECT * FROM
+		if ( $keyword != null ) {
+			$keyword = strtolower( $keyword );
+			$sql     .= " where ";
+			$sql     .= " lower(user_name) like '%" . $keyword . "%' or";
+			$sql     .= " lower(user_id) like '%" . $keyword . "%' or";
+			$sql     .= " lower(email) like '%" . $keyword . "%' or";
+			$sql     .= " lower(bu_name) like '%" . $keyword . "%'";
+		}
+		$sql .= ") WHERE Row_Num BETWEEN $start and $end";
+		$res = $this->db->query( $sql );
+
+		return $res->result_array();
+	}
+
+	public function user_List( $keyword = null ) {
+		$sql = "SELECT * FROM
 (select u.*,b.bu_name,
 ROW_NUMBER() OVER (ORDER BY b.bu_name) Row_Num
  from users u
 join p_bu b on u.bu_id=b.bu_id ";
-      if ($keyword!=null) {
-        $keyword=strtolower($keyword);
-        $sql.=" where ";
-        $sql.=" lower(user_name) like '%".$keyword."%' or";
-        $sql.=" lower(user_id) like '%".$keyword."%' or";
-        $sql.=" lower(email) like '%".$keyword."%' or";
-        $sql.=" lower(bu_name) like '%".$keyword."%'";
-      }
-      $res=$this->db->query($sql.")");
-      return $res->result();
-    }
-    function sendVerification($email,$name){
-      $this->load->library('email');
-      $config['protocol']='smtp';
-      $config['smtp_host']='smtp.sigma.co.id';
-      $config['smtp_user']=SMTP_AUTH_USR;
-      $config['smtp_pass']=SMTP_AUTH_PWD;
-      $config['smtp_port']='587';
-      $config['smtp_timeout']='100';
-      $config['charset']    = 'utf-8';
-      $config['newline']    = "\r\n";
-      $config['mailtype'] = 'html';
-      $config['validation'] = TRUE;
-      $this->email->initialize($config);
-      $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-      $this->email->to("emil.gunawan.h@gmail.com");
-      $logo=base_url()."asset/image/logo_new_sigma1.png";
-      $css=base_url()."asset/css/confirm.css";
-      $this->email->attach($logo);
-      $this->email->attach($css);
-      $cid_logo = $this->email->attachment_cid($logo);
-      $this->email->subject('Verification PROUDS Account');
-      $this->email->message("<!DOCTYPE html>
+		if ( $keyword != null ) {
+			$keyword = strtolower( $keyword );
+			$sql     .= " where ";
+			$sql     .= " lower(user_name) like '%" . $keyword . "%' or";
+			$sql     .= " lower(user_id) like '%" . $keyword . "%' or";
+			$sql     .= " lower(email) like '%" . $keyword . "%' or";
+			$sql     .= " lower(bu_name) like '%" . $keyword . "%'";
+		}
+		$res = $this->db->query( $sql . ")" );
+
+		return $res->result();
+	}
+
+	function sendVerification( $email, $name ) {
+		$this->load->library( 'email' );
+		$config['protocol']     = 'smtp';
+		$config['smtp_host']    = 'smtp.sigma.co.id';
+		$config['smtp_user']    = SMTP_AUTH_USR;
+		$config['smtp_pass']    = SMTP_AUTH_PWD;
+		$config['smtp_port']    = '587';
+		$config['smtp_timeout'] = '100';
+		$config['charset']      = 'utf-8';
+		$config['newline']      = "\r\n";
+		$config['mailtype']     = 'html';
+		$config['validation']   = true;
+		$this->email->initialize( $config );
+		$this->email->from( 'prouds.support@sigma.co.id', 'Project & Resources Development System' );
+		$this->email->to( "emil.gunawan.h@gmail.com" );
+		$logo = base_url() . "asset/image/logo_new_sigma1.png";
+		$css  = base_url() . "asset/css/confirm.css";
+		$this->email->attach( $logo );
+		$this->email->attach( $css );
+		$cid_logo = $this->email->attachment_cid( $logo );
+		$this->email->subject( 'Verification PROUDS Account' );
+		$this->email->message( "<!DOCTYPE html>
       <html>
       <head>
       <meta name='viewport' content='width=device-width' />
@@ -462,15 +478,15 @@ join p_bu b on u.bu_id=b.bu_id ";
       <tr>
       <td>
       <br/>
-      <img src='cid:".$cid_logo."' height='173' width='581' alt='logo Telkomsigma' />
-      <h2>Hi ".$name.",</h3>
+      <img src='cid:" . $cid_logo . "' height='173' width='581' alt='logo Telkomsigma' />
+      <h2>Hi " . $name . ",</h3>
       <br/>
       <h4>One more step to activate your account!</h4>
       <br>
 
       <p style='text-align:center;'>
       <a class='btn' style='background-color: #1da1db; border-radius: 3px;
-      box-shadow: 3px 3px 10px 3px #B7B7B7;' href='".base_url()."index.php/login/verifyEmail/".md5($email)."'>Activate Account &raquo;</a>
+      box-shadow: 3px 3px 10px 3px #B7B7B7;' href='" . base_url() . "index.php/login/verifyEmail/" . md5( $email ) . "'>Activate Account &raquo;</a>
       </p>
       <br/>
       <p style='text-align: left'>Trouble activating? Contact us at <a href='mailto:prouds.support@sigma.co.id?Subject=Need%20help' target='_top'>prouds.support@sigma.co.id</a></p>
@@ -511,37 +527,38 @@ join p_bu b on u.bu_id=b.bu_id ";
 
       </body>
 
-      </html>");
+      </html>" );
 
-      if($this->email->send()){
-        return true;
-      }else{
-        return false;
-      }
+		if ( $this->email->send() ) {
+			return true;
+		} else {
+			return false;
+		}
 
-    }
-    function sendDeactivateInfo($email,$name){
-  $this->load->library('email');
-  $config['protocol']='smtp';
-  $config['smtp_host']='smtp.sigma.co.id';
-  $config['smtp_user']=SMTP_AUTH_USR;
-  $config['smtp_pass']=SMTP_AUTH_PWD;
-  $config['smtp_port']='587';
-  $config['smtp_timeout']='100';
-  $config['charset']    = 'utf-8';
-  $config['newline']    = "\r\n";
-  $config['mailtype'] = 'html';
-  $config['validation'] = TRUE;
-  $this->email->initialize($config);
-  $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-  $this->email->to("emil.gunawan.h@gmail.com");
-  $logo=base_url()."asset/image/logo_new_sigma1.png";
-  $css=base_url()."asset/css/confirm.css";
-  $this->email->attach($logo);
-  $this->email->attach($css);
-  $cid_logo = $this->email->attachment_cid($logo);
-  $this->email->subject('Verification PROUDS Account');
-  $this->email->message("<!DOCTYPE html>
+	}
+
+	function sendDeactivateInfo( $email, $name ) {
+		$this->load->library( 'email' );
+		$config['protocol']     = 'smtp';
+		$config['smtp_host']    = 'smtp.sigma.co.id';
+		$config['smtp_user']    = SMTP_AUTH_USR;
+		$config['smtp_pass']    = SMTP_AUTH_PWD;
+		$config['smtp_port']    = '587';
+		$config['smtp_timeout'] = '100';
+		$config['charset']      = 'utf-8';
+		$config['newline']      = "\r\n";
+		$config['mailtype']     = 'html';
+		$config['validation']   = true;
+		$this->email->initialize( $config );
+		$this->email->from( 'prouds.support@sigma.co.id', 'Project & Resources Development System' );
+		$this->email->to( "emil.gunawan.h@gmail.com" );
+		$logo = base_url() . "asset/image/logo_new_sigma1.png";
+		$css  = base_url() . "asset/css/confirm.css";
+		$this->email->attach( $logo );
+		$this->email->attach( $css );
+		$cid_logo = $this->email->attachment_cid( $logo );
+		$this->email->subject( 'Verification PROUDS Account' );
+		$this->email->message( "<!DOCTYPE html>
   <html>
   <head>
   <meta name='viewport' content='width=device-width' />
@@ -796,8 +813,8 @@ join p_bu b on u.bu_id=b.bu_id ";
   <tr>
   <td>
   <br/>
-  <img src='cid:".$cid_logo."' height='173' width='581' alt='logo Telkomsigma' />
-  <h2>Hi ".$name.",</h3>
+  <img src='cid:" . $cid_logo . "' height='173' width='581' alt='logo Telkomsigma' />
+  <h2>Hi " . $name . ",</h3>
   <br/>
   <h4>Your PROMS account has been deactivated.</h4>
   <br>
@@ -841,38 +858,39 @@ join p_bu b on u.bu_id=b.bu_id ";
 
   </body>
 
-  </html>");
+  </html>" );
 
-  if($this->email->send()){
-    return true;
-  }else{
-    return false;
-  }
+		if ( $this->email->send() ) {
+			return true;
+		} else {
+			return false;
+		}
 
 
-}
-    function sendActivateInfo($email,$name){
-  $this->load->library('email');
-  $config['protocol']='smtp';
-  $config['smtp_host']='smtp.sigma.co.id';
-  $config['smtp_user']=SMTP_AUTH_USR;
-  $config['smtp_pass']=SMTP_AUTH_PWD;
-  $config['smtp_port']='587';
-  $config['smtp_timeout']='100';
-  $config['charset']    = 'utf-8';
-  $config['newline']    = "\r\n";
-  $config['mailtype'] = 'html';
-  $config['validation'] = TRUE;
-  $this->email->initialize($config);
-  $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-  $this->email->to("emil.gunawan.h@gmail.com");
-  $logo=base_url()."asset/image/logo_new_sigma1.png";
-  $css=base_url()."asset/css/confirm.css";
-  $this->email->attach($logo);
-  $this->email->attach($css);
-  $cid_logo = $this->email->attachment_cid($logo);
-  $this->email->subject('Verification PROUDS Account');
-  $this->email->message("<!DOCTYPE html>
+	}
+
+	function sendActivateInfo( $email, $name ) {
+		$this->load->library( 'email' );
+		$config['protocol']     = 'smtp';
+		$config['smtp_host']    = 'smtp.sigma.co.id';
+		$config['smtp_user']    = SMTP_AUTH_USR;
+		$config['smtp_pass']    = SMTP_AUTH_PWD;
+		$config['smtp_port']    = '587';
+		$config['smtp_timeout'] = '100';
+		$config['charset']      = 'utf-8';
+		$config['newline']      = "\r\n";
+		$config['mailtype']     = 'html';
+		$config['validation']   = true;
+		$this->email->initialize( $config );
+		$this->email->from( 'prouds.support@sigma.co.id', 'Project & Resources Development System' );
+		$this->email->to( "emil.gunawan.h@gmail.com" );
+		$logo = base_url() . "asset/image/logo_new_sigma1.png";
+		$css  = base_url() . "asset/css/confirm.css";
+		$this->email->attach( $logo );
+		$this->email->attach( $css );
+		$cid_logo = $this->email->attachment_cid( $logo );
+		$this->email->subject( 'Verification PROUDS Account' );
+		$this->email->message( "<!DOCTYPE html>
   <html>
   <head>
   <meta name='viewport' content='width=device-width' />
@@ -1127,8 +1145,8 @@ join p_bu b on u.bu_id=b.bu_id ";
   <tr>
   <td>
   <br/>
-  <img src='cid:".$cid_logo."' height='173' width='581' alt='logo Telkomsigma' />
-  <h2>Hi ".$name.",</h3>
+  <img src='cid:" . $cid_logo . "' height='173' width='581' alt='logo Telkomsigma' />
+  <h2>Hi " . $name . ",</h3>
   <br/>
   <h4>Your PROMS account has been activated.</h4>
   <br>
@@ -1172,38 +1190,39 @@ join p_bu b on u.bu_id=b.bu_id ";
 
   </body>
 
-  </html>");
+  </html>" );
 
-  if($this->email->send()){
-    return true;
-  }else{
-    return false;
-  }
+		if ( $this->email->send() ) {
+			return true;
+		} else {
+			return false;
+		}
 
 
-}
-function sendVerificationManual($email,$name,$namevendor){
-  $this->load->library('email');
-  $config['protocol']='smtp';
-  $config['smtp_host']='smtp.sigma.co.id';
-  $config['smtp_user']=SMTP_AUTH_USR;
-  $config['smtp_pass']=SMTP_AUTH_PWD;
-  $config['smtp_port']='587';
-  $config['smtp_timeout']='100';
-  $config['charset']    = 'utf-8';
-  $config['newline']    = "\r\n";
-  $config['mailtype'] = 'html';
-  $config['validation'] = TRUE;
-  $this->email->initialize($config);
-  $this->email->from('prouds.support@sigma.co.id', 'Project & Resources Development System');
-  $this->email->to("emil.gunawan.h@gmail.com");
-  $logo=base_url()."asset/image/logo_new_sigma1.png";
-  $css=base_url()."asset/css/confirm.css";
-  $this->email->attach($logo);
-  $this->email->attach($css);
-  $cid_logo = $this->email->attachment_cid($logo);
-  $this->email->subject('Verification PROUDS Account');
-  $this->email->message("<!DOCTYPE html>
+	}
+
+	function sendVerificationManual( $email, $name, $namevendor ) {
+		$this->load->library( 'email' );
+		$config['protocol']     = 'smtp';
+		$config['smtp_host']    = 'smtp.sigma.co.id';
+		$config['smtp_user']    = SMTP_AUTH_USR;
+		$config['smtp_pass']    = SMTP_AUTH_PWD;
+		$config['smtp_port']    = '587';
+		$config['smtp_timeout'] = '100';
+		$config['charset']      = 'utf-8';
+		$config['newline']      = "\r\n";
+		$config['mailtype']     = 'html';
+		$config['validation']   = true;
+		$this->email->initialize( $config );
+		$this->email->from( 'prouds.support@sigma.co.id', 'Project & Resources Development System' );
+		$this->email->to( "emil.gunawan.h@gmail.com" );
+		$logo = base_url() . "asset/image/logo_new_sigma1.png";
+		$css  = base_url() . "asset/css/confirm.css";
+		$this->email->attach( $logo );
+		$this->email->attach( $css );
+		$cid_logo = $this->email->attachment_cid( $logo );
+		$this->email->subject( 'Verification PROUDS Account' );
+		$this->email->message( "<!DOCTYPE html>
   <html>
   <head>
   <meta name='viewport' content='width=device-width' />
@@ -1458,10 +1477,10 @@ function sendVerificationManual($email,$name,$namevendor){
   <tr>
   <td>
   <br/>
-  <img src='cid:".$cid_logo."' height='173' width='581' alt='logo Telkomsigma' />
-  <h2>Hi ".$name.",</h3>
+  <img src='cid:" . $cid_logo . "' height='173' width='581' alt='logo Telkomsigma' />
+  <h2>Hi " . $name . ",</h3>
   <br/>
-  <h4>User ".$namevendor." is already activated by PMO </h4>
+  <h4>User " . $namevendor . " is already activated by PMO </h4>
   <br>
 
   <br/>
@@ -1503,49 +1522,54 @@ function sendVerificationManual($email,$name,$namevendor){
 
   </body>
 
-  </html>");
+  </html>" );
 
-  if($this->email->send()){
-    return true;
-  }else{
-    return false;
-  }
+		if ( $this->email->send() ) {
+			return true;
+		} else {
+			return false;
+		}
 
-}
-public function ExportDatatoExcelIn(){
-	$query = $this->db->query("
+	}
+
+	public function ExportDatatoExcelIn() {
+		$query = $this->db->query( "
 	SELECT USER_ID, USER_NAME, EMAIL, LAST_LOGIN, USER_TYPE_ID,B.BU_NAME AS BU_NAME,C.PROF_NAME AS PROF_NAME,
     CASE A.IS_ACTIVE
     WHEN 0 THEN 'TIDAK AKTIF'
     WHEN 1 THEN 'AKTIF'
     END AS STATUS
 FROM USERS A INNER JOIN P_BU B ON A.BU_ID=B.BU_ID
-INNER JOIN PROFILE C ON A.PROF_ID=C.PROF_ID where USER_TYPE_ID='int'  ");
+INNER JOIN PROFILE C ON A.PROF_ID=C.PROF_ID where USER_TYPE_ID='int'  " );
 
-        if($query->num_rows() > 0){
-            foreach($query->result() as $data){
-                $hasil[] = $data;
-            }
-            return $hasil;
-        }
+		if ( $query->num_rows() > 0 ) {
+			foreach ( $query->result() as $data ) {
+				$hasil[] = $data;
+			}
+
+			return $hasil;
+		}
 	}
-  public function ExportDatatoExcelExt(){
-  	$query = $this->db->query("
+
+	public function ExportDatatoExcelExt() {
+		$query = $this->db->query( "
   	SELECT USER_ID, USER_NAME, EMAIL, LAST_LOGIN, USER_TYPE_ID,B.BU_NAME AS BU_NAME,C.PROF_NAME AS PROF_NAME,
       CASE A.IS_ACTIVE
       WHEN 0 THEN 'TIDAK AKTIF'
       WHEN 1 THEN 'AKTIF'
       END AS STATUS
   FROM USERS A INNER JOIN P_BU B ON A.BU_ID=B.BU_ID
-  INNER JOIN PROFILE C ON A.PROF_ID=C.PROF_ID where USER_TYPE_ID='ext'  ");
+  INNER JOIN PROFILE C ON A.PROF_ID=C.PROF_ID where USER_TYPE_ID='ext'  " );
 
-          if($query->num_rows() > 0){
-              foreach($query->result() as $data){
-                  $hasil[] = $data;
-              }
-              return $hasil;
-          }
-  	}
+		if ( $query->num_rows() > 0 ) {
+			foreach ( $query->result() as $data ) {
+				$hasil[] = $data;
+			}
+
+			return $hasil;
+		}
+	}
 
 }
+
 ?>
