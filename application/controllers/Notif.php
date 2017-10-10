@@ -90,9 +90,9 @@ class Notif extends CI_Controller {
 
 	public function read() {
 		$user_id    = $this->datajson['userdata']["USER_ID"];
-		$time       = $this->input->post( "notif_id" );
+		$notif_id       = $this->input->post( "notif_id" );
 
-		if(setNotif($user_id,$time))
+		if($this->M_notif->setNotif($user_id,$notif_id))
 		{
 			$output["status"]="success";
 		}
