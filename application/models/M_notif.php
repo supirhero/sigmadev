@@ -48,6 +48,24 @@ Class M_notif extends CI_Model {
 					"unixtime"         => $notif["NOTIF_TIME"],
 					"datetime"         => date( "Y-m-d h:i", $notif["NOTIF_TIME"] ),
 				];
+			}
+			elseif (strtolower( $notif["NOTIF_TYPE"] ) == "deny" ) {
+				$anu            = intval( $notif["PROJECT_PERCENT"] );
+				$percent        = round( $anu, 2 );
+				$data["list"][] = [
+					"notif_id"       => $notif["NOTIF_ID"],
+					"project_id"       => $notif["NOTIF_TO"],
+					"project_name"     => $notif["PROJECT_NAME"],
+					"project_status"   => $notif["PROJECT_STATUS"],
+					"project_complete" => $percent,
+					"user_id"          => $notif["NOTIF_FROM"],
+					"user_name"        => $notif["USER_NAME"],
+					"text"             => "Your timesheet is denied",
+					"type"             => $notif["NOTIF_TYPE"],
+					"readed"             => $notif["NOTIF_READ"],
+					"unixtime"         => $notif["NOTIF_TIME"],
+					"datetime"         => date( "Y-m-d h:i", $notif["NOTIF_TIME"] ),
+				];
 			} else {
 				$anu            = intval( $notif["PROJECT_PERCENT"] );
 				$percent        = round( $anu, 2 );

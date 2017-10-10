@@ -694,9 +694,10 @@ class Timesheet extends CI_Controller {
 		if ( $q->num_rows() > 0 ) {
 			$info = $q->row_array();
 			$time = time();
+			$type = ( $confirm_code == 0 ) ? "Deny" : "Approve";
 			$sql  = "INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
               '" . $info['USER_ID'] . "',
-              'Approve',
+              '$type',
               '" . $approver . "',
               '" . $project_id . "',
               '" . $time . "')";
