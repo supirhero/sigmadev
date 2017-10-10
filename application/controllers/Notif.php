@@ -75,7 +75,8 @@ class Notif extends CI_Controller {
 	public function get() {
 		$user_id    = $this->datajson['userdata']["USER_ID"];
 		$time       = $this->input->post( "time" );
-		$list_notif = $this->M_notif->getNotif( $user_id, $time );
+		$filter     = $this->input->post( "filter" );
+		$list_notif = $this->M_notif->getNotif( $user_id,$time, $filter);
 		if ( $list_notif["list"] != null && $list_notif["list"] != "" && $list_notif["list"] != "null" && $list_notif["list"] != "NULL" ) {
 			$c['notif_list'] = $list_notif["list"];
 			$c['notif_info'] = $list_notif["info"];
@@ -85,6 +86,19 @@ class Notif extends CI_Controller {
 		}
 		echo json_encode( $c, JSON_NUMERIC_CHECK );
 		$this->M_notif->setNotif( $user_id );
+	}
+
+	public function read() {
+		$user_id    = $this->datajson['userdata']["USER_ID"];
+		$time       = $this->input->post( "notif_id" );
+
+		if(setNotif($user_id,$time))
+		{
+			$output["status"]="success";
+		}
+		else{
+			$output["status"]="fail";
+		}
 	}
 
 	public function check() {

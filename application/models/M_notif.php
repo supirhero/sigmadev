@@ -1,7 +1,7 @@
 <?php
 
 Class M_notif extends CI_Model {
-	function getNotif( $user_id, $time = 0 ) {
+	function getNotif( $user_id, $time = 0,$filter="" ) {
 		$unread = $this->unreadNotif( $user_id );
 		if ( $time >= 1 ) {
 			$sql = "
@@ -35,6 +35,7 @@ Class M_notif extends CI_Model {
 				$anu            = intval( $notif["PROJECT_PERCENT"] );
 				$percent        = round( $anu, 2 );
 				$data["list"][] = [
+					"notif_id"       => $notif["NOTIF_ID"],
 					"project_id"       => $notif["NOTIF_TO"],
 					"project_name"     => $notif["PROJECT_NAME"],
 					"project_status"   => $notif["PROJECT_STATUS"],
@@ -51,6 +52,7 @@ Class M_notif extends CI_Model {
 				$anu            = intval( $notif["PROJECT_PERCENT"] );
 				$percent        = round( $anu, 2 );
 				$data["list"][] = [
+					"notif_id"       => $notif["NOTIF_ID"],
 					"project_id"       => $notif["NOTIF_TO"],
 					"project_name"     => $notif["PROJECT_NAME"],
 					"project_status"   => $notif["PROJECT_STATUS"],
@@ -71,7 +73,6 @@ Class M_notif extends CI_Model {
 			"total_unread"    => $unread,
 			"load_more"       => $notif["NOTIF_TIME"]
 		];
-
 		return $data;
 	}
 
@@ -87,10 +88,22 @@ Class M_notif extends CI_Model {
 
 	}
 
-	function setNotif( $user_id ) {
+	function setNotif( $user_id, $notif_id=0 ) {
+if($notif_id >=1)
+{
+	$query = $this->db->query( "update USER_NOTIF set notif_read=2 where user_id='$user_id' AND notif_id='$notif_id' " );
+}
+else{
+	$query = $this->db->query( "update USER_NOTIF set notif_read=1 where user_id='$user_id' AND notif_read=0" );
 
-		$sql   = "select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read = 0";
-		$query = $this->db->query( "update USER_NOTIF set notif_read=1 where user_id='$user_id'" );
+}
+if($query)
+{
+	return true;
+}
+else{
+	return false;
+}
 
 	}
 
