@@ -78,7 +78,7 @@ Class M_notif extends CI_Model {
 
 	function unreadNotif( $user_id ) {
 
-		$sql = "select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read = 0";
+		$sql = "select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read <2";
 
 
 		$query = $this->db->query( $sql );
