@@ -8,7 +8,7 @@ Class M_notif extends CI_Model {
             select *
             from  
             ( 
-            select * from USER_NOTIF where user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC
+            select * from USER_NOTIF where notif_type='2' AND user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC
             )
             where ROWNUM <= 10
             ";
@@ -16,13 +16,14 @@ Class M_notif extends CI_Model {
 			$sql = "
                 select *
                 from  
-                ( select n.*,u.USER_NAME,coalesce(p.project_name,'') as project_name,coalesce(p.project_status,'') as project_status,coalesce(p.project_complete,0) as project_percent 
+                ( select n.*,u.USER_NAME,coalesce(p.project_name,'') as project_name,coalesce(p.project_status,'') as project_status,
+                coalesce(p.project_complete,0) as project_percent 
                   from USER_NOTIF n
                   left join projects p
                   on n.NOTIF_TO = p.project_id 
                   left join USERS u
                   on n.NOTIF_FROM = u.USER_ID 
-                  where n.user_id='$user_id'   ORDER BY n.NOTIF_TIME DESC 
+                  where n.user_id='$user_id' AND  n.notif_type='2'   ORDER BY n.NOTIF_TIME DESC 
                 ) 
                 where ROWNUM <= 10";
 		}
