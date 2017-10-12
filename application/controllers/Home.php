@@ -360,7 +360,7 @@ class Home extends CI_Controller {
 
 		$user_id                      = $this->datajson['userdata']["USER_ID"];
 		$time                         = $this->input->post( "time" );
-		$list_notif                   = $this->M_notif->getNotif( $user_id, $time );
+		$list_notif                   = $this->M_notif->getNotif( $user_id );
 		$this->datajson['notif_info'] = $list_notif["info"];
 		//$this->datajson['bussines_unit'] = $query->BU_NAME;
 		$this->project();
