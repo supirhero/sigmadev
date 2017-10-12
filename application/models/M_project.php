@@ -364,6 +364,8 @@ class M_project extends CI_Model {
 		$sql .= " order by date_created desc)";
 
 		//  $sql.=" where ROWNUM > $start and ROWNUM <= $end";
+
+
 		if($this->db->query( $sql ))
 		{
 			return $this->db->query( $sql )->result_array();
