@@ -554,7 +554,7 @@ Class M_detail_project extends CI_Model {
 
 
 
-            if($this->db->query("select wbs_id from wbs where wbs_id ='$wbs'")->row()->wbs_id == null){
+            if($this->db->query("select wbs_id from wbs where wbs_id ='$wbs'")->row()->WBS_ID == null){
 
 
                 $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
@@ -570,6 +570,7 @@ Class M_detail_project extends CI_Model {
 
                 $dur = $this->db->query( "select DURATION as DUR from temporary_edit_wbs where wbs_id='$wbs'" )->row()->DUR;
                 $res = $this->db->query( "select count(rp_id) as RES from TEMPORARY_EDIT_WBS_POOL where wbs_id='$wbs'" )->row()->RES;
+
                 $this->db->query( "update temporary_edit_wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
 
             }
