@@ -685,7 +685,7 @@ class Timesheet extends CI_Controller {
 		$project_id   = $_POST['project_id'];
 		$rh_id        = $this->db->query( "select rh_id from projects where project_id = '$project_id'" )->row()->RH_ID;
 		//NOTIF
-		$sql = "select USER_ID
+		$sql = "select rp.USER_ID
                 from timesheet ts
                 inner join wbs_pool wp on ts.wp_id=wp.wp_id
                 inner join RESOURCE_POOL rp on wp.rp_id=rp.rp_id
@@ -694,9 +694,10 @@ class Timesheet extends CI_Controller {
 		if ( $q->num_rows() > 0 ) {
 			$info = $q->row_array();
 			$time = time();
+			$type = ( $confirm_code == 0 ) ? "Deny" : "Approve";
 			$sql  = "INSERT INTO USER_NOTIF (USER_ID,NOTIF_TYPE,NOTIF_FROM,NOTIF_TO, NOTIF_TIME) VALUES (
               '" . $info['USER_ID'] . "',
-              'Approve',
+              '$type',
               '" . $approver . "',
               '" . $project_id . "',
               '" . $time . "')";

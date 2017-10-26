@@ -1307,12 +1307,13 @@ class Project extends CI_Controller {
 
 		/// end here
 		foreach ( $list as $l ) {
-			$wbs[] = array( 'text'       => $l['TEXT'],
-			                'id'         => $l['ID'],
-			                'parent'     => $l['PARENT'],
-			                'start_date' => date( "Y-m-d", strtotime( $l['START_DATE'] ) ),
-			                'duration'   => $l['DURATION'],
-			                'progress'   => $l['PROGRESS']
+			$wbs[] = array(
+				'text'       => $l['TEXT'],
+				'id'         => $l['ID'],
+				'parent'     => $l['PARENT'],
+				'start_date' => date( "Y-m-d", strtotime( $l['START_DATE'] ) ),
+				'duration'   => $l['DURATION'],
+				'progress'   => $l['PROGRESS']
 			);
 		}
 		echo json_encode( $wbs );

@@ -8,7 +8,7 @@ Class M_notif extends CI_Model {
             select *
             from  
             ( 
-            select * from USER_NOTIF where user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC
+            select * from USER_NOTIF where NOTIF_READ<2 AND user_id='$user_id' AND NOTIF_TIME < $time ORDER BY NOTIF_TIME DESC
             )
             where ROWNUM <= 10
             ";
@@ -16,13 +16,14 @@ Class M_notif extends CI_Model {
 			$sql = "
                 select *
                 from  
-                ( select n.*,u.USER_NAME,coalesce(p.project_name,'') as project_name,coalesce(p.project_status,'') as project_status,coalesce(p.project_complete,0) as project_percent 
+                ( select n.*,u.USER_NAME,coalesce(p.project_name,'') as project_name,coalesce(p.project_status,'') as project_status,
+                coalesce(p.project_complete,0) as project_percent 
                   from USER_NOTIF n
                   left join projects p
                   on n.NOTIF_TO = p.project_id 
                   left join USERS u
                   on n.NOTIF_FROM = u.USER_ID 
-                  where n.user_id='$user_id'   ORDER BY n.NOTIF_TIME DESC 
+                  where n.user_id='$user_id' AND  n.NOTIF_READ<2   ORDER BY n.NOTIF_TIME DESC 
                 ) 
                 where ROWNUM <= 10";
 		}
@@ -43,6 +44,24 @@ Class M_notif extends CI_Model {
 					"user_id"          => $notif["NOTIF_FROM"],
 					"user_name"        => $notif["USER_NAME"],
 					"text"             => "Your timesheet is approved",
+					"type"             => $notif["NOTIF_TYPE"],
+					"readed"             => $notif["NOTIF_READ"],
+					"unixtime"         => $notif["NOTIF_TIME"],
+					"datetime"         => date( "Y-m-d h:i", $notif["NOTIF_TIME"] ),
+				];
+			}
+			elseif (strtolower( $notif["NOTIF_TYPE"] ) == "deny" ) {
+				$anu            = intval( $notif["PROJECT_PERCENT"] );
+				$percent        = round( $anu, 2 );
+				$data["list"][] = [
+					"notif_id"       => $notif["NOTIF_ID"],
+					"project_id"       => $notif["NOTIF_TO"],
+					"project_name"     => $notif["PROJECT_NAME"],
+					"project_status"   => $notif["PROJECT_STATUS"],
+					"project_complete" => $percent,
+					"user_id"          => $notif["NOTIF_FROM"],
+					"user_name"        => $notif["USER_NAME"],
+					"text"             => "Your timesheet is denied",
 					"type"             => $notif["NOTIF_TYPE"],
 					"readed"             => $notif["NOTIF_READ"],
 					"unixtime"         => $notif["NOTIF_TIME"],
@@ -78,7 +97,7 @@ Class M_notif extends CI_Model {
 
 	function unreadNotif( $user_id ) {
 
-		$sql = "select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read = 0";
+		$sql = "select count(*) as unread from USER_NOTIF where user_id='$user_id' and notif_read <2";
 
 
 		$query = $this->db->query( $sql );

@@ -149,7 +149,7 @@ class M_project extends CI_Model {
 		$CUST_END_ID        = $this->input->post( 'END_CUST_ID' );
 		$PROJECT_DESC       = $this->input->post( 'DESC' );
 		$MARGIN             = $this->input->post( 'MARGIN' );
-		$TYPE_OF_EFFORT     = $this->input->post( 'TYPE_OF_EFFORT' );
+		$TYPE_OF_EFFORT     = intval($this->input->post( 'TYPE_OF_EFFORT' ));
 		$PRODUCT_TYPE       = $this->input->post( 'PRODUCT_TYPE' );
 		$TYPE_OF_EXPENSE    = $this->input->post( 'TYPE_OF_EXPENSE' );
 		$PROJECT_STATUS     = $this->input->post( 'PROJECT_STATUS' );
@@ -248,7 +248,7 @@ class M_project extends CI_Model {
 		$PROJECT_STATUS     = $this->input->post( 'PROJECT_STATUS' );
 		$PROJECT_DESC       = $this->input->post( 'DESC' );
 		$MARGIN             = $this->input->post( 'MARGIN' );
-		$TYPE_OF_EFFORT     = $this->input->post( 'TYPE_OF_EFFORT' );
+		$TYPE_OF_EFFORT     = intval($this->input->post( 'TYPE_OF_EFFORT' ));
 		$PRODUCT_TYPE       = $this->input->post( 'PRODUCT_TYPE' );
 		$VISIBILITY         = $this->input->post( 'VISIBILITY' );
 		$TYPE_OF_EXPENSE    = $this->input->post( 'TYPE_OF_EXPENSE' );
@@ -364,7 +364,12 @@ class M_project extends CI_Model {
 		$sql .= " order by date_created desc)";
 
 		//  $sql.=" where ROWNUM > $start and ROWNUM <= $end";
-		return $this->db->query( $sql )->result_array();
+
+
+		if($this->db->query( $sql ))
+		{
+			return $this->db->query( $sql )->result_array();
+		}
 	}
 
 	function getWBS( $project ) {
