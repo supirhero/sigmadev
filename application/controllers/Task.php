@@ -1578,6 +1578,7 @@ class Task extends CI_Controller {
         //send email
         $wbs           = $this->input->post( 'WBS_ID' );
         $memberproject = $this->input->post( 'MEMBER' );
+
         foreach ( $memberproject as $member ) {
             $project_id = $this->M_detail_project->getRPProject( $member );
             $sql        = "select * from WBS_POOL wbs join wbs w on w.wbs_id=wbs.wbs_id join RESOURCE_POOL rp on rp.rp_id=wbs.rp_id join USERS on rp.user_id=users.user_id where wbs.WBS_ID=$wbs";
