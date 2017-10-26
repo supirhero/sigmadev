@@ -550,26 +550,58 @@ Class M_detail_project extends CI_Model {
 
 		foreach ($memberproject as $member){
 
-            $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from WBS_POOL" )->row()->NEW_ID;
-            $this->db->set( 'RP_ID', $member );
-            $this->db->set( 'WP_ID', $id );
-            $this->db->set( 'WBS_ID', $wbs );
-            $this->db->insert( "WBS_POOL" );
 
-            $res = $this->db->query( "select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'" )->row()->RES;
-            $dur = $this->db->query( "select DURATION as DUR from wbs where wbs_id='$wbs'" )->row()->DUR;
-            $this->db->query( "update wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
-            $allParent = $this->getAllParentWBS( $wbs );
-            foreach ( $allParent as $ap ) {
-                $resAp    = $this->db->query( "select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'" )->row()->RES;
-                $wc       = 0;
-                $allChild = $this->getAllChildWBS( $ap->WBS_ID );
-                foreach ( $allChild as $ac ) {
-                    $works = $this->db->query( "select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'" )->row()->WC;
-                    $wc    = $wc + $works;
-                }
-                $this->db->query( "update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'" );
+
+
+
+            if($this->db->query("select wbs_id from wbs where wbs_id ='$wbs'")->row()->wbs_id == null){
+
+
+                $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+                                select WP_ID from WBS_POOL
+                                UNION
+                                select WP_ID from TEMPORARY_EDIT_WBS_POOL)" )->row()->NEW_ID;
+                $this->db->set( 'RP_ID', $member );
+                $this->db->set( 'WP_ID', $id );
+                $this->db->set( 'WBS_ID', $wbs );
+                $this->db->set( 'ACTION', 'create' );
+                $this->db->insert( "TEMPORARY_EDIT_WBS_POOL" );
+
+
+                $dur = $this->db->query( "select DURATION as DUR from temporary_edit_wbs where wbs_id='$wbs'" )->row()->DUR;
+                $res = $this->db->query( "select count(rp_id) as RES from TEMPORARY_EDIT_WBS_POOL where wbs_id='$wbs'" )->row()->RES;
+                $this->db->query( "update temporary_edit_wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
+
             }
+            else{
+                $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+                                select WP_ID from WBS_POOL
+                                UNION
+                                select WP_ID from TEMPORARY_EDIT_WBS_POOL)" )->row()->NEW_ID;
+                $this->db->set( 'RP_ID', $member );
+                $this->db->set( 'WP_ID', $id );
+                $this->db->set( 'WBS_ID', $wbs );
+                $this->db->insert( "WBS_POOL" );
+
+                $dur = $this->db->query( "select DURATION as DUR from wbs where wbs_id='$wbs'" )->row()->DUR;
+                $res = $this->db->query( "select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'" )->row()->RES;
+                $this->db->query( "update wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
+
+                $allParent = $this->getAllParentWBS( $wbs );
+                foreach ( $allParent as $ap ) {
+                    $resAp    = $this->db->query( "select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'" )->row()->RES;
+                    $wc       = 0;
+                    $allChild = $this->getAllChildWBS( $ap->WBS_ID );
+                    foreach ( $allChild as $ac ) {
+                        $works = $this->db->query( "select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'" )->row()->WC;
+                        $wc    = $wc + $works;
+                    }
+                    $this->db->query( "update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'" );
+                }
+            }
+
+
+
         }
 
 	}
