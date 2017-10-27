@@ -1025,6 +1025,10 @@ class Task extends CI_Controller {
                                                           WHERE PROJECT_ID='$project' and RESOURCE_POOL.user_id  in
                                                           (select user_id from temporary_edit_wbs_pool inner join resource_pool on temporary_edit_wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
                                                           group by RESOURCE_POOL.RP_ID, users.user_name,users.email" )->result_array();
+
+			echo $this->db->last_query();
+            die;
+
 			if ( count( $data['currently_assigned'] ) ) {
 				foreach ( $data['currently_assigned'] as &$curass ) {
 					$curass['status'] = 'none';
@@ -1128,6 +1132,7 @@ class Task extends CI_Controller {
 		$project_id    = explode( ".", $_POST['WBS_ID'] );
 		$project_id    = $project_id[0];
 		$statusProject = strtolower( $this->db->query( "select project_status from projects where project_id = '$project_id'" )->row()->PROJECT_STATUS );
+		/*
 		if ( $statusProject == 'on hold' ) {
 			$this->M_detail_project->removeAssignementTemp();
 			$data['status']  = 'success';
@@ -1159,7 +1164,18 @@ class Task extends CI_Controller {
 			$this->output->set_status_header( 400 );
 			$data['status']  = 'failed';
 			$data['message'] = 'gagal remove task member';
-		}
+		}*/
+
+        $this->M_detail_project->removeAssignement();
+
+        //send email
+        $email     = $this->input->post( 'EMAIL' );
+        $user_name = $this->input->post( 'NAME' );
+        $wbs_name  = $this->input->post( 'WBS_NAME' );
+        $this->sendVerificationremoveMember( $email, $user_name, $wbs_name );
+        $data['status']  = 'success';
+        $data['message'] = 'Task member berhasil di hapus';
+
 		echo json_encode( $data );
 	}
 
