@@ -1487,7 +1487,6 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 		$project = $this->input->post( "project_id" );
 
 		$array_data['new_task']      = $this->db->query( "select * from temporary_edit_wbs where project_id = '$project' and action = 'create'" )->result_array();
-
 		$array_data['modified_task'] = $this->db->query( "select * from temporary_edit_wbs where project_id = '$project' and action = 'update'" )->result_array();
 		$array_data['delete_task']   = $this->db->query( "select * from temporary_edit_wbs where project_id = '$project' and action = 'delete'" )->result_array();
 		$array_data['assign_task']   = $this->db->query( "select * from temporary_edit_wbs_pool tewp inner join (
@@ -1582,8 +1581,9 @@ CONNECT BY LEVEL <= (TRUNC(end_date,'IW') - TRUNC(start_date,'IW')) / 7 + 1) t2
 				$data['WBS_NAME']      = $newtask["WBS_NAME"];
 				$data['WBS_ID']        = $project_id;
 				$data['WBS_PARENT_ID'] = $newtask["WBS_PARENT_ID"];
-				$data['START_DATE']    = "TO_DATE('" . $newtask['START_DATE'] . "','yyyy-mm-dd')";
-				$data['FINISH_DATE']   = "TO_DATE('" . $newtask["FINISH_DATE"] . "','yyyy-mm-dd')";
+				$data['START_DATE']    = "TO_DATE('" . $newtask['START_DATE'] . "','dd-mm-yyyy')";
+				$data['FINISH_DATE']   = "TO_DATE('" . $newtask["FINISH_DATE"] . "','dd-mm-yyyy')";
+
 
 				// insert into wbs temporary and get new ID
 				$newid = $this->M_detail_project->insertWBSTemp( $data, $project_id, $rh_id );

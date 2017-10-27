@@ -1006,12 +1006,12 @@ Class M_detail_project extends CI_Model {
                 'create'
                 )";
 		$q   = $this->db->query( $sql );
-		$dur = $this->db->query( "select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id
+		$dur = $this->db->query( "select COUNT_DURATION from (SELECT   COUNT (TRUNC (a.start_date + delta)) count_duration, wbs_id,rh_id
        FROM TEMPORARY_WBS a,
             (SELECT     LEVEL - 1 AS delta
                    FROM DUAL
              CONNECT BY LEVEL - 1 <= (SELECT MAX (finish_date - start_date)
-                                        FROM wbs))
+                                        FROM TEMPORARY_WBS))
       WHERE TRUNC (a.start_date + delta) <= TRUNC (a.finish_date)
         AND TO_CHAR (TRUNC (start_date + delta),
                      'DY',
@@ -1019,8 +1019,11 @@ Class M_detail_project extends CI_Model {
                     ) NOT IN ('SAT', 'SUN')
         AND TRUNC (a.start_date + delta) NOT IN (SELECT dt
                                                    FROM v_holiday_excl_weekend)
-   GROUP BY wbs_id
-   ORDER BY wbs_id) where wbs_id='" . $data['WBS_ID'] . ".$id'" )->row()->COUNT_DURATION;
+   GROUP BY wbs_id,rh_id
+   ORDER BY wbs_id) where wbs_id='" . $data['WBS_ID'] . ".$id' and rh_id = '$rh_id'" )->row()->COUNT_DURATION;
+
+
+
 		( $dur == 0 || $dur == null ? $dur = 1 : $dur = $dur );
 		$hour_total = $dur * 8;
 		$this->db->query( "update temporary_wbs set duration='$dur',work_complete = '$hour_total' where wbs_id='" . $data['WBS_ID'] . ".$id'" );
