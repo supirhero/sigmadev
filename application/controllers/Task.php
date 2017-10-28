@@ -1026,8 +1026,6 @@ class Task extends CI_Controller {
                                                           (select user_id from temporary_edit_wbs_pool inner join resource_pool on temporary_edit_wbs_pool.rp_id=resource_pool.rp_id where wbs_id='$wbs_id')
                                                           group by RESOURCE_POOL.RP_ID, users.user_name,users.email" )->result_array();
 
-			echo $this->db->last_query();
-            die;
 
 			if ( count( $data['currently_assigned'] ) ) {
 				foreach ( $data['currently_assigned'] as &$curass ) {
@@ -1132,6 +1130,7 @@ class Task extends CI_Controller {
 		$project_id    = explode( ".", $_POST['WBS_ID'] );
 		$project_id    = $project_id[0];
 		$statusProject = strtolower( $this->db->query( "select project_status from projects where project_id = '$project_id'" )->row()->PROJECT_STATUS );
+		$rh_id = strtolower( $this->db->query( "select rh_id from projects where project_id = '$project_id'" )->row()->RH_ID );
 		/*
 		if ( $statusProject == 'on hold' ) {
 			$this->M_detail_project->removeAssignementTemp();
@@ -1166,7 +1165,7 @@ class Task extends CI_Controller {
 			$data['message'] = 'gagal remove task member';
 		}*/
 
-        $this->M_detail_project->removeAssignement();
+        $this->M_detail_project->removeAssignement($rh_id);
 
         //send email
         $email     = $this->input->post( 'EMAIL' );
@@ -1512,7 +1511,9 @@ class Task extends CI_Controller {
 	public function assignTaskMemberProject() {
 		$project_id    = explode( ".", $_POST['WBS_ID'] );
 		$project_id    = $project_id[0];
-		$statusProject = strtolower( $this->db->query( "select project_status from projects where project_id = '$project_id'" )->row()->PROJECT_STATUS );
+        $rh_id = strtolower( $this->db->query( "select rh_id from projects where project_id = '$project_id'" )->row()->RH_ID );
+
+        $statusProject = strtolower( $this->db->query( "select project_status from projects where project_id = '$project_id'" )->row()->PROJECT_STATUS );
 
 		/*FLOW YANG BETUL*/
 		/*if ( $statusProject == 'on hold' ) {
@@ -1590,7 +1591,7 @@ class Task extends CI_Controller {
 		/*FLOW GEIYA, GAK PERLU REBASELINE*/
 
         //assign process
-        $this->M_detail_project->postAssignment();
+        $this->M_detail_project->postAssignment($rh_id);
         //send email
         $wbs           = $this->input->post( 'WBS_ID' );
         $memberproject = $this->input->post( 'MEMBER' );

@@ -512,95 +512,163 @@ Class M_detail_project extends CI_Model {
 		return $this->db->query( "select wbs_id, wbs_name from wbs where PROJECT_ID='" . $id . "' connect by  wbs_parent_id= prior wbs_id start with wbs_id='" . $id . ".0' order siblings by wbs_parent_id" )->result_array();
 	}
 
-	function removeAssignement() {
+	function removeAssignement($rh_id) {
 		$wbs    = $this->input->post( 'WBS_ID' );
 		$member = $this->input->post( 'RP_ID' );
 
-		//delete member from wbs_pool
-		$this->db->where( 'RP_ID', $member );
-		$this->db->where( 'WBS_ID', $wbs );
-		$this->db->delete( "WBS_POOL" );
+
+		if($this->db->query("select wbs_id from wbs where wbs_id ='$wbs'")->row()->WBS_ID != null){
+		    echo "1 ";
+            //delete member from wbs_pool
+            $this->db->where( 'RP_ID', $member );
+            $this->db->where( 'WBS_ID', $wbs );
+            $this->db->delete( "WBS_POOL" );
 
 
-		//count jumlah member di task
-		$res = $this->db->query( "select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'" )->row()->RES;
-		//update resource wbs same as $res
-		$this->db->query( "update wbs set resource_wbs=$res where wbs_id='$wbs'" );
-		$allParent = $this->getAllParentWBS( $wbs );
-		//print_r($allParent);
-		//die;
+            //count jumlah member di task
+            echo $res = $this->db->query( "select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'" )->row()->RES;
+            echo" ". $wc = $this->db->query("select duration as dur from WBS where wbs_id = '$wbs'")->row()->DUR * $res*8;
+            //update resource wbs same as $res
+            $this->db->query( "update wbs set resource_wbs=$res,work_complete = $wc where wbs_id='$wbs'" );
+            $allParent = $this->getAllParentWBS( $wbs );
+            //print_r($allParent);
+            //die;
 
-		//Recalculation Work Complete Hours
-		foreach ( $allParent as $ap ) {
-			$resAp    = $this->db->query( "select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'" )->row()->RES;
-			$wc       = 0;
-			$allChild = $this->getAllChildWBS( $ap->WBS_ID );
-			foreach ( $allChild as $ac ) {
-				$works = $this->db->query( "select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'" )->row()->WC;
-				$wc    = $wc + $works;
-			}
-			$this->db->query( "update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'" );
-		}
+            //Recalculation Work Complete Hours
+            foreach ( $allParent as $ap ) {
+                $resAp    = $this->db->query( "select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'" )->row()->RES;
+                $wc       = 0;
+                $allChild = $this->getAllChildWBS( $ap->WBS_ID );
+                foreach ( $allChild as $ac ) {
+                    $works = $this->db->query( "select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'" )->row()->WC;
+                    $wc    = $wc + $works;
+                }
+                $this->db->query( "update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'" );
+            }
+        }elseif($this->db->query("select wbs_id from temporary_wbs where wbs_id ='$wbs' and rh_id = '$rh_id'")->row()->WBS_ID){
+            echo "2";
+
+
+            //delete member from wbs_pool
+            $this->db->where( 'RP_ID', $member );
+            $this->db->where('RH_ID',$rh_id);
+            $this->db->where( 'WBS_ID', $wbs );
+            $this->db->delete( "TEMPORARY_WBS_POOL" );
+
+
+
+            //count jumlah member di task & work complete
+            $res = $this->db->query( "select count(rp_id) as RES from TEMPORARY_WBS_POOL where wbs_id='$wbs' and rh_id = '$rh_id'" )->row()->RES;
+            $wc = $this->db->query("select duration as dur from TEMPORARY_WBS where wbs_id = '$wbs' and rh_id = '$rh_id'")->row()->DUR * $res*8;
+            //update resource wbs same as $res
+            $this->db->query( "update TEMPORARY_WBS set resource_wbs=$res,work_complete = '$wc' where wbs_id='$wbs' and rh_id = '$rh_id'" );
+            echo $this->db->affected_rows();
+
+        }else{
+            echo "3";
+            //delete member from wbs_pool
+            $this->db->where( 'RP_ID', $member );
+            $this->db->where( 'WBS_ID', $wbs );
+            $this->db->delete( "TEMPORARY_EDIT_WBS_POOL" );
+
+
+            //count jumlah member di task
+            $res = $this->db->query( "select count(rp_id) as RES from TEMPORARY_EDIT_WBS_POOL where wbs_id='$wbs'" )->row()->RES;
+            $wc = $this->db->query("select duration as dur from TEMPORARY_EDIT_WBS where wbs_id = '$wbs'")->row()->DUR * $res*8;
+            //update resource wbs same as $res
+            $this->db->query( "update TEMPORARY_EDIT_WBS set resource_wbs=$res,work_complete = '$wc' where wbs_id='$wbs'" );
+        }
 	}
 
-	function postAssignment() {
+	function postAssignment($rh_id) {
 		$wbs    = $this->input->post( 'WBS_ID' );
 		$memberproject = $this->input->post( 'MEMBER' );
-
+        $error = 0;
 
 		foreach ($memberproject as $member){
 
 
-
-
-
-            if($this->db->query("select wbs_id from wbs where wbs_id ='$wbs'")->row()->WBS_ID == null){
-
-
-                $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+            if($this->db->query("select wbs_id from wbs where wbs_id ='$wbs'")->row()->WBS_ID){
+                if($this->db->query("select count(*) as hasil from wbs_pool where rp_id = '$member' and wbs_id = '$wbs'")->row()->HASIL == 0){
+                    $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
                                 select WP_ID from WBS_POOL
                                 UNION
-                                select WP_ID from TEMPORARY_EDIT_WBS_POOL)" )->row()->NEW_ID;
-                $this->db->set( 'RP_ID', $member );
-                $this->db->set( 'WP_ID', $id );
-                $this->db->set( 'WBS_ID', $wbs );
-                $this->db->set( 'ACTION', 'create' );
-                $this->db->insert( "TEMPORARY_EDIT_WBS_POOL" );
+                                select WP_ID from TEMPORARY_EDIT_WBS_POOL
+                                UNION 
+                                select WP_ID from temporary_WBS_POOL where rh_id = '$rh_id')" )->row()->NEW_ID;
+                    $this->db->set( 'RP_ID', $member );
+                    $this->db->set( 'WP_ID', $id );
+                    $this->db->set( 'WBS_ID', $wbs );
+                    $this->db->insert( "WBS_POOL" );
+
+                    $dur = $this->db->query( "select DURATION as DUR from wbs where wbs_id='$wbs'" )->row()->DUR;
+                    $res = $this->db->query( "select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'" )->row()->RES;
+                    $this->db->query( "update wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
+
+                    $allParent = $this->getAllParentWBS( $wbs );
+                    foreach ( $allParent as $ap ) {
+                        $resAp    = $this->db->query( "select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'" )->row()->RES;
+                        $wc       = 0;
+                        $allChild = $this->getAllChildWBS( $ap->WBS_ID );
+                        foreach ( $allChild as $ac ) {
+                            $works = $this->db->query( "select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'" )->row()->WC;
+                            $wc    = $wc + $works;
+                        }
+                        $this->db->query( "update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'" );
+                    }
+                }else{$error=1;}
+            }
+            elseif ($this->db->query("select wbs_id from temporary_wbs where wbs_id ='$wbs' and rh_id = '$rh_id' and action = 'create'")->row()->WBS_ID){
+                if($this->db->query("select count(*) as hasil from temporary_wbs_pool where rp_id = '$member' and wbs_id = '$wbs' and rh_id = '$rh_id'")->row()->HASIL == 0){
+
+                    $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+                                select WP_ID from WBS_POOL
+                                UNION
+                                select WP_ID from TEMPORARY_EDIT_WBS_POOL
+                                UNION 
+                                select WP_ID from temporary_WBS_POOL where rh_id = '$rh_id')" )->row()->NEW_ID;
+                    $this->db->set( 'RP_ID', $member );
+                    $this->db->set( 'WP_ID', $id );
+                    $this->db->set( 'WBS_ID', $wbs );
+                    $this->db->set( 'ACTION', 'create' );
+                    $this->db->set( 'IS_VALID', 1 );
+                    $this->db->set( 'RH_ID', $rh_id );
+                    $this->db->insert( "TEMPORARY_WBS_POOL" );
 
 
-                $dur = $this->db->query( "select DURATION as DUR from temporary_edit_wbs where wbs_id='$wbs'" )->row()->DUR;
-                $res = $this->db->query( "select count(rp_id) as RES from TEMPORARY_EDIT_WBS_POOL where wbs_id='$wbs'" )->row()->RES;
+                    $dur = $this->db->query( "select DURATION as DUR from temporary_wbs where wbs_id='$wbs'" )->row()->DUR;
+                    $res = $this->db->query( "select count(rp_id) as RES from TEMPORARY_WBS_POOL where wbs_id='$wbs'" )->row()->RES;
 
-                $this->db->query( "update temporary_edit_wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
+                    $this->db->query( "update temporary_wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
+                }
+                else{
+                    $error = 1;
+                }
 
             }
             else{
-                $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
+                if($this->db->query("select count(*) as hasil from TEMPORARY_EDIT_WBS_POOL where rp_id = '$member' and wbs_id = '$wbs'")->row()->HASIL == 0){
+                    $id = $this->db->query( "select NVL(max(cast(WP_ID as int))+1, 1) as NEW_ID from (
                                 select WP_ID from WBS_POOL
                                 UNION
-                                select WP_ID from TEMPORARY_EDIT_WBS_POOL)" )->row()->NEW_ID;
-                $this->db->set( 'RP_ID', $member );
-                $this->db->set( 'WP_ID', $id );
-                $this->db->set( 'WBS_ID', $wbs );
-                $this->db->insert( "WBS_POOL" );
+                                select WP_ID from TEMPORARY_EDIT_WBS_POOL
+                                UNION 
+                                select WP_ID from temporary_WBS_POOL where rh_id = '$rh_id')" )->row()->NEW_ID;
+                    $this->db->set( 'RP_ID', $member );
+                    $this->db->set( 'WP_ID', $id );
+                    $this->db->set( 'WBS_ID', $wbs );
+                    $this->db->set( 'ACTION', 'create' );
+                    $this->db->insert( "TEMPORARY_EDIT_WBS_POOL" );
 
-                $dur = $this->db->query( "select DURATION as DUR from wbs where wbs_id='$wbs'" )->row()->DUR;
-                $res = $this->db->query( "select count(rp_id) as RES from wbs_pool where wbs_id='$wbs'" )->row()->RES;
-                $this->db->query( "update wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
 
-                $allParent = $this->getAllParentWBS( $wbs );
-                foreach ( $allParent as $ap ) {
-                    $resAp    = $this->db->query( "select nvl(sum(resource_wbs),0) as RES from wbs where wbs_parent_id='$ap->WBS_ID'" )->row()->RES;
-                    $wc       = 0;
-                    $allChild = $this->getAllChildWBS( $ap->WBS_ID );
-                    foreach ( $allChild as $ac ) {
-                        $works = $this->db->query( "select WORK_COMPLETE as WC from wbs where wbs_id='$ac->WBS_ID'" )->row()->WC;
-                        $wc    = $wc + $works;
-                    }
-                    $this->db->query( "update wbs set resource_wbs=$resAp,WORK_COMPLETE='$wc' where wbs_id='$ap->WBS_ID'" );
+                    $dur = $this->db->query( "select DURATION as DUR from temporary_edit_wbs where wbs_id='$wbs'" )->row()->DUR;
+                    $res = $this->db->query( "select count(rp_id) as RES from TEMPORARY_EDIT_WBS_POOL where wbs_id='$wbs'" )->row()->RES;
+
+                    $this->db->query( "update temporary_edit_wbs set resource_wbs=$res, WORK_COMPLETE=$dur*$res*8 where wbs_id='$wbs'" );
+                }else{
+                    $error=1;
                 }
             }
-
 
 
         }
